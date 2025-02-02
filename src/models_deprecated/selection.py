@@ -5,7 +5,7 @@ import pandas as pd
 from src.utils import concatenate_unique_rows
 from src.models_deprecated import logger
 from src.models_deprecated.selection_items import Item
-from src.api_connection import FootballDataConnector
+from src.football_data_source import FootballDataConnector
 
 
 class Selection:

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from src.models_deprecated import logger
-from src.api_connection import FootballDataConnector
+from src.football_data_source import FootballDataConnector
 
 
 class Item(ABC):

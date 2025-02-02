@@ -3,7 +3,7 @@ from pathlib import Path
 
 from src import logger
 from src.cli_utils import parse_arguments
-from src.api_connection import FootballDataConnector
+from src.football_data_source import FootballDataConnector
 from src.models_deprecated import Selection
 from src.calendar_creation import FootballCalendar
 from src.admin_utils import (
