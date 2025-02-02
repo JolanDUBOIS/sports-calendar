@@ -1,0 +1,41 @@
+version: 1
+
+formatters:
+  simple:
+    format: "%(asctime)s - %(levelname)s - %(message)s"
+  detailed:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+
+handlers:
+  console_handler:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+  debug_handler:
+    class: logging.FileHandler
+    filename: logs/DEBUG.log
+    level: DEBUG
+    formatter: detailed
+
+loggers:
+  src.api_connection:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+  src.calendar_creation:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+  src.cli_utils:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+  src.models:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+
+root:
+  level: DEBUG
+  handlers: [console_handler, debug_handler]
+  propagate: False
