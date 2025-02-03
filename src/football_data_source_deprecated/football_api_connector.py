@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from src.utils import concatenate_unique_rows
-from src.football_data_source import logger
+from src.football_data_source_deprecated import logger
 
 
 TIME_RANGE = int(os.getenv('TIME_RANGE', 21))   # TODO - better way to set default value
