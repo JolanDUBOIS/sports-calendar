@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.football_data_source import FootballDataConnector
+from src.football_data_source_deprecated import FootballDataConnector
 
 
 def fetch_and_store_teams(connector: FootballDataConnector, file_path: Path):
