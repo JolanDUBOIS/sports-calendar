@@ -15,7 +15,15 @@ def parse_arguments():
         '--update-database',
         action='store_true',
         default=False,
-        help='Updates the databases by querying APIs. Should be run every once in a while.'
+        help='Updates the databases by querying APIs. Should be run at least 24 hours before running the selection.'
+    )
+    
+    parser.add_argument(
+        '-fu',
+        '--full-update',
+        action='store_true',
+        default=False,
+        help='Erases and updates the databases by querying APIs. Should be run only by administrators.'
     )
 
     parser.add_argument(

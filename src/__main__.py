@@ -7,7 +7,6 @@ from src.selection import Selection
 from src.cli_utils import parse_arguments
 from src.live_soccer_source import SoccerLiveScraper
 from src.calendar import FootballCalendar, GoogleCalendarManager
-from src.live_soccer_source.playground import next_button_scrapping
 
 
 def update_database():
@@ -44,8 +43,5 @@ if __name__ == '__main__':
 
     elif args.run_selection:
         run_selection(save_ics=True)
-    
-    elif args.test == 1:
-        next_button_scrapping()
 
     logger.info("--------------------- Programm ends ---------------------")
