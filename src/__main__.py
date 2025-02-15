@@ -1,4 +1,4 @@
-import os, json
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -7,6 +7,7 @@ from src.selection import Selection
 from src.cli_utils import parse_arguments
 from src.live_soccer_source import SoccerLiveScraper
 from src.calendar import FootballCalendar, GoogleCalendarManager
+from src.live_soccer_source.playground import next_button_scrapping
 
 
 def update_database():
@@ -17,9 +18,9 @@ def update_database():
 
 def run_selection(save_ics: bool=False):
     logger.info("Running selection...")
-    selection_file = Path(os.getenv("SELECTION_FILE"))
+    selection_file_path = Path(os.getenv("SELECTION_FILE"))
     database_path = Path("data")
-    selection = Selection.from_json(selection_file, database_path)
+    selection = Selection.from_json(selection_file_path, database_path)
     matches = selection.get_matches()
     calendar = FootballCalendar()
     calendar.add_matches(matches)
@@ -36,8 +37,15 @@ if __name__ == '__main__':
 
     if args.update_database:
         update_database()
+    
+    elif args.full_update:
+        # TODO 
+        pass
 
     elif args.run_selection:
         run_selection(save_ics=True)
+    
+    elif args.test == 1:
+        next_button_scrapping()
 
     logger.info("--------------------- Programm ends ---------------------")

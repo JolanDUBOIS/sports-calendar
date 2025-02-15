@@ -24,11 +24,11 @@ class GoogleCalendarManager:
     @property
     def credentials_file_path(self) -> Path:
         """ TODO """
-        if creds_file_path is None:
-            creds_file_path = Path(os.getenv('GOOGLE_CREDENTIALS_FILE'))
-            if not creds_file_path.exists():
-                raise FileNotFoundError(f"Credentials file not found at {creds_file_path}")
-        return creds_file_path
+        if self.creds_file_path is None:
+            self.creds_file_path = Path(os.getenv('GOOGLE_CREDENTIALS_FILE'))
+            if not self.creds_file_path.exists():
+                raise FileNotFoundError(f"Credentials file not found at {self.creds_file_path}")
+        return self.creds_file_path
     
     @property
     def credentials(self) -> Credentials:

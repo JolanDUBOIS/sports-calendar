@@ -83,6 +83,9 @@ class FootballCalendar:
         stadium: str=''
     ):
         """ TODO - We recommend to use the short name instead of the full name """
+        if pd.isna(home_team) or pd.isna(away_team):
+            logger.warning(f"Failed to add match: {home_team} - {away_team}.")
+            return
         title = self.get_match_title(home_team, away_team, competition_code)
         match_start = datetime.strptime(date, "%Y-%m-%d %H:%M")
         if match_start > self.limit_date:
