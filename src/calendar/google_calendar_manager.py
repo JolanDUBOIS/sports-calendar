@@ -6,6 +6,7 @@ from google.oauth2.credentials import Credentials # type: ignore
 from google.auth.transport.requests import Request # type: ignore
 from google_auth_oauthlib.flow import InstalledAppFlow # type: ignore
 from googleapiclient.discovery import build # type: ignore
+from google.auth.exceptions import RefreshError # type: ignore
 from icalendar import Calendar, Event # type: ignore
 
 from src.calendar import logger
@@ -35,19 +36,36 @@ class GoogleCalendarManager:
         """ TODO """
         creds = None
         token_path = Path('credentials') / 'token.json'
-        if token_path.exists():
-            creds = Credentials.from_authorized_user_file(token_path, self.SCOPES)
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    self.credentials_file_path,
-                    self.SCOPES
-                )
-                creds = flow.run_local_server(port=0, open_browser=False)
+        
+        def write_token(token_path: Path, creds: Credentials):
             with token_path.open(mode='w') as token:
                 token.write(creds.to_json())
+
+        if token_path.exists():
+            try:
+                creds = Credentials.from_authorized_user_file(token_path, self.SCOPES)
+                if creds and creds.valid:
+                    return creds
+            except Exception as e:
+                logger.warning(f"Failed to load credentials: {e}")
+                token_path.unlink(missing_ok=True)
+
+        if creds and creds.expired and creds.refresh_token:
+            try:
+                creds.refresh(Request())
+                write_token(token_path, creds)
+                return creds
+            except RefreshError:
+                logger.warning("Refresh token expired or revoked. Re-authenticating...")
+                token_path.unlink(missing_ok=True)
+
+        flow = InstalledAppFlow.from_client_secrets_file(
+            self.credentials_file_path,
+            self.SCOPES
+        )
+        creds = flow.run_local_server(port=0, open_browser=False)
+        write_token(token_path, creds)
+
         return creds
 
     @property
@@ -82,7 +100,7 @@ class GoogleCalendarManager:
 
             # Check if the event already exists
             if self.event_exists(start_time, summary, existing_events):
-                logger.info(f"Event '{summary}' already exists, skipping.")
+                logger.debug(f"Event '{summary}' already exists, skipping.")
                 continue
 
             if start_time.tzinfo and start_time.tzinfo != paris_tz:
