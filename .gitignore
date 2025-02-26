@@ -4,3 +4,4 @@ credentials/
 .env
 poetry.lock
 __pycache__/
+playground.ipynb
