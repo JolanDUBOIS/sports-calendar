@@ -62,7 +62,7 @@ class SoccerLiveScraper:
 
     def get_competition(self, competition: str) -> tuple[pd.DataFrame|None, pd.DataFrame|None]:
         """ TODO - Add more error handling """
-        logger.info(f"Fetching data for competition: {competition}")
+        logger.debug(f"Fetching data for competition: {competition}")
         url = f"{self.BASE_URL}competitions/{self.competitions_data[competition]['endpoint']}"
     
         response = self.get_url_response(url)
@@ -94,7 +94,7 @@ class SoccerLiveScraper:
         table = soup.find('table', {'class': 'standings'})
 
         if not table:
-            logger.info(f"No standings table found for competition: {competition}")
+            logger.debug(f"No standings table found for competition: {competition}")
             return None
 
         else:
@@ -228,7 +228,7 @@ class SoccerLiveScraper:
 
         all_standings = pd.DataFrame()
         for competition in competitions:
-            logger.info(f"----- Updating database for competition: {competition} -----")
+            logger.info(f"Updating database for competition: {competition}")
             try:
                 matches, standings = self.get_competition(competition)
                 if matches is not None:
@@ -237,10 +237,10 @@ class SoccerLiveScraper:
                         matches.to_csv(matches_file_path, mode='a', header=False, index=False)
                     else:
                         matches.to_csv(matches_file_path, index=False)
-                    logger.info(f"Added matches for {competition} to database.")
+                    logger.debug(f"Added matches for {competition} to database.")
                 if standings is not None:
                     all_standings = pd.concat([all_standings, standings], ignore_index=True)
-                    logger.info(f"Added standings for {competition} to database.")
+                    logger.debug(f"Added standings for {competition} to database.")
             except Exception as e:
                 logger.error(f"Error while updating database for competition {competition}: {e}")
                 logger.debug(traceback.format_exc())

@@ -13,7 +13,7 @@ class FootballCalendar:
     # TODO - Add a restriction (no past events and no events more than 2 months in the future)
     # TODO - Make class more robust (better error handling)
 
-    def __init__(self, calendar: Calendar=None, max_future_days: int=28, **kwargs):
+    def __init__(self, calendar: Calendar=None, max_future_days: int=48, **kwargs):
         """ TODO """
         self.limit_date = datetime.now() + timedelta(days=max_future_days)
         if calendar is None:
@@ -89,7 +89,7 @@ class FootballCalendar:
         title = self.get_match_title(home_team, away_team, competition_code)
         match_start = datetime.strptime(date, "%Y-%m-%d %H:%M")
         if match_start > self.limit_date:
-            logger.warning(f"Match {title} is too far in the future. Skipping...")
+            logger.info(f"Match {title} is too far in the future. Skipping...")
             return
         match_end = match_start + timedelta(hours=2)
         location = stadium

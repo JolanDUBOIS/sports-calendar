@@ -28,11 +28,10 @@ def run_selection(save_ics: bool=False):
         calendar.save_to_ics(database_path / f"selection_calendar_{now}.ics")
     google_calendar_manager = GoogleCalendarManager()
     google_calendar_manager.add_calendar(calendar)
-    logger.info("Selection run successfully")
+    logger.info("Selection ran successfully")
 
 if __name__ == '__main__':
     args = parse_arguments()
-    logger.info("--------------------- Programm starts ---------------------")
 
     if args.update_database:
         update_database()
@@ -43,5 +42,3 @@ if __name__ == '__main__':
 
     elif args.run_selection:
         run_selection(save_ics=True)
-
-    logger.info("--------------------- Programm ends ---------------------")
