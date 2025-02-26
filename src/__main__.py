@@ -25,7 +25,7 @@ def run_selection(save_ics: bool=False):
     calendar.add_matches(matches)
     if save_ics:
         now = datetime.now().strftime("%Y-%m-%d")
-        calendar.save_to_ics(database_path / f"selection_calendar_{now}.ics")
+        calendar.save_to_ics(database_path / "ics_calendars" / f"selection_calendar_{now}.ics")
     google_calendar_manager = GoogleCalendarManager()
     google_calendar_manager.add_calendar(calendar)
     logger.info("Selection ran successfully")

@@ -15,7 +15,7 @@ class SoccerLiveScraper:
 
     BASE_URL = "https://www.livesoccertv.com/"
     competitions_data_file_path = Path(__file__).resolve().parent / "competitions_data.json"
-    database_path = Path("data")
+    database_path = Path("data") / "live_soccer"
 
     def __init__(self, wait_time: int=20):
         """ TODO """
