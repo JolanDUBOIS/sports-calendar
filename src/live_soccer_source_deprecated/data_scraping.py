@@ -1,4 +1,4 @@
-import re, json, time, pytz, traceback
+import json, time, pytz, traceback, requests
 from pathlib import Path
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus
@@ -7,7 +7,7 @@ import cloudscraper # type: ignore
 import pandas as pd
 from bs4 import BeautifulSoup # type: ignore
 
-from src.live_soccer_source import logger
+from src.live_soccer_source_deprecated import logger
 
 
 class SoccerLiveScraper:
@@ -30,7 +30,7 @@ class SoccerLiveScraper:
                 self._competitions_data = json.load(file)
         return self._competitions_data
     
-    def get_url_response(self, url: str, max_retries=5) -> BeautifulSoup:
+    def get_url_response(self, url: str, max_retries=5) -> requests.Response|None:
         """ TODO """
         try:
             scraper = cloudscraper.create_scraper()
@@ -88,6 +88,26 @@ class SoccerLiveScraper:
                 matches_df = pd.concat([matches_df, next_matches], ignore_index=True)
 
         return matches_df, standings_df
+
+    def get_competitions(self) -> pd.DataFrame:
+        """ TODO """
+        logger.debug("Fetching all competitions...")
+        url = f"{self.BASE_URL}competitions/"
+
+        response = self.get_url_response(url)
+        if not response:
+            return None
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+        competitions = []
+        for section in soup.find_all("div", class_="r-section"):
+            region = section.find("h2").text.strip()
+            for comp in section.find_all("a", class_="flag world"):
+                name = comp.text.strip()
+                url = comp["href"]
+                competitions.append({"Region": region, "Competition": name, "URL": url})
+
+        return pd.DataFrame(competitions)
 
     def get_standings(self, soup: BeautifulSoup, competition: str) -> pd.DataFrame|None:
         """ TODO """
