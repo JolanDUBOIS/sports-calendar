@@ -1,4 +1,4 @@
-import pytz
+import pytz, traceback
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -83,24 +83,29 @@ class FootballCalendar:
         stadium: str=''
     ):
         """ TODO - We recommend to use the short name instead of the full name """
-        if pd.isna(home_team) or pd.isna(away_team):
-            logger.warning(f"Failed to add match: {home_team} - {away_team}.")
-            return
-        title = self.get_match_title(home_team, away_team, competition_code)
-        match_start = datetime.strptime(date, "%Y-%m-%d %H:%M")
-        if match_start > self.limit_date:
-            logger.info(f"Match {title} is too far in the future. Skipping...")
-            return
-        match_end = match_start + timedelta(hours=2)
-        location = stadium
-        description = self.get_match_description(competition, stage)
-        self.__add_event(
-            title, 
-            match_start,
-            match_end, 
-            location,
-            description
-        )
+        try:
+            if pd.isna(home_team) or pd.isna(away_team):
+                logger.warning(f"Failed to add match: {home_team} - {away_team}.")
+                return
+            title = self.get_match_title(home_team, away_team, competition_code)
+            match_start = datetime.strptime(date, "%Y-%m-%d %H:%M")
+            if match_start > self.limit_date:
+                logger.info(f"Match {title} is too far in the future. Skipping...")
+                return
+            match_end = match_start + timedelta(hours=2)
+            location = stadium
+            description = self.get_match_description(competition, stage)
+            self.__add_event(
+                title, 
+                match_start,
+                match_end, 
+                location,
+                description
+            )
+        except Exception as e:
+            logger.debug(f"Failed to add match: {home_team} - {away_team}. {e}")
+            logger.debug(f"date: {date}")
+            logger.debug(traceback.format_exc())
 
     @staticmethod
     def get_match_title(

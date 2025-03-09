@@ -140,7 +140,7 @@ class GoogleCalendarManager:
         creds = self.credentials
         service = build('calendar', 'v3', credentials=creds)
         
-        now = now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(timezone.utc).isoformat()
         events_result = service.events().list(
             calendarId=self.google_calendar_id,
             timeMin=now,
@@ -160,6 +160,25 @@ class GoogleCalendarManager:
             existing_events.append(event_details)
 
         return existing_events
+
+    def delete_all_events(self):
+        """ TODO """
+        logger.warning("Deleting all events from Google Calendar...")
+        
+        creds = self.credentials
+        service = build('calendar', 'v3', credentials=creds)
+        
+        events_result = service.events().list(calendarId=self.google_calendar_id, maxResults=2500, singleEvents=True).execute()
+        events = events_result.get('items', [])
+        
+        if not events:
+            logger.info("No events found.")
+        else:
+            for event in events:
+                try:
+                    service.events().delete(calendarId=self.google_calendar_id, eventId=event['id']).execute()
+                except Exception as e:
+                    logger.error(f"Failed to delete event: {e}")
 
     @staticmethod
     def event_exists(start_time: str, summary: str, existing_events: list) -> bool:
