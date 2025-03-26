@@ -1,5 +1,7 @@
 data/
 logs/
+credentials/
 .env
 poetry.lock
 __pycache__/
+notebooks/

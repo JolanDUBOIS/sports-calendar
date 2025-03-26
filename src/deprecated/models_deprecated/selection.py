@@ -3,9 +3,9 @@ from typing import List
 import pandas as pd
 
 from src.utils import concatenate_unique_rows
-from src.models_deprecated import logger
-from src.models_deprecated.selection_items import Item
-from src.api_connection import FootballDataConnector
+from src.deprecated.models_deprecated import logger
+from src.deprecated.models_deprecated.selection_items import Item
+from src.deprecated.football_data_source_deprecated import FootballDataConnector
 
 
 class Selection:
