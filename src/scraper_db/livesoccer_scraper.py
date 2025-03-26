@@ -8,13 +8,12 @@ import pandas as pd
 from bs4 import BeautifulSoup # type: ignore
 
 from src.scraper_db import logger
-from src.scraper_db.database_manager import DatabaseManager
 
 
-class SoccerLiveScraper:
+class LiveSoccerScraper:
     """ TODO """
 
-    urls_config_file_path = Path(__file__).resolve().parent / "config" / "urls.json"
+    urls_config_file_path = Path(__file__).resolve().parent / "config" / "livesoccertv_urls.json"
 
     def __init__(self, wait_time: int=20):
         """ TODO """
@@ -77,7 +76,7 @@ class SoccerLiveScraper:
 
         return response
 
-    def get_competition(self, competition: str) -> tuple[pd.DataFrame|None, pd.DataFrame|None]:
+    def get_competition(self, competition: str, max_iter: int=4) -> tuple[pd.DataFrame|None, pd.DataFrame|None]:
         """ TODO - Add more error handling """
         logger.debug(f"Fetching data for competition: {competition}")
         url = f"{self.base_url}{self.competitions_endpoints[competition]}"
@@ -90,12 +89,10 @@ class SoccerLiveScraper:
 
         # Get standings
         standings_df = self.get_standings(soup, competition)
-
+                    
         # Get matches
         matches_df = self.get_matches(soup, competition)
-        
-        # Get next page
-        if not matches_df.empty:
+        for i in range(max_iter):
             last_match = matches_df.iloc[-1]
             next_url = self.get_next_url(soup, last_match, url)
             if next_url:
@@ -104,6 +101,10 @@ class SoccerLiveScraper:
                     soup = BeautifulSoup(response.text, 'html.parser')
                     next_matches = self.get_matches(soup, competition)
                     matches_df = pd.concat([matches_df, next_matches], ignore_index=True)
+                else:
+                    break
+            else:
+                break
 
         return matches_df, standings_df
 
