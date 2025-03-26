@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from src.models_deprecated import logger
-from src.football_data_source_deprecated import FootballDataConnector
+from src.deprecated.models_deprecated import logger
+from src.deprecated.football_data_source_deprecated import FootballDataConnector
 
 
 class Item(ABC):

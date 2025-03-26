@@ -7,10 +7,10 @@ import cloudscraper # type: ignore
 import pandas as pd
 from bs4 import BeautifulSoup # type: ignore
 
-from src.live_soccer_source_deprecated import logger
+from src.deprecated.live_soccer_source_deprecated import logger
 
 
-class SoccerLiveScraper:
+class LiveSoccerScraper:
     """ TODO """
 
     BASE_URL = "https://www.livesoccertv.com/"

@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup # type: ignore
 
-from .data_scraping import SoccerLiveScraper
+from .data_scraping import LiveSoccerScraper
 
 
 def test():
-    scraper = SoccerLiveScraper()
+    scraper = LiveSoccerScraper()
     response = scraper.get_url_response(url="https://www.livesoccertv.com/competitions/")
     soup = BeautifulSoup(response.text, 'html.parser')
     competitions_dict = {}
