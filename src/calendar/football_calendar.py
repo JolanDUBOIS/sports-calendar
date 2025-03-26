@@ -1,23 +1,31 @@
-import pytz
+import pytz, traceback
 from pathlib import Path
 from datetime import datetime, timedelta
 
 import pandas as pd
-from icalendar import Calendar, Event
+from icalendar import Calendar, Event # type: ignore
 
-from src.calendar_creation import logger
+from src.calendar import logger
 
 
 class FootballCalendar:
     """ TODO - ics oriented """
+    # TODO - Add a restriction (no past events and no events more than 2 months in the future)
+    # TODO - Make class more robust (better error handling)
 
-    def __init__(self, calendar: Calendar=None, **kwargs):
+    def __init__(self, calendar: Calendar=None, max_future_days: int=48, **kwargs):
         """ TODO """
+        self.limit_date = datetime.now() + timedelta(days=max_future_days)
         if calendar is None:
             self.calendar = Calendar()
         else:
             self.calendar = calendar
-    
+
+    @property
+    def events(self):
+        """ Expose events directly """
+        return self.calendar.events
+
     @property
     def ics_content(self):
         """ TODO """
@@ -58,46 +66,46 @@ class FootballCalendar:
         """ TODO """
         for _, match in matches.iterrows():
             self.add_match(
-                home_team=match['home_team_short_name'],
-                away_team=match['away_team_short_name'],
-                utc_date=match['utc_date'],
-                competition=match['competition_name'],
-                competition_code=match['competition_code'],   # TODO - optional
-                stage=match['stage']   # TODO - optional
+                home_team=match['Home Team'],
+                away_team=match['Away Team'],
+                date=f"{match['Date']} {match['Time']}",
+                competition=match['Competition']
             )
 
     def add_match(
         self,
         home_team: str,
         away_team: str,
-        utc_date: str,
+        date: str,
         competition: str='',
         competition_code: str='',
         stage: str='',
         stadium: str=''
     ):
         """ TODO - We recommend to use the short name instead of the full name """
-        title = self.get_match_title(home_team, away_team, competition_code)
-        match_start = datetime.strptime(utc_date, "%Y-%m-%dT%H:%M:%SZ")
-        match_end = match_start + timedelta(hours=2)
-        location = stadium
-        description = self.get_match_description(competition, stage)
-        self.__add_event(
-            title, 
-            match_start,
-            match_end, 
-            location,
-            description
-        )
-    
-    def save(self, file_path: Path):
-        """ TODO """
-        file_suffix = file_path.suffix
-        if file_suffix != '.ics':
-            logger.error("The file path must have a suffix '.ics'. Please provide a valid .ics file.")
-            return
-        with file_path.open(mode='wb') as ics_file:
-            ics_file.write(self.ics_content)
+        try:
+            if pd.isna(home_team) or pd.isna(away_team):
+                logger.warning(f"Failed to add match: {home_team} - {away_team}.")
+                return
+            title = self.get_match_title(home_team, away_team, competition_code)
+            match_start = datetime.strptime(date, "%Y-%m-%d %H:%M")
+            if match_start > self.limit_date:
+                logger.debug(f"Match {title} is too far in the future. Skipping...")
+                return
+            match_end = match_start + timedelta(hours=2)
+            location = stadium
+            description = self.get_match_description(competition, stage)
+            self.__add_event(
+                title, 
+                match_start,
+                match_end, 
+                location,
+                description
+            )
+        except Exception as e:
+            logger.debug(f"Failed to add match: {home_team} - {away_team}. {e}")
+            logger.debug(f"date: {date}")
+            logger.debug(traceback.format_exc())
 
     @staticmethod
     def get_match_title(
@@ -128,3 +136,12 @@ class FootballCalendar:
     def format_stage(stage: str) -> str:
         """ TODO """
         return stage.lower().replace('_', ' ').capitalize()
+    
+    def save_to_ics(self, file_path: Path):
+        """ TODO """
+        file_suffix = file_path.suffix
+        if file_suffix != '.ics':
+            logger.error("The file path must have a suffix '.ics'. Please provide a valid .ics file.")
+            return
+        with file_path.open(mode='wb') as ics_file:
+            ics_file.write(self.ics_content)

@@ -18,10 +18,6 @@ handlers:
     formatter: detailed
 
 loggers:
-  src.api_connection:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
   src.calendar_creation:
     level: DEBUG
     handlers: [console_handler, debug_handler]
@@ -30,9 +26,25 @@ loggers:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
+  src.football_data_source:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+  src.live_soccer_source:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
   src.models:
     level: DEBUG
     handlers: [console_handler, debug_handler]
+    propagate: False
+  src.models_deprecated:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+  googleapiclient.discovery_cache:
+    level: DEBUG
+    handlers: [debug_handler]
     propagate: False
 
 root:
