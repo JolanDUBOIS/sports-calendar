@@ -4,24 +4,26 @@ from datetime import datetime
 
 from src import logger
 from src.selection import Selection
-from src.scraper_db import DatabaseManager
+from src.scraper_db import DatabaseManager, FootballRankingScraper
 from src.calendar import FootballCalendar, GoogleCalendarManager
-from src.live_soccer_source_deprecated.new_feature_playground import test as ls_test
+from src.deprecated.live_soccer_source_deprecated.new_feature_playground import test as ls_test
 
 
 def run_selection(save_ics: bool=False):
     """ TODO """
     logger.info("Running selection...")
     selection_file_path = Path(os.getenv("SELECTION_FILE"))
+
     db = DatabaseManager()
+    calendar = FootballCalendar()
+    google_calendar_manager = GoogleCalendarManager()
+
     selection = Selection.from_json(selection_file_path, db)
     matches = selection.get_matches()
-    calendar = FootballCalendar()
     calendar.add_matches(matches)
     if save_ics:
         now = datetime.now().strftime("%Y-%m-%d")
         calendar.save_to_ics(Path("data") / "ics_calendars" / f"selection_calendar_{now}.ics")
-    google_calendar_manager = GoogleCalendarManager()
     google_calendar_manager.add_calendar(calendar)
     logger.info("Selection ran successfully")
 
@@ -44,3 +46,8 @@ def test(no: int):
         selection = Selection.from_json(selection_file_path, db)
         matches = selection.get_matches()
         logger.debug(matches)
+
+    elif no == 4:
+        scraper = FootballRankingScraper()
+        rankings = scraper.get_fifa_rankings()
+        logger.debug(rankings)
