@@ -90,7 +90,7 @@ class FootballCalendar:
             title = self.get_match_title(home_team, away_team, competition_code)
             match_start = datetime.strptime(date, "%Y-%m-%d %H:%M")
             if match_start > self.limit_date:
-                logger.info(f"Match {title} is too far in the future. Skipping...")
+                logger.debug(f"Match {title} is too far in the future. Skipping...")
                 return
             match_end = match_start + timedelta(hours=2)
             location = stadium

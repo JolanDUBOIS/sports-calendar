@@ -21,6 +21,9 @@ class GoogleCalendarManager:
         """ TODO """
         self.creds_file_path = None
         self.gcal_id = None
+        
+        # Run credentials once at the beginning
+        self.credentials
     
     @property
     def credentials_file_path(self) -> Path:

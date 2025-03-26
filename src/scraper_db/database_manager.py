@@ -89,8 +89,11 @@ class DatabaseManager:
         data["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") # Add versioning
         if table == "matches":
             self._insert_matches(data)
-        else:
+        elif table == "standings":
             self._insert_standings(data)
+        else:
+            logger.error(f"Table {table} not supported.")
+            raise ValueError(f"Table {table} not supported.")
     
     def _insert_matches(self, matches: pd.DataFrame):
         """ TODO """
@@ -111,7 +114,7 @@ class DatabaseManager:
     def _insert_standings(self, standings: pd.DataFrame):
         """ TODO """
         standings["id"] = standings.apply(lambda row: self._generate_id(row, columns=['Competition', 'Team']), axis=1)
-        self.tables['standings'] = pd.concat([self.tables['standings'], standings], ignore_index=True)
+        self.tables['standings'] = pd.concat([self.tables['standings'], standings], ignore_index=True, join='outer')
 
     def _generate_id(self, row: pd.Series, columns: list[str]) -> str:
         """ TODO """
