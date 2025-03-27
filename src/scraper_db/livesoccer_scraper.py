@@ -287,10 +287,10 @@ class LiveSoccerScraper:
                     pageid = int(onclick_values[2].strip().strip("'"))
                     return pageid
                 except ValueError:
-                    logger.error("Failed to extract pageid from the page.")
+                    logger.debug("Failed to extract pageid from the page.")
                     return None
 
-        logger.error("Failed to extract pageid from the page.")
+        logger.debug("Failed to extract pageid from the page.")
         return None
 
     @staticmethod

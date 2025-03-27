@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from datetime import datetime
 
@@ -9,21 +8,20 @@ from src.calendar import FootballCalendar, GoogleCalendarManager
 from src.deprecated.live_soccer_source_deprecated.new_feature_playground import test as ls_test
 
 
-def run_selection(save_ics: bool=False):
+def run_selection(selection_file: Path, google_credentials_file_path: Path, google_calendar_id: str, save_ics: bool=False):
     """ TODO """
     logger.info("Running selection...")
-    selection_file_path = Path(os.getenv("SELECTION_FILE"))
 
     db = DatabaseManager()
     calendar = FootballCalendar()
-    google_calendar_manager = GoogleCalendarManager()
+    google_calendar_manager = GoogleCalendarManager(google_credentials_file_path, google_calendar_id)
 
-    selection = Selection.from_json(selection_file_path, db)
+    selection = Selection.from_json(selection_file, db)
     matches = selection.get_matches()
     calendar.add_matches(matches)
     if save_ics:
         now = datetime.now().strftime("%Y-%m-%d")
-        calendar.save_to_ics(Path("data") / "ics_calendars" / f"selection_calendar_{now}.ics")
+        calendar.save_to_ics(Path("data") / "ics_calendars" / f"selection_calendar_{now}.ics") # TODO - Add to config
     google_calendar_manager.add_calendar(calendar)
     logger.info("Selection ran successfully")
 
