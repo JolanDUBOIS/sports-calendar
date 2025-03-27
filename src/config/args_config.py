@@ -1,5 +1,6 @@
 import argparse
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Application for sports calendar generation.')
 
@@ -31,6 +32,13 @@ def parse_arguments():
         action='store_true',
         default=False,
         help='Creates the calendar based on the provided selection.'
+    )
+    
+    parser.add_argument(
+        '--config-file',
+        type=str,
+        default='config/app_config.yml',
+        help='Path to the application configuration file.'
     )
 
     return parser.parse_args()
