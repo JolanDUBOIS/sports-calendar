@@ -12,7 +12,7 @@ from src.utils import concatenate_unique_rows
 from src.deprecated.football_data_source_deprecated import logger
 
 
-TIME_RANGE = int(os.getenv('TIME_RANGE', 21))   # TODO - better way to set default value
+TIME_RANGE = 21   # TODO - better way to set default value
 
 class FootballDataConnector:
     """ TODO """

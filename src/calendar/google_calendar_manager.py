@@ -17,23 +17,17 @@ class GoogleCalendarManager:
     
     SCOPES = ['https://www.googleapis.com/auth/calendar']
     
-    def __init__(self):
+    def __init__(self, credentials_file_path: Path, google_calendar_id: str='primary'):
         """ TODO """
-        self.creds_file_path = None
-        self.gcal_id = None
-        
-        # Run credentials once at the beginning
-        self.credentials
-    
-    @property
-    def credentials_file_path(self) -> Path:
-        """ TODO """
-        if self.creds_file_path is None:
-            self.creds_file_path = Path(os.getenv('GOOGLE_CREDENTIALS_FILE'))
-            if not self.creds_file_path.exists():
-                raise FileNotFoundError(f"Credentials file not found at {self.creds_file_path}")
-        return self.creds_file_path
-    
+        if not isinstance(credentials_file_path, Path):
+            raise ValueError(f"Expected credentials_file_path to be a Path object, got {type(credentials_file_path)}.")
+
+        if not credentials_file_path.exists():
+            raise FileNotFoundError(f"Credentials file not found: {credentials_file_path}.")
+
+        self.credentials_file_path = credentials_file_path
+        self.google_calendar_id = google_calendar_id
+
     @property
     def credentials(self) -> Credentials:
         """ TODO """
@@ -70,13 +64,6 @@ class GoogleCalendarManager:
         write_token(token_path, creds)
 
         return creds
-
-    @property
-    def google_calendar_id(self) -> str:
-        """ TODO """
-        if self.gcal_id is None:
-            self.gcal_id = os.getenv('GOOGLE_CALENDAR_ID', 'primary')
-        return self.gcal_id
 
     def add_calendar(self, calendar: Calendar):
         """ TODO """
