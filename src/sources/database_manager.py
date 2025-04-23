@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.scraper_db import logger
+from src.sources import logger
 
 
 class DatabaseManager:

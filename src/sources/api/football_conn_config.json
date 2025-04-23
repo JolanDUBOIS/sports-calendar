@@ -1,0 +1,172 @@
+{
+    "requests": {
+        "competitions": {
+            "url_fragment": "/v4/competitions/",
+            "query": "competitions",
+            "multiple_requests": false
+        },
+        "competitions_standings": {
+            "url_fragment": "/v4/competitions/{id}/standings",
+            "query": "standings",
+            "multiple_requests": false
+        },
+        "competitions_matches": {
+            "url_fragment": "/v4/competitions/{id}/matches",
+            "query": "matches",
+            "multiple_requests": false
+        },
+        "competitions_teams": {
+            "url_fragment": "/v4/competitions/{id}/teams",
+            "query": "teams",
+            "multiple_requests": false
+        },
+        "teams_matches": {
+            "url_fragment": "/v4/teams/{id}/matches/",
+            "query": "matches",
+            "multiple_requests": false
+        },
+        "matches": {
+            "url_fragment": "/v4/matches/{id}",
+            "query": null,
+            "multiple_requests": false
+        },
+        "areas": {
+            "url_fragment": "/v4/areas/",
+            "query": "areas",
+            "multiple_requests": false
+        }
+    },
+    "queries": {
+        "competitions": [
+            {
+                "path": [
+                    "competitions",
+                    "*"
+                ],
+                "data_keys": {
+                    "id": "id",
+                    "name": "name",
+                    "code": "code",
+                    "type": "type"
+                }
+            }
+        ],
+        "standings": [
+            {
+                "path": [
+                    "standings",
+                    {"key": "table", "filter_key": "type", "filter_value": "TOTAL"},
+                    "*"
+                ],
+                "data_keys": {
+                    "position": "position",
+                    "nb_played_games": "playedGames"
+                }
+            },
+            {
+                "path": [
+                    "standings",
+                    {"key": "table", "filter_key": "type", "filter_value": "TOTAL"},
+                    "*",
+                    "team"
+                ],
+                "data_keys": {
+                    "team_id": "id",
+                    "team_name": "name",
+                    "team_shortname": "shortName",
+                    "team_tla": "tla"
+                }
+            }
+        ],
+        "matches": [
+            {
+                "path": [
+                    "matches",
+                    "*"
+                ],
+                "data_keys": {
+                    "id": "id",
+                    "utc_date": "utcDate",
+                    "stage": "stage"
+                }
+            },
+            {
+                "path": [
+                    "matches",
+                    "*",
+                    "competition"
+                ],
+                "data_keys": {
+                    "competition_id": "id",
+                    "competition_name": "name",
+                    "competition_code": "code"
+                }
+            },
+            {
+                "path": [
+                    "matches",
+                    "*",
+                    "homeTeam"
+                ],
+                "data_keys": {
+                    "home_team_id": "id",
+                    "home_team_name": "name",
+                    "home_team_short_name": "shortName",
+                    "home_team_tla": "tla"
+                }
+            },
+            {
+                "path": [
+                    "matches",
+                    "*",
+                    "awayTeam"
+                ],
+                "data_keys": {
+                    "away_team_id": "id",
+                    "away_team_name": "name",
+                    "away_team_short_name": "shortName",
+                    "away_team_tla": "tla"
+                }
+            }
+        ],
+        "teams": [
+            {
+                "path": [
+                    "teams",
+                    "*"
+                ],
+                "data_keys": {
+                    "id": "id",
+                    "name": "name",
+                    "code": "code",
+                    "short_name": "shortName",
+                    "tla": "tla"
+                }
+            },
+            {
+                "path": [
+                    "teams",
+                    "*",
+                    "area"
+                ],
+                "data_keys": {
+                    "area_id": "id"
+                }
+            }
+        ],
+        "areas": [
+            {
+                "path": [
+                    "areas",
+                    "*"
+                ],
+                "data_keys": {
+                    "id": "id",
+                    "name": "name",
+                    "country_code": "countryCode",
+                    "parent_area_id": "parentAreaId"
+                }
+            }
+        ]
+    }
+}

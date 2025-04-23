@@ -7,13 +7,13 @@ import cloudscraper # type: ignore
 import pandas as pd
 from bs4 import BeautifulSoup # type: ignore
 
-from src.scraper_db import logger
+from src.sources import logger
 
 
 class LiveSoccerScraper:
     """ TODO """
 
-    urls_config_file_path = Path(__file__).resolve().parent / "config" / "livesoccertv_urls.json"
+    urls_config_file_path = Path(__file__).resolve().parent.parent / "config" / "livesoccertv_urls.json"
 
     def __init__(self, wait_time: int=20):
         """ TODO """
@@ -80,7 +80,7 @@ class LiveSoccerScraper:
         """ TODO - Add more error handling """
         logger.debug(f"Fetching data for competition: {competition}")
         url = f"{self.base_url}{self.competitions_endpoints[competition]}"
-    
+
         response = self.get_url_response(url)
         if not response:
             return None, None
@@ -92,41 +92,45 @@ class LiveSoccerScraper:
                     
         # Get matches
         matches_df = self.get_matches(soup, competition)
-        for i in range(max_iter):
-            last_match = matches_df.iloc[-1]
-            next_url = self.get_next_url(soup, last_match, url)
-            if next_url:
-                response = self.get_url_response(next_url)
-                if response:
-                    soup = BeautifulSoup(response.text, 'html.parser')
-                    next_matches = self.get_matches(soup, competition)
-                    matches_df = pd.concat([matches_df, next_matches], ignore_index=True)
+        try:
+            for i in range(max_iter):
+                last_match = matches_df.iloc[-1]
+                next_url = self.get_next_url(soup, last_match, url)
+                if next_url:
+                    response = self.get_url_response(next_url)
+                    if response:
+                        soup = BeautifulSoup(response.text, 'html.parser')
+                        next_matches = self.get_matches(soup, competition)
+                        matches_df = pd.concat([matches_df, next_matches], ignore_index=True)
+                    else:
+                        break
                 else:
                     break
-            else:
-                break
+        except Exception as e:
+            logger.error(f"Error while fetching next matches: {e}")
+            logger.debug(traceback.format_exc())
 
         return matches_df, standings_df
 
-    def get_competitions(self) -> pd.DataFrame:
-        """ TODO """
-        logger.debug("Fetching all competitions...")
-        url = f"{self.BASE_URL}competitions/"
+    # def get_competitions(self) -> pd.DataFrame:
+    #     """ TODO """
+    #     logger.debug("Fetching all competitions...")
+    #     url = f"{self.BASE_URL}competitions/"
 
-        response = self.get_url_response(url)
-        if not response:
-            return None
+    #     response = self.get_url_response(url)
+    #     if not response:
+    #         return None
 
-        soup = BeautifulSoup(response.text, 'html.parser')
-        competitions = []
-        for section in soup.find_all("div", class_="r-section"):
-            region = section.find("h2").text.strip()
-            for comp in section.find_all("a", class_="flag world"):
-                name = comp.text.strip()
-                url = comp["href"]
-                competitions.append({"Region": region, "Competition": name, "URL": url})
+    #     soup = BeautifulSoup(response.text, 'html.parser')
+    #     competitions = []
+    #     for section in soup.find_all("div", class_="r-section"):
+    #         region = section.find("h2").text.strip()
+    #         for comp in section.find_all("a", class_="flag world"):
+    #             name = comp.text.strip()
+    #             url = comp["href"]
+    #             competitions.append({"Region": region, "Competition": name, "URL": url})
 
-        return pd.DataFrame(competitions)
+    #     return pd.DataFrame(competitions)
 
     def get_standings(self, soup: BeautifulSoup, competition: str) -> pd.DataFrame|None:
         """ TODO """
@@ -170,55 +174,64 @@ class LiveSoccerScraper:
         current_date, matches = None, []
         for row in soup.find_all('tr'):
             # Check if row is a match
-            if 'matchrow' in row.get('class', []):
-                # Match time
-                time_cell = row.find('span', class_='timecell')
-                time_value = time_cell.find('span', class_='ts')['dv'] if time_cell else None
-                time_value_sl = time_cell.get_text(strip=True) if time_cell else None  # SoccerLiveTV weird timezone time
+            if 'matchrow' in row.get('class', []):                
+                try:
+                    if 'repeatrow' in row.get('class', []):
+                        # Skip repeated rows
+                        continue
 
-                if time_value:
-                    # Convert timestamp (milliseconds) to seconds for datetime
-                    timestamp = int(time_value) / 1000  # Convert milliseconds to seconds
+                    # Match time
+                    time_cell = row.find('span', class_='timecell')
+                    time_value = time_cell.find('span', class_='ts')['dv'] if time_cell else None
+                    time_value_sl = time_cell.get_text(strip=True) if time_cell else None  # SoccerLiveTV weird timezone time
 
-                    # Get UTC time and convert it to the Europe/Paris timezone
-                    paris_tz = pytz.timezone('Europe/Paris')
-                    utc_time = datetime.fromtimestamp(timestamp, tz=pytz.utc)  # Using fromtimestamp with UTC
+                    if time_value:
+                        # Convert timestamp (milliseconds) to seconds for datetime
+                        timestamp = int(time_value) / 1000  # Convert milliseconds to seconds
 
-                    # Now localized_time will give you the correct time in Paris time zone
-                    localized_time = utc_time.astimezone(paris_tz)
+                        # Get UTC time and convert it to the Europe/Paris timezone
+                        paris_tz = pytz.timezone('Europe/Paris')
+                        utc_time = datetime.fromtimestamp(timestamp, tz=pytz.utc)  # Using fromtimestamp with UTC
 
-                    # Format time as 'HH:MM'
-                    time_value = localized_time.strftime('%H:%M')
+                        # Now localized_time will give you the correct time in Paris time zone
+                        localized_time = utc_time.astimezone(paris_tz)
 
-                # Teams
-                match = row.find('td', id='match')
-                match_text = match.get_text(strip=True) if match else None
-                if " - " in match_text:  # Match is in progress or over
-                    home_info, away_info = match_text.split(" - ")
-                    home_team = home_info[:-1]
-                    away_team = away_info[1:]
-                elif " vs " in match_text:
-                    home_team, away_team = match_text.split(" vs ")
-                else:
-                    home_team, away_team = None, None
+                        # Format time as 'HH:MM'
+                        time_value = localized_time.strftime('%H:%M')
 
-                # Channels
-                channels_div = row.find('td', id='channels')
-                channels = [a.get_text(strip=True) for a in channels_div.find_all("a")] if channels_div else []
-                
-                # Store the data
-                matches.append({
-                    "Title": match_text,
-                    "Date": current_date,
-                    "SL Time": time_value,
-                    "Time": self.closest_lower_time(time_value, time_step=10),
-                    "Original Time (SL TZ)": time_value_sl,
-                    "Home Team": home_team,
-                    "Away Team": away_team,
-                    "Competition": competition,
-                    "Region": self.get_region(competition),
-                    "Channels": channels
-                })
+                    # Teams
+                    match = row.find('td', id='match')
+                    match_text = match.get_text(strip=True) if match else None
+                    if " - " in match_text:  # Match is in progress or over
+                        home_info, away_info = match_text.split(" - ")
+                        home_team = home_info[:-1]
+                        away_team = away_info[1:]
+                    elif " vs " in match_text:
+                        home_team, away_team = match_text.split(" vs ")
+                    else:
+                        home_team, away_team = None, None
+
+                    # Channels
+                    channels_div = row.find('td', id='channels')
+                    channels = [a.get_text(strip=True) for a in channels_div.find_all("a")] if channels_div else []
+                    
+                    # Store the data
+                    matches.append({
+                        "Title": match_text,
+                        "Date": current_date,
+                        "SL Time": time_value,
+                        "Time": self.closest_lower_time(time_value, time_step=10),
+                        "Original Time (SL TZ)": time_value_sl,
+                        "Home Team": home_team,
+                        "Away Team": away_team,
+                        "Competition": competition,
+                        "Region": self.get_region(competition),
+                        "Channels": channels
+                    })
+                except Exception as e:
+                    logger.debug(f"Error parsing match row: {e}")
+                    logger.debug(traceback.format_exc())
+                    continue
 
             # Check if the row contains a date (not a match row)
             elif row.find('a') and ',' in row.get_text():

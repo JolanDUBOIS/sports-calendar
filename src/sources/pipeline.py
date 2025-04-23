@@ -1,8 +1,7 @@
 import traceback
 
-from src.scraper_db import logger
-from .livesoccer_scraper import LiveSoccerScraper
-from .football_ranking_scraper import FootballRankingScraper
+from src.sources import logger
+from .web import LiveSoccerScraper, FootballRankingScraper
 from .database_manager import DatabaseManager
 
 def update_database(competitions: list[str]=None):
