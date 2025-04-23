@@ -1,3 +1,8 @@
-selection_file_path: data/selections/selection.json
-google_credentials_file_path: credentials/client_secret.json
-database_path: data/live_soccer
+selection:
+  file_path: data/selections/selection.json
+
+google:
+  credentials_file_path: credentials/client_secret.json
+
+database:
+  url: sqlite:///data/football.db

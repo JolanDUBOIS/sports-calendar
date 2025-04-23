@@ -2,21 +2,23 @@ from pathlib import Path
 from datetime import datetime
 
 from src import logger
+from src.config import get_config
 from src.selection import Selection
-from src.scraper_db import DatabaseManager, FootballRankingScraper
+from src.sources import DatabaseManager, FootballRankingScraper, update_database
 from src.calendar import FootballCalendar, GoogleCalendarManager
 from src.deprecated.live_soccer_source_deprecated.new_feature_playground import test as ls_test
 
 
-def run_selection(selection_file: Path, google_credentials_file_path: Path, google_calendar_id: str, save_ics: bool=False):
+def run_selection(save_ics: bool=False):
     """ TODO """
     logger.info("Running selection...")
 
     db = DatabaseManager()
     calendar = FootballCalendar()
-    google_calendar_manager = GoogleCalendarManager(google_credentials_file_path, google_calendar_id)
+    google_calendar_manager = GoogleCalendarManager()
 
-    selection = Selection.from_json(selection_file, db)
+    selection_file_path = Path(get_config("selection.file_path"))
+    selection = Selection.from_json(selection_file_path, db)
     matches = selection.get_matches()
     calendar.add_matches(matches)
     if save_ics:
@@ -49,3 +51,7 @@ def test(no: int):
         scraper = FootballRankingScraper()
         rankings = scraper.get_fifa_rankings()
         logger.debug(rankings)
+
+    elif no == 5:
+        competitions = ["Ligue 1"]
+        update_database(competitions)
