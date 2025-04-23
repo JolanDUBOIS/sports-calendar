@@ -5,3 +5,4 @@ credentials/
 poetry.lock
 __pycache__/
 notebooks/
+.coverage
