@@ -1,0 +1,3 @@
+Region: seed_data/regions.csv
+Competition: seed_data/competitions.csv
+Team: seed_data/teams.csv

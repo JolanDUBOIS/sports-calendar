@@ -1,0 +1,29 @@
+name,abbreviation,region_name,type
+"Ligue 1",,France,league
+"Coupe de France",,France,cup
+"Super Cup",,France,cup
+"Premier League",,England,league
+"League Cup",,England,cup
+"FA Community Shield",,England,cup
+"FA Cup",,England,cup
+"Serie A",,Italy,league
+"Supercoppa Italiana",,Italy,cup
+"Coppa Italia",,Italy,cup
+"La Liga",,Spain,league
+"Copa del Rey",,Spain,cup
+"Supercopa de España",,Spain,cup
+"Bundesliga",,Germany,league
+"DFL-Supercup",,Germany,cup
+"DFB Pokal",,Germany,cup
+"UEFA Champions League",,International,cup
+"UEFA Europa League",,International,cup
+"UEFA Conference League",,International,cup
+"Africa Cup of Nations",,International,cup
+"Copa América",,International,cup
+"FIFA World Cup",,International,cup
+"FIFA Club World Cup",,International,cup
+"UEFA Euro Qualifying",,International,cup
+"UEFA Euro",,International,cup
+"UEFA Super Cup",,International,cup
+"UEFA Nations League",,International,cup
+"FIFA Rankings",,International,league

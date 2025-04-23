@@ -1,0 +1,308 @@
+name,abbreviation,league
+PSG,,Ligue 1
+Olympique Marseille,,Ligue 1
+Nice,,Ligue 1
+Lille,,Ligue 1
+Monaco,,Ligue 1
+Olympique Lyonnais,,Ligue 1
+Strasbourg,,Ligue 1
+Lens,,Ligue 1
+Brest,,Ligue 1
+Toulouse,,Ligue 1
+Auxerre,,Ligue 1
+Angers SCO,,Ligue 1
+Rennes,,Ligue 1
+Nantes,,Ligue 1
+Reims,,Ligue 1
+Saint-Étienne,,Ligue 1
+Le Havre,,Ligue 1
+Montpellier,,Ligue 1
+Liverpool,,Premier League
+Arsenal,,Premier League
+Nottingham Forest,,Premier League
+Manchester City,,Premier League
+Chelsea,,Premier League
+Newcastle United,,Premier League
+AFC Bournemouth,,Premier League
+Brighton & Hove Albion,,Premier League
+Fulham,,Premier League
+Aston Villa,,Premier League
+Brentford,,Premier League
+Crystal Palace,,Premier League
+Tottenham Hotspur,,Premier League
+Manchester United,,Premier League
+West Ham United,,Premier League
+Everton,,Premier League
+Wolverhampton Wanderers,,Premier League
+Ipswich Town,,Premier League
+Leicester City,,Premier League
+Southampton,,Premier League
+Internazionale,,Serie A
+Napoli,,Serie A
+Atalanta,,Serie A
+Juventus,,Serie A
+Lazio,,Serie A
+Bologna,,Serie A
+Fiorentina,,Serie A
+Milan,,Serie A
+Roma,,Serie A
+Udinese,,Serie A
+Torino,,Serie A
+Genoa,,Serie A
+Como,,Serie A
+Hellas Verona,,Serie A
+Cagliari,,Serie A
+Lecce,,Serie A
+Parma,,Serie A
+Empoli,,Serie A
+Venezia,,Serie A
+Monza,,Serie A
+Barcelona,,La Liga
+Real Madrid,,La Liga
+Atlético Madrid,,La Liga
+Athletic Club,,La Liga
+Villarreal,,La Liga
+Rayo Vallecano,,La Liga
+Real Betis,,La Liga
+Mallorca,,La Liga
+Real Sociedad,,La Liga
+Celta de Vigo,,La Liga
+Sevilla,,La Liga
+Osasuna,,La Liga
+Girona,,La Liga
+Getafe,,La Liga
+Espanyol,,La Liga
+Leganés,,La Liga
+Las Palmas,,La Liga
+Valencia,,La Liga
+Deportivo Alavés,,La Liga
+Real Valladolid,,La Liga
+Bayern München,,Bundesliga
+Bayer Leverkusen,,Bundesliga
+Eintracht Frankfurt,,Bundesliga
+Freiburg,,Bundesliga
+Mainz 05,,Bundesliga
+RB Leipzig,,Bundesliga
+Stuttgart,,Bundesliga
+Wolfsburg,,Bundesliga
+Borussia M'gladbach,,Bundesliga
+Borussia Dortmund,,Bundesliga
+Augsburg,,Bundesliga
+Werder Bremen,,Bundesliga
+Union Berlin,,Bundesliga
+Hoffenheim,,Bundesliga
+St. Pauli,,Bundesliga
+Heidenheim,,Bundesliga
+Bochum,,Bundesliga
+Holstein Kiel,,Bundesliga
+Argentina,,FIFA Rankings
+France,,FIFA Rankings
+Spain,,FIFA Rankings
+England,,FIFA Rankings
+Brazil,,FIFA Rankings
+Portugal,,FIFA Rankings
+Netherlands,,FIFA Rankings
+Belgium,,FIFA Rankings
+Italy,,FIFA Rankings
+Germany,,FIFA Rankings
+Uruguay,,FIFA Rankings
+Colombia,,FIFA Rankings
+Croatia,,FIFA Rankings
+Morocco,,FIFA Rankings
+Japan,,FIFA Rankings
+USA,,FIFA Rankings
+Senegal,,FIFA Rankings
+IR Iran,,FIFA Rankings
+Mexico,,FIFA Rankings
+Switzerland,,FIFA Rankings
+Denmark,,FIFA Rankings
+Austria,,FIFA Rankings
+Korea Republic,,FIFA Rankings
+Ecuador,,FIFA Rankings
+Ukraine,,FIFA Rankings
+Australia,,FIFA Rankings
+Sweden,,FIFA Rankings
+Türkiye,,FIFA Rankings
+Wales,,FIFA Rankings
+Hungary,,FIFA Rankings
+Canada,,FIFA Rankings
+Serbia,,FIFA Rankings
+Russia,,FIFA Rankings
+Poland,,FIFA Rankings
+Egypt,,FIFA Rankings
+Panama,,FIFA Rankings
+Algeria,,FIFA Rankings
+Romania,,FIFA Rankings
+Greece,,FIFA Rankings
+Peru,,FIFA Rankings
+Slovakia,,FIFA Rankings
+Czechia,,FIFA Rankings
+Norway,,FIFA Rankings
+Nigeria,,FIFA Rankings
+Scotland,,FIFA Rankings
+Côte d'Ivoire,,FIFA Rankings
+Venezuela,,FIFA Rankings
+Chile,,FIFA Rankings
+Qatar,,FIFA Rankings
+Cameroon,,FIFA Rankings
+Tunisia,,FIFA Rankings
+Mali,,FIFA Rankings
+Paraguay,,FIFA Rankings
+Slovenia,,FIFA Rankings
+Costa Rica,,FIFA Rankings
+Iraq,,FIFA Rankings
+South Africa,,FIFA Rankings
+Uzbekistan,,FIFA Rankings
+Saudi Arabia,,FIFA Rankings
+Republic of Ireland,,FIFA Rankings
+Congo DR,,FIFA Rankings
+Jamaica,,FIFA Rankings
+United Arab Emirates,,FIFA Rankings
+Jordan,,FIFA Rankings
+Burkina Faso,,FIFA Rankings
+Albania,,FIFA Rankings
+North Macedonia,,FIFA Rankings
+Georgia,,FIFA Rankings
+Finland,,FIFA Rankings
+Iceland,,FIFA Rankings
+Northern Ireland,,FIFA Rankings
+Cabo Verde,,FIFA Rankings
+Montenegro,,FIFA Rankings
+Bosnia and Herzegovina,,FIFA Rankings
+Honduras,,FIFA Rankings
+Israel,,FIFA Rankings
+Ghana,,FIFA Rankings
+Guinea,,FIFA Rankings
+Oman,,FIFA Rankings
+Bolivia,,FIFA Rankings
+Bahrain,,FIFA Rankings
+Bulgaria,,FIFA Rankings
+El Salvador,,FIFA Rankings
+Gabon,,FIFA Rankings
+Angola,,FIFA Rankings
+Haiti,,FIFA Rankings
+Zambia,,FIFA Rankings
+Uganda,,FIFA Rankings
+Aotearoa New Zealand,,FIFA Rankings
+China PR,,FIFA Rankings
+Curaçao,,FIFA Rankings
+Luxembourg,,FIFA Rankings
+Equatorial Guinea,,FIFA Rankings
+Benin,,FIFA Rankings
+Syria,,FIFA Rankings
+Mozambique,,FIFA Rankings
+Belarus,,FIFA Rankings
+Thailand,,FIFA Rankings
+Kosovo,,FIFA Rankings
+Armenia,,FIFA Rankings
+Palestine,,FIFA Rankings
+Trinidad and Tobago,,FIFA Rankings
+Comoros,,FIFA Rankings
+Tajikistan,,FIFA Rankings
+Guatemala,,FIFA Rankings
+Tanzania,,FIFA Rankings
+Kyrgyz Republic,,FIFA Rankings
+Kenya,,FIFA Rankings
+Mauritania,,FIFA Rankings
+Namibia,,FIFA Rankings
+Kazakhstan,,FIFA Rankings
+Vietnam,,FIFA Rankings
+Lebanon,,FIFA Rankings
+Sudan,,FIFA Rankings
+Korea DPR,,FIFA Rankings
+Madagascar,,FIFA Rankings
+Azerbaijan,,FIFA Rankings
+Libya,,FIFA Rankings
+Togo,,FIFA Rankings
+Zimbabwe,,FIFA Rankings
+Guinea-Bissau,,FIFA Rankings
+Niger,,FIFA Rankings
+Estonia,,FIFA Rankings
+Congo,,FIFA Rankings
+The Gambia,,FIFA Rankings
+Malawi,,FIFA Rankings
+Rwanda,,FIFA Rankings
+India,,FIFA Rankings
+Sierra Leone,,FIFA Rankings
+Cyprus,,FIFA Rankings
+Indonesia,,FIFA Rankings
+Malaysia,,FIFA Rankings
+Kuwait,,FIFA Rankings
+Nicaragua,,FIFA Rankings
+Central African Republic,,FIFA Rankings
+Botswana,,FIFA Rankings
+Faroe Islands,,FIFA Rankings
+Suriname,,FIFA Rankings
+Latvia,,FIFA Rankings
+Burundi,,FIFA Rankings
+Dominican Republic,,FIFA Rankings
+Lithuania,,FIFA Rankings
+Turkmenistan,,FIFA Rankings
+St Kitts and Nevis,,FIFA Rankings
+Liberia,,FIFA Rankings
+Ethiopia,,FIFA Rankings
+Philippines,,FIFA Rankings
+Fiji,,FIFA Rankings
+Lesotho,,FIFA Rankings
+Moldova,,FIFA Rankings
+Solomon Islands,,FIFA Rankings
+New Caledonia,,FIFA Rankings
+Tahiti,,FIFA Rankings
+Guyana,,FIFA Rankings
+"Hong Kong, China",,FIFA Rankings
+Afghanistan,,FIFA Rankings
+Puerto Rico,,FIFA Rankings
+Yemen,,FIFA Rankings
+Eswatini,,FIFA Rankings
+Antigua and Barbuda,,FIFA Rankings
+Singapore,,FIFA Rankings
+Maldives,,FIFA Rankings
+Cuba,,FIFA Rankings
+Vanuatu,,FIFA Rankings
+Chinese Taipei,,FIFA Rankings
+Bermuda,,FIFA Rankings
+St Lucia,,FIFA Rankings
+Malta,,FIFA Rankings
+Myanmar,,FIFA Rankings
+South Sudan,,FIFA Rankings
+Andorra,,FIFA Rankings
+Papua New Guinea,,FIFA Rankings
+St Vincent and the Grenadines,,FIFA Rankings
+Grenada,,FIFA Rankings
+Nepal,,FIFA Rankings
+Chad,,FIFA Rankings
+Barbados,,FIFA Rankings
+Belize,,FIFA Rankings
+Mauritius,,FIFA Rankings
+Cambodia,,FIFA Rankings
+Montserrat,,FIFA Rankings
+Bhutan,,FIFA Rankings
+Dominica,,FIFA Rankings
+Brunei Darussalam,,FIFA Rankings
+Bangladesh,,FIFA Rankings
+Laos,,FIFA Rankings
+American Samoa,,FIFA Rankings
+Mongolia,,FIFA Rankings
+São Tomé and Príncipe,,FIFA Rankings
+Cook Islands,,FIFA Rankings
+Djibouti,,FIFA Rankings
+Samoa,,FIFA Rankings
+Macau,,FIFA Rankings
+Cayman Islands,,FIFA Rankings
+Aruba,,FIFA Rankings
+Gibraltar,,FIFA Rankings
+Timor-Leste,,FIFA Rankings
+Pakistan,,FIFA Rankings
+Tonga,,FIFA Rankings
+Sri Lanka,,FIFA Rankings
+Seychelles,,FIFA Rankings
+Somalia,,FIFA Rankings
+Guam,,FIFA Rankings
+Liechtenstein,,FIFA Rankings
+Bahamas,,FIFA Rankings
+Turks and Caicos Islands,,FIFA Rankings
+British Virgin Islands,,FIFA Rankings
+US Virgin Islands,,FIFA Rankings
+Anguilla,,FIFA Rankings
+San Marino,,FIFA Rankings
+New Zealand,,FIFA Rankings
