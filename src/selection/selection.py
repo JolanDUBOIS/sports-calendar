@@ -6,7 +6,7 @@ import pandas as pd
 
 from src.selection import logger
 from src.utils import concatenate_unique_rows
-from src.scraper_db import DatabaseManager
+from src.sources import DatabaseManager
 
 
 class Selection:
