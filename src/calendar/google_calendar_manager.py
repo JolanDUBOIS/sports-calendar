@@ -10,6 +10,7 @@ from google.auth.exceptions import RefreshError # type: ignore
 from icalendar import Calendar, Event # type: ignore
 
 from src.calendar import logger
+from src.config import get_config
 
 
 class GoogleCalendarManager:
@@ -17,16 +18,24 @@ class GoogleCalendarManager:
     
     SCOPES = ['https://www.googleapis.com/auth/calendar']
     
-    def __init__(self, credentials_file_path: Path, google_calendar_id: str='primary'):
+    def __init__(self, credentials_file_path: str = None, google_calendar_id: str = None):
         """ TODO """
-        if not isinstance(credentials_file_path, Path):
-            raise ValueError(f"Expected credentials_file_path to be a Path object, got {type(credentials_file_path)}.")
+        self._credentials_file_path = credentials_file_path
+        self._google_calendar_id = google_calendar_id
 
-        if not credentials_file_path.exists():
-            raise FileNotFoundError(f"Credentials file not found: {credentials_file_path}.")
+    @property
+    def credentials_file_path(self) -> str:
+        """ TODO """
+        if self._credentials_file_path is None:
+            self._credentials_file_path = get_config('google.credentials_file_path')
+            if self._credentials_file_path is None:
+                raise ValueError('Google credentials file path is not set. Please set it in the config.')
+        
+        self._credentials_file_path = Path(self._credentials_file_path)
+        if not self._credentials_file_path.exists():
+            raise FileNotFoundError(f"Credentials file not found: {self._credentials_file_path}.")
 
-        self.credentials_file_path = credentials_file_path
-        self.google_calendar_id = google_calendar_id
+        return self._credentials_file_path
 
     @property
     def credentials(self) -> Credentials:
@@ -64,6 +73,15 @@ class GoogleCalendarManager:
         write_token(token_path, creds)
 
         return creds
+    
+    @property
+    def google_calendar_id(self) -> str:
+        """ TODO """
+        if self._google_calendar_id is None:
+            self._google_calendar_id = os.getenv("GOOGLE_CALENDAR_ID", "primary")
+            if self._google_calendar_id == "primary":
+                raise ValueError('GOOGLE_CALENDAR_ID environment variable is not set. Please set it to your Google Calendar ID.')
+        return self._google_calendar_id
 
     def add_calendar(self, calendar: Calendar):
         """ TODO """
