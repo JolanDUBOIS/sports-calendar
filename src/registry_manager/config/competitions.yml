@@ -1,0 +1,432 @@
+ligue_1:
+  aliases:
+  - Ligue 1
+  - French Ligue 1
+  - Ligue 1 Uber Eats
+  - L1
+  - FL1
+  name: Ligue 1
+  sources:
+    espn: fra.1
+    football-data: 2015
+    livesoccertv: /france/ligue-1
+    football-ranking: null
+coupe_de_france:
+  aliases:
+  - Coupe de France
+  - French Cup
+  name: Coupe de France
+  sources:
+    espn: fra.coupe_de_france
+    football-data: null
+    livesoccertv: /france/coupe-de-france
+    football-ranking: null
+trophee_des_champions:
+  aliases:
+  - "Trophée des Champions"
+  - French Super Cup
+  - Super Cup
+  name: "Trophée des Champions"
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /france/super-cup
+    football-ranking: null
+premier_league:
+  aliases:
+  - Premier League
+  - English Premier League
+  - EPL
+  - PL
+  name: Premier League
+  sources:
+    espn: eng.1
+    football-data: 2021
+    livesoccertv: /england/premier-league
+    football-ranking: null
+fa_cup:
+  aliases:
+  - English FA Cup
+  name: FA Cup
+  sources:
+    espn: eng.fa
+    football-data: null
+    livesoccertv: /england/fa-cup
+    football-ranking: null
+league_cup:
+  aliases:
+  - League Cup
+  - EFL Cup
+  - Carabao Cup
+  - English Carabao Cup
+  name: League Cup
+  sources:
+    espn: eng.league_cup
+    football-data: null
+    livesoccertv: /england/league-cup
+    football-ranking: null
+fa_community_shield:
+  aliases:
+  - FA Community Shield
+  - FA Shield
+  - English Super Cup
+  name: FA Community Shield
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /england/fa-community-shield
+    football-ranking: null
+serie_a:
+  aliases:
+  - Serie A
+  - Italian Serie A
+  - Serie A TIM
+  name: Serie A
+  sources:
+    espn: ita.1
+    football-data: 2019
+    livesoccertv: /italy/serie-a
+    football-ranking: null
+coppa_italia:
+  aliases:
+  - Coppa Italia
+  - Italian Cup
+  name: Coppa Italia
+  sources:
+    espn: ita.coppa_italia
+    football-data: null
+    livesoccertv: /italy/coppa-italia
+    football-ranking: null
+supercoppa_italiana:
+  aliases:
+  - Supercoppa Italiana
+  - Italian Super Cup
+  name: Supercoppa Italiana
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /italy/supercoppa-italiana
+    football-ranking: null
+la_liga:
+  aliases:
+  - La Liga
+  - Spanish La Liga
+  - Primera Division
+  name: La Liga
+  sources:
+    espn: esp.1
+    football-data: 2014
+    livesoccertv: /spain/primera-division
+    football-ranking: null
+copa_del_rey:
+  aliases:
+  - Copa del Rey
+  - Spanish Cup
+  - Spanish Copa del Rey
+  name: Copa del Rey
+  sources:
+    espn: esp.copa_del_rey
+    football-data: null
+    livesoccertv: /spain/copa-del-rey
+    football-ranking: null
+supercopa_de_espana:
+  aliases:
+  - "Supercopa de España"
+  - Spanish Super Cup
+  name: "Supercopa de España"
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /spain/spanish-super-cup
+    football-ranking: null
+bundesliga:
+  aliases:
+  - Bundesliga
+  - German Bundesliga
+  name: Bundesliga
+  sources:
+    espn: ger.1
+    football-data: 2002
+    livesoccertv: /germany/bundesliga
+    football-ranking: null
+dfb_pokal:
+  aliases:
+  - DFB Pokal
+  - German Cup
+  name: DFB Pokal
+  sources:
+    espn: ger.dfb_pokal
+    football-data: null
+    livesoccertv: /germany/german-cup
+    football-ranking: null
+dfl_supercup:
+  aliases:
+  - DFL-Supercup
+  - German Super Cup
+  name: DFL Supercup
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /germany/dfl-supercup
+    football-ranking: null
+primeira_liga:
+  aliases:
+  - Primeira Liga
+  - Portuguese Primeira Liga
+  - Liga Portugal
+  name: Primeira Liga
+  sources:
+    espn: por.1
+    football-data: 2017
+    livesoccertv: null
+    football-ranking: null
+eredivisie:
+  aliases:
+  - Eredivisie
+  - Dutch Eredivisie
+  - Dutch League
+  name: Eredivisie
+  sources:
+    espn: ned.1
+    football-data: 2003
+    livesoccertv: null
+    football-ranking: null
+eliteserien:
+  aliases:
+  - Eliteserien
+  - Norwegian Eliteserien
+  name: Eliteserien
+  sources:
+    espn: nor.1
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+uefa_champions_league:
+  aliases:
+  - Champions League
+  - UEFA Champions League
+  - UCL
+  name: UEFA Champions League
+  sources:
+    espn: uefa.champions
+    football-data: 2001
+    livesoccertv: /international/uefa-champions-league
+    football-ranking: null
+uefa_champions_league_qualifying:
+  aliases:
+  - Champions League Qualifying
+  - UEFA Champions League Qualifying
+  name: UEFA Champions League Qualifying
+  sources:
+    espn: uefa.champions_qual
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+uefa_europa_league:
+  aliases:
+  - Europa League
+  - UEFA Europa League
+  - UEL
+  name: UEFA Europa League
+  sources:
+    espn: uefa.europa
+    football-data: null
+    livesoccertv: /international/uefa-europa-league
+    football-ranking: null
+uefa_europa_league_qualifying:
+  aliases:
+  - Europa League Qualifying
+  - UEFA Europa League Qualifying
+  name: UEFA Europa League Qualifying
+  sources:
+    espn: uefa.europa_qual
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+uefa_conference_league:
+  aliases:
+  - Conference League
+  - UEFA Conference League
+  name: UEFA Conference League
+  sources:
+    espn: uefa.europa.conf
+    football-data: null
+    livesoccertv: /international/uefa-europa-conference-league
+    football-ranking: null
+uefa_conference_league_qualifying:
+  aliases:
+  - Conference League Qualifying
+  - UEFA Conference League Qualifying
+  name: UEFA Conference League Qualifying
+  sources:
+    espn: uefa.europa.conf_qual
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+uefa_super_cup:
+  aliases:
+  - UEFA Super Cup
+  - European Super Cup
+  name: UEFA Super Cup
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /international/uefa-super-cup
+    football-ranking: null
+fifa_club_world_cup:
+  aliases:
+  - FIFA Club World Cup
+  - FIFA CWC
+  name: FIFA Club World Cup
+  sources:
+    espn: fifa.cwc
+    football-data: null
+    livesoccertv: /international/fifa-club-world-cup
+    football-ranking: null
+uefa_euro:
+  aliases:
+  - UEFA Euro
+  - European Championship
+  - Euro
+  - UEFA European Championship
+  name: UEFA Euro
+  sources:
+    espn: uefa.euro
+    football-data: 2018
+    livesoccertv: /international/uefa-european-championship
+    football-ranking: null
+uefa_euro_qualifying:
+  aliases:
+  - UEFA Euro Qualifying
+  - European Championship Qualifying
+  - UEFA European Championship Qualifying
+  - Euro Qualifying
+  name: UEFA Euro Qualifying
+  sources:
+    espn: uefa.euro.qual
+    football-data: null
+    livesoccertv: /international/uefa-euro-qualifying
+    football-ranking: null
+uefa_nations_league:
+  aliases:
+  - UEFA Nations League
+  - UEFA Nations League Finals
+  name: UEFA Nations League
+  sources:
+    espn: uefa.nations
+    football-data: null
+    livesoccertv: /international/uefa-nations-league
+    football-ranking: null
+fifa_world_cup:
+  aliases:
+  - FIFA World Cup
+  - World Cup
+  - FIFA WC
+  - WC
+  name: FIFA World Cup
+  sources:
+    espn: fifa.world
+    football-data: 2000
+    livesoccertv: /international/world-cup
+    football-ranking: null
+fifa_world_cup_qualifying_-_uefa:
+  aliases:
+  - FIFA World Cup Qualifying - UEFA
+  - FIFA WC Qualifying - UEFA
+  - FIFA WCQ - UEFA
+  name: FIFA World Cup Qualifying - UEFA
+  sources:
+    espn: fifa.world.qual.uefa
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+copa_america:
+  aliases:
+  - Copa América
+  - Copa America
+  - South American Championship
+  name: "Copa América"
+  sources:
+    espn: conmebol.america
+    football-data: null
+    livesoccertv: /international/copa-america
+    football-ranking: null
+africa_cup_of_nations:
+  aliases:
+  - Africa Cup of Nations
+  - AFCON
+  name: Africa Cup of Nations
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: /international/africa-cup-of-nations
+    football-ranking: null
+mens_olympic_football_tournament:
+  aliases:
+  - Men's Olympic Soccer Tournament
+  - Olympic Football Tournament
+  - Olympic Games
+  name: Men's Olympic Soccer Tournament
+  sources:
+    espn: fifa.olympics
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+international_friendly:
+  aliases:
+  - International Friendly
+  - Friendly Match
+  - FIFA Friendly
+  - FIFA International Friendly
+  name: International Friendly
+  sources:
+    espn: fifa.friendly
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+fifa_rankings:
+  aliases:
+  - FIFA Rankings
+  - FIFA World Rankings
+  name: FIFA Rankings
+  sources:
+    espn: null
+    football-data: null
+    livesoccertv: null
+    football-ranking: /fifa-rankings
+uefa_womens_champions_league:
+  aliases:
+  - UEFA Women's Champions League
+  name: UEFA Women's Champions League
+  sources:
+    espn: uefa.wchampions
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+uefa_womens_european_championship:
+  aliases:
+  - UEFA Women's European Championship
+  name: UEFA Women's European Championship
+  sources:
+    espn: uefa.weuro
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+womens_olympic_football_tournament:
+  aliases:
+  - Women's Olympic Soccer Tournament
+  name: Women's Olympic Soccer Tournament
+  sources:
+    espn: fifa.w.olympics
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
+fifa_womens_world_cup:
+  aliases:
+  - FIFA Women's World Cup
+  name: FIFA Women's World Cup
+  sources:
+    espn: fifa.wwc
+    football-data: null
+    livesoccertv: null
+    football-ranking: null
