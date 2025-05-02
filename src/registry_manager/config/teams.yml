@@ -1,9 +1,11 @@
 ajax:
   aliases:
   - AJA
-  - AFC Ajax
-  - Football Club Ajax
   - Ajax
+  - AFC Ajax
+  - Ajax Amsterdam
+  - Amsterdamsche Football Club Ajax
+  name: Ajax
   sources:
     espn: null
     football-data: 678
@@ -12,6 +14,8 @@ alavés:
   aliases:
   - ALA
   - Deportivo Alavés
+  - Alavés
+  name: Alavés
   sources:
     espn: null
     football-data: 263
@@ -20,6 +24,7 @@ albania:
   aliases:
   - ALB
   - Albania
+  name: Albania
   sources:
     espn: null
     football-data: 1065
@@ -27,7 +32,9 @@ albania:
 alianza_lima:
   aliases:
   - ALI
+  - Alianza Lima
   - Club Alianza Lima
+  name: Alianza Lima
   sources:
     espn: null
     football-data: 5680
@@ -39,6 +46,7 @@ almere_city:
   - Almere City Football Club
   - Almere City
   - ACFC
+  name: Almere City
   sources:
     espn: null
     football-data: 1911
@@ -46,11 +54,12 @@ almere_city:
 amadora:
   aliases:
   - AMA
-  - CF Estrela da Amadora
-  - Club de Fútbol Estrela da Amadora
   - Estrela da Amadora
-  - CEDA
-  - CDFEDA
+  - CF Estrela da Amadora
+  - Club Football Estrela Amadora
+  - Club Football Estrela Amadora SAD
+  - Amadora
+  name: Amadora
   sources:
     espn: null
     football-data: 9136
@@ -59,8 +68,8 @@ angers_sco:
   aliases:
   - ANG
   - Angers SCO
-  - Angers Sport ClubO
-  - AngersO
+  - Angers Sporting Club de l'Ouest
+  name: Angers SCO
   sources:
     espn: null
     football-data: 532
@@ -69,6 +78,7 @@ argentina:
   aliases:
   - ARG
   - Argentina
+  name: Argentina
   sources:
     espn: null
     football-data: 762
@@ -77,8 +87,9 @@ arouca:
   aliases:
   - FCA
   - FC Arouca
-  - Football Club Arouca
+  - Futebol Clube de Arouca
   - Arouca
+  name: Arouca
   sources:
     espn: null
     football-data: 712
@@ -89,6 +100,7 @@ arsenal:
   - Arsenal FC
   - Arsenal Football Club
   - Arsenal
+  name: Arsenal
   sources:
     espn: null
     football-data: 57
@@ -100,6 +112,7 @@ aston_villa:
   - Aston Villa Football Club
   - Aston Villa
   - AVFC
+  name: Aston Villa
   sources:
     espn: null
     football-data: 58
@@ -108,6 +121,8 @@ atalanta:
   aliases:
   - ATA
   - Atalanta BC
+  - Atalanta
+  name: Atalanta
   sources:
     espn: null
     football-data: 102
@@ -116,6 +131,8 @@ athletic:
   aliases:
   - ATH
   - Athletic Club
+  - Athletic
+  name: Athletic
   sources:
     espn: null
     football-data: 77
@@ -124,8 +141,9 @@ atleti:
   aliases:
   - ATL
   - Club Atlético de Madrid
-  - CADM
   - Atlético de Madrid
+  - Atleti
+  name: Atlético de Madrid
   sources:
     espn: null
     football-data: 78
@@ -136,6 +154,7 @@ augsburg:
   - FC Augsburg
   - Football Club Augsburg
   - Augsburg
+  name: Augsburg
   sources:
     espn: null
     football-data: 16
@@ -144,6 +163,7 @@ australia:
   aliases:
   - AUS
   - Australia
+  name: Australia
   sources:
     espn: null
     football-data: 779
@@ -152,6 +172,7 @@ austria:
   aliases:
   - AUT
   - Austria
+  name: Austria
   sources:
     espn: null
     football-data: 816
@@ -160,6 +181,8 @@ auxerre:
   aliases:
   - AJA
   - AJ Auxerre
+  - Auxerre
+  name: Auxerre
   sources:
     espn: null
     football-data: 519
@@ -168,6 +191,7 @@ avs:
   aliases:
   - AVS
   - AVS Futebol SAD
+  name: AVS
   sources:
     espn: null
     football-data: 10340
@@ -177,6 +201,7 @@ az:
   - AZ
   - Alkmaar Zaanstreek
   - AZ Alkmaar
+  name: AZ Alkmaar
   sources:
     espn: null
     football-data: 682
@@ -185,6 +210,8 @@ bahia:
   aliases:
   - BAH
   - EC Bahia
+  - Bahia
+  name: Bahia
   sources:
     espn: null
     football-data: 1777
@@ -195,6 +222,8 @@ barça:
   - FC Barcelona
   - Football Club Barcelona
   - Barcelona
+  - Barça
+  name: Barça
   sources:
     espn: null
     football-data: 81
@@ -206,6 +235,8 @@ bayern:
   - Football Club Bayern München
   - Bayern München
   - FCBM
+  - Bayern
+  name: Bayern
   sources:
     espn: null
     football-data: 5
@@ -214,6 +245,7 @@ belgium:
   aliases:
   - BEL
   - Belgium
+  name: Belgium
   sources:
     espn: null
     football-data: 805
@@ -224,7 +256,8 @@ blackburn:
   - Blackburn Rovers FC
   - Blackburn Rovers Football Club
   - Blackburn Rovers
-  - BRFC
+  - Blackburn
+  name: Blackburn
   sources:
     espn: null
     football-data: 59
@@ -235,6 +268,7 @@ boavista:
   - Boavista FC
   - Boavista Football Club
   - Boavista
+  name: Boavista
   sources:
     espn: null
     football-data: 810
@@ -243,6 +277,8 @@ bochum:
   aliases:
   - BOC
   - VfL Bochum 1848
+  - Bochum
+  name: Bochum
   sources:
     espn: null
     football-data: 36
@@ -250,10 +286,12 @@ bochum:
 bologna:
   aliases:
   - BOL
+  - Bologna
+  - Bologna FC
   - Bologna FC 1909
   - Bologna Football Club 1909
   - Bologna 1909
-  - BFC1
+  name: Bologna
   sources:
     espn: null
     football-data: 103
@@ -263,6 +301,7 @@ boston_river:
   - BOR
   - Boston River
   - CA Boston River
+  name: Boston River
   sources:
     espn: null
     football-data: 5181
@@ -272,6 +311,7 @@ bournemouth:
   - BOU
   - Bournemouth
   - AFC Bournemouth
+  name: Bournemouth
   sources:
     espn: null
     football-data: 1044
@@ -279,8 +319,10 @@ bournemouth:
 braga:
   aliases:
   - SCB
+  - SC Braga
   - Sporting Clube de Braga
-  - SCDB
+  - Braga
+  name: Braga
   sources:
     espn: null
     football-data: 5613
@@ -289,6 +331,7 @@ brazil:
   aliases:
   - BRA
   - Brazil
+  name: Brazil
   sources:
     espn: null
     football-data: 764
@@ -296,7 +339,10 @@ brazil:
 bremen:
   aliases:
   - SVW
+  - Werder Bremen
   - SV Werder Bremen
+  - Bremen
+  name: Bremen
   sources:
     espn: null
     football-data: 12
@@ -307,6 +353,7 @@ brentford:
   - Brentford FC
   - Brentford Football Club
   - Brentford
+  name: Brentford
   sources:
     espn: null
     football-data: 402
@@ -314,7 +361,10 @@ brentford:
 brest:
   aliases:
   - BRE
+  - Brest
+  - Stade Brestois
   - Stade Brestois 29
+  name: Brest
   sources:
     espn: null
     football-data: 512
@@ -322,11 +372,12 @@ brest:
 brighton_hove:
   aliases:
   - BHA
+  - Brighton
   - Brighton & Hove Albion FC
   - Brighton & Hove Albion Football Club
   - Brighton & Hove Albion
-  - B&HAFC
-  - B&HA
+  - Brighton Hove
+  name: Brighton Hove
   sources:
     espn: null
     football-data: 397
@@ -337,7 +388,7 @@ bristol_city:
   - Bristol City FC
   - Bristol City Football Club
   - Bristol City
-  - BCFC
+  name: Bristol City
   sources:
     espn: null
     football-data: 387
@@ -348,6 +399,7 @@ burnley:
   - Burnley FC
   - Burnley Football Club
   - Burnley
+  name: Burnley
   sources:
     espn: null
     football-data: 328
@@ -356,6 +408,8 @@ cagliari:
   aliases:
   - CAG
   - Cagliari Calcio
+  - Cagliari
+  name: Cagliari
   sources:
     espn: null
     football-data: 104
@@ -364,6 +418,7 @@ cameroon:
   aliases:
   - CMR
   - Cameroon
+  name: Cameroon
   sources:
     espn: null
     football-data: 781
@@ -372,6 +427,7 @@ canada:
   aliases:
   - CAN
   - Canada
+  name: Canada
   sources:
     espn: null
     football-data: 828
@@ -382,7 +438,8 @@ cardiff:
   - Cardiff City FC
   - Cardiff City Football Club
   - Cardiff City
-  - CCFC
+  - Cardiff
+  name: Cardiff
   sources:
     espn: null
     football-data: 715
@@ -393,7 +450,7 @@ casa_pia:
   - Casa Pia AC
   - Casa Pia Associazione Calcio
   - Casa Pia
-  - CPAC
+  name: Casa Pia
   sources:
     espn: null
     football-data: 6618
@@ -402,6 +459,7 @@ cd_blooming:
   aliases:
   - BLO
   - CD Blooming
+  name: CD Blooming
   sources:
     espn: null
     football-data: 4259
@@ -410,6 +468,7 @@ cd_nacional:
   aliases:
   - CDN
   - CD Nacional
+  name: CD Nacional
   sources:
     espn: null
     football-data: 5529
@@ -420,6 +479,8 @@ celta:
   - RC Celta de Vigo
   - Real Club Celta de Vigo
   - Celta de Vigo
+  - Celta
+  name: Celta
   sources:
     espn: null
     football-data: 558
@@ -430,6 +491,7 @@ celtic:
   - Celtic FC
   - Celtic Football Club
   - Celtic
+  name: Celtic
   sources:
     espn: null
     football-data: 732
@@ -440,6 +502,7 @@ chelsea:
   - Chelsea FC
   - Chelsea Football Club
   - Chelsea
+  name: Chelsea
   sources:
     espn: null
     football-data: 61
@@ -448,22 +511,17 @@ club_brugge:
   aliases:
   - CLU
   - Club Brugge KV
+  - Club Brugge
+  name: Club Brugge
   sources:
     espn: null
     football-data: 851
-    livesoccertv: null
-club_nacional:
-  aliases:
-  - NAC
-  - Club Nacional
-  sources:
-    espn: null
-    football-data: 5188
     livesoccertv: null
 como_1907:
   aliases:
   - COM
   - Como 1907
+  name: Como 1907
   sources:
     espn: null
     football-data: 7397
@@ -475,6 +533,8 @@ corinthians:
   - Sport Club Corinthians Paulista
   - Corinthians Paulista
   - SCCP
+  - Corinthians
+  name: Corinthians
   sources:
     espn: null
     football-data: 1779
@@ -483,6 +543,7 @@ costa_rica:
   aliases:
   - CRC
   - Costa Rica
+  name: Costa Rica
   sources:
     espn: null
     football-data: 793
@@ -494,6 +555,7 @@ coventry_city:
   - Coventry City Football Club
   - Coventry City
   - CCFC
+  name: Coventry City
   sources:
     espn: null
     football-data: 1076
@@ -502,6 +564,7 @@ croatia:
   aliases:
   - CRO
   - Croatia
+  name: Croatia
   sources:
     espn: null
     football-data: 799
@@ -510,6 +573,8 @@ crvena_zvedza:
   aliases:
   - CRV
   - FK Crvena Zvezda
+  - Crvena Zvedza
+  name: Crvena Zvedza
   sources:
     espn: null
     football-data: 7283
@@ -520,6 +585,7 @@ crystal_palace:
   - Crystal Palace FC
   - Crystal Palace Football Club
   - Crystal Palace
+  name: Crystal Palace
   sources:
     espn: null
     football-data: 354
@@ -528,6 +594,7 @@ czechia:
   aliases:
   - CZE
   - Czechia
+  name: Czechia
   sources:
     espn: null
     football-data: 798
@@ -538,6 +605,7 @@ defensor:
   - Defensor SC
   - Defensor Sport Club
   - Defensor
+  name: Defensor
   sources:
     espn: null
     football-data: 5190
@@ -546,6 +614,7 @@ denmark:
   aliases:
   - DEN
   - Denmark
+  name: Denmark
   sources:
     espn: null
     football-data: 782
@@ -557,6 +626,7 @@ derby_county:
   - Derby County Football Club
   - Derby County
   - DCFC
+  name: Derby County
   sources:
     espn: null
     football-data: 342
@@ -565,6 +635,8 @@ dinamo_zagreb:
   aliases:
   - DIN
   - GNK Dinamo Zagreb
+  - Dinamo Zagreb
+  name: Dinamo Zagreb
   sources:
     espn: null
     football-data: 755
@@ -573,6 +645,8 @@ dortmund:
   aliases:
   - BVB
   - Borussia Dortmund
+  - Dortmund
+  name: Dortmund
   sources:
     espn: null
     football-data: 4
@@ -581,6 +655,7 @@ ecuador:
   aliases:
   - ECU
   - Ecuador
+  name: Ecuador
   sources:
     espn: null
     football-data: 791
@@ -589,6 +664,8 @@ el_nacional:
   aliases:
   - ELN
   - CSCyD El Nacional
+  - El Nacional
+  name: El Nacional
   sources:
     espn: null
     football-data: 4524
@@ -599,6 +676,7 @@ empoli:
   - Empoli FC
   - Empoli Football Club
   - Empoli
+  name: Empoli
   sources:
     espn: null
     football-data: 445
@@ -607,6 +685,7 @@ england:
   aliases:
   - ENG
   - England
+  name: England
   sources:
     espn: null
     football-data: 770
@@ -615,6 +694,8 @@ espanyol:
   aliases:
   - ESP
   - RCD Espanyol de Barcelona
+  - Espanyol
+  name: Espanyol
   sources:
     espn: null
     football-data: 80
@@ -623,6 +704,8 @@ estoril_praia:
   aliases:
   - EST
   - GD Estoril Praia
+  - Estoril Praia
+  name: Estoril Praia
   sources:
     espn: null
     football-data: 582
@@ -633,6 +716,7 @@ everton:
   - Everton FC
   - Everton Football Club
   - Everton
+  name: Everton
   sources:
     espn: null
     football-data: 62
@@ -644,6 +728,7 @@ famalicão:
   - Football Club Famalicão
   - Futebol Clube de Famalicão
   - Famalicão
+  name: Famalicão
   sources:
     espn: null
     football-data: 5531
@@ -654,6 +739,7 @@ farense:
   - SC Farense
   - Sporting Clube Farense
   - Farense
+  name: Farense
   sources:
     espn: null
     football-data: 5602
@@ -662,6 +748,7 @@ fbc_melgar:
   aliases:
   - MEL
   - FBC Melgar
+  name: FBC Melgar
   sources:
     espn: null
     football-data: 5682
@@ -670,6 +757,8 @@ feyenoord:
   aliases:
   - FEY
   - Feyenoord Rotterdam
+  - Feyenoord
+  name: Feyenoord
   sources:
     espn: null
     football-data: 675
@@ -679,6 +768,7 @@ fiorentina:
   - FIO
   - ACF Fiorentina
   - Fiorentina
+  name: Fiorentina
   sources:
     espn: null
     football-data: 99
@@ -687,6 +777,7 @@ france:
   aliases:
   - FRA
   - France
+  name: France
   sources:
     espn: null
     football-data: 773
@@ -695,6 +786,8 @@ frankfurt:
   aliases:
   - SGE
   - Eintracht Frankfurt
+  - Frankfurt
+  name: Frankfurt
   sources:
     espn: null
     football-data: 19
@@ -706,6 +799,7 @@ freiburg:
   - Sport Club Freiburg
   - Sport-Club Freiburg
   - Freiburg
+  name: Freiburg
   sources:
     espn: null
     football-data: 17
@@ -716,6 +810,7 @@ fulham:
   - Fulham FC
   - Fulham Football Club
   - Fulham
+  name: Fulham
   sources:
     espn: null
     football-data: 63
@@ -725,6 +820,8 @@ genoa:
   - GEN
   - Genoa CFC
   - Genoa Cricket and Football Club
+  - Genoa
+  name: Genoa
   sources:
     espn: null
     football-data: 107
@@ -733,6 +830,7 @@ georgia:
   aliases:
   - GEO
   - Georgia
+  name: Georgia
   sources:
     espn: null
     football-data: 1978
@@ -741,6 +839,7 @@ germany:
   aliases:
   - GER
   - Germany
+  name: Germany
   sources:
     espn: null
     football-data: 759
@@ -751,6 +850,7 @@ getafe:
   - Getafe CF
   - Getafe Club de Fútbol
   - Getafe
+  name: Getafe
   sources:
     espn: null
     football-data: 82
@@ -759,6 +859,7 @@ ghana:
   aliases:
   - GHA
   - Ghana
+  name: Ghana
   sources:
     espn: null
     football-data: 763
@@ -770,6 +871,7 @@ gil_vicente:
   - Gil Vicente Football Club
   - Gil Vicente Futebol Clube
   - Gil Vicente
+  name: Gil Vicente
   sources:
     espn: null
     football-data: 5533
@@ -781,6 +883,7 @@ girona:
   - Girona Football Club
   - Girona Futbol Club
   - Girona
+  name: Girona
   sources:
     espn: null
     football-data: 298
@@ -789,6 +892,8 @@ go_ahead:
   aliases:
   - GOA
   - Go Ahead Eagles
+  - Go Ahead
+  name: Go Ahead
   sources:
     espn: null
     football-data: 718
@@ -799,6 +904,7 @@ groningen:
   - FC Groningen
   - Football Club Groningen
   - Groningen
+  name: Groningen
   sources:
     espn: null
     football-data: 677
@@ -809,6 +915,7 @@ heerenveen:
   - SC Heerenveen
   - Sport Club Heerenveen
   - Heerenveen
+  name: Heerenveen
   sources:
     espn: null
     football-data: 673
@@ -822,6 +929,7 @@ heidenheim:
   - Heidenheim 1846
   - Football Club Heidenheim
   - Heidenheim
+  name: Heidenheim
   sources:
     espn: null
     football-data: 44
@@ -830,6 +938,8 @@ heracles:
   aliases:
   - HER
   - Heracles Almelo
+  - Heracles
+  name: Heracles
   sources:
     espn: null
     football-data: 671
@@ -838,6 +948,8 @@ hoffenheim:
   aliases:
   - TSG
   - TSG 1899 Hoffenheim
+  - Hoffenheim
+  name: Hoffenheim
   sources:
     espn: null
     football-data: 2
@@ -846,6 +958,7 @@ holstein_kiel:
   aliases:
   - KSV
   - Holstein Kiel
+  name: Holstein Kiel
   sources:
     espn: null
     football-data: 720
@@ -854,6 +967,8 @@ hull_city:
   aliases:
   - HUL
   - Hull City AFC
+  - Hull City
+  name: Hull City
   sources:
     espn: null
     football-data: 322
@@ -862,6 +977,7 @@ hungary:
   aliases:
   - HUN
   - Hungary
+  name: Hungary
   sources:
     espn: null
     football-data: 827
@@ -871,10 +987,12 @@ inter:
   - INT
   - FC Internazionale Milano
   - Football Club Internazionale Milano
-  - Internazionale Milano*
+  - Internazionale Milano
   - Internazionale
   - Inter
+  - Inter Milan
   - FC Internazionale
+  name: Inter Milan
   sources:
     espn: null
     football-data: 108
@@ -885,6 +1003,7 @@ ipswich_town:
   - Ipswich Town FC
   - Ipswich Town Football Club
   - Ipswich Town
+  name: Ipswich Town
   sources:
     espn: null
     football-data: 349
@@ -893,6 +1012,8 @@ iquique:
   aliases:
   - IQU
   - CD Iquique
+  - Iquique
+  name: Iquique
   sources:
     espn: null
     football-data: 4458
@@ -901,6 +1022,7 @@ iran:
   aliases:
   - IRN
   - Iran
+  name: Iran
   sources:
     espn: null
     football-data: 840
@@ -909,6 +1031,7 @@ italy:
   aliases:
   - ITA
   - Italy
+  name: Italy
   sources:
     espn: null
     football-data: 784
@@ -917,6 +1040,7 @@ japan:
   aliases:
   - JPN
   - Japan
+  name: Japan
   sources:
     espn: null
     football-data: 766
@@ -927,6 +1051,7 @@ juventus:
   - Juventus FC
   - Juventus Football Club
   - Juventus
+  name: Juventus
   sources:
     espn: null
     football-data: 109
@@ -935,6 +1060,8 @@ korea_republic:
   aliases:
   - KOR
   - South Korea
+  - Korea Republic
+  name: Korea Republic
   sources:
     espn: null
     football-data: 772
@@ -945,6 +1072,7 @@ las_palmas:
   - UD Las Palmas
   - Unión Deportiva Las Palmas
   - Las Palmas
+  name: Las Palmas
   sources:
     espn: null
     football-data: 275
@@ -953,6 +1081,8 @@ lazio:
   aliases:
   - LAZ
   - SS Lazio
+  - Lazio
+  name: Lazio
   sources:
     espn: null
     football-data: 110
@@ -963,6 +1093,7 @@ le_havre:
   - Le Havre AC
   - Le Havre Athletic Club
   - Le Havre
+  name: Le Havre
   sources:
     espn: null
     football-data: 533
@@ -971,6 +1102,8 @@ lecce:
   aliases:
   - USL
   - US Lecce
+  - Lecce
+  name: Lecce
   sources:
     espn: null
     football-data: 5890
@@ -981,6 +1114,7 @@ leeds_united:
   - Leeds United FC
   - Leeds United Football Club
   - Leeds United
+  name: Leeds United
   sources:
     espn: null
     football-data: 341
@@ -989,6 +1123,8 @@ leganés:
   aliases:
   - LEG
   - CD Leganés
+  - Leganés
+  name: Leganés
   sources:
     espn: null
     football-data: 745
@@ -999,6 +1135,7 @@ leicester_city:
   - Leicester City FC
   - Leicester City Football Club
   - Leicester City
+  name: Leicester City
   sources:
     espn: null
     football-data: 338
@@ -1007,6 +1144,8 @@ leverkusen:
   aliases:
   - B04
   - Bayer 04 Leverkusen
+  - Leverkusen
+  name: Leverkusen
   sources:
     espn: null
     football-data: 3
@@ -1018,6 +1157,7 @@ lille:
   - LOSC
   - Lille Olympique Sporting Club
   - Lille
+  name: Lille
   sources:
     espn: null
     football-data: 521
@@ -1028,6 +1168,7 @@ liverpool:
   - Liverpool FC
   - Liverpool Football Club
   - Liverpool
+  name: Liverpool
   sources:
     espn: null
     football-data: 64
@@ -1038,6 +1179,7 @@ luton_town:
   - Luton Town FC
   - Luton Town Football Club
   - Luton Town
+  name: Luton Town
   sources:
     espn: null
     football-data: 389
@@ -1046,6 +1188,8 @@ m'gladbach:
   aliases:
   - BMG
   - Borussia Mönchengladbach
+  - M'gladbach
+  name: M'gladbach
   sources:
     espn: null
     football-data: 18
@@ -1056,6 +1200,7 @@ mainz:
   - 1. FSV Mainz 05
   - Mainz 05
   - Mainz
+  name: Mainz
   sources:
     espn: null
     football-data: 15
@@ -1064,6 +1209,8 @@ mallorca:
   aliases:
   - MAL
   - RCD Mallorca
+  - Mallorca
+  name: Mallorca
   sources:
     espn: null
     football-data: 89
@@ -1074,6 +1221,8 @@ man_city:
   - Manchester City FC
   - Manchester City Football Club
   - Manchester City
+  - Man City
+  name: Man City
   sources:
     espn: null
     football-data: 65
@@ -1084,6 +1233,8 @@ man_united:
   - Manchester United FC
   - Manchester United Football Club
   - Manchester United
+  - Man United
+  name: Man United
   sources:
     espn: null
     football-data: 66
@@ -1094,6 +1245,7 @@ marseille:
   - Olympique de Marseille
   - OM
   - Marseille
+  name: Marseille
   sources:
     espn: null
     football-data: 516
@@ -1102,6 +1254,7 @@ mexico:
   aliases:
   - MEX
   - Mexico
+  name: Mexico
   sources:
     espn: null
     football-data: 769
@@ -1112,6 +1265,7 @@ middlesbrough:
   - Middlesbrough FC
   - Middlesbrough Football Club
   - Middlesbrough
+  name: Middlesbrough
   sources:
     espn: null
     football-data: 343
@@ -1122,6 +1276,7 @@ milan:
   - AC Milan
   - Associazione Calcio Milan
   - Milan
+  name: Milan
   sources:
     espn: null
     football-data: 98
@@ -1132,6 +1287,7 @@ millwall:
   - Millwall FC
   - Millwall Football Club
   - Millwall
+  name: Millwall
   sources:
     espn: null
     football-data: 384
@@ -1148,6 +1304,7 @@ monaco:
   - Monaco Football Club
   - Association Sportive Monaco
   - Monaco
+  name: Monaco
   sources:
     espn: null
     football-data: 548
@@ -1158,6 +1315,7 @@ monagas_sc:
   - Monagas SC
   - Monagas Sport Club
   - Monagas
+  name: Monagas SC
   sources:
     espn: null
     football-data: 5175
@@ -1168,6 +1326,7 @@ montpellier:
   - Montpellier HSC
   - MHSC
   - Montpellier
+  name: Montpellier
   sources:
     espn: null
     football-data: 518
@@ -1178,6 +1337,7 @@ monza:
   - AC Monza
   - Associazione Calcio Monza
   - Monza
+  name: Monza
   sources:
     espn: null
     football-data: 5911
@@ -1188,6 +1348,7 @@ moreirense:
   - Moreirense FC
   - Moreirense Football Club
   - Moreirense
+  name: Moreirense
   sources:
     espn: null
     football-data: 583
@@ -1196,6 +1357,7 @@ morocco:
   aliases:
   - MAR
   - Morocco
+  name: Morocco
   sources:
     espn: null
     football-data: 815
@@ -1204,19 +1366,10 @@ nac:
   aliases:
   - NAC
   - NAC Breda
+  name: NAC Breda
   sources:
     espn: null
     football-data: 681
-    livesoccertv: null
-nan:
-  aliases:
-  - .nan
-  - Universidad Central de Venezuela FC
-  - Universidad Central de Venezuela Football Club
-  - Universidad Central de Venezuela
-  sources:
-    espn: null
-    football-data: 9357
     livesoccertv: null
 nantes:
   aliases:
@@ -1224,6 +1377,7 @@ nantes:
   - FC Nantes
   - Football Club Nantes
   - Nantes
+  name: Nantes
   sources:
     espn: null
     football-data: 543
@@ -1234,6 +1388,7 @@ napoli:
   - SSC Napoli
   - Società Sportiva Calcio Napoli
   - Napoli
+  name: Napoli
   sources:
     espn: null
     football-data: 113
@@ -1241,7 +1396,8 @@ napoli:
 nec:
   aliases:
   - NEC
-  - NEC
+  - NEC Nijmegen
+  name: NEC Nijmegen
   sources:
     espn: null
     football-data: 1915
@@ -1250,6 +1406,7 @@ netherlands:
   aliases:
   - NED
   - Netherlands
+  name: Netherlands
   sources:
     espn: null
     football-data: 8601
@@ -1260,6 +1417,8 @@ newcastle:
   - Newcastle United FC
   - Newcastle United Football Club
   - Newcastle United
+  - Newcastle
+  name: Newcastle
   sources:
     espn: null
     football-data: 67
@@ -1269,6 +1428,8 @@ nice:
   - NIC
   - OGCN
   - OGC Nice
+  - Nice
+  name: Nice
   sources:
     espn: null
     football-data: 522
@@ -1279,6 +1440,8 @@ norwich:
   - Norwich City FC
   - Norwich City Football Club
   - Norwich City
+  - Norwich
+  name: Norwich
   sources:
     espn: null
     football-data: 68
@@ -1289,6 +1452,8 @@ nottingham:
   - Nottingham Forest FC
   - Nottingham Forest Football Club
   - Nottingham Forest
+  - Nottingham
+  name: Nottingham
   sources:
     espn: null
     football-data: 351
@@ -1297,6 +1462,8 @@ nublense:
   aliases:
   - CDN
   - CD Nublense
+  - Nublense
+  name: Nublense
   sources:
     espn: null
     football-data: 9362
@@ -1306,6 +1473,8 @@ olympique_lyon:
   - LYO
   - OL
   - Olympique Lyonnais
+  - Olympique Lyon
+  name: Olympique Lyonnais
   sources:
     espn: null
     football-data: 523
@@ -1314,6 +1483,8 @@ osasuna:
   aliases:
   - OSA
   - CA Osasuna
+  - Osasuna
+  name: Osasuna
   sources:
     espn: null
     football-data: 79
@@ -1324,6 +1495,7 @@ oxford_united:
   - Oxford United FC
   - Oxford United Football Club
   - Oxford United
+  name: Oxford United
   sources:
     espn: null
     football-data: 1082
@@ -1332,6 +1504,8 @@ parma:
   aliases:
   - PAR
   - Parma Calcio 1913
+  - Parma
+  name: Parma
   sources:
     espn: null
     football-data: 112
@@ -1342,6 +1516,8 @@ plymouth_arg:
   - Plymouth Argyle FC
   - Plymouth Argyle Football Club
   - Plymouth Argyle
+  - Plymouth Arg
+  name: Plymouth Arg
   sources:
     espn: null
     football-data: 1138
@@ -1350,6 +1526,7 @@ poland:
   aliases:
   - POL
   - Poland
+  name: Poland
   sources:
     espn: null
     football-data: 794
@@ -1361,6 +1538,7 @@ porto:
   - Football Club Porto
   - Futebol Clube do Porto
   - Porto
+  name: Porto
   sources:
     espn: null
     football-data: 503
@@ -1371,6 +1549,7 @@ portsmouth:
   - Portsmouth FC
   - Portsmouth Football Club
   - Portsmouth
+  name: Portsmouth
   sources:
     espn: null
     football-data: 325
@@ -1379,6 +1558,7 @@ portugal:
   aliases:
   - POR
   - Portugal
+  name: Portugal
   sources:
     espn: null
     football-data: 765
@@ -1389,6 +1569,8 @@ preston_ne:
   - Preston North End FC
   - Preston North End Football Club
   - Preston North End
+  - Preston NE
+  name: Preston NE
   sources:
     espn: null
     football-data: 1081
@@ -1401,6 +1583,7 @@ psg:
   - Paris Saint-Germain
   - Paris Saint-Germain FC
   - Paris Saint-Germain Football Club
+  name: PSG
   sources:
     espn: null
     football-data: 524
@@ -1410,6 +1593,7 @@ psv:
   - PSV
   - Philips Sport Vereniging
   - PSV Eindhoven
+  name: PSV
   sources:
     espn: null
     football-data: 674
@@ -1418,6 +1602,7 @@ qatar:
   aliases:
   - QAT
   - Qatar
+  name: Qatar
   sources:
     espn: null
     football-data: 8030
@@ -1428,6 +1613,7 @@ qpr:
   - Queens Park Rangers FC
   - Queens Park Rangers Football Club
   - Queens Park Rangers
+  name: Queens Park Rangers
   sources:
     espn: null
     football-data: 69
@@ -1438,6 +1624,7 @@ rayo_vallecano:
   - Rayo
   - Rayo Vallecano
   - Rayo Vallecano de Madrid
+  name: Rayo Vallecano
   sources:
     espn: null
     football-data: 87
@@ -1447,6 +1634,7 @@ rb_leipzig:
   - RBL
   - RasenBallsport Leipzig
   - RB Leipzig
+  name: RB Leipzig
   sources:
     espn: null
     football-data: 721
@@ -1457,6 +1645,8 @@ rb_salzburg:
   - FC Red Bull Salzburg
   - Football Club Red Bull Salzburg
   - Red Bull Salzburg
+  - RB Salzburg
+  name: RB Salzburg
   sources:
     espn: null
     football-data: 1877
@@ -1466,6 +1656,7 @@ rc_lens:
   - RCL
   - RC Lens
   - Racing Club de Lens
+  name: RC Lens
   sources:
     espn: null
     football-data: 546
@@ -1475,6 +1666,7 @@ real_betis:
   - BET
   - Real Betis
   - Real Betis Balompié
+  name: Real Betis
   sources:
     espn: null
     football-data: 90
@@ -1485,6 +1677,7 @@ real_madrid:
   - Real Madrid CF
   - Real Madrid Club de Fútbol
   - Real Madrid
+  name: Real Madrid
   sources:
     espn: null
     football-data: 86
@@ -1493,6 +1686,8 @@ real_sociedad:
   aliases:
   - RSO
   - Real Sociedad de Fútbol
+  - Real Sociedad
+  name: Real Sociedad
   sources:
     espn: null
     football-data: 92
@@ -1503,6 +1698,7 @@ rio_ave:
   - Rio Ave FC
   - Rio Ave Football Club
   - Rio Ave
+  name: Rio Ave
   sources:
     espn: null
     football-data: 496
@@ -1511,6 +1707,7 @@ rkc:
   aliases:
   - RKC
   - RKC Waalwijk
+  name: RKC Waalwijk
   sources:
     espn: null
     football-data: 683
@@ -1521,6 +1718,7 @@ roma:
   - AS Roma
   - Associazione Sportiva Roma
   - Roma
+  name: Roma
   sources:
     espn: null
     football-data: 100
@@ -1529,6 +1727,7 @@ romania:
   aliases:
   - ROU
   - Romania
+  name: Romania
   sources:
     espn: null
     football-data: 811
@@ -1539,6 +1738,7 @@ saint-étienne:
   - AS Saint-Étienne
   - Association Sportive Saint-Étienne
   - Saint-Étienne
+  name: Saint-Étienne
   sources:
     espn: null
     football-data: 527
@@ -1548,6 +1748,9 @@ santa_clara:
   - SCL
   - CD Santa Clara
   - Clube Desportivo Santa Clara
+  - Santa Clara
+  - 'CD '
+  name: Santa Clara
   sources:
     espn: null
     football-data: 5530
@@ -1557,6 +1760,7 @@ santa_fe:
   - SAN
   - Santa Fe
   - Independiente Santa Fe
+  name: Santa Fe
   sources:
     espn: null
     football-data: 4441
@@ -1565,6 +1769,7 @@ saudi_arabia:
   aliases:
   - KSA
   - Saudi Arabia
+  name: Saudi Arabia
   sources:
     espn: null
     football-data: 801
@@ -1573,6 +1778,7 @@ scotland:
   aliases:
   - SCO
   - Scotland
+  name: Scotland
   sources:
     espn: null
     football-data: 8873
@@ -1581,6 +1787,7 @@ senegal:
   aliases:
   - SEN
   - Senegal
+  name: Senegal
   sources:
     espn: null
     football-data: 804
@@ -1589,6 +1796,7 @@ serbia:
   aliases:
   - SRB
   - Serbia
+  name: Serbia
   sources:
     espn: null
     football-data: 780
@@ -1599,6 +1807,7 @@ sevilla_fc:
   - Sevilla FC
   - Sevilla Football Club
   - Sevilla
+  name: Sevilla FC
   sources:
     espn: null
     football-data: 559
@@ -1609,6 +1818,8 @@ shaktar:
   - Shakhtar Donetsk
   - FC Shakhtar Donetsk
   - FK Shakhtar Donetsk
+  - Shaktar
+  name: Shaktar
   sources:
     espn: null
     football-data: 1887
@@ -1619,6 +1830,8 @@ sheffield_utd:
   - Sheffield United FC
   - Sheffield United Football Club
   - Sheffield United
+  - Sheffield Utd
+  name: Sheffield Utd
   sources:
     espn: null
     football-data: 356
@@ -1629,6 +1842,8 @@ sheffield_wed:
   - Sheffield Wednesday FC
   - Sheffield Wednesday Football Club
   - Sheffield Wednesday
+  - Sheffield Wed
+  name: Sheffield Wed
   sources:
     espn: null
     football-data: 345
@@ -1637,6 +1852,8 @@ sittard:
   aliases:
   - SIT
   - Fortuna Sittard
+  - Sittard
+  name: Sittard
   sources:
     espn: null
     football-data: 1920
@@ -1645,6 +1862,8 @@ sl._bratislava:
   aliases:
   - SBA
   - ŠK Slovan Bratislava
+  - Sl. Bratislava
+  name: Sl. Bratislava
   sources:
     espn: null
     football-data: 7509
@@ -1655,6 +1874,7 @@ sl_benfica:
   - Sport Lisboa e Benfica
   - Benfica
   - SL Benfica
+  name: SL Benfica
   sources:
     espn: null
     football-data: 1903
@@ -1663,6 +1883,7 @@ slovakia:
   aliases:
   - SVK
   - Slovakia
+  name: Slovakia
   sources:
     espn: null
     football-data: 768
@@ -1671,6 +1892,7 @@ slovenia:
   aliases:
   - SVN
   - Slovenia
+  name: Slovenia
   sources:
     espn: null
     football-data: 777
@@ -1681,6 +1903,7 @@ southampton:
   - Southampton FC
   - Southampton Football Club
   - Southampton
+  name: Southampton
   sources:
     espn: null
     football-data: 340
@@ -1689,6 +1912,7 @@ spain:
   aliases:
   - ESP
   - Spain
+  name: Spain
   sources:
     espn: null
     football-data: 760
@@ -1697,6 +1921,8 @@ sparta:
   aliases:
   - SPA
   - Sparta Rotterdam
+  - Sparta
+  name: Sparta
   sources:
     espn: null
     football-data: 6806
@@ -1709,6 +1935,7 @@ sparta_praha:
   - AC Sparta Prague
   - AC Sparta Praha
   - Athletic Club Sparta Praha
+  name: Sparta Praha
   sources:
     espn: null
     football-data: 907
@@ -1718,6 +1945,7 @@ sporting_cp:
   - SPO
   - Sporting CP
   - Sporting Clube de Portugal
+  name: Sporting CP
   sources:
     espn: null
     football-data: 498
@@ -1730,6 +1958,7 @@ st._pauli:
   - St. Pauli 1910
   - St. Pauli
   - FC St. Pauli
+  name: St. Pauli
   sources:
     espn: null
     football-data: 20
@@ -1739,6 +1968,7 @@ stade_de_reims:
   - SDR
   - Reims
   - Stade de Reims
+  name: Stade de Reims
   sources:
     espn: null
     football-data: 547
@@ -1750,6 +1980,7 @@ stade_rennais:
   - Stade Rennais FC
   - Stade Rennais FC 1901
   - Stade Rennais Football Club 1901
+  name: Stade Rennais
   sources:
     espn: null
     football-data: 529
@@ -1760,6 +1991,8 @@ stoke:
   - Stoke City FC
   - Stoke City Football Club
   - Stoke City
+  - Stoke
+  name: Stoke
   sources:
     espn: null
     football-data: 70
@@ -1773,6 +2006,9 @@ strasbourg:
   - Racing Club Strasbourg
   - RC Strasbourg Alsace
   - Racing Club Strasbourg Alsace
+  - Strasbourg
+  - 'RC '
+  name: Strasbourg
   sources:
     espn: null
     football-data: 576
@@ -1782,6 +2018,7 @@ sturm_graz:
   - STU
   - Sturm Graz
   - SK Sturm Graz
+  name: Sturm Graz
   sources:
     espn: null
     football-data: 2021
@@ -1791,6 +2028,7 @@ stuttgart:
   - VFB
   - Stuttgart
   - VfB Stuttgart
+  name: Stuttgart
   sources:
     espn: null
     football-data: 10
@@ -1801,6 +2039,7 @@ sunderland:
   - Sunderland
   - Sunderland AFC
   - Sunderland Association Football Club
+  name: Sunderland
   sources:
     espn: null
     football-data: 71
@@ -1811,6 +2050,8 @@ swansea:
   - Swansea City
   - Swansea City AFC
   - Swansea City Association Football Club
+  - Swansea
+  name: Swansea
   sources:
     espn: null
     football-data: 72
@@ -1819,6 +2060,7 @@ switzerland:
   aliases:
   - SUI
   - Switzerland
+  name: Switzerland
   sources:
     espn: null
     football-data: 788
@@ -1828,6 +2070,7 @@ the_strongest:
   - STR
   - The Strongest
   - Club The Strongest
+  name: The Strongest
   sources:
     espn: null
     football-data: 4267
@@ -1836,6 +2079,8 @@ tolima:
   aliases:
   - TOL
   - CD Tolima
+  - Tolima
+  name: Tolima
   sources:
     espn: null
     football-data: 4437
@@ -1846,6 +2091,7 @@ torino:
   - Torino FC
   - Torino Football Club
   - Torino
+  name: Torino
   sources:
     espn: null
     football-data: 586
@@ -1856,6 +2102,8 @@ tottenham:
   - Tottenham Hotspur FC
   - Tottenham Hotspur Football Club
   - Tottenham Hotspur
+  - Tottenham
+  name: Tottenham
   sources:
     espn: null
     football-data: 73
@@ -1867,6 +2115,7 @@ toulouse:
   - Toulouse
   - Toulouse FC
   - Toulouse Football Club
+  name: Toulouse
   sources:
     espn: null
     football-data: 511
@@ -1875,6 +2124,7 @@ tunisia:
   aliases:
   - TUN
   - Tunisia
+  name: Tunisia
   sources:
     espn: null
     football-data: 802
@@ -1883,6 +2133,7 @@ turkey:
   aliases:
   - TUR
   - Turkey
+  name: Turkey
   sources:
     espn: null
     football-data: 803
@@ -1893,6 +2144,8 @@ twente:
   - FC Twente '65
   - Football Club Twente '65
   - Twente '65
+  - Twente
+  name: Twente
   sources:
     espn: null
     football-data: 666
@@ -1902,6 +2155,7 @@ udinese:
   - UDI
   - Udinese
   - Udinese Calcio
+  name: Udinese
   sources:
     espn: null
     football-data: 115
@@ -1910,6 +2164,7 @@ ukraine:
   aliases:
   - UKR
   - Ukraine
+  name: Ukraine
   sources:
     espn: null
     football-data: 790
@@ -1923,6 +2178,7 @@ union_berlin:
   - 1. FC Union Berlin
   - 1. Football Club Union Berlin
   - 1. Union Berlin
+  name: Union Berlin
   sources:
     espn: null
     football-data: 28
@@ -1931,6 +2187,7 @@ uruguay:
   aliases:
   - URU
   - Uruguay
+  name: Uruguay
   sources:
     espn: null
     football-data: 758
@@ -1939,6 +2196,7 @@ usa:
   aliases:
   - USA
   - United States
+  name: USA
   sources:
     espn: null
     football-data: 771
@@ -1949,6 +2207,7 @@ utrecht:
   - FC Utrecht
   - Football Club Utrecht
   - Utrecht
+  name: Utrecht
   sources:
     espn: null
     football-data: 676
@@ -1959,6 +2218,7 @@ valencia:
   - Valencia CF
   - Valencia Club de Fútbol
   - Valencia
+  name: Valencia
   sources:
     espn: null
     football-data: 95
@@ -1969,6 +2229,8 @@ valladolid:
   - Real Valladolid CF
   - Real Valladolid Club de Fútbol
   - Real Valladolid
+  - Valladolid
+  name: Valladolid
   sources:
     espn: null
     football-data: 250
@@ -1979,6 +2241,7 @@ venezia_fc:
   - Venezia FC
   - Venezia Football Club
   - Venezia
+  name: Venezia FC
   sources:
     espn: null
     football-data: 454
@@ -1989,6 +2252,8 @@ verona:
   - Hellas Verona FC
   - Hellas Verona Football Club
   - Hellas Verona
+  - Verona
+  name: Verona
   sources:
     espn: null
     football-data: 450
@@ -1999,6 +2264,7 @@ villarreal:
   - Villarreal CF
   - Villarreal Club de Fútbol
   - Villarreal
+  name: Villarreal
   sources:
     espn: null
     football-data: 94
@@ -2009,6 +2275,7 @@ vitória_sc:
   - Vitória SC
   - Vitória Sport Clube
   - Vitória
+  name: Vitória SC
   sources:
     espn: null
     football-data: 5543
@@ -2017,6 +2284,7 @@ wales:
   aliases:
   - WAL
   - Wales
+  name: Wales
   sources:
     espn: null
     football-data: 833
@@ -2027,6 +2295,7 @@ watford:
   - Watford FC
   - Watford Football Club
   - Watford
+  name: Watford
   sources:
     espn: null
     football-data: 346
@@ -2037,6 +2306,8 @@ west_brom:
   - West Bromwich Albion FC
   - West Bromwich Albion Football Club
   - West Bromwich Albion
+  - West Brom
+  name: West Brom
   sources:
     espn: null
     football-data: 74
@@ -2047,6 +2318,8 @@ west_ham:
   - West Ham United FC
   - West Ham United Football Club
   - West Ham United
+  - West Ham
+  name: West Ham
   sources:
     espn: null
     football-data: 563
@@ -2056,6 +2329,7 @@ willem_ii:
   - WII
   - Willem II
   - Willem II Tilburg
+  name: Willem II
   sources:
     espn: null
     football-data: 672
@@ -2065,6 +2339,7 @@ wolfsburg:
   - WOB
   - Wolfsburg
   - VfL Wolfsburg
+  name: Wolfsburg
   sources:
     espn: null
     football-data: 11
@@ -2075,6 +2350,8 @@ wolverhampton:
   - Wolverhampton Wanderers FC
   - Wolverhampton Wanderers Football Club
   - Wolverhampton Wanderers
+  - Wolverhampton
+  name: Wolverhampton
   sources:
     espn: null
     football-data: 76
@@ -2085,6 +2362,7 @@ young_boys:
   - Young Boys
   - BSC Young Boys
   - Berner Sport Club Young Boys
+  name: Young Boys
   sources:
     espn: null
     football-data: 1871
@@ -2093,6 +2371,8 @@ zwolle:
   aliases:
   - ZWO
   - PEC Zwolle
+  - Zwolle
+  name: Zwolle
   sources:
     espn: null
     football-data: 684
