@@ -17,11 +17,39 @@ class LiveSoccerScraper(BaseScraper):
     def __init__(self, **kwargs):
         """ TODO """
         super().__init__(**kwargs)
+        
+    # Scrape competitions
+    
+    def scrape_competitions(self) -> pd.DataFrame:
+        """ TODO """
+        logger.info("Scraping competitions...")
+        url = f"{self.base_url}/competitions"
+        soup = self.scrape_url(url)
+        if not soup:
+            logger.debug("Failed to fetch competitions.")
+            return pd.DataFrame()
+
+        competitions = []
+        for section in soup.select('div.r-section'):
+            section_title = section.find('h2').text.strip() if section.find('h2') else None
+
+            for a in section.select('ul.competitions a'):
+                name = a.text.strip()
+                href = a.get('href')
+                if href:
+                    competitions.append({
+                        'section_title': section_title,
+                        'name': name,
+                        'endpoint': href
+                    })
+
+        return pd.DataFrame(competitions)
 
     # Scrape standings
     
     def scrape_standings(self, competition_endpoint: str) -> pd.DataFrame:
         """ TODO """
+        logger.info(f"Scraping standings for competition at endpoint: {competition_endpoint}")
         url = f"{self.base_url}/competitions{competition_endpoint}"
         soup = self.scrape_url(url)
         if not soup:
@@ -37,7 +65,9 @@ class LiveSoccerScraper(BaseScraper):
             if parsed_row:
                 standings.append(parsed_row)
 
-        return pd.DataFrame(standings)
+        standings_df = pd.DataFrame(standings)
+        standings_df["competition_endpoint"] = competition_endpoint
+        return standings_df
 
     def _parse_standings_row(self, row: Tag) -> dict | None:
         """ TODO """
@@ -66,25 +96,34 @@ class LiveSoccerScraper(BaseScraper):
 
     def scrape_matches(self, competition_endpoint: str) -> pd.DataFrame:
         """ TODO """
+        logger.info(f"Scraping matches for competition at endpoint: {competition_endpoint}")
         url = f"{self.base_url}/competitions{competition_endpoint}"
 
         counter = 0
         matches = [] 
         while counter < 5:
+            logger.debug(f"Scraping URL: {url}")
             soup = self.scrape_url(url)
+            if not soup:
+                logger.debug(f"Failed to fetch matches for competition at endpoint: {competition_endpoint}")
+                break
+            logger.debug(f"Scraping matches")
             new_matches = self._scrape_matches(soup)
             if not new_matches:
                 logger.debug(f"No more matches found at endpoint: {competition_endpoint}")
                 break
             matches.extend(new_matches)
             last_match = matches[-1]
+            logger.debug(f"Getting next URL for matches")
             url = self.get_next_url(soup, last_match, url)
             if not url:
                 logger.debug(f"No next URL found at endpoint: {competition_endpoint}")
                 break
             counter += 1
 
-        return pd.DataFrame(matches) 
+        matches_df = pd.DataFrame(matches)
+        matches_df["competition_endpoint"] = competition_endpoint
+        return matches_df
 
     def _scrape_matches(self, soup: BeautifulSoup) -> list[dict]:
         """ TODO """
@@ -202,16 +241,22 @@ if __name__ == "__main__":
         "/international/uefa-champions-league",
         "/england/premier-league"
     ]
-    
-    logger.info("Scraping matches...")
-    liver_soccer_scraper = LiveSoccerScraper()
-    for endpoint in competition_endpoints:
-        matches_df = liver_soccer_scraper.scrape_matches(endpoint)
-        logger.info(f"Number of matches scraped from {endpoint}: {len(matches_df)}")
-        logger.info(matches_df[['match_date', 'source_time', 'home_team_source_name', 'away_team_source_name']].head(2))
 
-    logger.info("Scraping standings...")
-    for endpoint in competition_endpoints:
-        standings_df = liver_soccer_scraper.scrape_standings(endpoint)
-        logger.info(f"Number of standings scraped from {endpoint}: {len(standings_df)}")
-        logger.info(standings_df[['position', 'team_source_name', 'points']].head(4))
+    liver_soccer_scraper = LiveSoccerScraper()
+
+    # logger.info("Scraping matches...")
+    # for endpoint in competition_endpoints:
+    #     matches_df = liver_soccer_scraper.scrape_matches(endpoint)
+    #     logger.info(f"Number of matches scraped from {endpoint}: {len(matches_df)}")
+    #     logger.info(matches_df[['match_date', 'source_time', 'home_team_source_name', 'away_team_source_name']].head(2))
+
+    # logger.info("Scraping standings...")
+    # for endpoint in competition_endpoints:
+    #     standings_df = liver_soccer_scraper.scrape_standings(endpoint)
+    #     logger.info(f"Number of standings scraped from {endpoint}: {len(standings_df)}")
+    #     logger.info(standings_df[['position', 'team_source_name', 'points']].head(4))
+
+    logger.info("Scraping competitions...")
+    competitions_df = liver_soccer_scraper.scrape_competitions()
+    logger.info(f"Number of competitions scraped: {len(competitions_df)}")
+    logger.info(competitions_df.head(4))
