@@ -6,3 +6,6 @@ google:
 
 database:
   url: sqlite:///data/football.db
+
+db: # tempory, will be renamed to database
+  path: data/repository
