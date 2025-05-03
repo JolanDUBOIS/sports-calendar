@@ -51,6 +51,10 @@ loggers:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
+  src.clients:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
   src.registry_manager:
     level: DEBUG
     handlers: [console_handler, debug_handler]
