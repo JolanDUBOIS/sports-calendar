@@ -59,7 +59,7 @@ loggers:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
-  src.ingestion:
+  src.data_processing:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
