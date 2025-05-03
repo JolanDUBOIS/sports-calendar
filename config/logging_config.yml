@@ -59,6 +59,10 @@ loggers:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
+  src.ingestion:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
   googleapiclient.discovery_cache:
     level: DEBUG
     handlers: [debug_handler]
