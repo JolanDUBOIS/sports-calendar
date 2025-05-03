@@ -1,0 +1,110 @@
+espn_matches:
+  source_type: json
+  landing_file: espn_matches.json
+  extraction_file: espn_matches.csv
+  columns:
+    paths:
+      id: id
+      date: date
+      name: name
+      shortName: shortName
+      season_year: season.year
+      venue: venue.displayName
+      leg: competitions.0.leg
+      team_A_id: competitions.0.competitors.0.id
+      team_A_homeAway: competitions.0.competitors.0.homeAway
+      team_A_winner: competitions.0.competitors.0.winner
+      team_A_score: competitions.0.competitors.0.score
+      team_A_abbreviation: competitions.0.competitors.0.team.abbreviation
+      team_A_displayName: competitions.0.competitors.0.team.displayName
+      team_A_shortDisplayName: competitions.0.competitors.0.team.shortDisplayName
+      team_A_name: competitions.0.competitors.0.team.name
+      team_A_location: competitions.0.competitors.0.team.location
+      team_A_venue_id: competitions.0.competitors.0.team.venue.id
+      team_B_id: competitions.0.competitors.1.id
+      team_B_homeAway: competitions.0.competitors.1.homeAway
+      team_B_winner: competitions.0.competitors.1.winner
+      team_B_score: competitions.0.competitors.1.score
+      team_B_abbreviation: competitions.0.competitors.1.team.abbreviation
+      team_B_displayName: competitions.0.competitors.1.team.displayName
+      team_B_shortDisplayName: competitions.0.competitors.1.team.shortDisplayName
+      team_B_name: competitions.0.competitors.1.team.name
+      team_B_location: competitions.0.competitors.1.team.location
+      team_B_venue_id: competitions.0.competitors.1.team.venue.id
+      landing_created_at: created_at
+    injected:
+      created_at: !date_offset 0
+
+football_data_matches:
+  source_type: json
+  landing_file: football_data_matches.json
+  extraction_file: football_data_matches.csv
+  columns:
+    paths:
+      area_id: area.id
+      area_name: area.name
+      area_code: area.code
+      competition_id: competition.id
+      competition_name: competition.name
+      competition_code: competition.code
+      competition_type: competition.type
+      season_id: season.id
+      season_start_date: season.startDate
+      season_end_date: season.endDate
+      season_current_matchday: season.currentMatchday
+      id: id
+      utcDate: utcDate
+      status: status
+      matchday: matchday
+      stage: stage
+      homeTeam_id: homeTeam.id
+      homeTeam_name: homeTeam.name
+      homeTeam_shortName: homeTeam.shortName
+      homeTeam_tla: homeTeam.tla
+      awayTeam_id: awayTeam.id
+      awayTeam_name: awayTeam.name
+      awayTeam_shortName: awayTeam.shortName
+      awayTeam_tla: awayTeam.tla
+      winner: score.winner
+      score_fullTime_home: score.fullTime.home
+      score_fullTime_away: score.fullTime.away
+      score_halfTime_home: score.halfTime.home
+      score_halfTime_away: score.halfTime.away
+      score_regularTime_home: score.regularTime.home
+      score_regularTime_away: score.regularTime.away
+      score_extraTime_home: score.extraTime.home
+      score_extraTime_away: score.extraTime.away
+      score_penalties_home: score.penalties.home
+      score_penalties_away: score.penalties.away
+      landing_created_at: created_at
+    injected:
+      created_at: !date_offset 0
+
+football_data_standings:
+  source_type: json
+  landing_file: football_data_standings.json
+  extraction_file: football_data_standings.csv
+  columns:
+    paths:
+      stage: stage
+      type: type
+      group: group
+      landing_created_at: created_at
+    injected:
+      created_at: !date_offset 0
+    iterate:
+      path: table
+      columns:
+        position: position
+        team_id: team.id
+        team_name: team.name
+        team_shortName: team.shortName
+        team_tla: team.tla
+        playedGames: playedGames
+        won: won
+        draw: draw
+        lost: lost
+        points: points
+        goalsFor: goalsFor
+        goalsAgainst: goalsAgainst
+        goalDifference: goalDifference
