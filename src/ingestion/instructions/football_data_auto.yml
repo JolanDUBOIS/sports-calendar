@@ -1,0 +1,62 @@
+trigger: automatic
+
+class_object: FootballDataApiClient
+
+instructions:
+- method: query_competition_matches
+  params: 
+    - competition_id: 2013
+      date_from: !date_offset 0  # Today
+      date_to: !date_offset 14  # 14d from today
+    - competition_id: 2016
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2021
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2001
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2018
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2015
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2002
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2019
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2003
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2017
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2152
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2014
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+    - competition_id: 2000
+      date_from: !date_offset 0
+      date_to: !date_offset 14
+  output_type: json
+  save_file: football_data_matches.json
+
+- method: query_standings
+  params: 
+    - competition_id: 2013
+    - competition_id: 2016
+    - competition_id: 2021
+    - competition_id: 2015
+    - competition_id: 2002
+    - competition_id: 2019
+    - competition_id: 2003
+    - competition_id: 2017
+    - competition_id: 2014
+  output_type: json
+  save_file: football_data_standings.json

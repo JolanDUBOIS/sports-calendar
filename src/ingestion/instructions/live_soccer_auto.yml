@@ -1,3 +1,5 @@
+trigger: automatic
+
 class_object: LiveSoccerScraper
 
 instructions:

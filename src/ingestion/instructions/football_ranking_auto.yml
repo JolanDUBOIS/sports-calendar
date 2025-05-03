@@ -1,0 +1,8 @@
+trigger: automatic
+
+class_object: FootballRankingScraper
+
+instructions:
+  - method: scrape_fifa_ranking
+    output_type: csv
+    save_file: football_ranking_fifa_ranking.csv
