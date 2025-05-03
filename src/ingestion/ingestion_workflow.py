@@ -1,6 +1,9 @@
+# TODO - This script can be improved, it's not very clean and has some redundant code.
 import json
 import importlib
 from pathlib import Path
+from datetime import datetime, timedelta
+from abc import ABC, abstractmethod
 
 import yaml
 import pandas as pd
@@ -11,12 +14,83 @@ from src.ingestion import logger
 INSTRUCTIONS_FOLDER_PATH = Path(__file__).parent / "instructions"
 
 # TODO - Add check for the instructions file
+# TODO - Potentially separate this script into multiple files
+# TODO - Add parallel processing for the ingestion (query each API/website in parallel)
+
+def date_offset_constructor(loader, node):
+    """ Custom YAML constructor to handle date offsets. """
+    days = int(node.value)
+    return (datetime.today() + timedelta(days=days)).strftime("%Y-%m-%d")
+
+yaml.add_constructor('!date_offset', date_offset_constructor, Loader=yaml.loader.SafeLoader)
 
 def read_yml_file(file_path: Path):
     """ Read a YAML file and return its content as a dictionary. """
     with file_path.open(mode='r') as file:
         config = yaml.safe_load(file)
     return config
+
+class OutputHandler(ABC):
+    """ Abstract base class for handling output. """
+    @abstractmethod
+    def save(self, data, file_path: Path):
+        pass
+
+class CSVOutputHandler(OutputHandler):
+    """ Handles saving data to CSV files. """
+    def save(self, data, file_path: Path):
+        if not all(isinstance(df, pd.DataFrame) for df in data):
+            logger.error("All elements in the list must be pandas DataFrames.")
+            raise ValueError("All elements in the list must be pandas DataFrames.")
+        
+        df = pd.concat(data, ignore_index=True)
+        df["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        if not file_path.suffix == ".csv":
+            logger.error(f"File path {file_path} is not a CSV file.")
+            raise ValueError(f"File path {file_path} is not a CSV file.")
+        
+        if not file_path.exists():
+            df.to_csv(file_path, mode='w', header=True, index=False)
+        else:
+            df.to_csv(file_path, mode='a', header=False, index=False)
+        
+        logger.info(f"Data appended to {file_path}")
+
+class JSONOutputHandler(OutputHandler):
+    """ Handles saving data to JSON files. """
+    def save(self, data, file_path: Path):
+        if not file_path.suffix == ".json":
+            logger.error(f"File path {file_path} is not a JSON file.")
+            raise ValueError(f"File path {file_path} is not a JSON file.")
+        
+        flattened_data = [item for sublist in data for item in sublist if isinstance(sublist, list) if isinstance(item, dict)]
+        for d in flattened_data:
+            d["created_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        if not file_path.exists():
+            with file_path.open(mode='w') as file:
+                json.dump(flattened_data, file, indent=4)
+        else:
+            with file_path.open(mode='r') as file:
+                existing_data = json.load(file)
+            existing_data.extend(flattened_data)
+            with file_path.open(mode='w') as file:
+                json.dump(existing_data, file, indent=4)
+        
+        logger.info(f"Data appended to {file_path}")
+
+class OutputHandlerFactory:
+    """ Factory to create output handlers based on output type. """
+    @staticmethod
+    def get_handler(output_type: str) -> OutputHandler:
+        if output_type == "csv":
+            return CSVOutputHandler()
+        elif output_type == "json":
+            return JSONOutputHandler()
+        else:
+            logger.error(f"Output type {output_type} not supported.")
+            raise ValueError(f"Output type {output_type} not supported.")
 
 def apply_instruction(instruction: dict, client_obj: any) -> list[any]:
     """ TODO """
@@ -28,65 +102,21 @@ def apply_instruction(instruction: dict, client_obj: any) -> list[any]:
         raise ValueError(f"Method {method_name} not found in the class {client_obj.__class__.__name__}.")
 
     outputs = []
-    params_list = instruction.get("params", [])
+    params_list = instruction.get("params", [{}])
     for params in params_list:
         output = method(**params)
         outputs.append(output)
 
     return outputs
 
-def append_to_csv(df: pd.DataFrame, file_path: Path):
-    """ Append a DataFrame to a CSV file. """
-    if not file_path.suffix == ".csv":
-        logger.error(f"File path {file_path} is not a CSV file.")
-        raise ValueError(f"File path {file_path} is not a CSV file.")
-    
-    if not file_path.exists():
-        df.to_csv(file_path, mode='w', header=True, index=False)
-    else:
-        df.to_csv(file_path, mode='a', header=False, index=False)
-
-    logger.info(f"Data appended to {file_path}")
-
-def save_to_csv(dfs: list[pd.DataFrame], file_path: Path):
-    """ Save a list of DataFrames to a CSV file. """
-    if not all(isinstance(df, pd.DataFrame) for df in dfs):
-        logger.error("All elements in the list must be pandas DataFrames.")
-        raise ValueError("All elements in the list must be pandas DataFrames.")
-    
-    df = pd.concat(dfs, ignore_index=True)
-    append_to_csv(df, file_path)
-
-def append_to_json(dicts: list[dict], file_path: Path):
-    """ Append a list of dictionaries to a JSON file. """
-    if not file_path.suffix == ".json":
-        logger.error(f"File path {file_path} is not a JSON file.")
-        raise ValueError(f"File path {file_path} is not a JSON file.")
-    
-    if not file_path.exists():
-        with file_path.open(mode='w') as file:
-            json.dump(dicts, file, indent=4)
-    else:
-        with file_path.open(mode='r') as file:
-            existing_data = json.load(file)
-        existing_data.extend(dicts)
-        with file_path.open(mode='w') as file:
-            json.dump(existing_data, file, indent=4)
-    
-    logger.info(f"Data appended to {file_path}")
-
-def save_to_json(dicts: list[dict], file_path: Path):
-    """ Save a list of dictionaries to a JSON file. """
-    if not all(isinstance(d, dict) for d in dicts):
-        logger.error("All elements in the list must be dictionaries.")
-        raise ValueError("All elements in the list must be dictionaries.")
-
-    append_to_json(dicts, file_path)
-
-def execute_ingestion_plan(folder_path: Path, instruction_file: Path):
+def execute_ingestion_plan(folder_path: Path, instruction_file: Path, manual: bool = False):
     """ Execute the ingestion plan defined in the instruction file. """
     logger.info(f"Executing ingestion plan from {instruction_file.name}")
     instructions = read_yml_file(instruction_file)
+    trigger = instructions.get("trigger", "automatic")
+    if not manual and trigger == "manual" or trigger != "automatic":
+        logger.info(f"Skipping instructions {instruction_file.name} due to trigger condition.")
+        return
     class_name = instructions.get("class_object")
     if class_name is None:
         logger.error("class_object not found in the instruction file.")
@@ -105,15 +135,10 @@ def execute_ingestion_plan(folder_path: Path, instruction_file: Path):
         outputs = apply_instruction(instruction, client_obj)
         output_type = instruction.get("output_type")
         file_path = folder_path / instruction.get("save_file")
-        if output_type == "csv":
-            save_to_csv(outputs, file_path)
-        elif output_type == "json":
-            save_to_json(outputs, file_path)
-        else:
-            logger.error(f"Output type {output_type} not supported.")
-            raise ValueError(f"Output type {output_type} not supported.")
+        handler = OutputHandlerFactory.get_handler(output_type)
+        handler.save(outputs, file_path)
 
-def ingestion_workflow(db_repo: str):
+def ingestion_workflow(db_repo: str, manual: bool = False):
     """ Main function to execute the ingestion workflow. """
     logger.info("Starting ingestion workflow.")
     instruction_files = INSTRUCTIONS_FOLDER_PATH.glob("*.yml")
@@ -122,7 +147,7 @@ def ingestion_workflow(db_repo: str):
         landing_path.mkdir(parents=True)
         logger.info(f"Created landing folder at {landing_path}")
     for instruction_file in instruction_files:
-        execute_ingestion_plan(landing_path, instruction_file)
+        execute_ingestion_plan(landing_path, instruction_file, manual)
     logger.info("Ingestion workflow completed.")
 
 
