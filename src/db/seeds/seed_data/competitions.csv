@@ -1,29 +1,42 @@
-name,abbreviation,region_name,type
-"Ligue 1",,France,league
-"Coupe de France",,France,cup
-"Super Cup",,France,cup
-"Premier League",,England,league
-"League Cup",,England,cup
-"FA Community Shield",,England,cup
-"FA Cup",,England,cup
-"Serie A",,Italy,league
-"Supercoppa Italiana",,Italy,cup
-"Coppa Italia",,Italy,cup
-"La Liga",,Spain,league
-"Copa del Rey",,Spain,cup
-"Supercopa de España",,Spain,cup
-"Bundesliga",,Germany,league
-"DFL-Supercup",,Germany,cup
-"DFB Pokal",,Germany,cup
-"UEFA Champions League",,International,cup
-"UEFA Europa League",,International,cup
-"UEFA Conference League",,International,cup
-"Africa Cup of Nations",,International,cup
-"Copa América",,International,cup
-"FIFA World Cup",,International,cup
-"FIFA Club World Cup",,International,cup
-"UEFA Euro Qualifying",,International,cup
-"UEFA Euro",,International,cup
-"UEFA Super Cup",,International,cup
-"UEFA Nations League",,International,cup
-"FIFA Rankings",,International,league
+id,name,gender
+ligue_1,Ligue 1,men
+coupe_de_france,Coupe de France,men
+trophee_des_champions,Trophée des Champions,men
+premier_league,Premier League,men
+fa_cup,FA Cup,men
+league_cup,League Cup,men
+fa_community_shield,FA Community Shield,men
+serie_a,Serie A,men
+coppa_italia,Coppa Italia,men
+supercoppa_italiana,Supercoppa Italiana,men
+la_liga,La Liga,men
+copa_del_rey,Copa del Rey,men
+supercopa_de_espana,Supercopa de España,men
+bundesliga,Bundesliga,men
+dfb_pokal,DFB Pokal,men
+dfl_supercup,DFL Supercup,men
+primeira_liga,Primeira Liga,men
+eredivisie,Eredivisie,men
+eliteserien,Eliteserien,men
+uefa_champions_league,UEFA Champions League,men
+uefa_champions_league_qualifying,UEFA Champions League Qualifying,men
+uefa_europa_league,UEFA Europa League,men
+uefa_europa_league_qualifying,UEFA Europa League Qualifying,men
+uefa_conference_league,UEFA Conference League,men
+uefa_conference_league_qualifying,UEFA Conference League Qualifying,men
+uefa_super_cup,UEFA Super Cup,men
+fifa_club_world_cup,FIFA Club World Cup,men
+uefa_euro,UEFA Euro,men
+uefa_euro_qualifying,UEFA Euro Qualifying,men
+uefa_nations_league,UEFA Nations League,men
+fifa_world_cup,FIFA World Cup,men
+fifa_world_cup_qualifying_uefa,FIFA World Cup Qualifying - UEFA,men
+copa_america,Copa América,men
+africa_cup_of_nations,Africa Cup of Nations,men
+mens_olympic_football_tournament,Men's Olympic Soccer Tournament,men
+international_friendly,International Friendly,men
+fifa_rankings,FIFA Rankings,men
+uefa_womens_champions_league,UEFA Women's Champions League,women
+uefa_womens_european_championship,UEFA Women's European Championship,women
+womens_olympic_football_tournament,Women's Olympic Soccer Tournament,women
+fifa_womens_world_cup,FIFA Women's World Cup,women

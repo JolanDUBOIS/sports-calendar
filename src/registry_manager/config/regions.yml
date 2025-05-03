@@ -1,0 +1,30 @@
+france:
+  aliases: [France, FR, FRA]
+  name: France
+england:
+  aliases: [England, ENG]
+  name: England
+germany:
+  aliases: [Germany, DE, GER]
+  name: Germany
+italy:
+  aliases: [Italy, IT, ITA]
+  name: Italy
+spain:
+  aliases: [Spain, ES, ESP]
+  name: Spain
+norway:
+  aliases: [Norway, NO, NOR]
+  name: Norway
+portugal:
+  aliases: [Portugal, PT, POR]
+  name: Portugal
+netherlands:
+  aliases: [Netherlands, NL, NED]
+  name: Netherlands
+europe:
+  aliases: [Europe, EU, EUR, UEFA]
+  name: Europe
+world:
+  aliases: [World, International, INT, FIFA]
+  name: World

@@ -8,9 +8,10 @@ import pandas as pd
 from bs4 import BeautifulSoup # type: ignore
 
 from src.sources import logger
+from .base_scraper import BaseScraper
 
 
-class LiveSoccerScraper:
+class LiveSoccerScraper(BaseScraper):
     """ TODO """
 
     urls_config_file_path = Path(__file__).resolve().parent.parent / "config" / "livesoccertv_urls.json"
@@ -18,7 +19,7 @@ class LiveSoccerScraper:
     def __init__(self, wait_time: int=20):
         """ TODO """
         self.wait_time = wait_time
-        
+
         self._urls_data = None
         self._competitions_endpoints = None
 
@@ -34,7 +35,7 @@ class LiveSoccerScraper:
     def base_url(self) -> str:
         """ TODO """
         return self.urls_data["base_url"]
-    
+
     @property
     def competitions_endpoints(self) -> dict:
         """ TODO """
@@ -45,7 +46,7 @@ class LiveSoccerScraper:
                 for competition_name, competition_data in region_competitions.items()
             }
         return self._competitions_endpoints
-    
+
     def get_url_response(self, url: str, max_retries=5) -> requests.Response|None:
         """ TODO """
         try:
@@ -89,7 +90,7 @@ class LiveSoccerScraper:
 
         # Get standings
         standings_df = self.get_standings(soup, competition)
-                    
+
         # Get matches
         matches_df = self.get_matches(soup, competition)
         try:
@@ -168,7 +169,7 @@ class LiveSoccerScraper:
                 })
 
             return pd.DataFrame(data)
-    
+
     def get_matches(self, soup: BeautifulSoup, competition: str) -> pd.DataFrame:
         """ TODO """
         current_date, matches = None, []
@@ -214,7 +215,7 @@ class LiveSoccerScraper:
                     # Channels
                     channels_div = row.find('td', id='channels')
                     channels = [a.get_text(strip=True) for a in channels_div.find_all("a")] if channels_div else []
-                    
+
                     # Store the data
                     matches.append({
                         "Title": match_text,
@@ -245,7 +246,7 @@ class LiveSoccerScraper:
                 elif final_date > upper_bound:
                     final_date = final_date.replace(year=today.year - 1)
                 current_date = final_date.strftime("%Y-%m-%d")
-        
+
         return pd.DataFrame(matches)
 
     def get_next_url(self, soup: BeautifulSoup, last_match: pd.Series, competition_url: str) -> str|None:
@@ -254,7 +255,7 @@ class LiveSoccerScraper:
         match_time_ls = last_match['Original Time (SL TZ)']
         home_team = last_match['Home Team']
         away_team = last_match['Away Team']
-        
+
         pageid = self.extract_pageid(soup)
         if not pageid:
             return None
@@ -262,10 +263,10 @@ class LiveSoccerScraper:
         match_datetime = f"{match_date}%20{match_time_ls}:00"
         game = f"{home_team} vs {away_team}"
         game = quote_plus(game)
-        
+
         next_url = f"{self.base_url}/xschedule.php?direction=next&pagetype=competition&pageid={pageid}&start={match_datetime}&game={game}&xml=1&tab=_live&page=1&pageurl={quote_plus(competition_url)}"
         return next_url
-    
+
     def get_region(self, competition: str) -> str:
         """ TODO """
         for region, competitions in self.urls_data["competitions"].items():
@@ -273,7 +274,7 @@ class LiveSoccerScraper:
                 return region
         logger.warning(f"Competition '{competition}' not found in any region.")
         return None
-    
+
     def get_competitions(self, region: str=None) -> list[str]:
         """ TODO """
         if region is None:
@@ -310,8 +311,8 @@ class LiveSoccerScraper:
     def closest_lower_time(time_str: str, time_step: int=10) -> str:
         """ TODO """
         time_obj = datetime.strptime(time_str, "%H:%M")
-        
+
         minutes = (time_obj.minute // time_step) * time_step
         closest_time = time_obj.replace(minute=minutes, second=0, microsecond=0)
-        
+
         return closest_time.strftime("%H:%M")

@@ -1,63 +1,54 @@
-import re, time, traceback, requests
+import re
 
-import cloudscraper # type: ignore
 import pandas as pd
-from bs4 import BeautifulSoup # type: ignore
 
 from src.sources import logger
+from .base_scraper import BaseScraper
 
 
-class FootballRankingScraper:
+class FootballRankingScraper(BaseScraper):
     """ TODO """
 
-    def __init__(self):
-        self.base_url = 'https://football-ranking.com'
-
-    def get_url_response(self, url: str, max_retries=5) -> requests.Response|None:
+    def __init__(self, **kwargs):
         """ TODO """
-        try:
-            scraper = cloudscraper.create_scraper()
-            response = scraper.get(url)
+        super().__init__(**kwargs)
 
-            # Retry if rate limit is hit (HTTP 429)
-            retries = 0
-            while response.status_code == 429 and retries < max_retries:  # Too many requests
-                logger.warning(f"Rate limit hit, waiting for {self.wait_time} seconds...")
-                time.sleep(self.wait_time)
-                response = scraper.get(url)
-                retries += 1
+    @property
+    def base_url(self) -> str:
+        """ Getter for the base_url property. """
+        return "https://football-ranking.com"
 
-            if retries == max_retries:
-                logger.error(f"Max retries reached ({max_retries}). Could not fetch URL: {url}")
-                return None
+    @property
+    def source_name(self):
+        """ Getter for the source_name property. """
+        return "football-ranking"
 
-            # Handle other error codes
-            if response.status_code != 200:
-                logger.error(f"Error {response.status_code} while accessing URL: {url}")
-                return None
-
-        except Exception as e:
-            logger.error(f"Error while scraping: {e}")
-            logger.debug(traceback.format_exc())
-            return None
-
-        return response
-
-    def get_fifa_rankings(self) -> pd.DataFrame|None:
+    def get_matches(
+        self,
+        competition_id: str = None,
+        team_id: str = None,
+        date_from: str = None,
+        date_to: str = None,
+        **kwargs
+    ) -> pd.DataFrame:
         """ TODO """
-        logger.debug(f"Fetching FIFA ranking...")
+        logger.warning("FootballRankingScraper does not provide match data. Returning empty DataFrame.")
+        return pd.DataFrame()
 
-        rankings = pd.DataFrame(columns=["Position", "Team", "Points"])
+    def get_standings(self, league_id: str, date: str = None, **kwargs) -> pd.DataFrame:
+        """ TODO """
+        league_route = self.competition_registry.get_route(self.source_name, league_id)  # Either /fifa-rankings or None
+        if not league_route:
+            logger.debug(f"Invalid league_id: {league_id} for FootballRankingScraper. Returning empty DataFrame.")
+            return pd.DataFrame()
+
+        standings = []
         for k in range(1, 6):
-            logger.debug(f"Fetching page {k}...")
-            url = f'{self.base_url}/fifa-rankings?page={k}'
-            response = self.get_url_response(url)
-            if not response:
-                continue
+            url = f"{self.base_url}{league_route}?page={k}"
+            soup = self.scrape_url(url)
+            if not soup:
+                return standings
 
-            soup = BeautifulSoup(response.text, 'html.parser')
-
-            rankings_list = []
             for row in soup.select("table tbody tr"):
                 cols = row.find_all("td")
                 if len(cols) < 5:
@@ -66,16 +57,21 @@ class FootballRankingScraper:
                 rank = cols[0].text.strip()
                 team = cols[1].text.strip().split("(")[0].strip()  # Remove country code (e.g., "(FRA)")
                 points = cols[2].text.strip()
-                
+
                 rank = re.match(r'\d+', rank)
                 rank = rank.group(0) if rank else ''
-                
+
                 points = points.replace(',', '')
                 points = re.match(r'\d+(\.\d+)?', points)
                 points = points.group(0) if points else ''
 
-                rankings_list.append([rank, team, points])
+                standings.append({
+                    "competition_id": league_id,
+                    "position": rank,
+                    "team_source_name": team,
+                    "team_id": self.team_registry.get_id_by_alias(team),
+                    "points": points
+                })
 
-            rankings = pd.concat([rankings, pd.DataFrame(rankings_list, columns=["Position", "Team", "Points"])], ignore_index=True)
-
-        return rankings
+        standings_df = pd.DataFrame(standings)
+        return standings_df

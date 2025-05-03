@@ -16,6 +16,11 @@ handlers:
     filename: logs/DEBUG.log
     level: DEBUG
     formatter: detailed
+  aliases_handler:
+    class: logging.FileHandler
+    filename: logs/UNDEFINED_ALIASES.log
+    level: DEBUG
+    formatter: simple
 
 loggers:
   src.calendar_creation:
@@ -53,6 +58,11 @@ loggers:
   googleapiclient.discovery_cache:
     level: DEBUG
     handlers: [debug_handler]
+    propagate: False
+  
+  aliases_logger:
+    level: DEBUG
+    handlers: [aliases_handler]
     propagate: False
 
 root:
