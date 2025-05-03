@@ -18,7 +18,7 @@ class BaseApiClient:
         params: dict = None,
         headers: dict = None,
         max_retries: int = 3,
-        delay: int = 5
+        delay: int = 15
     ) -> dict|None:
         """ TODO """
         retries = 0
@@ -34,6 +34,7 @@ class BaseApiClient:
                     retries += 1
                 else:
                     logger.error(f"Failed to fetch data from URL: {url}. Status code: {response.status_code}")
+                    logger.debug(f"Response content: {response.content}")
                     return None
 
             except Exception as e:

@@ -7,7 +7,7 @@ from src.clients.api.base_api_client import BaseApiClient
 class FootballDataApiClient(BaseApiClient):
     """ TODO """
     
-    base_url = "https://api.football-data.org/v4/"
+    base_url = "https://api.football-data.org/v4"
 
     def __init__(self, api_token: str = None, **kwargs):
         """ TODO """

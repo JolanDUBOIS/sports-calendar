@@ -12,7 +12,7 @@ class BaseScraper:
     def __init__(self, **kwargs):
         """ TODO """
 
-    def scrape_url(self, url: str, max_retries: int = 3, delay: int = 5) -> BeautifulSoup|None:
+    def scrape_url(self, url: str, max_retries: int = 3, delay: int = 15) -> BeautifulSoup|None:
         """ TODO """
         retries = 0
         scraper = cloudscraper.create_scraper()
