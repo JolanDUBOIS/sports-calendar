@@ -6,7 +6,7 @@ from src.clients.api.base_api_client import BaseApiClient
 
 class FootballDataApiClient(BaseApiClient):
     """ TODO """
-    
+
     base_url = "https://api.football-data.org/v4"
 
     def __init__(self, api_token: str = None, **kwargs):
@@ -24,7 +24,7 @@ class FootballDataApiClient(BaseApiClient):
             'X-Auth-Token': self.api_token,
             'Content-Type': 'application/json'
         }
-    
+
     def query_team_matches(self, team_id: int, date_from: str=None, date_to: str=None) -> list[dict]:
         """ TODO """
         url_fragment = f"/teams/{team_id}/matches"
@@ -34,7 +34,7 @@ class FootballDataApiClient(BaseApiClient):
         if not response:
             return []
         return response.get("matches", [])
-    
+
     def query_competition_matches(self, competition_id: int, date_from: str=None, date_to: str=None) -> list[dict]:
         """ TODO """
         url_fragment = f"/competitions/{competition_id}/matches"
@@ -44,7 +44,7 @@ class FootballDataApiClient(BaseApiClient):
         if not response:
             return []
         return response.get("matches", [])
-    
+
     def query_standings(self, competition_id: int) -> list[dict]:
         """ TODO """
         url_fragment = f"/competitions/{competition_id}/standings"
@@ -52,8 +52,8 @@ class FootballDataApiClient(BaseApiClient):
         response = self.query_api(url, headers=self.headers, request_interval=6)
         if not response:
             return []
-        return response.get("standings", [])
-    
+        return [response]
+
     def query_competitions(self) -> list[dict]:
         """ TODO """
         url_fragment = "/competitions"
