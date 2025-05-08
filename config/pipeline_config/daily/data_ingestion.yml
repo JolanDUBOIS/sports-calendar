@@ -1,0 +1,308 @@
+name: data_ingestion
+
+models:
+  - name: espn_matches
+    description: Ingests match information from the ESPN API.
+    trigger: automatic
+    sources:
+      - name: ESPN
+        type: api
+        client_class: ESPNApiClient
+    method: query_matches
+    params:
+      - competition_slug: uefa.champions
+        date_from: !date_offset 0  # Today
+        date_to: !date_offset 14  # 14d from today
+      - competition_slug: uefa.europa
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.europa.conf
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.champions_qual
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.europa_qual
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.europa.conf_qual
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.nations
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.euro
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.euroq
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.world
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.worldq.caf
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.worldq.uefa
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.worldq.ofc
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.worldq.conmebol
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.worldq.afc
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.worldq.concacaf
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.cwc
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: conmebol.america
+        date_from: !date_offset 0
+        date_to: !date_offset 14 
+      - competition_slug: fifa.olympics
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.friendly
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.weuro
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: uefa.wchampions
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.w.olympics
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fifa.wwc
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: eng.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: esp.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fra.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: ger.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: ita.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: por.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: nor.1
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: eng.fa
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: eng.league_cup
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: esp.copa_del_rey
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: ger.dfb_pokal
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: ita.coppa_italia
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_slug: fra.coupe_de_france
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+    output:
+      path: landing/espn_matches.json
+      mode: append
+
+  - name: football_data_matches
+    description: Ingests match information from the Football Data API.
+    trigger: automatic
+    sources:
+      - name: football-data
+        type: api
+        client_class: FootballDataApiClient
+    method: query_competition_matches
+    params:
+      - competition_id: 2013
+        date_from: !date_offset 0  # Today
+        date_to: !date_offset 14  # 14d from today
+      - competition_id: 2016
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2021
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2001
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2018
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2015
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2002
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2019
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2003
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2017
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2152
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2014
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+      - competition_id: 2000
+        date_from: !date_offset 0
+        date_to: !date_offset 14
+    output:
+      path: football_data_matches.json
+      mode: append
+
+  - name: football_data_standings
+    description: Ingests standings information from the Football Data API.
+    trigger: automatic
+    sources:
+      - name: football-data
+        type: api
+        client_class: FootballDataApiClient
+    method: query_standings
+    params:
+      - competition_id: 2013
+      - competition_id: 2016
+      - competition_id: 2021
+      - competition_id: 2015
+      - competition_id: 2002
+      - competition_id: 2019
+      - competition_id: 2003
+      - competition_id: 2017
+      - competition_id: 2014
+    output:
+      path: landing/football_data_standings.json
+      mode: append
+
+  - name: football_data_teams
+    description: Ingests team information from the Football Data API.
+    trigger: manual
+    sources:
+      - name: football-data
+        type: api
+        client_class: FootballDataApiClient
+    method: query_teams
+    params:
+      - competition_id: 2013
+      - competition_id: 2016
+      - competition_id: 2021
+      - competition_id: 2001
+      - competition_id: 2018
+      - competition_id: 2015
+      - competition_id: 2002
+      - competition_id: 2019
+      - competition_id: 2003
+      - competition_id: 2017
+      - competition_id: 2152
+      - competition_id: 2014
+      - competition_id: 2000
+    output:
+      path: landing/football_data_teams.json
+      mode: append
+
+  - name: live_soccer_matches
+    description: Ingests live match information from the Live Soccer Scraper.
+    trigger: automatic
+    sources:
+      - name: livesoccertv
+        type: scraper
+        client_class: LiveSoccerScraper
+    method: scrape_matches
+    params:
+      - competition_endpoint: /france/ligue-1
+      - competition_endpoint: /france/coupe-de-france
+      - competition_endpoint: /france/super-cup
+      - competition_endpoint: /england/premier-league
+      - competition_endpoint: /england/fa-cup
+      - competition_endpoint: /england/league-cup
+      - competition_endpoint: /england/fa-community-shield
+      - competition_endpoint: /italy/serie-a
+      - competition_endpoint: /italy/coppa-italia
+      - competition_endpoint: /italy/supercoppa-italiana
+      - competition_endpoint: /spain/primera-division
+      - competition_endpoint: /spain/copa-del-rey
+      - competition_endpoint: /spain/spanish-super-cup
+      - competition_endpoint: /germany/bundesliga
+      - competition_endpoint: /germany/german-cup
+      - competition_endpoint: /germany/dfl-supercup
+      - competition_endpoint: /international/uefa-champions-league
+      - competition_endpoint: /international/uefa-europa-league
+      - competition_endpoint: /international/uefa-europa-conference-league
+      - competition_endpoint: /international/uefa-super-cup
+      - competition_endpoint: /international/fifa-club-world-cup
+      - competition_endpoint: /international/uefa-european-championship
+      - competition_endpoint: /international/uefa-euro-qualifying
+      - competition_endpoint: /international/uefa-nations-league
+      - competition_endpoint: /international/world-cup
+      - competition_endpoint: /international/copa-america
+      - competition_endpoint: /international/africa-cup-of-nations
+    output:
+      path: landing/live_soccer_matches.csv
+      mode: append
+
+  - name: live_soccer_standings
+    description: Ingests live standings information from the Live Soccer Scraper.
+    trigger: automatic
+    sources:
+      - name: livesoccertv
+        type: scraper
+        client_class: LiveSoccerScraper
+    method: scrape_standings
+    params: 
+      - competition_endpoint: /france/ligue-1
+      - competition_endpoint: /england/premier-league
+      - competition_endpoint: /italy/serie-a
+      - competition_endpoint: /spain/primera-division
+      - competition_endpoint: /germany/bundesliga
+    output:
+      path: landing/live_soccer_standings.csv
+      mode: append
+
+  - name: live_soccer_competitions
+    description: Ingests live competition information from the Live Soccer Scraper.
+    trigger: manual
+    sources:
+      - name: livesoccertv
+        type: scraper
+        client_class: LiveSoccerScraper
+    method: scrape_competitions
+    output:
+      path: landing/live_soccer_competitions.csv
+      mode: append
+
+  - name: football_ranking_fifa_ranking
+    description: Ingests FIFA ranking information from the Football Ranking Scraper.
+    trigger: automatic
+    sources:
+      - name: football-ranking
+        type: scraper
+        client_class: FootballRankingScraper
+    method: scrape_fifa_ranking
+    output:
+      path: landing/football_ranking_fifa_ranking.csv
+      mode: append

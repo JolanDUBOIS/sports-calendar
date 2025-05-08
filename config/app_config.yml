@@ -7,5 +7,6 @@ google:
 database:
   url: sqlite:///data/football.db
 
-db: # tempory, will be renamed to database
-  path: data/repository
+pipeline:
+  config_files: config/pipeline_config/test
+  repository_path: data/repository/test

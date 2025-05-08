@@ -4,13 +4,14 @@ models:
   - name: espn_matches
     description: Extracts match information from the ESPN json data.
     trigger: automatic
-    materialized: incremental
     sources:
       - name: espn_matches
-        type: json
         path: landing/espn_matches.json
+        mode: newest # newest, all
+        on: created_at
     columns:
       - name: id
+        unique: true
       - name: date
       - name: name
       - name: shortName
@@ -76,16 +77,17 @@ models:
             landing_created_at: created_at
     dependencies:
       - landing.espn_matches
-    output: intermediate/espn_matches.csv
+    output:
+      path: intermediate/espn_matches.csv
 
   - name: football_data_matches
     description: Extracts match information from the Football Data Matches json data.
     trigger: automatic
-    materialized: incremental
     sources:
       - name: football_data_matches
-        type: json
         path: landing/football_data_matches.json
+        mode: newest
+        on: created_at
     columns:
       - name: area_id
       - name: area_name
@@ -99,6 +101,7 @@ models:
       - name: season_end_date
       - name: season_current_matchday
       - name: id
+        unique: true
       - name: utcDate
       - name: status
       - name: matchday
@@ -167,22 +170,38 @@ models:
             landing_created_at: created_at
     dependencies:
       - landing.football_data_matches
-    output: intermediate/football_data_matches.csv
+    output:
+      path: intermediate/football_data_matches.csv
 
   - name: football_data_standings
     description: Extracts standings information from the Football Data Standings json data.
     trigger: automatic
-    materialized: incremental
     sources:
       - name: football_data_standings
-        type: json
         path: landing/football_data_standings.json
+        mode: newest
+        on: created_at
     columns:
+      - name: area_id
+      - name: area_name
+      - name: area_code
+      - name: competition_id
+        unique: true
+      - name: competition_name
+      - name: competition_code
+      - name: competition_type
+      - name: season_id
+        unique: true
+      - name: season_startDate
+      - name: season_endDate
+      - name: season_currentMatchday
+      - name: season_winner
       - name: stage
       - name: type
       - name: group
       - name: position
       - name: team_id
+        unique: true
       - name: team_name
       - name: team_shortName
       - name: team_tla
@@ -201,12 +220,24 @@ models:
     params:
       - columns_mapping:
           direct_paths:
-            stage: stage
-            type: type
-            group: group
+            area_id: area.id
+            area_name: area.name
+            area_code: area.code
+            competition_id: competition.id
+            competition_name: competition.name
+            competition_code: competition.code
+            competition_type: competition.type
+            season_id: season.id
+            season_startDate: season.startDate
+            season_endDate: season.endDate
+            season_currentMatchday: season.currentMatchday
+            season_winner: season.winner
+            stage: standings.0.stage
+            type: standings.0.type
+            group: standings.0.group
             landing_created_at: created_at
           iterate:
-            path: table
+            path: standings.0.table
             columns:
               position: position
               team_id: team.id
@@ -223,18 +254,20 @@ models:
               goalDifference: goalDifference
     dependencies:
       - landing.football_data_standings
-    output: intermediate/football_data_standings.csv
+    output: 
+      path: intermediate/football_data_standings.csv
 
   - name: espn_teams
     description: Extracts team information from the ESPN matches data.
     trigger: automatic
-    materialized: incremental
     sources: 
       - name: espn_matches
-        type: csv
         path: intermediate/espn_matches.csv
+        mode: newest
+        on: created_at
     columns:
       - name: team_id
+        unique: true
       - name: team_name
       - name: team_abbreviation
       - name: team_displayName
@@ -252,4 +285,5 @@ models:
         deduplicate: true
     dependencies:
       - intermediate.espn_matches
-    output: intermediate/espn_teams.csv
+    output: 
+      path: intermediate/espn_teams.csv
