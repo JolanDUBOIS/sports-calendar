@@ -159,14 +159,6 @@ class LiveSoccerScraper(BaseScraper):
         # Teams
         match = row.find('td', id='match')
         match_text = match.get_text(strip=True) if match else None
-        if " - " in match_text:  # Match is in progress or over
-            home_info, away_info = match_text.split(" - ")
-            home_team = home_info[:-1]
-            away_team = away_info[1:]
-        elif " vs " in match_text:
-            home_team, away_team = match_text.split(" vs ")
-        else:
-            home_team, away_team = None, None
 
         # Channels
         channels_div = row.find('td', id='channels')
@@ -178,8 +170,6 @@ class LiveSoccerScraper(BaseScraper):
             "match_date": current_date,
             "source_time": time_value,
             "source_tz_time": time_value_tz,
-            "home_team_source_name": home_team,
-            "away_team_source_name": away_team,
             "channels": channels
         }
 
@@ -200,18 +190,14 @@ class LiveSoccerScraper(BaseScraper):
         """ TODO """
         match_date = last_match['match_date']
         match_time_ls = last_match['source_tz_time']
-        home_team = last_match['home_team_source_name']
-        away_team = last_match['away_team_source_name']
+        title = last_match['title']
+        match_datetime = f"{match_date}%20{match_time_ls}:00"
 
         pageid = self.extract_pageid(soup)
         if not pageid:
             return None
 
-        match_datetime = f"{match_date}%20{match_time_ls}:00"
-        game = f"{home_team} vs {away_team}"
-        game = quote_plus(game)
-
-        next_url = f"{self.base_url}/xschedule.php?direction=next&pagetype=competition&pageid={pageid}&start={match_datetime}&game={game}&xml=1&tab=_live&page=1&pageurl={quote_plus(competition_url)}"
+        next_url = f"{self.base_url}/xschedule.php?direction=next&pagetype=competition&pageid={pageid}&start={match_datetime}&game={quote_plus(title)}&xml=1&tab=_live&page=1&pageurl={quote_plus(competition_url)}"
         return next_url
 
     @staticmethod
