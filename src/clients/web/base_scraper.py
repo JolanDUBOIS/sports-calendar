@@ -12,12 +12,13 @@ class BaseScraper:
     def __init__(self, **kwargs):
         """ TODO """
 
-    def scrape_url(self, url: str, max_retries: int = 3, delay: int = 15) -> BeautifulSoup|None:
+    def scrape_url(self, url: str, max_retries: int = 3, delay: int = 15, request_interval: int = 0) -> BeautifulSoup|None:
         """ TODO """
         retries = 0
         scraper = cloudscraper.create_scraper()
         while retries < max_retries:
             try:
+                time.sleep(request_interval)
                 response = scraper.get(url)
 
                 if response.status_code == 200:

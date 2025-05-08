@@ -30,7 +30,7 @@ class FootballDataApiClient(BaseApiClient):
         url_fragment = f"/teams/{team_id}/matches"
         url = f"{self.base_url}{url_fragment}"
         params = {"dateFrom": date_from, "dateTo": date_to}
-        response = self.query_api(url, params=params, headers=self.headers)
+        response = self.query_api(url, params=params, headers=self.headers, request_interval=6)
         if not response:
             return []
         return response.get("matches", [])
@@ -40,7 +40,7 @@ class FootballDataApiClient(BaseApiClient):
         url_fragment = f"/competitions/{competition_id}/matches"
         url = f"{self.base_url}{url_fragment}"
         params = {"dateFrom": date_from, "dateTo": date_to}
-        response = self.query_api(url, params=params, headers=self.headers)
+        response = self.query_api(url, params=params, headers=self.headers, request_interval=6)
         if not response:
             return []
         return response.get("matches", [])
@@ -49,7 +49,7 @@ class FootballDataApiClient(BaseApiClient):
         """ TODO """
         url_fragment = f"/competitions/{competition_id}/standings"
         url = f"{self.base_url}{url_fragment}"
-        response = self.query_api(url, headers=self.headers)
+        response = self.query_api(url, headers=self.headers, request_interval=6)
         if not response:
             return []
         return response.get("standings", [])
@@ -58,7 +58,7 @@ class FootballDataApiClient(BaseApiClient):
         """ TODO """
         url_fragment = "/competitions"
         url = f"{self.base_url}{url_fragment}"
-        response = self.query_api(url, headers=self.headers)
+        response = self.query_api(url, headers=self.headers, request_interval=6)
         if not response:
             return []
         return response.get("competitions", [])
@@ -67,7 +67,7 @@ class FootballDataApiClient(BaseApiClient):
         """ TODO """
         url_fragment = "/areas"
         url = f"{self.base_url}{url_fragment}"
-        response = self.query_api(url, headers=self.headers)
+        response = self.query_api(url, headers=self.headers, request_interval=6)
         if not response:
             return []
         return response.get("areas", [])
@@ -76,7 +76,7 @@ class FootballDataApiClient(BaseApiClient):
         """ TODO """
         url_fragment = f"/competitions/{competition_id}/teams"
         url = f"{self.base_url}{url_fragment}"
-        response = self.query_api(url, headers=self.headers)
+        response = self.query_api(url, headers=self.headers, request_interval=6)
         if not response:
             return []
         return response.get("teams", [])

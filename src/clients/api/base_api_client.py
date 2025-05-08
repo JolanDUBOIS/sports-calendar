@@ -18,12 +18,14 @@ class BaseApiClient:
         params: dict = None,
         headers: dict = None,
         max_retries: int = 3,
-        delay: int = 15
+        delay: int = 15,
+        request_interval: int = 0
     ) -> dict|None:
         """ TODO """
         retries = 0
         while retries < max_retries:
             try:
+                time.sleep(request_interval)
                 response = requests.get(url, params=params, headers=headers)
 
                 if response.status_code == 200:

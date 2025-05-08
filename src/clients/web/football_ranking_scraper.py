@@ -18,6 +18,7 @@ class FootballRankingScraper(BaseScraper):
 
     def scrape_fifa_ranking(self) -> pd.DataFrame:
         """ TODO """
+        logger.info("Scraping FIFA rankings...")
         endpoint = "/fifa-rankings"
         rankings = []
         for k in range(1,6):
@@ -31,6 +32,7 @@ class FootballRankingScraper(BaseScraper):
                 if parsed_row:
                     rankings.append(parsed_row)
         
+        logger.debug(f"Parsed {len(rankings)} FIFA rankings.")
         return pd.DataFrame(rankings)
     
     def _parse_fifa_ranking(self, row: Tag) -> dict|None:
