@@ -1,8 +1,0 @@
-trigger: manual
-
-class_object: LiveSoccerScraper
-
-instructions:
-- method: scrape_competitions
-  output_type: csv
-  save_file: live_soccer_competitions.csv
