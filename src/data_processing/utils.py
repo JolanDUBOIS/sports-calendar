@@ -41,7 +41,7 @@ def order_models(models: list[dict], stage: str) -> list[dict]:
     model_dependencies = {}
     for model in models:
         model_name = model.get('name')
-        model_dep = model.get('dependencies')
+        model_dep = model.get('dependencies', [])
         model_dependencies[model_name] = []
         for dependency in model_dep:
             dependency_stage = DataStage.from_str(dependency.split('.')[0])
