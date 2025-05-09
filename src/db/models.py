@@ -67,6 +67,8 @@ class Match(Base):
     away_team_id = Column(String, ForeignKey('teams.id'), nullable=False)
     venue = Column(String)
     competition_id = Column(String, ForeignKey('competitions.id'), nullable=False)
+    stage = Column(String)
+    leg = Column(String)
     channels = Column(String)
     source = Column(String)
     created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
