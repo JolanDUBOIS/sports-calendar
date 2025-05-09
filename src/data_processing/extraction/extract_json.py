@@ -53,6 +53,7 @@ def extract_from_json(
         logger.error("Only one source is supported for json extraction.")
         raise ValueError("Only one source is supported for json extraction.")
     json_data = next(iter(sources.values()))
+    logger.debug(f"Extracting from JSON data: {json_data}")
     if not isinstance(json_data, list) and all(isinstance(i, dict) for i in json_data):
         # Maybe too computationally expensive to go through all the elements already
         logger.error("The source should be a list of dictionaries.")
@@ -60,6 +61,7 @@ def extract_from_json(
 
     extracted_data = []
     for item in json_data:
+        logger.debug(f"Extracting item: {item} with mapping: {columns_mapping}")
         extracted_item = _extract_item(item, columns_mapping)
         extracted_data.append(extracted_item)
 
