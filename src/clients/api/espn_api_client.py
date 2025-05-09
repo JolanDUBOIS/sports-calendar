@@ -24,9 +24,9 @@ class ESPNApiClient(BaseApiClient):
         matches = []
         for date_str in date_list:
             new_matches = self.query_matches_single_day(competition_slug, date_str)
-            logger.debug(f"Matches for {date_str}: {new_matches}")
+            # logger.debug(f"Matches for {date_str}: {new_matches}")
             matches.extend(new_matches)
-        logger.debug(f"Matches for {competition_slug} from {date_from} to {date_to}: {matches}")
+        # logger.debug(f"Matches for {competition_slug} from {date_from} to {date_to}: {matches}")
         return matches
 
     def query_matches_single_day(self, competition_slug: str, date_str: str) -> list[dict]:
