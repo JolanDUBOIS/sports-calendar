@@ -10,3 +10,7 @@ database:
 pipeline:
   config_files: config/pipeline_config/test
   repository_path: data/repository/test
+  workflows:
+    # - data_ingestion
+    - data_extraction
+  manual: false

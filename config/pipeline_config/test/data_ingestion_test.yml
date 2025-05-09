@@ -8,6 +8,10 @@ models:
       - name: ESPN
         type: api
         client_class: ESPNApiClient
+    static_fields:
+      created_at: !date_offset 0
+      source: espn
+      source_type: api
     method: query_matches
     params:
       - competition_slug: uefa.champions
@@ -132,6 +136,10 @@ models:
       - name: football-data
         type: api
         client_class: FootballDataApiClient
+    static_fields:
+      created_at: !date_offset 0
+      source: football-data
+      source_type: api
     method: query_competition_matches
     params:
       - competition_id: 2013
@@ -174,7 +182,7 @@ models:
         date_from: !date_offset 0
         date_to: !date_offset 7
     output:
-      path: football_data_matches.json
+      path: landing/football_data_matches.json
       mode: append
 
   - name: football_data_standings
@@ -184,6 +192,10 @@ models:
       - name: football-data
         type: api
         client_class: FootballDataApiClient
+    static_fields:
+      created_at: !date_offset 0
+      source: football-data
+      source_type: api
     method: query_standings
     params:
       - competition_id: 2013
@@ -206,6 +218,10 @@ models:
       - name: football-data
         type: api
         client_class: FootballDataApiClient
+    static_fields:
+      created_at: !date_offset 0
+      source: football-data
+      source_type: api
     method: query_teams
     params:
       - competition_id: 2013
@@ -232,6 +248,10 @@ models:
       - name: livesoccertv
         type: scraper
         client_class: LiveSoccerScraper
+    static_fields:
+      created_at: !date_offset 0
+      source: livesoccertv
+      source_type: scraper
     method: scrape_matches
     params:
       - competition_endpoint: /france/ligue-1
@@ -241,26 +261,26 @@ models:
       - competition_endpoint: /england/fa-cup
       - competition_endpoint: /england/league-cup
       - competition_endpoint: /england/fa-community-shield
-      - competition_endpoint: /italy/serie-a
-      - competition_endpoint: /italy/coppa-italia
-      - competition_endpoint: /italy/supercoppa-italiana
-      - competition_endpoint: /spain/primera-division
-      - competition_endpoint: /spain/copa-del-rey
-      - competition_endpoint: /spain/spanish-super-cup
-      - competition_endpoint: /germany/bundesliga
-      - competition_endpoint: /germany/german-cup
-      - competition_endpoint: /germany/dfl-supercup
-      - competition_endpoint: /international/uefa-champions-league
-      - competition_endpoint: /international/uefa-europa-league
-      - competition_endpoint: /international/uefa-europa-conference-league
-      - competition_endpoint: /international/uefa-super-cup
-      - competition_endpoint: /international/fifa-club-world-cup
-      - competition_endpoint: /international/uefa-european-championship
-      - competition_endpoint: /international/uefa-euro-qualifying
-      - competition_endpoint: /international/uefa-nations-league
-      - competition_endpoint: /international/world-cup
-      - competition_endpoint: /international/copa-america
-      - competition_endpoint: /international/africa-cup-of-nations
+      # - competition_endpoint: /italy/serie-a
+      # - competition_endpoint: /italy/coppa-italia
+      # - competition_endpoint: /italy/supercoppa-italiana
+      # - competition_endpoint: /spain/primera-division
+      # - competition_endpoint: /spain/copa-del-rey
+      # - competition_endpoint: /spain/spanish-super-cup
+      # - competition_endpoint: /germany/bundesliga
+      # - competition_endpoint: /germany/german-cup
+      # - competition_endpoint: /germany/dfl-supercup
+      # - competition_endpoint: /international/uefa-champions-league
+      # - competition_endpoint: /international/uefa-europa-league
+      # - competition_endpoint: /international/uefa-europa-conference-league
+      # - competition_endpoint: /international/uefa-super-cup
+      # - competition_endpoint: /international/fifa-club-world-cup
+      # - competition_endpoint: /international/uefa-european-championship
+      # - competition_endpoint: /international/uefa-euro-qualifying
+      # - competition_endpoint: /international/uefa-nations-league
+      # - competition_endpoint: /international/world-cup
+      # - competition_endpoint: /international/copa-america
+      # - competition_endpoint: /international/africa-cup-of-nations
     output:
       path: landing/live_soccer_matches.csv
       mode: append
@@ -272,6 +292,10 @@ models:
       - name: livesoccertv
         type: scraper
         client_class: LiveSoccerScraper
+    static_fields:
+      created_at: !date_offset 0
+      source: livesoccertv
+      source_type: scraper
     method: scrape_standings
     params: 
       - competition_endpoint: /france/ligue-1
@@ -290,6 +314,10 @@ models:
       - name: livesoccertv
         type: scraper
         client_class: LiveSoccerScraper
+    static_fields:
+      created_at: !date_offset 0
+      source: livesoccertv
+      source_type: scraper
     method: scrape_competitions
     output:
       path: landing/live_soccer_competitions.csv
@@ -302,6 +330,10 @@ models:
       - name: football-ranking
         type: scraper
         client_class: FootballRankingScraper
+    static_fields:
+      created_at: !date_offset 0
+      source: football-ranking
+      source_type: scraper
     method: scrape_fifa_ranking
     output:
       path: landing/football_ranking_fifa_ranking.csv

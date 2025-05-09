@@ -7,11 +7,15 @@ models:
     sources:
       - name: espn_matches
         path: landing/espn_matches.json
-        mode: newest # newest, all
-        on: created_at
+        versioning:
+          mode: newest # newest or all
+          on: created_at
+          type: datetime
     columns:
       - name: id
         unique: true
+        ordered_by: created_at
+        ascending: false
       - name: date
       - name: name
       - name: shortName
@@ -41,7 +45,8 @@ models:
       - name: team_B_venue_id 
       - name: landing_created_at
       - name: created_at
-        static: !date_offset 0
+    static_fields:
+      created_at: !date_offset 0
     function: extract_from_json
     params:
       - columns_mapping:
@@ -86,8 +91,10 @@ models:
     sources:
       - name: football_data_matches
         path: landing/football_data_matches.json
-        mode: newest
-        on: created_at
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
     columns:
       - name: area_id
       - name: area_name
@@ -102,6 +109,8 @@ models:
       - name: season_current_matchday
       - name: id
         unique: true
+        ordered_by: created_at
+        ascending: false
       - name: utcDate
       - name: status
       - name: matchday
@@ -127,7 +136,8 @@ models:
       - name: score_penalties_away
       - name: landing_created_at
       - name: created_at
-        static: !date_offset 0
+    static_fields:
+      created_at: !date_offset 0
     function: extract_from_json
     params:
       - columns_mapping:
@@ -179,19 +189,25 @@ models:
     sources:
       - name: football_data_standings
         path: landing/football_data_standings.json
-        mode: newest
-        on: created_at
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
     columns:
       - name: area_id
       - name: area_name
       - name: area_code
       - name: competition_id
         unique: true
+        ordered_by: created_at
+        ascending: false
       - name: competition_name
       - name: competition_code
       - name: competition_type
       - name: season_id
         unique: true
+        ordered_by: created_at
+        ascending: false
       - name: season_startDate
       - name: season_endDate
       - name: season_currentMatchday
@@ -202,6 +218,8 @@ models:
       - name: position
       - name: team_id
         unique: true
+        ordered_by: created_at
+        ascending: false
       - name: team_name
       - name: team_shortName
       - name: team_tla
@@ -215,7 +233,8 @@ models:
       - name: goalDifference
       - name: landing_created_at
       - name: created_at
-        static: !date_offset 0
+    static_fields:
+      created_at: !date_offset 0
     function: extract_from_json
     params:
       - columns_mapping:
@@ -263,17 +282,22 @@ models:
     sources: 
       - name: espn_matches
         path: intermediate/espn_matches.csv
-        mode: newest
-        on: created_at
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
     columns:
       - name: team_id
         unique: true
+        ordered_by: created_at
+        ascending: false
       - name: team_name
       - name: team_abbreviation
       - name: team_displayName
       - name: team_shortDisplayName
       - name: created_at
-        static: !date_offset 0
+    static_fields:
+      created_at: !date_offset 0
     function: extract_parallel_entities
     params:
       - columns_mapping: 
