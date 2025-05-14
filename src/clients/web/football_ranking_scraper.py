@@ -16,7 +16,7 @@ class FootballRankingScraper(BaseScraper):
         """ TODO """
         super().__init__(**kwargs)
 
-    def scrape_fifa_ranking(self) -> pd.DataFrame:
+    def scrape_fifa_rankings(self) -> pd.DataFrame:
         """ TODO """
         logger.info("Scraping FIFA rankings...")
         endpoint = "/fifa-rankings"

@@ -1,4 +1,5 @@
 import os
+from dateutil import parser
 
 from src.clients import logger
 from src.clients.api.base_api_client import BaseApiClient
@@ -27,6 +28,8 @@ class FootballDataApiClient(BaseApiClient):
 
     def query_team_matches(self, team_id: int, date_from: str=None, date_to: str=None) -> list[dict]:
         """ TODO """
+        date_from = self.parse_date(date_from)
+        date_to = self.parse_date(date_to)
         url_fragment = f"/teams/{team_id}/matches"
         url = f"{self.base_url}{url_fragment}"
         params = {"dateFrom": date_from, "dateTo": date_to}
@@ -37,6 +40,8 @@ class FootballDataApiClient(BaseApiClient):
 
     def query_competition_matches(self, competition_id: int, date_from: str=None, date_to: str=None) -> list[dict]:
         """ TODO """
+        date_from = self.parse_date(date_from)
+        date_to = self.parse_date(date_to)
         url_fragment = f"/competitions/{competition_id}/matches"
         url = f"{self.base_url}{url_fragment}"
         params = {"dateFrom": date_from, "dateTo": date_to}
@@ -80,3 +85,10 @@ class FootballDataApiClient(BaseApiClient):
         if not response:
             return []
         return response.get("teams", [])
+
+    @staticmethod
+    def parse_date(date_str: str) -> str:
+        """ TODO """
+        if date_str:
+            return parser.parse(date_str).strftime("%Y-%m-%d")
+        return None
