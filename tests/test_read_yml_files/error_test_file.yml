@@ -1,0 +1,15 @@
+name: test
+
+models:
+  - name: test_model
+    output:
+      name: fake_model
+    processing:
+      - processor: FakeProcessor
+        params:
+          columns_mapping: !include
+            file: include_test.yml
+            model_name: error_test_model
+    static_fields:
+      - name: date_value_test
+        value: !date_offset 0

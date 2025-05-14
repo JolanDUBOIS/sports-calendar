@@ -1,0 +1,9 @@
+name: test
+
+params:
+  columns_mapping: !include
+    file: include_test.yml
+    model_name: test_model
+  other_param: other_value
+
+date_value: !date_offset 0

@@ -1,6 +1,12 @@
+from pathlib import Path
+from datetime import datetime
+
 import pytest
 
-from src.data_processing.utils import order_models
+from src.data_processing.utils import (
+    order_models,
+    read_yml_file
+)
 
 
 def test_order_models():
@@ -38,7 +44,7 @@ def test_order_models():
 
     models = [
         {"name": "model1", "dependencies": ["staging.model2"]},
-        {"name": "model2", "dependencies": ["serving.model3"]},
+        {"name": "model2", "dependencies": ["production.model3"]},
         {"name": "model3", "dependencies": []},
     ]
 
@@ -54,3 +60,29 @@ def test_order_models():
 
     with pytest.raises(ValueError):
         order_models(models, "intermediate")
+
+def test_read_yml_file():
+    root_path = Path(__file__).parent
+    
+    data = read_yml_file(root_path / "test_read_yml_files/test_file.yml")
+    
+    assert data["params"] == {
+        "columns_mapping": {
+            "direct_paths": {
+                "path1": "alpha.beta",
+                "path2": "alpha.beta.0.gamma"
+            },
+            "iterate": {
+                "path": "alpha.gamma",
+                "columns": {
+                    "path3": "delta.epsilon",
+                    "path4": "delta.zeta"
+                }
+            }
+        },
+        "other_param": "other_value"
+    }
+    datetime.strptime(data["date_value"], "%Y-%m-%d %H:%M:%S") # Shouldn't raise an error
+    
+    with pytest.raises(ValueError):
+        data = read_yml_file(root_path / "test_read_yml_files/error_test_file.yml")
