@@ -17,6 +17,11 @@ class FileHandler(ABC):
         self.now = datetime.now().isoformat(timespec="seconds")
         self.meta_path = self.file_path.parent / ".meta.json"
 
+    @property
+    def path(self) -> Path:
+        """ Return the file path. """
+        return self.file_path
+
     @abstractmethod
     def read(self, mode: str = "all", **kwargs) -> Any:
         """ Read the file and return its content. """
@@ -78,29 +83,8 @@ class FileHandler(ABC):
 class CSVHandler(FileHandler):
     """ CSV file handler. """
 
-    def __init__(self, file_path: Path, schema: list[dict] = None):
+    def __init__(self, file_path: Path):
         super().__init__(file_path)
-        self.add_schema(schema)
-
-    def add_schema(self, schema: list[dict]|None) -> None:
-        """ TODO """
-        if schema is not None:
-            self._check_schema(schema)
-        self.schema = schema
-
-    @staticmethod
-    def _check_schema(schema: list[dict]) -> None:
-        """ TODO """
-        if not isinstance(schema, list):
-            logger.error("Schema must be a list.")
-            raise TypeError("Schema must be a list.")
-        if not all(isinstance(col, dict) for col in schema):
-            logger.error("All elements in the schema must be dictionaries.")
-            raise TypeError("All elements in the schema must be dictionaries.")
-        for col in schema:
-            if "name" not in col:
-                logger.error("Column name is missing in the schema.")
-                raise ValueError("Column name is missing in the schema.")
 
     def read(self, mode: str = "all", **kwargs) -> pd.DataFrame:
         """ TODO """
@@ -120,11 +104,13 @@ class CSVHandler(FileHandler):
             logger.error(f"Unsupported read mode: {mode}")
             raise ValueError(f"Unsupported read mode: {mode}")
 
-    def write(self, data: pd.DataFrame, overwrite: bool = False, strict_enforce_schema: bool = False) -> None:
+    def write(self, data: pd.DataFrame, overwrite: bool = False) -> None:
         """ Write the data to a CSV file. """
+        if data.empty:
+            logger.warning("Data is empty. Nothing to write.")
+            return
         logger.info(f"Writing data to {self.file_path}")
         if not self.file_path.exists() or (overwrite and self.confirm_overwrite()):
-            data = self.enforce_schema(data, strict=strict_enforce_schema)
             data.to_csv(self.file_path, mode='w', header=True, index=False)
         else:
             try:
@@ -132,52 +118,9 @@ class CSVHandler(FileHandler):
             except pd.errors.EmptyDataError:
                 existing_df = pd.DataFrame()
             data = pd.concat([existing_df, data], ignore_index=True)
-            data = self.enforce_schema(data, strict=strict_enforce_schema)
-            data.to_csv(self.file_path, mode='w', header=False, index=False)
+            data.to_csv(self.file_path, mode='w', header=True, index=False)
         self._update_metadata(writer_type=self.__class__.__name__, rows=len(data))
         logger.debug(f"Data written to {self.file_path}")
-
-    def enforce_schema(self, data: pd.DataFrame, strict: bool = True) -> pd.DataFrame:
-        """ TODO """
-        if self.schema is None:
-            logger.debug("No schema defined. Skipping schema enforcement...")
-            return data
-
-        for col in self.schema:
-
-            col_name = col.get("name")
-            if col_name not in data.columns:
-                if strict:
-                    logger.error(f"Column {col_name} is missing in the DataFrame.")
-                    raise ValueError(f"Column {col_name} is missing in the DataFrame.")
-                else:
-                    logger.warning(f"Column {col_name} is missing in the DataFrame. Adding it with None values.")
-                    data[col_name] = None
-
-            col_type = col.get("type")
-            if col_type:
-                try:
-                    data[col_name] = data[col_name].astype(col_type)
-                except Exception as e:
-                    if strict:
-                        raise TypeError(f"Failed to cast column {col_name} to {col_type}: {e}")
-                    else:
-                        logger.warning(f"Failed to cast column {col_name} to {col_type}: {e}")
-
-            col_unique = col.get("unique", False)
-            if col_unique:
-                if strict:
-                    if data[col_name].duplicated().any():
-                        logger.error(f"Column {col_name} has duplicates.")
-                        raise ValueError(f"Column {col_name} has duplicates.")
-                else:
-                    col_ordered_by = col.get("ordered_by", "created_at")
-                    col_ascending = col.get("ascending", False)
-                    data.sort_values(by=col_ordered_by, ascending=col_ascending, inplace=True)
-                    data.drop_duplicates(subset=[col_name], keep="first", inplace=True)
-                    logger.debug(f"Column {col_name} has been made unique by dropping duplicates.")
-
-        return data
 
     @staticmethod
     def _get_newest_version(data: pd.DataFrame, version_field: str, version_threshold: Any = None, version_type: str = 'datetime') -> pd.DataFrame:
@@ -229,6 +172,9 @@ class JSONHandler(FileHandler):
 
     def write(self, data: list[dict], overwrite: bool = False) -> None:
         """ Write the data to a JSON file. """
+        if not data:
+            logger.warning("Data is empty. Nothing to write.")
+            return
         logger.info(f"Writing data to {self.file_path}")
         if not isinstance(data, list):
             logger.error("Data must be a list.")
@@ -238,6 +184,7 @@ class JSONHandler(FileHandler):
             with self.file_path.open(mode='w') as file:
                 json.dump(data, file, indent=4)
         else:
+            # TODO - Maybe use .jsonl ?
             with self.file_path.open(mode='r') as file:
                 existing_data = json.load(file)
             if not isinstance(existing_data, list):

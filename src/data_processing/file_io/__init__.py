@@ -1,1 +1,1 @@
-from .file_handler import FileHandlerFactory
+from .file_handler import FileHandlerFactory, FileHandler
