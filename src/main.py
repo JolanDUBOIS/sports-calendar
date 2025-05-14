@@ -6,7 +6,9 @@ from src.config import get_config
 from src.selection import Selection
 from src.sources import DatabaseManager, FootballRankingScraper, update_database
 from src.calendar import FootballCalendar, GoogleCalendarManager
-from src.deprecated.live_soccer_source_deprecated.new_feature_playground import test as ls_test
+from src.data_processing.utils import read_yml_file
+from src.data_processing.ingestion_landing import ingestion_landing
+from src.data_processing.build_intermediate import build_intermediate
 
 
 def run_selection(save_ics: bool=False):
@@ -33,12 +35,18 @@ def test(no: int):
     """ TODO """
     logger.info("Running test...")
     if no == 1:
-        competitions = ls_test()
-        logger.debug(competitions.keys())
+        db_repo = Path(__file__).parent.parent / "data/repository/new_test"
+        instructions_path = Path(__file__).parent.parent / "config/pipeline_config/test/workflows/ingestion_landing.yml"
+        instructions = read_yml_file(instructions_path)
+        ingestion_landing(db_repo, instructions, manual=True)
         
     elif no == 2:
-        google_calendar_manager = GoogleCalendarManager()
-        google_calendar_manager.delete_all_events()
+        db_repo = Path(__file__).parent.parent / "data/repository/new_test"
+        instructions_path = Path(__file__).parent.parent / "config/pipeline_config/test/workflows/build_intermediate.yml"
+        instructions = read_yml_file(instructions_path)
+        schemas_path = Path(__file__).parent.parent / "config/pipeline_config/test/schemas/intermediate.yml"
+        schemas = read_yml_file(schemas_path)
+        build_intermediate(db_repo, instructions, schemas, manual=True)
 
     elif no == 3:
         selection_file_path = Path("data/selections/new_selection.json")
