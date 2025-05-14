@@ -1,23 +1,22 @@
-# TODO - This script can be improved, it's not very clean and has some redundant code.
 from pathlib import Path
 
 import pandas as pd
 
 from src.data_processing import logger
-from src.data_processing.utils import order_models, inject_static_fields
+from src.data_processing.utils import (
+    order_models,
+    inject_static_fields
+)
 from src.data_processing.file_io import FileHandlerFactory
-from src.clients import ESPNApiClient, FootballDataApiClient, LiveSoccerScraper, FootballRankingScraper
+from src.clients import (
+    ESPNApiClient,
+    FootballDataApiClient,
+    LiveSoccerScraper,
+    FootballRankingScraper
+)
 
 
-INSTRUCTIONS_FOLDER_PATH = Path(__file__).parent / "instructions"
-
-# TODO - Add check for the instructions file
-# TODO - Potentially separate this script into multiple files
-# TODO - Add parallel processing for the ingestion (query each API/website in parallel)
-# TODO - Reunite the instructions files into one file + add a key to identify each ingestion instruction => to handle better the manual trigger
-# TODO - Add a version control (only process the new data) !!!
-
-INGESTION_CLIENT_REGISTRY = {
+CLIENT_REGISTRY = {
     "ESPNApiClient": ESPNApiClient,
     "FootballDataApiClient": FootballDataApiClient,
     "LiveSoccerScraper": LiveSoccerScraper,
@@ -76,7 +75,7 @@ def _append_data(data: list[dict]|pd.DataFrame|None, new_data: dict|list[dict]|p
         raise TypeError(f"Unsupported data type: {type(data)}")
     return data
 
-def ingestion_workflow(db_repo: str, instructions: dict, manual: bool = False):
+def ingestion_landing(db_repo: str, instructions: dict, manual: bool = False):
     """ TODO """
     logger.info("Starting ingestion workflow.")
     db_repo = Path(db_repo)
@@ -84,6 +83,7 @@ def ingestion_workflow(db_repo: str, instructions: dict, manual: bool = False):
     models = instructions.get("models", [])
     models = order_models(models, "landing")
     for model in models:
+        # Trigger
         model_trigger = model.get("trigger", "automatic")
         if not manual and model_trigger == "manual":
             continue
@@ -91,32 +91,36 @@ def ingestion_workflow(db_repo: str, instructions: dict, manual: bool = False):
             logger.warning(f"Unsupported trigger type: {model_trigger}.")
             continue
 
+        # Name
         model_name = model.get("name")
-        logger.info(f"Ingestion for model: {model_name}")
+        logger.info(f"Running ingestion for model: {model_name}")
 
-        sources = model.get("sources", [])
-        if len(sources) != 1:
-            logger.error(f"Only one source is supported for ingestion.")
-            raise ValueError(f"Only one source is supported for ingestion.")
+        # Output handler
+        output = model.get("output", {})
+        output_handler = FileHandlerFactory.create_file_handler(db_repo / output.get("path"))
 
-        client_class = INGESTION_CLIENT_REGISTRY.get(sources[0].get("client_class"))
-        if not client_class:
-            logger.error(f"Unsupported client class: {sources[0].get('client_class')}.")
-            raise ValueError(f"Unsupported client class: {sources[0].get('client_class')}.")
+        # Processing
+        processing = model.get("processing", {})
+        client_class = processing.get("client_class")
+        method = processing.get("method")
+        if not client_class or not method:
+            logger.error(f"Client class or method not found in the instruction file.")
+            raise ValueError(f"Client class or method not found in the instruction file.")
+        processor = CLIENT_REGISTRY.get(client_class)
+        if not processor:
+            logger.error(f"Unsupported client class: {client_class}.")
+            raise ValueError(f"Unsupported client class: {client_class}.")
+        list_params = processing.get("params", [{}])
+        logger.debug(f"List of parameters: {list_params}")
+        outputs = fetch_data_from_client(processor(), method, list_params)
 
-        list_params = model.get("params", [{}])
-        method = model.get("method")
-        if not method:
-            logger.error(f"Method not found in the instruction file.")
-            raise ValueError(f"Method not found in the instruction file.")
+        # Inject static fields
+        static_fields = model.get("static_fields", {})
+        if static_fields:
+            outputs = inject_static_fields(outputs, static_fields)
 
-        client_obj = client_class()
-        outputs = fetch_data_from_client(client_obj, method, list_params)
-
-        static_fields = model.get("static_fields", [])
-        outputs = inject_static_fields(outputs, static_fields)
-
-        output_file = db_repo / model.get("output", {}).get("path")
-        FileHandlerFactory.create_file_handler(output_file).write(outputs, overwrite=False)
+        # Write to output
+        output_handler.write(outputs, overwrite=False)
+        logger.info(f"Output written to: {output_handler.path}")
 
     logger.info("Ingestion workflow completed.")
