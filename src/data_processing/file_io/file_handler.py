@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Tuple, Any
 from datetime import datetime
 from pathlib import Path
 from abc import ABC, abstractmethod
@@ -13,18 +13,50 @@ class FileHandler(ABC):
     """ Abstract base class for file handlers. """
 
     def __init__(self, file_path: Path):
+        """ Initialize the file handler """
+        self._check_path(file_path)
         self.file_path = file_path
         self.now = datetime.now().isoformat(timespec="seconds")
         self.meta_path = self.file_path.parent / ".meta.json"
+
+    @staticmethod
+    def _check_path(file_path: Path) -> None:
+        """ Check if the file path is valid. """
+        if not file_path.exists():
+            logger.error(f"File {file_path} does not exist.")
+            raise FileNotFoundError(f"File {file_path} does not exist.")
+        if not file_path.is_file():
+            logger.error(f"{file_path} is not a file.")
+            raise ValueError(f"{file_path} is not a file.")
 
     @property
     def path(self) -> Path:
         """ Return the file path. """
         return self.file_path
 
-    @abstractmethod
     def read(self, mode: str = "all", **kwargs) -> Any:
         """ Read the file and return its content. """
+        logger.info(f"Reading data from {self.file_path}")
+        if mode == "all":
+            return self._read_all()
+        elif mode == "newest":
+            version_field = kwargs.get("on", "created_at")
+            version_type = kwargs.get("version_type", "datetime")
+            version_threshold = kwargs.get("version_threshold") if "version_threshold" in kwargs else 0
+            logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
+            return self._read_newest(version_field, version_threshold, version_type)
+        else:
+            logger.error(f"Unsupported read mode: {mode}")
+            raise ValueError(f"Unsupported read mode: {mode}")
+
+    @abstractmethod
+    def _read_all(self) -> Any:
+        """ Read all data from the file. """
+        pass
+
+    @abstractmethod
+    def _read_newest(self, version_field: str, version_threshold: Any = None) -> Any:
+        """ Read the newest version of the data. """
         pass
 
     @abstractmethod
@@ -75,12 +107,13 @@ class FileHandler(ABC):
             return None
 
     @staticmethod
-    @abstractmethod
-    def _get_newest_version(
-        data: list[dict]|pd.DataFrame,
-        version_field: str,
-        version_threshold: Any = None,
-        version_type: str = 'datetime'
-    ) -> list[dict]|pd.DataFrame:
-        """ TODO """
-        pass
+    def _parse_version_value(value: Any) -> Tuple[Any, str]:
+        """ Parse the version value to determine its type. """
+        try:
+            return float(value), 'numeric'
+        except (ValueError, TypeError):
+            try:
+                return pd.to_datetime(value, errors='raise'), 'datetime'
+            except (ValueError, TypeError):
+                logger.error(f"The provided value {value} is not a valid datetime or numeric value.")
+                raise ValueError(f"The provided value {value} is not a valid datetime or numeric value.")

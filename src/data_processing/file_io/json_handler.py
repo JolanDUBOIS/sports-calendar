@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -9,28 +10,38 @@ from src.data_processing.file_io import logger
 
 class JSONHandler(FileHandler):
     """ JSON file writer. """
+
+    def _read_all(self) -> list[dict]:
+        """ Read all data from the JSON file. """
+        return self._read_json(self.file_path)
     
-    def read(self, mode: str = "all", **kwargs) -> dict:
-        """ TODO """
-        logger.info(f"Reading data from {self.file_path}")
-        with self.file_path.open("r") as f:
-            data = json.load(f)
-        if not isinstance(data, list):
-            logger.error(f"Data in the file {self.file_path} is not a list.")
-            raise ValueError(f"Data in the file {self.file_path} is not a list.")
-        if mode == "all":
+    def _read_newest(self, version_field: str, version_threshold: Any = None) -> list[dict]:
+        """ Read the newest version of the data. """
+        data = self._read_json(self.file_path)
+        if version_threshold is None:
             return data
-        elif mode == "newest":
-            version_field = kwargs.get("on", "created_at")
-            version_type = kwargs.get("version_type", "datetime")
-            version_threshold = kwargs.get("version_threshold")
-            if version_threshold is None:
-                version_threshold = 0
-            logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
-            return self._get_newest_version(data, version_field, version_threshold, version_type)
-        else:
-            logger.error(f"Unsupported read mode: {mode}")
-            raise ValueError(f"Unsupported read mode: {mode}")            
+        self._validate_data(data)
+
+        version_threshold, version_type = self._parse_version_value(version_threshold)
+
+        filtered_data = []
+        for row in data:
+            raw_value = row.get(version_field)
+            if raw_value is None:
+                continue
+
+            try:
+                if version_type == 'numeric':
+                    value = float(raw_value)
+                else:  # datetime
+                    value = pd.to_datetime(raw_value, errors='raise')
+            except (ValueError, TypeError):
+                continue
+            
+            if value >= version_threshold:
+                filtered_data.append(row)
+        
+        return filtered_data
 
     def write(self, data: list[dict], overwrite: bool = False) -> None:
         """ Write the data to a JSON file. """
@@ -58,32 +69,24 @@ class JSONHandler(FileHandler):
         self._update_metadata(writer_type=self.__class__.__name__, rows=len(data))
         logger.debug(f"Data written to {self.file_path}")
 
+    def _validate_data(self, data: list[dict]|None) -> None:
+        """ Validate the structure of the JSON data. """
+        if data is None:
+            logger.warning(f"Data at path {self.path} is None.")
+        elif not isinstance(data, (list)):
+            logger.error("Data must be a list.")
+            raise ValueError("Data must be a list.")
+        elif not all(isinstance(d, dict) for d in data):
+            logger.error("All elements in the data must be dictionaries.")
+            raise ValueError("All elements in the data must be dictionaries.")
+
     @staticmethod
-    def _get_newest_version(
-        data: list[dict],
-        version_field: str,
-        version_threshold: Any = None,
-        version_type: str = 'datetime'
-    ) -> list:
-        """ TODO """
-        if not all(isinstance(d, dict) for d in data):
-            logger.error("All elements in the list must be dictionaries.")
-            raise ValueError("All elements in the list must be dictionaries.")
-
-        version_list = [d.get(version_field) for d in data]
-        if any(v is None for v in version_list):
-            logger.error(f"Version field '{version_field}' contains null values.")
-            raise ValueError(f"Version field '{version_field}' contains null values.")
-
-        if version_type == 'datetime':
-            version_list = [pd.to_datetime(v, errors='raise') for v in version_list]
-            version_threshold = pd.to_datetime(version_threshold, errors='raise') if version_threshold else pd.Timestamp('1900-01-01')
-        elif version_type == 'numeric':
-            version_list = [float(v) for v in version_list]
-            version_threshold = float(version_threshold) if version_threshold else 0
-        else:
-            logger.error(f"Unsupported version type: {version_type}. Supported types are 'datetime' and 'numeric'.")
-            raise ValueError(f"Unsupported version type: {version_type}. Supported types are 'datetime' and 'numeric'.")
-
-        mask = [v > version_threshold for v in version_list]
-        return [d for d, m in zip(data, mask) if m]
+    def _read_json(file_path: Path) -> dict|list|None:
+        """ Read a JSON file and return its content. """
+        try:
+            with file_path.open("r") as f:
+                data = json.load(f)
+            return data
+        except Exception as e:
+            logger.error(f"Failed to read JSON file {file_path}: {e}")
+            raise e
