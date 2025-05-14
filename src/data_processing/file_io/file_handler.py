@@ -1,5 +1,5 @@
 import json
-from typing import Tuple, Any
+from typing import Tuple, TypeAlias, Any
 from datetime import datetime
 from pathlib import Path
 from abc import ABC, abstractmethod
@@ -8,6 +8,8 @@ import pandas as pd
 
 from src.data_processing.file_io import logger
 
+
+FileContent: TypeAlias = list[dict] | pd.DataFrame | None
 
 class FileHandler(ABC):
     """ Abstract base class for file handlers. """
@@ -34,7 +36,7 @@ class FileHandler(ABC):
         """ Return the file path. """
         return self.file_path
 
-    def read(self, mode: str = "all", **kwargs) -> Any:
+    def read(self, mode: str = "all", **kwargs) -> FileContent:
         """ Read the file and return its content. """
         logger.info(f"Reading data from {self.file_path}")
         if mode == "all":
@@ -49,17 +51,17 @@ class FileHandler(ABC):
             raise ValueError(f"Unsupported read mode: {mode}")
 
     @abstractmethod
-    def _read_all(self) -> Any:
+    def _read_all(self) -> FileContent:
         """ Read all data from the file. """
         pass
 
     @abstractmethod
-    def _read_newest(self, version_field: str, version_threshold: Any = None) -> Any:
+    def _read_newest(self, version_field: str, version_threshold: Any = None) -> FileContent:
         """ Read the newest version of the data. """
         pass
 
     @abstractmethod
-    def write(self, data: Any, overwrite: bool = False, **kwargs) -> None:
+    def write(self, data: FileContent, overwrite: bool = False, **kwargs) -> None:
         """ Write the data to the file. """
         pass
 
@@ -106,7 +108,7 @@ class FileHandler(ABC):
             return None
 
     @staticmethod
-    def _parse_version_value(value: Any) -> Tuple[Any, str]:
+    def _parse_version_value(value: Any) -> Tuple[float|pd.Timestamp, str]:
         """ Parse the version value to determine its type. """
         try:
             return float(value), 'numeric'
