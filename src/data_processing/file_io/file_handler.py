@@ -61,6 +61,21 @@ class FileHandler(ABC):
         pass
 
     @abstractmethod
+    def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
+        """ Delete records from the file based on the version field and threshold. """
+        pass
+
+    @abstractmethod
+    def _prepare_version_field(
+        self,
+        data: FileContent,
+        version_field: str,
+        version_threshold: Any
+    ) -> tuple[FileContent, float|pd.Timestamp|None]:
+        """ Prepare the version field for the data. """
+        pass
+
+    @abstractmethod
     def write(self, data: FileContent, overwrite: bool = False, **kwargs) -> None:
         """ Write the data to the file. """
         pass

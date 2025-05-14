@@ -16,22 +16,49 @@ class CSVHandler(FileHandler):
     def _read_newest(self, version_field: str, version_threshold: Any = None) -> pd.DataFrame:
         """ Read the newest version of the data. """
         data = pd.read_csv(self.file_path)
+        data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
         if version_threshold is None:
-            return data
+            return data.copy()
+        data = data.dropna(subset=[version_field])
+        return data[data[version_field] > version_threshold].copy()
 
-        version_threshold, version_type = self._parse_version_value(version_threshold)
+    def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
+        """ Delete records from the CSV file based on the version field and threshold. """
+        data = pd.read_csv(self.file_path)
+        data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
+        if version_threshold is None:
+            return
+
+        data = data.dropna(subset=[version_field])
+        if delete_newest:
+            data = data[data[version_field] < version_threshold]
+        else:
+            data = data[data[version_field] > version_threshold]
+            
+        self.write(data, overwrite=True)
+
+    def _prepare_version_field(
+        self,
+        data: pd.DataFrame,
+        version_field: str,
+        version_threshold: Any
+    ) -> tuple[pd.DataFrame, float|pd.Timestamp|None]:
+        """ Clean and convert the version_field, return cleaned data and parsed threshold. """
+        if version_threshold is None:
+            return data, None
 
         if version_field not in data.columns:
             logger.warning(f"Version field '{version_field}' not found in DataFrame.")
-            return data
+            return data, None
+
+        version_threshold, version_type = self._parse_version_value(version_threshold)
 
         if version_type == 'numeric':
             data[version_field] = pd.to_numeric(data[version_field], errors='coerce')
         elif version_type == 'datetime':
             data[version_field] = pd.to_datetime(data[version_field], errors='coerce')
-        data = data.dropna(subset=[version_field])
-        filtered_data = data[data[version_field] > version_threshold].copy()
-        return filtered_data
+
+        return data, version_threshold
 
     def write(self, data: pd.DataFrame, overwrite: bool = False) -> None:
         """ Write the data to a CSV file. """

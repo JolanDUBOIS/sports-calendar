@@ -14,34 +14,58 @@ class JSONHandler(FileHandler):
     def _read_all(self) -> list[dict]:
         """ Read all data from the JSON file. """
         return self._read_json(self.file_path)
-    
+
     def _read_newest(self, version_field: str, version_threshold: Any = None) -> list[dict]:
         """ Read the newest version of the data. """
         data = self._read_json(self.file_path)
+        data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
         if version_threshold is None:
-            return data
-        self._validate_data(data)
+            return data.copy()
+        if len(data) == 0:
+            logger.warning("No data found in the version field.")
+            return data.copy()
+        return [row for row in data if row.get(version_field) is not None and row.get(version_field) > version_threshold]
 
+    def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
+        """ Delete records from the JSON file based on the version field and threshold. """
+        data = self._read_json(self.file_path)
+        data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
+        if version_threshold is None:
+            return
+        if len(data) == 0:
+            logger.warning("No data found in the version field.")
+            return
+        if delete_newest:
+            data = [row for row in data if row.get(version_field) is not None and row.get(version_field) < version_threshold]
+        else:
+            data = [row for row in data if row.get(version_field) is not None and row.get(version_field) > version_threshold]
+        self.write(data, overwrite=True)
+
+    def _prepare_version_field(
+        self,
+        data: list[dict],
+        version_field: str,
+        version_threshold: Any
+    ) -> tuple[list[dict], float|pd.Timestamp|None]:
+        """ Clean and convert the version_field, return cleaned data and parsed threshold. """
+        if version_threshold is None:
+            return data, None
+        self._validate_data(data)
         version_threshold, version_type = self._parse_version_value(version_threshold)
 
-        filtered_data = []
         for row in data:
             raw_value = row.get(version_field)
             if raw_value is None:
                 continue
-
             try:
                 if version_type == 'numeric':
-                    value = float(raw_value)
+                    row[version_field] = float(raw_value)
                 else:  # datetime
-                    value = pd.to_datetime(raw_value, errors='raise')
+                    row[version_field] = pd.to_datetime(raw_value, errors='raise')
             except (ValueError, TypeError):
-                continue
-            
-            if value >= version_threshold:
-                filtered_data.append(row)
-        
-        return filtered_data
+                row[version_field] = None
+
+        return data, version_threshold
 
     def write(self, data: list[dict], overwrite: bool = False) -> None:
         """ Write the data to a JSON file. """
