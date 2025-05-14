@@ -1,0 +1,231 @@
+name: build_intermediate
+description: |
+  This workflow is responsible for orchestrating the data pipeline from the landing zone to the intermediate zone.
+  It includes tasks for data validation, transformation, parsing, reshaping and loading into the intermediate storage.
+stage: intermediate
+
+models:
+  - name: espn_matches
+    description: Extracts match information from the ESPN json data.
+    trigger: automatic
+    sources:
+      - name: espn_matches
+        path: landing/espn_matches.json
+        versioning:
+          mode: newest # newest or all
+          on: created_at
+          type: datetime
+    dependencies:
+      - landing.espn_matches
+    output:
+      name: espn_matches
+      layer: intermediate
+      path: intermediate/espn_matches.csv
+      schema: espn_matches
+    processing:
+        processor: ESPNMatchPipeline
+        params:
+          columns_mapping: !include
+            file: json_mappings.yml
+            model_name: espn_matches
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: football_data_matches
+    description: Extracts match information from the Football Data json data.
+    trigger: automatic
+    sources:
+      - name: football_data_matches
+        path: landing/football_data_matches.json
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - landing.football_data_matches
+    output:
+      name: football_data_matches
+      layer: intermediate
+      path: intermediate/football_data_matches.csv
+      schema: football_data_matches
+    processing:
+        processor: FootballDataMatchesPipeline
+        params:
+          columns_mapping: !include
+            file: json_mappings.yml
+            model_name: football_data_matches
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: football_data_standings
+    description: Extracts standings information from the Football Data json data.
+    trigger: automatic
+    sources:
+      - name: football_data_standings
+        path: landing/football_data_standings.json
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - landing.football_data_standings
+    output:
+      name: football_data_standings
+      layer: intermediate
+      path: intermediate/football_data_standings.csv
+      schema: football_data_standings
+    processing:
+        processor: FootballDataStandingsPipeline
+        params:
+          columns_mapping: !include
+            file: json_mappings.yml
+            model_name: football_data_standings
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: football_ranking_fifa_rankings
+    description: Extracts FIFA rankings information from the Football Ranking raw csv data.
+    trigger: automatic
+    sources:
+      - name: football_ranking_fifa_rankings
+        path: landing/football_ranking_fifa_rankings.csv
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - landing.football_ranking_fifa_rankings
+    output:
+      name: football_ranking_fifa_rankings
+      layer: intermediate
+      path: intermediate/football_ranking_fifa_rankings.csv
+      schema: football_ranking_fifa_rankings
+    processing:
+        processor: FootballRankingFifaRankingsPipeline
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: live_soccer_matches
+    description: Extracts live match information from the Live Soccer raw csv data.
+    trigger: automatic
+    sources:
+      - name: live_soccer_matches
+        path: landing/live_soccer_matches.csv
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - landing.live_soccer_matches
+    output:
+      name: live_soccer_matches
+      layer: intermediate
+      path: intermediate/live_soccer_matches.csv
+      schema: live_soccer_matches
+    processing:
+        processor: LiveSoccerMatchesPipeline
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: live_soccer_standings
+    description: Extracts live standings information from the Live Soccer raw csv data.
+    trigger: automatic
+    sources:
+      - name: live_soccer_standings
+        path: landing/live_soccer_standings.csv
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - landing.live_soccer_standings
+    output:
+      name: live_soccer_standings
+      layer: intermediate
+      path: intermediate/live_soccer_standings.csv
+      schema: live_soccer_standings
+    processing:
+        processor: LiveSoccerStandingsPipeline
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: espn_teams
+    description: Extracts team information from the ESPN matches data.
+    trigger: automatic
+    sources:
+      - name: espn_matches
+        path: intermediate/espn_matches.csv
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - intermediate.espn_matches
+    output:
+      name: espn_teams
+      layer: intermediate
+      path: intermediate/espn_teams.csv
+      schema: espn_teams
+    processing:
+        processor: ExtractTeamsPipeline
+        params:
+          source_key: espn_matches
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: football_data_teams
+    description: Extracts team information from the Football Data matches data.
+    trigger: automatic
+    sources:
+      - name: football_data_matches
+        path: intermediate/football_data_matches.csv
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - intermediate.football_data_matches
+    output:
+      name: football_data_teams
+      layer: intermediate
+      path: intermediate/football_data_teams.csv
+      schema: football_data_teams
+    processing:
+        processor: ExtractTeamsPipeline
+        params:
+          source_key: football_data_matches
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: live_soccer_teams
+    description: Extracts team information from the Live Soccer matches data.
+    trigger: automatic
+    sources:
+      - name: live_soccer_matches
+        path: intermediate/live_soccer_matches.csv
+        versioning:
+          mode: newest
+          on: created_at
+          type: datetime
+    dependencies:
+      - intermediate.live_soccer_matches
+    output:
+      name: live_soccer_teams
+      layer: intermediate
+      path: intermediate/live_soccer_teams.csv
+      schema: live_soccer_teams
+    processing:
+        processor: ExtractTeamsPipeline
+        params:
+          source_key: live_soccer_matches
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
