@@ -41,10 +41,9 @@ class FileHandler(ABC):
             return self._read_all()
         elif mode == "newest":
             version_field = kwargs.get("on", "created_at")
-            version_type = kwargs.get("version_type", "datetime")
             version_threshold = kwargs.get("version_threshold") if "version_threshold" in kwargs else 0
             logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
-            return self._read_newest(version_field, version_threshold, version_type)
+            return self._read_newest(version_field, version_threshold)
         else:
             logger.error(f"Unsupported read mode: {mode}")
             raise ValueError(f"Unsupported read mode: {mode}")
