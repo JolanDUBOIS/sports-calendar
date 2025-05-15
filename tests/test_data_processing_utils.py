@@ -3,9 +3,9 @@ from datetime import datetime
 
 import pytest
 
-from src.data_processing.utils import (
-    order_models,
-    read_yml_file
+from src.data_pipeline.utils import read_yml_file
+from src.data_pipeline.data_processing.utils import (
+    order_models
 )
 
 

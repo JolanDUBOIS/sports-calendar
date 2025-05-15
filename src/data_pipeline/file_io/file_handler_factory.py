@@ -3,7 +3,7 @@ from pathlib import Path
 from .file_handler import FileHandler
 from .csv_handler import CSVHandler
 from .json_handler import JSONHandler
-from src.data_processing.file_io import logger
+from src.data_pipeline.file_io import logger
 
 
 class FileHandlerFactory:

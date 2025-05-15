@@ -3,15 +3,14 @@ from pathlib import Path
 import pandas as pd
 
 from .pipelines import PipelineBaseClass
-from src.data_processing import logger
-from src.data_processing.utils import (
+from src.data_pipeline.data_processing import logger
+from src.data_pipeline.data_processing.utils import (
     inject_static_fields,
     order_models,
     load_sources,
-    enforce_schema,
     get_subclass
 )
-from src.data_processing.file_io import FileHandlerFactory
+from src.data_pipeline.file_io import FileHandlerFactory
 
 
 def build_intermediate(db_repo: str, instructions: dict, schemas: dict, manual: bool = False):
@@ -69,7 +68,7 @@ def build_intermediate(db_repo: str, instructions: dict, schemas: dict, manual: 
         except StopIteration:
             logger.error(f"Schema {schema_name} not found.")
             raise ValueError(f"Schema {schema_name} not found.")
-        data = enforce_schema(data, schema, strict=False)
+        # data = enforce_schema(data, schema, strict=False)
 
         # Write Output
         output_handler.write(data, overwrite=output.get("overwrite", False))

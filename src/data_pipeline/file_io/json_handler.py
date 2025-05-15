@@ -5,7 +5,7 @@ from typing import Any
 import pandas as pd
 
 from .file_handler import FileHandler
-from src.data_processing.file_io import logger
+from src.data_pipeline.file_io import logger
 
 
 class JSONHandler(FileHandler):

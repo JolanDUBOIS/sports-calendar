@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from src.data_processing.file_io import logger
+from src.data_pipeline.file_io import logger
 
 
 FileContent: TypeAlias = list[dict] | pd.DataFrame | None

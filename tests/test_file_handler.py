@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 import pandas as pd
 
-from src.data_processing.file_io import FileHandler, CSVHandler, JSONHandler
+from src.data_pipeline.file_io import FileHandler, CSVHandler, JSONHandler
 
 
 @pytest.fixture

@@ -9,7 +9,7 @@ from .processors import (
     ExtractTeams,
     Parsing
 )
-from src.data_processing import logger
+from src.data_pipeline.data_processing import logger
 
 
 SourceType = dict | list[dict] | pd.DataFrame

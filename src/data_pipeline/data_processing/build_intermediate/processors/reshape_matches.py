@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from .processor_base_class import Processor
-from src.data_processing import logger
+from src.data_pipeline.data_processing import logger
 
 
 class ReshapeMatches(Processor):

@@ -1,50 +1,11 @@
 import hashlib
 from enum import IntEnum
 from pathlib import Path
-from datetime import datetime, timedelta
 
-import yaml
 import pandas as pd
 
-from src.data_processing import logger
-from src.data_processing.file_io import FileHandlerFactory
-
-
-def date_offset_constructor(loader, node):
-    """ Custom YAML constructor to handle date offsets. """
-    days = int(node.value)
-    return (datetime.today() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
-
-def include_constructor(loader, node):
-    """ Custom YAML constructor to include part of another YAML file. """
-    value = loader.construct_mapping(node)
-    file = value["file"]
-    model_name = value["model_name"]
-
-    # Resolve path relative to the current YAML file being loaded
-    base_path = Path(loader.name).parent
-    include_path = base_path / file
-
-    # Load the included YAML content
-    with open(include_path, "r") as f:
-        included_yaml = yaml.safe_load(f)
-
-    # Extract the corresponding model's column mapping
-    for model in included_yaml.get("models", []):
-        if model.get("name") == model_name:
-            return model.get("columns_mapping", {})
-
-    raise ValueError(f"No model named '{model_name}' found in '{file}'")
-
-yaml.add_constructor('!date_offset', date_offset_constructor, Loader=yaml.loader.SafeLoader)
-yaml.add_constructor('!include', include_constructor, Loader=yaml.SafeLoader)
-
-
-def read_yml_file(file_path: Path):
-    """ Read a YAML file and return its content as a dictionary. """
-    with file_path.open(mode='r') as file:
-        config = yaml.safe_load(file)
-    return config
+from src.data_pipeline.data_processing import logger
+from src.data_pipeline.file_io import FileHandlerFactory
 
 
 class DataStage(IntEnum):
@@ -178,68 +139,3 @@ def load_sources(sources: list[dict], db_repo: Path, version_threshold: any = No
         )
     
     return loaded_sources
-
-
-# Schema enforcement
-
-def _check_schema(schema: list[dict]) -> None:
-    """ TODO """
-    if not isinstance(schema, list):
-        logger.debug(f"Schema: {schema}")
-        logger.error("Schema must be a list.")
-        raise TypeError("Schema must be a list.")
-    if not all(isinstance(col, dict) for col in schema):
-        logger.debug(f"Schema: {schema}")
-        logger.error("All elements in the schema must be dictionaries.")
-        raise TypeError("All elements in the schema must be dictionaries.")
-    for col in schema:
-        if "name" not in col:
-            logger.debug(f"Schema: {schema}")
-            logger.error("Column name is missing in the schema.")
-            raise ValueError("Column name is missing in the schema.")
-
-def enforce_schema(data: pd.DataFrame, schema: list[dict], strict: bool = True) -> pd.DataFrame: # TODO - This shouldn't be here
-    """ TODO """
-    _check_schema(schema)
-    if not isinstance(data, pd.DataFrame):
-        logger.error("Data must be a pandas DataFrame.")
-        raise TypeError("Data must be a pandas DataFrame.")
-    if data.empty:
-        logger.debug("Data is empty.")
-        return data
-    
-    for col in schema:
-
-        col_name = col.get("name")
-        if col_name not in data.columns:
-            if strict:
-                logger.error(f"Column {col_name} is missing in the DataFrame.")
-                raise ValueError(f"Column {col_name} is missing in the DataFrame.")
-            else:
-                logger.warning(f"Column {col_name} is missing in the DataFrame. Adding it with None values.")
-                data[col_name] = None
-
-        col_type = col.get("type")
-        if col_type:
-            try:
-                data[col_name] = data[col_name].astype(col_type)
-            except Exception as e:
-                if strict:
-                    raise TypeError(f"Failed to cast column {col_name} to {col_type}: {e}")
-                else:
-                    logger.warning(f"Failed to cast column {col_name} to {col_type}: {e}")
-
-        col_unique = col.get("unique", False)
-        if col_unique:
-            if strict:
-                if data[col_name].duplicated().any():
-                    logger.error(f"Column {col_name} has duplicates.")
-                    raise ValueError(f"Column {col_name} has duplicates.")
-            else:
-                col_ordered_by = col.get("ordered_by", "created_at")
-                col_ascending = col.get("ascending", False)
-                data.sort_values(by=col_ordered_by, ascending=col_ascending, inplace=True)
-                data.drop_duplicates(subset=[col_name], keep="first", inplace=True)
-                logger.debug(f"Column {col_name} has been made unique by dropping duplicates.")
-
-    return data
