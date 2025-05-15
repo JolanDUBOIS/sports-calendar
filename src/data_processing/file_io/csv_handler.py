@@ -19,8 +19,10 @@ class CSVHandler(FileHandler):
         data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
         if version_threshold is None:
             return data.copy()
-        data = data.dropna(subset=[version_field])
-        return data[data[version_field] > version_threshold].copy()
+        data = data.dropna(subset=[f'_version_{version_field}'])
+        data = data[data[f'_version_{version_field}'] >= version_threshold].copy()
+        data = data.drop(columns=[f'_version_{version_field}'])
+        return data
 
     def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
         """ Delete records from the CSV file based on the version field and threshold. """
@@ -28,13 +30,12 @@ class CSVHandler(FileHandler):
         data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
         if version_threshold is None:
             return
-
-        data = data.dropna(subset=[version_field])
+        data = data.dropna(subset=[f'_version_{version_field}'])
         if delete_newest:
-            data = data[data[version_field] < version_threshold]
+            data = data[data[f'_version_{version_field}'] <= version_threshold]
         else:
-            data = data[data[version_field] > version_threshold]
-            
+            data = data[data[f'_version_{version_field}'] >= version_threshold]
+        data = data.drop(columns=[f'_version_{version_field}'])
         self.write(data, overwrite=True)
 
     def _prepare_version_field(
@@ -54,26 +55,24 @@ class CSVHandler(FileHandler):
         version_threshold, version_type = self._parse_version_value(version_threshold)
 
         if version_type == 'numeric':
-            data[version_field] = pd.to_numeric(data[version_field], errors='coerce')
+            data[f'_version_{version_field}'] = pd.to_numeric(data[version_field], errors='coerce')
         elif version_type == 'datetime':
-            data[version_field] = pd.to_datetime(data[version_field], errors='coerce')
+            data[f'_version_{version_field}'] = pd.to_datetime(data[version_field], errors='coerce')
 
         return data, version_threshold
 
-    def write(self, data: pd.DataFrame, overwrite: bool = False) -> None:
-        """ Write the data to a CSV file. """
-        if data.empty:
-            logger.warning("Data is empty. Nothing to write.")
-            return
-        logger.info(f"Writing data to {self.file_path}")
-        if not self.file_path.exists() or (overwrite and self.confirm_overwrite()):
-            data.to_csv(self.file_path, mode='w', header=True, index=False)
-        else:
-            try:
-                existing_df = pd.read_csv(self.file_path)
-            except pd.errors.EmptyDataError:
-                existing_df = pd.DataFrame()
-            data = pd.concat([existing_df, data], ignore_index=True)
-            data.to_csv(self.file_path, mode='w', header=True, index=False)
-        self._update_metadata(writer_type=self.__class__.__name__, rows=len(data))
-        logger.debug(f"Data written to {self.file_path}")
+    def _append(self, data: pd.DataFrame) -> None:
+        """ Append the data to the CSV file. """
+        data.to_csv(self.file_path, mode='a', header=False, index=False)
+
+    def _overwrite(self, data: pd.DataFrame) -> None:
+        """ Overwrite the CSV file with the data. """
+        data.to_csv(self.file_path, mode='w', header=True, index=False)
+
+    def _validate_data(self, data: pd.DataFrame) -> None:
+        """ Validate the data. """
+        if data is None:
+            logger.warning(f"Data is None. File handler path: {self.file_path}")
+        if not isinstance(data, pd.DataFrame):
+            logger.error(f"Data is not a pandas DataFrame. File handler path: {self.file_path}")
+            raise ValueError(f"Data must be a pandas DataFrame. File handler path: {self.file_path}")

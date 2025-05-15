@@ -24,7 +24,9 @@ class JSONHandler(FileHandler):
         if len(data) == 0:
             logger.warning("No data found in the version field.")
             return data.copy()
-        return [row for row in data if row.get(version_field) is not None and row.get(version_field) > version_threshold]
+        data = [row for row in data if row.get(f'_version_{version_field}') is not None and row.get(f'_version_{version_field}') >= version_threshold]
+        data = self._drop_field(data, f'_version_{version_field}')
+        return data
 
     def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
         """ Delete records from the JSON file based on the version field and threshold. """
@@ -36,9 +38,10 @@ class JSONHandler(FileHandler):
             logger.warning("No data found in the version field.")
             return
         if delete_newest:
-            data = [row for row in data if row.get(version_field) is not None and row.get(version_field) < version_threshold]
+            data = [row for row in data if row.get(f'_version_{version_field}') is not None and row.get(f'_version_{version_field}') <= version_threshold]
         else:
-            data = [row for row in data if row.get(version_field) is not None and row.get(version_field) > version_threshold]
+            data = [row for row in data if row.get(f'_version_{version_field}') is not None and row.get(f'_version_{version_field}') >= version_threshold]
+        data = self._drop_field(data, f'_version_{version_field}')
         self.write(data, overwrite=True)
 
     def _prepare_version_field(
@@ -59,50 +62,37 @@ class JSONHandler(FileHandler):
                 continue
             try:
                 if version_type == 'numeric':
-                    row[version_field] = float(raw_value)
+                    row[f'_version_{version_field}'] = float(raw_value)
                 else:  # datetime
-                    row[version_field] = pd.to_datetime(raw_value, errors='raise')
+                    row[f'_version_{version_field}'] = pd.to_datetime(raw_value, errors='raise')
             except (ValueError, TypeError):
-                row[version_field] = None
+                row[f'_version_{version_field}'] = None
 
         return data, version_threshold
 
-    def write(self, data: list[dict], overwrite: bool = False) -> None:
-        """ Write the data to a JSON file. """
-        if not data:
-            logger.warning("Data is empty. Nothing to write.")
-            return
-        logger.info(f"Writing data to {self.file_path}")
-        if not isinstance(data, list):
-            logger.error("Data must be a list.")
-            raise ValueError("Data must be a list.")
+    def _append(self, data: list[dict]) -> None:
+        """ Append the data to the JSON file. """
+        existing_data = self._read_json(self.file_path)
+        if existing_data is None:
+            existing_data = []
+        self._validate_data(existing_data)
+        existing_data.extend(data)
+        self._write_json(self.file_path, existing_data)
 
-        if not self.file_path.exists() or (overwrite and self.confirm_overwrite()):
-            with self.file_path.open(mode='w') as file:
-                json.dump(data, file, indent=4)
-        else:
-            # TODO - Maybe use .jsonl ?
-            with self.file_path.open(mode='r') as file:
-                existing_data = json.load(file)
-            if not isinstance(existing_data, list):
-                logger.error("Existing data in the file is not a list.")
-                raise ValueError("Existing data in the file is not a list.")
-            existing_data.extend(data)
-            with self.file_path.open(mode='w') as file:
-                json.dump(existing_data, file, indent=4)
-        self._update_metadata(writer_type=self.__class__.__name__, rows=len(data))
-        logger.debug(f"Data written to {self.file_path}")
+    def _overwrite(self, data: list[dict]) -> None:
+        """ Overwrite the JSON file with the data. """
+        self._write_json(self.file_path, data)
 
     def _validate_data(self, data: list[dict]|None) -> None:
         """ Validate the structure of the JSON data. """
         if data is None:
-            logger.warning(f"Data at path {self.path} is None.")
+            logger.warning(f"Data is None. File handler path: {self.file_path}")
         elif not isinstance(data, (list)):
-            logger.error("Data must be a list.")
-            raise ValueError("Data must be a list.")
+            logger.error(f"Data must be a list. File handler path: {self.file_path}")
+            raise ValueError(f"Data must be a list. File handler path: {self.file_path}")
         elif not all(isinstance(d, dict) for d in data):
-            logger.error("All elements in the data must be dictionaries.")
-            raise ValueError("All elements in the data must be dictionaries.")
+            logger.error(f"All elements in the data must be dictionaries. File handler path: {self.file_path}")
+            raise ValueError(f"All elements in the data must be dictionaries. File handler path: {self.file_path}")
 
     @staticmethod
     def _read_json(file_path: Path) -> dict|list|None:
@@ -111,6 +101,25 @@ class JSONHandler(FileHandler):
             with file_path.open("r") as f:
                 data = json.load(f)
             return data
+        except json.JSONDecodeError:
+            logger.warning(f"JSON file {file_path} is empty.")
+            return None
         except Exception as e:
             logger.error(f"Failed to read JSON file {file_path}: {e}")
             raise e
+
+    @staticmethod
+    def _write_json(file_path: Path, data: dict|list|None) -> None:
+        """ Write data to a JSON file. """
+        if data is None:
+            logger.warning(f"Data is None. File handler path: {file_path}")
+            return
+        with file_path.open("w") as f:
+            json.dump(data, f, indent=4)
+
+    @staticmethod
+    def _drop_field(data: list[dict], field: str) -> list[dict]:
+        """ Drop a field from the data. """
+        for row in data:
+            row.pop(field, None)
+        return data

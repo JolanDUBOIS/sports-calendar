@@ -24,10 +24,7 @@ class FileHandler(ABC):
     @staticmethod
     def _check_path(file_path: Path) -> None:
         """ Check if the file path is valid. """
-        if not file_path.exists():
-            logger.error(f"File {file_path} does not exist.")
-            raise FileNotFoundError(f"File {file_path} does not exist.")
-        if not file_path.is_file():
+        if file_path.exists() and not file_path.is_file():
             logger.error(f"{file_path} is not a file.")
             raise ValueError(f"{file_path} is not a file.")
 
@@ -36,19 +33,23 @@ class FileHandler(ABC):
         """ Return the file path. """
         return self.file_path
 
+    # Read methods
+
     def read(self, mode: str = "all", **kwargs) -> FileContent:
         """ Read the file and return its content. """
         logger.info(f"Reading data from {self.file_path}")
         if mode == "all":
-            return self._read_all()
+            data = self._read_all()
         elif mode == "newest":
             version_field = kwargs.get("on", "created_at")
             version_threshold = kwargs.get("version_threshold") if "version_threshold" in kwargs else 0
             logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
-            return self._read_newest(version_field, version_threshold)
+            data = self._read_newest(version_field, version_threshold)
         else:
             logger.error(f"Unsupported read mode: {mode}")
             raise ValueError(f"Unsupported read mode: {mode}")
+        self._validate_data(data)
+        return data
 
     @abstractmethod
     def _read_all(self) -> FileContent:
@@ -60,30 +61,47 @@ class FileHandler(ABC):
         """ Read the newest version of the data. """
         pass
 
+    # Delete methods
+
     @abstractmethod
     def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
         """ Delete records from the file based on the version field and threshold. """
         pass
 
-    @abstractmethod
-    def _prepare_version_field(
-        self,
-        data: FileContent,
-        version_field: str,
-        version_threshold: Any
-    ) -> tuple[FileContent, float|pd.Timestamp|None]:
-        """ Prepare the version field for the data. """
-        pass
+    # Write methods
 
-    @abstractmethod
     def write(self, data: FileContent, overwrite: bool = False, **kwargs) -> None:
         """ Write the data to the file. """
+        self._validate_data(data)
+        if data is None or len(data) == 0:
+            logger.warning("Data is empty. Nothing to write.")
+            return
+        logger.info(f"Writing data to {self.file_path}")
+        if not self.file_path.exists() or self.file_path.stat().st_size == 0 or (overwrite and self.confirm_overwrite()):
+            logger.debug(f"Overwriting file {self.file_path}")
+            self._overwrite(data)
+        else:
+            logger.debug(f"Appending to file {self.file_path}")
+            self._append(data)
+        self._update_metadata(self.__class__.__name__, len(data))
+        logger.debug(f"Data written to {self.file_path}")
+
+    @abstractmethod
+    def _append(self, data: FileContent) -> None:
+        """ Write the data to the file. """
+        pass
+    
+    @abstractmethod
+    def _overwrite(self, data: FileContent) -> None:
+        """ Overwrite the file with the new data. """
         pass
 
     def confirm_overwrite(self) -> bool:
         """ Ask the user to confirm overwriting the file. """
         response = input(f"Are you sure you want to overwrite the file {self.file_path}? (yes/y to confirm): ").strip().lower()
         return response in ['yes', 'y']
+
+    # Metadata methods
 
     def _update_metadata(self, writer_type: str, rows: int) -> None:
         """ TODO """
@@ -121,6 +139,23 @@ class FileHandler(ABC):
         else:
             logger.warning(f"Metadata file {self.meta_path} does not exist.")
             return None
+
+    # Helper methods
+
+    @abstractmethod
+    def _prepare_version_field(
+        self,
+        data: FileContent,
+        version_field: str,
+        version_threshold: Any
+    ) -> tuple[FileContent, float|pd.Timestamp|None]:
+        """ Prepare the version field for the data. """
+        pass
+
+    @abstractmethod
+    def _validate_data(self, data: FileContent) -> None:
+        """ Validate the data after reading or before writing. """
+        pass
 
     @staticmethod
     def _parse_version_value(value: Any) -> Tuple[float|pd.Timestamp, str]:
