@@ -1,41 +1,107 @@
 import json
-from typing import Any
+from typing import Tuple, TypeAlias, Any
 from datetime import datetime
 from pathlib import Path
 from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from src.data_processing import logger
+from src.data_processing.file_io import logger
 
+
+FileContent: TypeAlias = list[dict] | pd.DataFrame | None
 
 class FileHandler(ABC):
     """ Abstract base class for file handlers. """
 
     def __init__(self, file_path: Path):
+        """ Initialize the file handler """
+        self._check_path(file_path)
         self.file_path = file_path
         self.now = datetime.now().isoformat(timespec="seconds")
         self.meta_path = self.file_path.parent / ".meta.json"
+
+    @staticmethod
+    def _check_path(file_path: Path) -> None:
+        """ Check if the file path is valid. """
+        if file_path.exists() and not file_path.is_file():
+            logger.error(f"{file_path} is not a file.")
+            raise ValueError(f"{file_path} is not a file.")
 
     @property
     def path(self) -> Path:
         """ Return the file path. """
         return self.file_path
 
-    @abstractmethod
-    def read(self, mode: str = "all", **kwargs) -> Any:
+    # Read methods
+
+    def read(self, mode: str = "all", **kwargs) -> FileContent:
         """ Read the file and return its content. """
+        logger.info(f"Reading data from {self.file_path}")
+        if mode == "all":
+            data = self._read_all()
+        elif mode == "newest":
+            version_field = kwargs.get("on", "created_at")
+            version_threshold = kwargs.get("version_threshold") if "version_threshold" in kwargs else 0
+            logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
+            data = self._read_newest(version_field, version_threshold)
+        else:
+            logger.error(f"Unsupported read mode: {mode}")
+            raise ValueError(f"Unsupported read mode: {mode}")
+        self._validate_data(data)
+        return data
+
+    @abstractmethod
+    def _read_all(self) -> FileContent:
+        """ Read all data from the file. """
         pass
 
     @abstractmethod
-    def write(self, data: Any, overwrite: bool = False, **kwargs) -> None:
+    def _read_newest(self, version_field: str, version_threshold: Any = None) -> FileContent:
+        """ Read the newest version of the data. """
+        pass
+
+    # Delete methods
+
+    @abstractmethod
+    def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
+        """ Delete records from the file based on the version field and threshold. """
+        pass
+
+    # Write methods
+
+    def write(self, data: FileContent, overwrite: bool = False, **kwargs) -> None:
         """ Write the data to the file. """
+        self._validate_data(data)
+        if data is None or len(data) == 0:
+            logger.warning("Data is empty. Nothing to write.")
+            return
+        logger.info(f"Writing data to {self.file_path}")
+        if not self.file_path.exists() or self.file_path.stat().st_size == 0 or (overwrite and self.confirm_overwrite()):
+            logger.debug(f"Overwriting file {self.file_path}")
+            self._overwrite(data)
+        else:
+            logger.debug(f"Appending to file {self.file_path}")
+            self._append(data)
+        self._update_metadata(self.__class__.__name__, len(data))
+        logger.debug(f"Data written to {self.file_path}")
+
+    @abstractmethod
+    def _append(self, data: FileContent) -> None:
+        """ Write the data to the file. """
+        pass
+    
+    @abstractmethod
+    def _overwrite(self, data: FileContent) -> None:
+        """ Overwrite the file with the new data. """
         pass
 
     def confirm_overwrite(self) -> bool:
         """ Ask the user to confirm overwriting the file. """
         response = input(f"Are you sure you want to overwrite the file {self.file_path}? (yes/y to confirm): ").strip().lower()
         return response in ['yes', 'y']
+
+    # Metadata methods
 
     def _update_metadata(self, writer_type: str, rows: int) -> None:
         """ TODO """
@@ -74,163 +140,31 @@ class FileHandler(ABC):
             logger.warning(f"Metadata file {self.meta_path} does not exist.")
             return None
 
-    @staticmethod
+    # Helper methods
+
     @abstractmethod
-    def _get_newest_version(data: list[dict]|pd.DataFrame, version_field: str, version_threshold: Any = None, version_type: str = 'datetime') -> list[dict]|pd.DataFrame:
-        """ TODO """
+    def _prepare_version_field(
+        self,
+        data: FileContent,
+        version_field: str,
+        version_threshold: Any
+    ) -> tuple[FileContent, float|pd.Timestamp|None]:
+        """ Prepare the version field for the data. """
         pass
 
-class CSVHandler(FileHandler):
-    """ CSV file handler. """
+    @abstractmethod
+    def _validate_data(self, data: FileContent) -> None:
+        """ Validate the data after reading or before writing. """
+        pass
 
-    def __init__(self, file_path: Path):
-        super().__init__(file_path)
-
-    def read(self, mode: str = "all", **kwargs) -> pd.DataFrame:
-        """ TODO """
-        logger.info(f"Reading data from {self.file_path}")
-        df = pd.read_csv(self.file_path)
-        if mode == "all":
-            return df
-        elif mode == "newest":
-            version_field = kwargs.get("on", "created_at")
-            version_type = kwargs.get("version_type", "datetime")
-            version_threshold = kwargs.get("version_threshold")
-            if version_threshold is None:
-                version_threshold = 0
-            logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
-            return self._get_newest_version(df, version_field, version_threshold, version_type)
-        else:
-            logger.error(f"Unsupported read mode: {mode}")
-            raise ValueError(f"Unsupported read mode: {mode}")
-
-    def write(self, data: pd.DataFrame, overwrite: bool = False) -> None:
-        """ Write the data to a CSV file. """
-        if data.empty:
-            logger.warning("Data is empty. Nothing to write.")
-            return
-        logger.info(f"Writing data to {self.file_path}")
-        if not self.file_path.exists() or (overwrite and self.confirm_overwrite()):
-            data.to_csv(self.file_path, mode='w', header=True, index=False)
-        else:
+    @staticmethod
+    def _parse_version_value(value: Any) -> Tuple[float|pd.Timestamp, str]:
+        """ Parse the version value to determine its type. """
+        try:
+            return float(value), 'numeric'
+        except (ValueError, TypeError):
             try:
-                existing_df = pd.read_csv(self.file_path)
-            except pd.errors.EmptyDataError:
-                existing_df = pd.DataFrame()
-            data = pd.concat([existing_df, data], ignore_index=True)
-            data.to_csv(self.file_path, mode='w', header=True, index=False)
-        self._update_metadata(writer_type=self.__class__.__name__, rows=len(data))
-        logger.debug(f"Data written to {self.file_path}")
-
-    @staticmethod
-    def _get_newest_version(data: pd.DataFrame, version_field: str, version_threshold: Any = None, version_type: str = 'datetime') -> pd.DataFrame:
-        """ TODO """
-        if version_field not in data.columns:
-            logger.error(f"Version field '{version_field}' not found in DataFrame.")
-            raise ValueError(f"Version field '{version_field}' not found in DataFrame.")
-
-        if data[version_field].isnull().any():
-            logger.error(f"Version field '{version_field}' contains null values.")
-            raise ValueError(f"Version field '{version_field}' contains null values.")
-
-        if version_type == 'datetime':
-            data[version_field] = pd.to_datetime(data[version_field], errors='raise')
-            version_threshold = pd.to_datetime(version_threshold, errors='raise') if version_threshold else pd.Timestamp('1900-01-01')
-        elif version_type == 'numeric':
-            data[version_field] = pd.to_numeric(data[version_field], errors='raise')
-            version_threshold = float(version_threshold) if version_threshold else 0
-        else:
-            logger.error(f"Unsupported version type: {version_type}. Supported types are 'datetime' and 'numeric'.")
-            raise ValueError(f"Unsupported version type: {version_type}. Supported types are 'datetime' and 'numeric'.")
-
-        return data.loc[data[version_field] > version_threshold].copy()
-
-class JSONHandler(FileHandler):
-    """ JSON file writer. """
-    
-    def read(self, mode: str = "all", **kwargs) -> dict:
-        """ TODO """
-        logger.info(f"Reading data from {self.file_path}")
-        with self.file_path.open("r") as f:
-            data = json.load(f)
-        if not isinstance(data, list):
-            logger.error(f"Data in the file {self.file_path} is not a list.")
-            raise ValueError(f"Data in the file {self.file_path} is not a list.")
-        if mode == "all":
-            return data
-        elif mode == "newest":
-            version_field = kwargs.get("on", "created_at")
-            version_type = kwargs.get("version_type", "datetime")
-            version_threshold = kwargs.get("version_threshold")
-            if version_threshold is None:
-                version_threshold = 0
-            logger.debug(f"Reading newest version with field: {version_field} and threshold: {version_threshold}")
-            return self._get_newest_version(data, version_field, version_threshold, version_type)
-        else:
-            logger.error(f"Unsupported read mode: {mode}")
-            raise ValueError(f"Unsupported read mode: {mode}")            
-
-    def write(self, data: list[dict], overwrite: bool = False) -> None:
-        """ Write the data to a JSON file. """
-        if not data:
-            logger.warning("Data is empty. Nothing to write.")
-            return
-        logger.info(f"Writing data to {self.file_path}")
-        if not isinstance(data, list):
-            logger.error("Data must be a list.")
-            raise ValueError("Data must be a list.")
-
-        if not self.file_path.exists() or (overwrite and self.confirm_overwrite()):
-            with self.file_path.open(mode='w') as file:
-                json.dump(data, file, indent=4)
-        else:
-            # TODO - Maybe use .jsonl ?
-            with self.file_path.open(mode='r') as file:
-                existing_data = json.load(file)
-            if not isinstance(existing_data, list):
-                logger.error("Existing data in the file is not a list.")
-                raise ValueError("Existing data in the file is not a list.")
-            existing_data.extend(data)
-            with self.file_path.open(mode='w') as file:
-                json.dump(existing_data, file, indent=4)
-        self._update_metadata(writer_type=self.__class__.__name__, rows=len(data))
-        logger.debug(f"Data written to {self.file_path}")
-
-    @staticmethod
-    def _get_newest_version(data: list[dict], version_field: str, version_threshold: Any = None, version_type: str = 'datetime') -> list:
-        """ TODO """
-        if not all(isinstance(d, dict) for d in data):
-            logger.error("All elements in the list must be dictionaries.")
-            raise ValueError("All elements in the list must be dictionaries.")
-
-        version_list = [d.get(version_field) for d in data]
-        if any(v is None for v in version_list):
-            logger.error(f"Version field '{version_field}' contains null values.")
-            raise ValueError(f"Version field '{version_field}' contains null values.")
-
-        if version_type == 'datetime':
-            version_list = [pd.to_datetime(v, errors='raise') for v in version_list]
-            version_threshold = pd.to_datetime(version_threshold, errors='raise') if version_threshold else pd.Timestamp('1900-01-01')
-        elif version_type == 'numeric':
-            version_list = [float(v) for v in version_list]
-            version_threshold = float(version_threshold) if version_threshold else 0
-        else:
-            logger.error(f"Unsupported version type: {version_type}. Supported types are 'datetime' and 'numeric'.")
-            raise ValueError(f"Unsupported version type: {version_type}. Supported types are 'datetime' and 'numeric'.")
-
-        mask = [v > version_threshold for v in version_list]
-        return [d for d, m in zip(data, mask) if m]
-
-class FileHandlerFactory:
-    """ Factory class to create file handlers. """
-
-    @staticmethod
-    def create_file_handler(file_path: Path) -> FileHandler:
-        """ Create a file handler based on the file extension. """
-        if file_path.suffix == ".csv":
-            return CSVHandler(file_path)
-        elif file_path.suffix == ".json":
-            return JSONHandler(file_path)
-        else:
-            logger.error(f"Unsupported file type: {file_path.suffix}")
-            raise ValueError(f"Unsupported file type: {file_path.suffix}")
+                return pd.to_datetime(value, errors='raise'), 'datetime'
+            except (ValueError, TypeError):
+                logger.error(f"The provided value {value} is not a valid datetime or numeric value.")
+                raise ValueError(f"The provided value {value} is not a valid datetime or numeric value.")

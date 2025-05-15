@@ -1,65 +1,157 @@
+from unittest.mock import patch
+
 import pytest
 import pandas as pd
 
-from src.data_processing.file_io.file_handler import CSVHandler, JSONHandler
+from src.data_processing.file_io import FileHandler, CSVHandler, JSONHandler
 
 
-def test_get_newest_version_csv():
-    df = pd.DataFrame({
+@pytest.fixture
+def csv_data():
+    return pd.DataFrame({
         'id': [1, 2, 3],
-        'version': [1, 2, 3],
-        'created_at': ['2023-01-01', '2023-01-02', '2023-01-02']
+        'created_at': ['2023-10-01T12:00:00', '2023-10-02T12:00:00', '2023-10-03T12:00:00'],
+        'version': [1, 2, 3]
     })
 
-    df_newest = CSVHandler._get_newest_version(df, 'version', 2, version_type='numeric')
-    assert isinstance(df_newest, pd.DataFrame)
-    assert len(df_newest) == 1
-    assert df_newest['version'].values[0] == 3
-    
-    df_newest = CSVHandler._get_newest_version(df, 'created_at', '2023-01-01 23:00:00')
-    assert isinstance(df_newest, pd.DataFrame)
-    assert len(df_newest) == 2
-    
-    df_newest = CSVHandler._get_newest_version(df, 'version', version_type='numeric')
-    assert isinstance(df_newest, pd.DataFrame)
-    assert len(df_newest) == 3
-
-    df_newest = CSVHandler._get_newest_version(df, 'created_at')
-    assert isinstance(df_newest, pd.DataFrame)
-    assert len(df_newest) == 3
-
-    with pytest.raises(ValueError):
-        CSVHandler._get_newest_version(df, 'non_existent_field')
-
-    with pytest.raises(ValueError):
-        CSVHandler._get_newest_version(df, 'version', version_type='non_existent_type')
-
-def test_get_newest_version_json():
-    data = [
-        {"id": 1, "version": 1, "created_at": "2023-01-01"},
-        {"id": 2, "version": 2, "created_at": "2023-01-02"},
-        {"id": 3, "version": 3, "created_at": "2023-01-02"}
+@pytest.fixture
+def json_data():
+    return [
+        {'id': 1, 'created_at': '2023-10-01T12:00:00', 'version': 1},
+        {'id': 2, 'created_at': '2023-10-02T12:00:00', 'version': 2},
+        {'id': 3, 'created_at': '2023-10-03T12:00:00', 'version': 3}
     ]
 
-    newest_data = JSONHandler._get_newest_version(data, 'version', 2, version_type='numeric')
-    assert isinstance(newest_data, list)
-    assert len(newest_data) == 1
-    assert newest_data[0]['version'] == 3
+def test_parse_version_value():
+    # Test with numeric value
+    version_value, version_type = FileHandler._parse_version_value("123.456")
+    assert version_value == 123.456
+    assert version_type == 'numeric'
 
-    newest_data = JSONHandler._get_newest_version(data, 'created_at', '2023-01-01 23:00:00')
-    assert isinstance(newest_data, list)
-    assert len(newest_data) == 2
+    # Test with datetime value
+    version_value, version_type = FileHandler._parse_version_value("2023-10-01T12:00:00")
+    assert version_value == pd.Timestamp("2023-10-01T12:00:00")
+    assert version_type == 'datetime'
 
-    newest_data = JSONHandler._get_newest_version(data, 'version', version_type='numeric')
-    assert isinstance(newest_data, list)
-    assert len(newest_data) == 3
-
-    newest_data = JSONHandler._get_newest_version(data, 'created_at')
-    assert isinstance(newest_data, list)
-    assert len(newest_data) == 3
-    
+    # Test with invalid value
     with pytest.raises(ValueError):
-        JSONHandler._get_newest_version(data, 'non_existent_field')
+        FileHandler._parse_version_value("invalid_value")
 
-    with pytest.raises(ValueError):
-        JSONHandler._get_newest_version(data, 'version', version_type='non_existent_type')
+def test_write_csv(tmp_path, csv_data):
+    file_path = tmp_path / "test_data_write_csv.csv"
+    handler = CSVHandler(file_path)
+
+    handler.write(csv_data)    
+    written_data = pd.read_csv(file_path)
+    pd.testing.assert_frame_equal(written_data, csv_data)
+
+    handler.write(csv_data)
+    written_data = pd.read_csv(file_path)
+    pd.testing.assert_frame_equal(written_data, pd.concat([csv_data, csv_data], ignore_index=True))
+
+    with patch("builtins.input", return_value="yes"):
+        handler.write(csv_data, overwrite=True)
+    written_data = pd.read_csv(file_path)
+    pd.testing.assert_frame_equal(written_data, csv_data)
+
+def test_write_json(tmp_path, json_data):
+    file_path = tmp_path / "test_data_write_json.json"
+    handler = JSONHandler(file_path)
+
+    handler.write(json_data)
+    written_data = handler._read_json(file_path)
+    assert written_data == json_data
+    assert file_path.stat().st_size > 0
+
+    handler.write(json_data)
+    written_data = handler._read_json(file_path)
+    assert written_data == json_data + json_data
+
+    with patch("builtins.input", return_value="yes"):
+        handler.write(json_data, overwrite=True)
+    written_data = handler._read_json(file_path)
+    assert written_data == json_data
+
+def test_read_csv(tmp_path, csv_data):
+    file_path = tmp_path / "test_data_read_csv.csv"
+    handler = CSVHandler(file_path)
+    handler.write(csv_data)
+
+    read_data = handler._read_all()
+    pd.testing.assert_frame_equal(read_data, csv_data)
+
+    read_newest_data = handler._read_newest(version_field="created_at", version_threshold="2023-10-02")
+    expected_data = csv_data.iloc[1:]
+    assert expected_data['id'].tolist() == read_newest_data['id'].tolist()
+
+    read_newest_data = handler._read_newest(version_field="version", version_threshold=2)
+    expected_data = csv_data.iloc[1:]
+    assert expected_data['id'].tolist() == read_newest_data['id'].tolist()
+
+def test_read_json(tmp_path, json_data):
+    file_path = tmp_path / "test_data_read_json.json"
+    handler = JSONHandler(file_path)
+    handler.write(json_data)
+
+    read_data = handler._read_all()
+    assert read_data == json_data
+
+    read_newest_data = handler._read_newest(version_field="created_at", version_threshold="2023-10-02")
+    read_newest_data_ids = [row['id'] for row in read_newest_data]
+    expected_data_ids = [row['id'] for row in json_data[1:]]
+    assert read_newest_data_ids == expected_data_ids
+
+    read_newest_data = handler._read_newest(version_field="version", version_threshold=2)
+    read_newest_data_ids = [row['id'] for row in read_newest_data]
+    expected_data_ids = [row['id'] for row in json_data[1:]]
+    assert read_newest_data_ids == expected_data_ids
+
+def test_delete_records_csv(tmp_path, csv_data):
+    file_path = tmp_path / "test_data_delete_records_csv.csv"
+    handler = CSVHandler(file_path)
+    handler.write(csv_data)
+
+    with patch("builtins.input", return_value="yes"):
+        handler.delete_records(version_field="created_at", version_threshold="2023-10-02", delete_newest=False)
+    read_data_ids = handler._read_all()["id"].tolist()
+    expected_data_ids = csv_data.loc[1:,"id"].tolist()
+    assert read_data_ids == expected_data_ids
+
+    with patch("builtins.input", return_value="yes"):
+        handler.write(csv_data, overwrite=True)
+        handler.delete_records(version_field="created_at", version_threshold="2023-10-02", delete_newest=True)
+    read_data_ids = handler._read_all()["id"].tolist()
+    expected_data_ids = csv_data.loc[[0],"id"].tolist()
+    assert read_data_ids == expected_data_ids
+
+    with patch("builtins.input", return_value="yes"):
+        handler.write(csv_data, overwrite=True)
+        handler.delete_records(version_field="version", version_threshold=2, delete_newest=False)
+    read_data_ids = handler._read_all()["id"].tolist()
+    expected_data_ids = csv_data.loc[1:,"id"].tolist()
+    assert read_data_ids == expected_data_ids
+
+def test_delete_records_json(tmp_path, json_data):
+    file_path = tmp_path / "test_data_delete_records_json.json"
+    handler = JSONHandler(file_path)
+    handler.write(json_data)
+
+    with patch("builtins.input", return_value="yes"):
+        handler.delete_records(version_field="created_at", version_threshold="2023-10-02", delete_newest=False)
+    read_data_ids = [row['id'] for row in handler._read_all()]
+    expected_data_ids = [2, 3]
+    assert read_data_ids == expected_data_ids
+
+    with patch("builtins.input", return_value="yes"):
+        handler.write(json_data, overwrite=True)
+        handler.delete_records(version_field="created_at", version_threshold="2023-10-02", delete_newest=True)
+    read_data_ids = [row['id'] for row in handler._read_all()]
+    expected_data_ids = [1]
+    assert read_data_ids == expected_data_ids
+
+    with patch("builtins.input", return_value="yes"):
+        handler.write(json_data, overwrite=True)
+        handler.delete_records(version_field="version", version_threshold=2, delete_newest=False)
+    read_data_ids = [row['id'] for row in handler._read_all()]
+    expected_data_ids = [2,3]
+    assert read_data_ids == expected_data_ids
