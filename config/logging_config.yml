@@ -61,11 +61,15 @@ loggers:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
-  src.data_processing:
+  src.data_pipeline.data_processing:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False
-  src.data_processing.file_io:
+  src.data_pipeline.data_validation:
+    level: DEBUG
+    handlers: [console_handler, debug_handler]
+    propagate: False
+  src.data_pipeline.file_io:
     level: DEBUG
     handlers: [console_handler, debug_handler]
     propagate: False

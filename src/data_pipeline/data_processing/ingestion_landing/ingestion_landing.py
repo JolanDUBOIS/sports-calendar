@@ -2,12 +2,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.data_processing import logger
-from src.data_processing.utils import (
+from src.data_pipeline.data_processing import logger
+from src.data_pipeline.data_processing.utils import (
     order_models,
     inject_static_fields
 )
-from src.data_processing.file_io import FileHandlerFactory
+from src.data_pipeline.file_io import FileHandlerFactory
 from src.clients import (
     ESPNApiClient,
     FootballDataApiClient,
