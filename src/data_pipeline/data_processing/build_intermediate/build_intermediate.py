@@ -13,7 +13,7 @@ from src.data_pipeline.data_processing.utils import (
 from src.data_pipeline.file_io import FileHandlerFactory
 
 
-def build_intermediate(db_repo: str, instructions: dict, schemas: dict, manual: bool = False):
+def build_intermediate(db_repo: str, instructions: dict, manual: bool = False):
     """ TODO """
     logger.info("Building intermediate...")
     db_repo = Path(db_repo)
@@ -60,15 +60,6 @@ def build_intermediate(db_repo: str, instructions: dict, schemas: dict, manual: 
         static_fields = model.get("static_fields", {})
         if static_fields:
             data = inject_static_fields(data, static_fields)
-
-        # Enforce schema
-        schema_name = output.get("schema")
-        try:
-            schema = next(model.get("columns") for model in schemas.get('models') if model.get("name") == schema_name)
-        except StopIteration:
-            logger.error(f"Schema {schema_name} not found.")
-            raise ValueError(f"Schema {schema_name} not found.")
-        # data = enforce_schema(data, schema, strict=False)
 
         # Write Output
         output_handler.write(data, overwrite=output.get("overwrite", False))
