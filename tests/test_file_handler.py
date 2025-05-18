@@ -1,3 +1,4 @@
+import json
 from unittest.mock import patch
 
 import pytest
@@ -21,6 +22,14 @@ def json_data():
         {'id': 2, 'created_at': '2023-10-02T12:00:00', 'version': 2},
         {'id': 3, 'created_at': '2023-10-03T12:00:00', 'version': 3}
     ]
+
+def read_metadata(file_path, key):
+    try:
+        with open(file_path, 'r') as f:
+            metadata = json.load(f)
+        return metadata.get(key)
+    except FileNotFoundError:
+        return None
 
 def test_parse_version_value():
     # Test with numeric value
@@ -155,3 +164,48 @@ def test_delete_records_json(tmp_path, json_data):
     read_data_ids = [row['id'] for row in handler._read_all()]
     expected_data_ids = [2,3]
     assert read_data_ids == expected_data_ids
+
+def test_metadata_handling(tmp_path):
+    metadata_file_path = tmp_path / ".meta.json"
+
+    file_path = tmp_path / "random_file.csv"
+    handler = CSVHandler(file_path)
+    handler.write(pd.DataFrame({"id": [1, 2, 3]}))
+    meta = read_metadata(metadata_file_path, "random_file.csv")
+    assert meta is not None
+
+    last_update = handler.last_update()
+    assert last_update is not None
+
+def test_delete(tmp_path):
+    metadata_file_path = tmp_path / ".meta.json"
+
+    file_path = tmp_path / "random_file.json"
+    handler = JSONHandler(file_path)
+    handler.write([{"key": "value"}])
+    assert read_metadata(metadata_file_path, "random_file.json") is not None
+    assert file_path.exists()
+    with patch("builtins.input", return_value="yes"):
+        handler.delete()
+    assert not file_path.exists()
+    assert read_metadata(metadata_file_path, "random_file.json") is None
+    
+    file_path = tmp_path / "random_file.csv"
+    handler = CSVHandler(file_path)
+    handler.write(pd.DataFrame({"id": [1, 2, 3]}))
+    assert file_path.exists()
+    assert read_metadata(metadata_file_path, "random_file.csv") is not None
+    with patch("builtins.input", return_value="yes"):
+        handler.delete()
+    assert not file_path.exists()
+    assert read_metadata(metadata_file_path, "random_file.csv") is None
+
+    file_path = tmp_path / "random_file.json"
+    handler = JSONHandler(file_path)
+    handler.write([{"key": "value"}])
+    assert file_path.exists()
+    with patch("builtins.input", return_value="no"):
+        handler.delete()
+    assert file_path.exists()
+
+    
