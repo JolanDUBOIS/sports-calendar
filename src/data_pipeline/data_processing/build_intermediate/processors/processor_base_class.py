@@ -11,6 +11,6 @@ class Processor(ABC):
         pass
 
     @abstractmethod
-    def process(self, sources: dict[str, dict|pd.DataFrame], **kwargs) -> dict[str, dict|pd.DataFrame]:
+    def process(self, sources: dict[str, dict|pd.DataFrame], **kwargs) -> pd.DataFrame:
         """ TODO """
         pass

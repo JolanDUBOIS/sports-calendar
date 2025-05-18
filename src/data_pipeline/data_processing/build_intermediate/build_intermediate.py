@@ -1,9 +1,10 @@
+import traceback
 from pathlib import Path
 
 import pandas as pd
 
+from . import logger
 from .pipelines import PipelineBaseClass
-from src.data_pipeline.data_processing import logger
 from src.data_pipeline.data_processing.utils import (
     inject_static_fields,
     order_models,
@@ -23,10 +24,10 @@ def build_intermediate(db_repo: str, instructions: dict, manual: bool = False):
     for model in models:
         # Trigger
         model_trigger = model.get("trigger", "automatic")
-        if not manual and model_trigger == "manual":
-            continue
-        if model_trigger != "automatic":
+        if model_trigger not in ["automatic", "manual"]:
             logger.warning(f"Unsupported trigger type: {model_trigger}.")
+            continue
+        elif not manual and model_trigger == "manual":
             continue
 
         # Name
@@ -44,22 +45,30 @@ def build_intermediate(db_repo: str, instructions: dict, manual: bool = False):
         logger.debug(f"Loaded sources: {loaded_sources.keys()}")
 
         # Processing
-        processing = model.get("processing", [])
-        processor_name = processing.get("processor")
-        processor = get_subclass(PipelineBaseClass, processor_name)
-        if not processor:
-            logger.error(f"Processor {processor_name} not found.")
-            raise ValueError(f"Processor {processor_name} not found.")
-        data = processor.run(sources=loaded_sources, **processing.get("params", {}))
-        if not isinstance(data, pd.DataFrame):
-            logger.error(f"The output data should be a pandas DataFrame.")
-            raise ValueError(f"The output data should be a pandas DataFrame.")
-        logger.debug(f"Data columns: {data.columns}")
+        try:
+            processing = model.get("processing", [])
+            processor_name = processing.get("processor")
+            processor = get_subclass(PipelineBaseClass, processor_name)
+            if not processor:
+                logger.error(f"Processor {processor_name} not found.")
+                raise ValueError(f"Processor {processor_name} not found.")
+            data = processor.run(sources=loaded_sources, **processing.get("params", {}))
+            if not isinstance(data, pd.DataFrame):
+                logger.error(f"The output data should be a pandas DataFrame.")
+                raise ValueError(f"The output data should be a pandas DataFrame.")
+            logger.debug(f"Data columns: {data.columns}")
+        except Exception as e:
+            logger.error(f"Error during processing: {e}")
+            logger.debug(traceback.format_exc())
+            raise e
 
         # Inject static fields
         static_fields = model.get("static_fields", {})
         if static_fields:
             data = inject_static_fields(data, static_fields)
+            logger.debug(f"Injected static fields: {static_fields}")
+        else:
+            logger.debug("No static fields to inject.")
 
         # Write Output
         output_handler.write(data, overwrite=output.get("overwrite", False))
