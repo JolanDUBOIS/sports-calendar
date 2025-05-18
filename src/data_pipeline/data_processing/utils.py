@@ -44,7 +44,7 @@ def order_models(models: list[dict], target_stage: str) -> list[dict]:
     ordered_models = []
     counter = 0
     max_iter = 2 * len(model_dependencies)
-    while len(ordered_models) < len(model_dependencies):
+    while len(ordered_models) < len(models):
         for model_name, dependency_names in list(model_dependencies.items()):
             if not dependency_names:
                 logger.debug(f"Model {model_name} has no dependencies, adding to ordered models.")
@@ -128,14 +128,12 @@ def load_sources(sources: list[dict], db_repo: Path, version_threshold: any = No
         source_versioning = source.get("versioning", {})
         version_mode = source_versioning.get("mode", "all")
         version_on = source_versioning.get("on", "created_at")
-        version_type = source_versioning.get("version_type", "datetime")
 
         file_handler = FileHandlerFactory.create_file_handler(db_repo / source_path)
         loaded_sources[source_name] = file_handler.read(
             mode=version_mode,
             on=version_on,
-            version_threshold=version_threshold,
-            version_type=version_type
+            version_threshold=version_threshold
         )
     
     return loaded_sources
