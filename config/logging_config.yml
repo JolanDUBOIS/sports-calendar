@@ -1,86 +1,98 @@
 version: 1
 
+
 formatters:
   simple:
     format: "%(asctime)s - %(levelname)s - %(message)s"
     datefmt: "%H:%M:%S"
+
   detailed:
     format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
+
 
 handlers:
   console_handler:
     class: logging.StreamHandler
     level: INFO
     formatter: simple
-  debug_handler:
+
+  main_debug_handler:
     class: logging.FileHandler
     filename: logs/DEBUG.log
     level: DEBUG
     formatter: detailed
-  aliases_handler:
+
+  ingestion_landing_debug_handler:
     class: logging.FileHandler
-    filename: logs/UNDEFINED_ALIASES.log
+    filename: logs/INGESTION_LANDING_DEBUG.log
     level: DEBUG
-    formatter: simple
+    formatter: detailed
+
+  build_intermediate_debug_handler:
+    class: logging.FileHandler
+    filename: logs/BUILD_INTERMEDIATE_DEBUG.log
+    level: DEBUG
+    formatter: detailed
+
 
 loggers:
-  src.calendar_creation:
+  # Main modules loggers
+  src.calendar:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
+    handlers: [console_handler, main_debug_handler]
     propagate: False
-  src.cli_utils:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.football_data_source:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.live_soccer_source:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.models:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.models_deprecated:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.db:
-    level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
+
   src.clients:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
+    handlers: [console_handler, main_debug_handler]
     propagate: False
-  src.registry_manager:
+
+  src.config:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
+    handlers: [console_handler, main_debug_handler]
     propagate: False
+
+  src.db:
+    level: DEBUG
+    handlers: [console_handler, main_debug_handler]
+    propagate: False
+
+  src.selection:
+    level: DEBUG
+    handlers: [console_handler, main_debug_handler]
+    propagate: False
+
+  # Data pipeline loggers
+  src.data_pipeline:
+    level: DEBUG
+    handlers: [console_handler, main_debug_handler]
+    propagate: False
+
   src.data_pipeline.data_processing:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
+    handlers: [console_handler, main_debug_handler]
     propagate: False
+
   src.data_pipeline.data_validation:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
+    handlers: [console_handler, main_debug_handler]
     propagate: False
-  src.data_pipeline.file_io:
+
+  src.data_pipeline.data_processing.ingestion_landing:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
+    handlers: [console_handler, ingestion_landing_debug_handler]
     propagate: False
+
+  src.data_pipeline.data_processing.build_intermediate:
+    level: DEBUG
+    handlers: [console_handler, build_intermediate_debug_handler]
+    propagate: False
+
+  # Imported modules loggers
   googleapiclient.discovery_cache:
     level: DEBUG
     handlers: [debug_handler]
-    propagate: False
-  
-  aliases_logger:
-    level: DEBUG
-    handlers: [aliases_handler]
     propagate: False
 
 root:
