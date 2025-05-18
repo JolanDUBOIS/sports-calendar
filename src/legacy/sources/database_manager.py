@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.sources import logger
+from src.legacy.sources import logger
 
 
 class DatabaseManager:

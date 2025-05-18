@@ -7,7 +7,7 @@ import cloudscraper # type: ignore
 import pandas as pd
 from bs4 import BeautifulSoup # type: ignore
 
-from src.sources import logger
+from src.legacy.sources import logger
 from .base_scraper import BaseScraper
 
 
