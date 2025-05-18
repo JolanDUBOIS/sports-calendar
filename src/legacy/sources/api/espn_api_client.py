@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 
 from .base_api_client import BaseApiClient
-from src.sources import logger
+from src.legacy.sources import logger
 
 
 # TODO - Careful with rate limites

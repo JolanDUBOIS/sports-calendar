@@ -6,7 +6,7 @@ import cloudscraper
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from src.sources import BaseSourceClient, logger
+from src.legacy.sources import BaseSourceClient, logger
 
 
 class BaseScraper(BaseSourceClient):

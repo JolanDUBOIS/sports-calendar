@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import yaml
 import pandas as pd
 
-from src.registry_manager import CompetitionRegistry, TeamRegistry
+from src.legacy.registry_manager import CompetitionRegistry, TeamRegistry
 
 
 class BaseSourceClient(ABC):

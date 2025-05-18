@@ -1,6 +1,6 @@
 import traceback
 
-from src.sources import logger
+from src.legacy.sources import logger
 from .web import LiveSoccerScraper, FootballRankingScraper
 from .database_manager import DatabaseManager
 

@@ -14,7 +14,6 @@ models:
         versioning:
           mode: newest # newest or all
           on: created_at
-          type: datetime
     dependencies:
       - landing.espn_matches
     output:
@@ -41,7 +40,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - landing.football_data_matches
     output:
@@ -68,7 +66,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - landing.football_data_standings
     output:
@@ -95,7 +92,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - landing.football_ranking_fifa_rankings
     output:
@@ -118,7 +114,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - landing.live_soccer_matches
     output:
@@ -141,7 +136,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - landing.live_soccer_standings
     output:
@@ -164,7 +158,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - intermediate.espn_matches
     output:
@@ -173,9 +166,11 @@ models:
       path: intermediate/espn_teams.csv
       schema: espn_teams
     processing:
-        processor: ExtractTeamsPipeline
+        processor: ExtractTablePipeline
         params:
           source_key: espn_matches
+          output_key: espn_teams
+          deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -184,23 +179,24 @@ models:
     description: Extracts team information from the Football Data matches data.
     trigger: automatic
     sources:
-      - name: football_data_matches
-        path: intermediate/football_data_matches.csv
+      - name: football_data_teams
+        path: landing/football_data_teams.json
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
-      - intermediate.football_data_matches
+      - landing.football_data_teams
     output:
       name: football_data_teams
       layer: intermediate
       path: intermediate/football_data_teams.csv
       schema: football_data_teams
     processing:
-        processor: ExtractTeamsPipeline
+        processor: FootballDataTeamsPipeline
         params:
-          source_key: football_data_matches
+          columns_mapping: !include
+            file: json_mappings.yml
+            model_name: football_data_teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -214,7 +210,6 @@ models:
         versioning:
           mode: newest
           on: created_at
-          type: datetime
     dependencies:
       - intermediate.live_soccer_matches
     output:
@@ -223,9 +218,234 @@ models:
       path: intermediate/live_soccer_teams.csv
       schema: live_soccer_teams
     processing:
-        processor: ExtractTeamsPipeline
+        processor: ExtractTablePipeline
         params:
           source_key: live_soccer_matches
+          output_key: live_soccer_teams
+          deduplicate: true
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: espn_competitions
+    description: Extracts competition information from the ESPN matches data.
+    trigger: automatic
+    sources:
+      - name: espn_matches
+        path: intermediate/espn_matches.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.espn_matches
+    output:
+      name: espn_competitions
+      layer: intermediate
+      path: intermediate/espn_competitions.csv
+      schema: espn_competitions
+    processing:
+        processor: ExtractTablePipeline
+        params:
+          source_key: espn_matches
+          output_key: espn_competitions
+          deduplicate: true
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: football_data_competitions
+    description: Extracts competition information from the Football Data standings data.
+    trigger: automatic
+    sources:
+      - name: football_data_standings
+        path: intermediate/football_data_standings.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.football_data_standings
+    output:
+      name: football_data_competitions
+      layer: intermediate
+      path: intermediate/football_data_competitions.csv
+      schema: football_data_competitions
+    processing:
+        processor: ExtractTablePipeline
+        params:
+          source_key: football_data_standings
+          output_key: football_data_competitions
+          deduplicate: true
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: live_soccer_competitions
+    description: Extracts competition information from the Live Soccer standings data.
+    trigger: automatic
+    sources:
+      - name: live_soccer_standings
+        path: intermediate/live_soccer_standings.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.live_soccer_standings
+    output:
+      name: live_soccer_competitions
+      layer: intermediate
+      path: intermediate/live_soccer_competitions.csv
+      schema: live_soccer_competitions
+    processing:
+        processor: ExtractTablePipeline
+        params:
+          source_key: live_soccer_standings
+          output_key: live_soccer_competitions
+          deduplicate: true
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: football_data_areas
+    description: Extracts area information from the Football Data standings data.
+    trigger: automatic
+    sources:
+      - name: football_data_standings
+        path: intermediate/football_data_standings.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.football_data_standings
+    output:
+      name: football_data_areas
+      layer: intermediate
+      path: intermediate/football_data_areas.csv
+      schema: football_data_areas
+    processing:
+        processor: ExtractTablePipeline
+        params:
+          source_key: football_data_standings
+          output_key: football_data_areas
+          deduplicate: true
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: live_soccer_areas
+    description: Extracts area information from the Live Soccer standings data.
+    trigger: automatic
+    sources:
+      - name: live_soccer_standings
+        path: intermediate/live_soccer_standings.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.live_soccer_standings
+    output:
+      name: live_soccer_areas
+      layer: intermediate
+      path: intermediate/live_soccer_areas.csv
+      schema: live_soccer_areas
+    processing:
+        processor: ExtractTablePipeline
+        params:
+          source_key: live_soccer_standings
+          output_key: live_soccer_areas
+          deduplicate: true
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: team_registry
+    description: Create teams similarity registry accross all sources.
+    trigger: automatic
+    sources:
+      - name: espn_teams
+        path: intermediate/espn_teams.csv
+        versioning:
+          mode: newest
+          on: created_at
+      - name: football_data_teams
+        path: intermediate/football_data_teams.csv
+      - name: live_soccer_teams
+        path: intermediate/live_soccer_teams.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.espn_teams
+      - intermediate.football_data_teams
+      - intermediate.live_soccer_teams
+    output:
+      name: team_registry
+      layer: intermediate
+      path: intermediate/team_registry.csv
+      schema: team_registry
+    processing:
+        processor: CreateRegistryPipeline
+        params:
+          output_key: teams
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: competition_registry
+    description: Create competitions similarity registry accross all sources.
+    trigger: automatic
+    sources:
+      - name: espn_competitions
+        path: intermediate/espn_competitions.csv
+      - name: football_data_competitions
+        path: intermediate/football_data_competitions.csv
+        versioning:
+          mode: newest
+          on: created_at
+      - name: live_soccer_competitions
+        path: intermediate/live_soccer_competitions.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.espn_competitions
+      - intermediate.football_data_competitions
+      - intermediate.live_soccer_competitions
+    output:
+      name: competition_registry
+      layer: intermediate
+      path: intermediate/competition_registry.csv
+      schema: competition_registry
+    processing:
+        processor: CreateRegistryPipeline
+        params:
+          output_key: competitions
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: area_registry
+    description: Create areas similarity registry accross all sources.
+    trigger: automatic
+    sources:
+      - name: football_data_areas
+        path: intermediate/football_data_areas.csv
+      - name: live_soccer_areas
+        path: intermediate/live_soccer_areas.csv
+        versioning:
+          mode: newest
+          on: created_at
+    dependencies:
+      - intermediate.football_data_areas
+      - intermediate.live_soccer_areas
+    output:
+      name: area_registry
+      layer: intermediate
+      path: intermediate/area_registry.csv
+      schema: area_registry
+    processing:
+        processor: CreateRegistryPipeline
+        params:
+          output_key: areas
     static_fields:
       - name: intermediate_at
         value: !date_offset 0

@@ -2,14 +2,15 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
+from . import logger
 from .processors import (
     ExtractJson,
     ReshapeMatches,
     DateNormalization,
-    ExtractTeams,
-    Parsing
+    Parsing,
+    ExtractTable,
+    CreateRegistry
 )
-from src.data_pipeline.data_processing import logger
 
 
 SourceType = dict | list[dict] | pd.DataFrame
@@ -22,6 +23,7 @@ class PipelineBaseClass(ABC):
     @abstractmethod
     def run(cls, sources: SourceBundleType, **kwargs) -> pd.DataFrame:
         """ TODO """
+        pass
 
     @staticmethod
     def _check_json_data(json_data: list[dict]) -> None:
@@ -57,13 +59,13 @@ class ESPNMatchPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_json_data(json_data)
         
-        data = ExtractJson().process(json_data, columns_mapping)
+        data = ExtractJson().process(json_data, columns_mapping, **kwargs)
         cls._check_dataframe(data)
 
-        data = ReshapeMatches().process(data, cls.source_key)
+        data = ReshapeMatches().process(data, cls.source_key, **kwargs)
         cls._check_dataframe(data)
 
-        data = DateNormalization().process(data, cls.source_key)
+        data = DateNormalization().process(data, cls.source_key, **kwargs)
         return data
 
 
@@ -85,10 +87,10 @@ class FootballDataMatchesPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_json_data(json_data)
         
-        data = ExtractJson().process(json_data, columns_mapping)
+        data = ExtractJson().process(json_data, columns_mapping, **kwargs)
         cls._check_dataframe(data)
 
-        data = DateNormalization().process(data, cls.source_key)
+        data = DateNormalization().process(data, cls.source_key, **kwargs)
         return data
 
 
@@ -110,7 +112,29 @@ class FootballDataStandingsPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_json_data(json_data)
         
-        data = ExtractJson().process(json_data, columns_mapping)
+        data = ExtractJson().process(json_data, columns_mapping, **kwargs)
+        return data
+
+
+class FootballDataTeamsPipeline(PipelineBaseClass): # TODO - Same as the previous one
+    """ TODO """
+    
+    source_key = "football_data_teams"
+
+    @classmethod
+    def run(cls, sources: dict[str, list[dict]], columns_mapping: dict[str, str], **kwargs) -> pd.DataFrame:
+        """ TODO """
+        logger.info("Running FootballDataTeamsPipeline")
+        json_data = sources.get(cls.source_key)
+        if json_data is None:
+            logger.error(f"No data found for source key: {cls.source_key}")
+            raise ValueError(f"No data found for source key: {cls.source_key}")
+        if not json_data:
+            logger.info(f"No new data found for source key: {cls.source_key}")
+            return pd.DataFrame()
+        cls._check_json_data(json_data)
+        
+        data = ExtractJson().process(json_data, columns_mapping, **kwargs)
         return data
 
 
@@ -132,7 +156,7 @@ class FootballRankingFifaRankingsPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_dataframe(data)
         
-        data = Parsing().process(data, cls.source_key)
+        data = Parsing().process(data, cls.source_key, **kwargs)
         return data
 
 
@@ -154,10 +178,10 @@ class LiveSoccerMatchesPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_dataframe(data)
         
-        data = Parsing().process(data, cls.source_key)
+        data = Parsing().process(data, cls.source_key, **kwargs)
         cls._check_dataframe(data)
         
-        data = DateNormalization().process(data, cls.source_key)
+        data = DateNormalization().process(data, cls.source_key, **kwargs)
         return data
 
 
@@ -179,17 +203,17 @@ class LiveSoccerStandingsPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_dataframe(data)
         
-        data = Parsing().process(data, cls.source_key)
+        data = Parsing().process(data, cls.source_key, **kwargs)
         return data
 
 
-class ExtractTeamsPipeline(PipelineBaseClass):
+class ExtractTablePipeline(PipelineBaseClass):
     """ TODO """
 
     @classmethod
-    def run(cls, sources: dict[str, pd.DataFrame], source_key: str, **kwargs) -> pd.DataFrame:
+    def run(cls, sources: dict[str, pd.DataFrame], source_key: str, output_key: str, **kwargs) -> pd.DataFrame:
         """ TODO """
-        logger.info(f"Running ExtractTeamsPipeline for {source_key}")
+        logger.info(f"Running ExtractTeamsPipeline for {output_key}")
         data = sources.get(source_key)
         if data is None:
             logger.error(f"No data found for source key: {source_key}")
@@ -199,5 +223,16 @@ class ExtractTeamsPipeline(PipelineBaseClass):
             return pd.DataFrame()
         cls._check_dataframe(data)
 
-        data = ExtractTeams().process(data, source_key)
+        data = ExtractTable().process(data, output_key, **kwargs)
+        return data
+
+
+class CreateRegistryPipeline(PipelineBaseClass):
+    """ TODO """
+
+    @classmethod
+    def run(cls, sources: dict[str, pd.DataFrame], output_key: str, **kwargs) -> pd.DataFrame:
+        """ TODO """
+        logger.info(f"Running CreateRegistryPipeline for {output_key}")
+        data = CreateRegistry().process(sources, output_key, **kwargs)
         return data

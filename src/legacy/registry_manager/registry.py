@@ -5,7 +5,7 @@ import unicodedata
 
 import yaml
 
-from src.registry_manager import logger
+from src.legacy.registry_manager import logger
 
 
 # TODO - When an alias can't be mapped, the alias is saved somewhere to be latter assigned to a name

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.data_pipeline.data_processing import logger
+from . import logger
 from src.data_pipeline.data_processing.utils import (
     order_models,
     inject_static_fields
@@ -85,10 +85,10 @@ def ingestion_landing(db_repo: str, instructions: dict, manual: bool = False):
     for model in models:
         # Trigger
         model_trigger = model.get("trigger", "automatic")
-        if not manual and model_trigger == "manual":
-            continue
-        if model_trigger != "automatic":
+        if model_trigger not in ["automatic", "manual"]:
             logger.warning(f"Unsupported trigger type: {model_trigger}.")
+            continue
+        elif not manual and model_trigger == "manual":
             continue
 
         # Name

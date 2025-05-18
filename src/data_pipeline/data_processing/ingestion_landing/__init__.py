@@ -1,2 +1,5 @@
-from .ingestion_workflow import ingestion_workflow
+import logging
+
+logger = logging.getLogger(__name__)
+
 from .ingestion_landing import ingestion_landing

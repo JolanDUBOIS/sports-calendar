@@ -92,10 +92,10 @@ loggers:
   # Imported modules loggers
   googleapiclient.discovery_cache:
     level: DEBUG
-    handlers: [debug_handler]
+    handlers: [main_debug_handler]
     propagate: False
 
 root:
   level: DEBUG
-  handlers: [console_handler, debug_handler]
+  handlers: [console_handler, main_debug_handler]
   propagate: False

@@ -5,7 +5,7 @@ from typing import Any
 import requests
 import pandas as pd
 
-from src.sources import BaseSourceClient, logger
+from src.legacy.sources import BaseSourceClient, logger
 
 
 class BaseApiClient(BaseSourceClient):
