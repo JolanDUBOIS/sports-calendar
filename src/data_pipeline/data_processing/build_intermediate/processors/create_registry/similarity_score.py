@@ -3,16 +3,8 @@ import unicodedata
 
 from rapidfuzz import fuzz # type: ignore
 
-from src.data_pipeline.data_processing import logger
+from . import logger
 
-
-GENERIC_TEAM_TOKENS = [
-    "FC", "Football Club", "Soccer Club", "SC", "Sporting Club",
-    "AC", "Club", "Associazione Calcio", "SV", "Sportverein",
-    "SS", "Società Sportiva", "CF", "Club de Fútbol", "SK", "Sportklub",
-    "US", "Unione Sportiva", "Union Sportive", "CD", "Club Deportivo", "AFC",
-    "Association Football Club", "AS", "Associazione Sportiva", "Association Sportive",
-]
 
 def strict_is_in(strA: str, strB: str) -> bool:
     """ TODO """
@@ -52,7 +44,7 @@ def normalize_string(string: str) -> str:
 
 def normalize_list(strings: list[str]) -> list[str]:
     """ Normalize a list of strings. """
-    return [normalize_string(string) for string in strings]
+    return [normalize_string(str(string)) for string in strings]
 
 def calculate_string_similarity_score(strA: str, strB: str) -> float:
     """ Calculate the similarity score between two strings. """
@@ -73,5 +65,5 @@ def calculate_list_similarity_score(listA: list[str], listB: list[str], tokens_t
         for strB in listB:
             score = calculate_string_similarity_score(strA, strB)
             scores.append(score)
-
+    logger.debug(f"Scores: {scores}")
     return max(scores) if scores else 0.0
