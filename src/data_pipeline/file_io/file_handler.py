@@ -63,6 +63,25 @@ class FileHandler(ABC):
 
     # Delete methods
 
+    def delete(self) -> None:
+        """ Delete the file and its metadata. """
+        logger.info(f"Deleting file {self.file_path}")
+        if self.file_path.exists() and self.confirm_delete():
+            try:
+                self.file_path.unlink()
+                self._delete_metadata()
+                logger.debug(f"File {self.file_path} deleted.")
+            except Exception as e:
+                logger.error(f"Failed to delete file {self.file_path}: {e}")
+                raise e
+        else:
+            logger.warning(f"File {self.file_path} does not exist.")
+
+    def confirm_delete(self) -> bool:
+        """ Ask the user to confirm deleting the file. """
+        response = input(f"Are you sure you want to delete the file {self.file_path}? (yes/y to confirm): ").strip().lower()
+        return response in ['yes', 'y']
+
     @abstractmethod
     def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
         """ Delete records from the file based on the version field and threshold. """
@@ -103,7 +122,7 @@ class FileHandler(ABC):
 
     # Metadata methods
 
-    def _update_metadata(self, writer_type: str, rows: int) -> None:
+    def _read_metadata(self) -> dict:
         """ TODO """
         meta = {}
         if self.meta_path.exists():
@@ -113,32 +132,39 @@ class FileHandler(ABC):
             except Exception as e:
                 logger.error(f"Failed to read existing metadata: {e}")
                 raise e
+        else:
+            logger.warning(f"Metadata file {self.meta_path} does not exist.")
+        return meta
 
+    def _write_metadata(self, meta: dict) -> None:
+        """ Write the metadata to the file. """
+        with self.meta_path.open("w") as f:
+            json.dump(meta, f, indent=4)
+
+    def _update_metadata(self, writer_type: str, rows: int) -> None:
+        """ TODO """
+        meta = self._read_metadata()
         meta[self.file_path.name] = {
             "last_written": self.now,
             "writer": writer_type,
             "rows": rows
         }
+        self._write_metadata(meta)
 
-        with self.meta_path.open("w") as f:
-            json.dump(meta, f, indent=4)
-        logger.debug(f"Metadata updated at {self.meta_path}")
+    def _delete_metadata(self) -> None:
+        """ Delete the file's metadata. """
+        meta = self._read_metadata()
+        if self.file_path.name in meta:
+            del meta[self.file_path.name]
+            self._write_metadata(meta)
+            logger.debug(f"Metadata for {self.file_path.name} deleted.")
+        else:
+            logger.warning(f"No metadata found for {self.file_path.name}.")
 
     def last_update(self) -> str:
         """ Get the last update time of the file. """
-        logger.debug(f"Getting last update time for {self.file_path}")
-        if self.meta_path.exists():
-            try:
-                with self.meta_path.open("r") as f:
-                    meta = json.load(f)
-                logger.debug(f"Metadata read: {meta}")
-                return meta.get(self.file_path.name, {}).get("last_written", None)
-            except Exception as e:
-                logger.error(f"Failed to read metadata: {e}")
-                raise e
-        else:
-            logger.warning(f"Metadata file {self.meta_path} does not exist.")
-            return None
+        meta = self._read_metadata()
+        return meta.get(self.file_path.name, {}).get("last_written", None)
 
     # Helper methods
 
