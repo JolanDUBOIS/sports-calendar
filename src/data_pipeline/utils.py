@@ -34,7 +34,7 @@ yaml.add_constructor('!date_offset', date_offset_constructor, Loader=yaml.loader
 yaml.add_constructor('!include', include_constructor, Loader=yaml.SafeLoader)
 
 
-def read_yml_file(file_path: Path):
+def read_yml_file(file_path: Path) -> dict:
     """ Read a YAML file and return its content as a dictionary. """
     with file_path.open(mode='r') as file:
         config = yaml.safe_load(file)
