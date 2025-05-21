@@ -7,9 +7,13 @@ formatters:
     datefmt: "%H:%M:%S"
 
   detailed:
-    format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    format: "%(asctime)s [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] (%(funcName)s) - %(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
 
+  json:
+    class: pythonjsonlogger.jsonlogger.JsonFormatter
+    format: "%(asctime)s %(levelname)s %(name)s %(filename)s %(lineno)d %(funcName)s %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
 
 handlers:
   console_handler:
@@ -23,79 +27,90 @@ handlers:
     level: DEBUG
     formatter: detailed
 
-  ingestion_landing_debug_handler:
+  json_debug_handler:
     class: logging.FileHandler
-    filename: logs/INGESTION_LANDING_DEBUG.log
+    filename: logs/DEBUG.json
     level: DEBUG
-    formatter: detailed
+    formatter: json
 
-  build_intermediate_debug_handler:
-    class: logging.FileHandler
-    filename: logs/BUILD_INTERMEDIATE_DEBUG.log
-    level: DEBUG
-    formatter: detailed
+  # ingestion_landing_debug_handler:
+  #   class: logging.FileHandler
+  #   filename: logs/INGESTION_LANDING_DEBUG.log
+  #   level: DEBUG
+  #   formatter: detailed
+
+  # build_intermediate_debug_handler:
+  #   class: logging.FileHandler
+  #   filename: logs/BUILD_INTERMEDIATE_DEBUG.log
+  #   level: DEBUG
+  #   formatter: detailed
 
 
 loggers:
   # Main modules loggers
   src.calendar:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   src.clients:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   src.config:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   src.db:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   src.selection:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   # Data pipeline loggers
   src.data_pipeline:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   src.data_pipeline.data_processing:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
   src.data_pipeline.data_validation:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
-  src.data_pipeline.data_processing.ingestion_landing:
+  src.data_pipeline.data_processing.processors:
     level: DEBUG
-    handlers: [console_handler, ingestion_landing_debug_handler]
+    handlers: [console_handler, main_debug_handler, json_debug_handler]
     propagate: False
 
-  src.data_pipeline.data_processing.build_intermediate:
-    level: DEBUG
-    handlers: [console_handler, build_intermediate_debug_handler]
-    propagate: False
+  # src.data_pipeline.data_processing.ingestion_landing:
+  #   level: DEBUG
+  #   handlers: [console_handler, ingestion_landing_debug_handler]
+  #   propagate: False
+
+  # src.data_pipeline.data_processing.build_intermediate:
+  #   level: DEBUG
+  #   handlers: [console_handler, build_intermediate_debug_handler]
+  #   propagate: False
 
   # Imported modules loggers
   googleapiclient.discovery_cache:
     level: DEBUG
-    handlers: [main_debug_handler]
+    handlers: [main_debug_handler, json_debug_handler]
     propagate: False
 
 root:
   level: DEBUG
-  handlers: [console_handler, main_debug_handler]
+  handlers: [console_handler, main_debug_handler, json_debug_handler]
   propagate: False
