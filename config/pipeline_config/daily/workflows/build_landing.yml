@@ -6,21 +6,19 @@ models:
   - name: espn_matches
     description: Ingests match information from the ESPN API.
     trigger: automatic
-    source:
-      name: espn
-      type: api
     output:
       name: espn_matches
       layer: landing
       path: landing/espn_matches.json
       mode: append
     processing:
-      client_class: ESPNApiClient
+      processor: ClientProcessor
+      source: espn
       method: query_matches
       params:
         - competition_slug: uefa.champions
           date_from: !date_offset 0  # Today
-          date_to: !date_offset 7  # 7d from today
+          date_to: !date_offset 14  # 7d from today
         - competition_slug: uefa.europa
           date_from: !date_offset 0
           date_to: !date_offset 14
@@ -92,13 +90,13 @@ models:
           date_to: !date_offset 14
         - competition_slug: eng.1
           date_from: !date_offset 0
-          date_to: !date_offset 7
+          date_to: !date_offset 14
         - competition_slug: esp.1
           date_from: !date_offset 0
           date_to: !date_offset 14
         - competition_slug: fra.1
           date_from: !date_offset 0
-          date_to: !date_offset 7
+          date_to: !date_offset 14
         - competition_slug: ger.1
           date_from: !date_offset 0
           date_to: !date_offset 14
@@ -140,16 +138,14 @@ models:
   - name: football_data_matches
     description: Ingests match information from the Football Data API.
     trigger: automatic
-    source:
-      name: football-data
-      type: api
     output:
       name: football_data_matches
       layer: landing
       path: landing/football_data_matches.json
       mode: append
     processing:
-      client_class: FootballDataApiClient
+      processor: ClientProcessor
+      source: football-data
       method: query_competition_matches
       params:
         - competition_id: 2013
@@ -202,16 +198,14 @@ models:
   - name: football_data_standings
     description: Ingests standings information from the Football Data API.
     trigger: automatic
-    source:
-      name: football-data
-      type: api
     output:
       name: football_data_standings
       layer: landing
       path: landing/football_data_standings.json
       mode: append
     processing:
-      client_class: FootballDataApiClient
+      processor: ClientProcessor
+      source: football-data
       method: query_standings
       params:
         - competition_id: 2013
@@ -234,16 +228,14 @@ models:
   - name: football_data_teams
     description: Ingests team information from the Football Data API.
     trigger: manual
-    source:
-      name: football-data
-      type: api
     output:
       name: football_data_teams
       layer: landing
       path: landing/football_data_teams.json
       mode: append
     processing:
-      client_class: FootballDataApiClient
+      processor: ClientProcessor
+      source: football-data
       method: query_teams
       params:
         - competition_id: 2013
@@ -270,16 +262,14 @@ models:
   - name: live_soccer_matches
     description: Ingests live match information from the Live Soccer Scraper.
     trigger: automatic
-    source:
-      name: livesoccertv
-      type: scraper
     output:
       name: live_soccer_matches
       layer: landing
       path: landing/live_soccer_matches.csv
       mode: append
     processing:
-      client_class: LiveSoccerScraper
+      processor: ClientProcessor
+      source: livesoccertv
       method: scrape_matches
       params:
         - competition_endpoint: /france/ligue-1
@@ -320,16 +310,14 @@ models:
   - name: live_soccer_standings
     description: Ingests live standings information from the Live Soccer Scraper.
     trigger: automatic
-    source:
-      name: livesoccertv
-      type: scraper
     output:
       name: live_soccer_standings
       layer: landing
       path: landing/live_soccer_standings.csv
       mode: append
     processing:
-      client_class: LiveSoccerScraper
+      processor: ClientProcessor
+      source: livesoccertv
       method: scrape_standings
       params: 
         - competition_endpoint: /france/ligue-1
@@ -357,7 +345,8 @@ models:
       path: landing/live_soccer_competitions.csv
       mode: append
     processing:
-      client_class: LiveSoccerScraper
+      processor: ClientProcessor
+      source: livesoccertv
       method: scrape_competitions
     static_fields:
       - name: created_at
@@ -370,21 +359,19 @@ models:
   - name: football_ranking_fifa_rankings
     description: Ingests FIFA ranking information from the Football Ranking Scraper.
     trigger: automatic
-    source:
-      name: football-ranking
-      type: scraper
     output:
       name: football_ranking_fifa_rankings
       layer: landing
       path: landing/football_ranking_fifa_rankings.csv
       mode: append
     processing:
-      client_class: FootballRankingScraper
+      processor: ClientProcessor
+      source: football-ranking
       method: scrape_fifa_rankings
     static_fields:
       - name: created_at
         value: !date_offset 0
       - name: source
-        value: livesoccertv
+        value: football-ranking
       - name: source_type
         value: scraper

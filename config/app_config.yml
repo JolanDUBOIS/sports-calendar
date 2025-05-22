@@ -8,9 +8,11 @@ database:
   url: sqlite:///data/football.db
 
 pipeline:
+  config_files: config/pipeline_config/daily
+  repository_path: data/repository
+  manual: false
+
+test_pipeline:
   config_files: config/pipeline_config/test
   repository_path: data/repository/test
-  workflows:
-    # - data_ingestion
-    - data_extraction
-  manual: false
+  manual: true

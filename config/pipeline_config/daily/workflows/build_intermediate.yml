@@ -22,11 +22,11 @@ models:
       path: intermediate/espn_matches.csv
       schema: espn_matches
     processing:
-        processor: ESPNMatchPipeline
-        params:
-          columns_mapping: !include
-            file: json_mappings.yml
-            model_name: espn_matches
+        processor: ExtractionProcessor
+        source_key: espn_matches
+        columns_mapping: !include
+          file: json_mappings.yml
+          model_name: espn_matches
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -48,11 +48,11 @@ models:
       path: intermediate/football_data_matches.csv
       schema: football_data_matches
     processing:
-        processor: FootballDataMatchesPipeline
-        params:
-          columns_mapping: !include
-            file: json_mappings.yml
-            model_name: football_data_matches
+        processor: ExtractionProcessor
+        source_key: football_data_matches
+        columns_mapping: !include
+          file: json_mappings.yml
+          model_name: football_data_matches
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -74,11 +74,11 @@ models:
       path: intermediate/football_data_standings.csv
       schema: football_data_standings
     processing:
-        processor: FootballDataStandingsPipeline
-        params:
-          columns_mapping: !include
-            file: json_mappings.yml
-            model_name: football_data_standings
+        processor: ExtractionProcessor
+        source_key: football_data_standings
+        columns_mapping: !include
+          file: json_mappings.yml
+          model_name: football_data_standings
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -100,7 +100,8 @@ models:
       path: intermediate/football_ranking_fifa_rankings.csv
       schema: football_ranking_fifa_rankings
     processing:
-        processor: FootballRankingFifaRankingsPipeline
+        processor: ParsingProcessor
+        source_key: football_ranking_fifa_rankings
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -122,7 +123,8 @@ models:
       path: intermediate/live_soccer_matches.csv
       schema: live_soccer_matches
     processing:
-        processor: LiveSoccerMatchesPipeline
+        processor: ParsingProcessor
+        source_key: live_soccer_matches
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -144,7 +146,8 @@ models:
       path: intermediate/live_soccer_standings.csv
       schema: live_soccer_standings
     processing:
-        processor: LiveSoccerStandingsPipeline
+        processor: ParsingProcessor
+        source_key: live_soccer_standings
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -166,11 +169,10 @@ models:
       path: intermediate/espn_teams.csv
       schema: espn_teams
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: espn_matches
-          output_key: espn_teams
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: espn_matches
+        output_key: espn_teams
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -192,11 +194,11 @@ models:
       path: intermediate/football_data_teams.csv
       schema: football_data_teams
     processing:
-        processor: FootballDataTeamsPipeline
-        params:
-          columns_mapping: !include
-            file: json_mappings.yml
-            model_name: football_data_teams
+        processor: ExtractionProcessor
+        source_key: football_data_teams
+        columns_mapping: !include
+          file: json_mappings.yml
+          model_name: football_data_teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -218,11 +220,10 @@ models:
       path: intermediate/live_soccer_teams.csv
       schema: live_soccer_teams
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: live_soccer_matches
-          output_key: live_soccer_teams
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: live_soccer_matches
+        output_key: live_soccer_teams
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -244,11 +245,10 @@ models:
       path: intermediate/espn_competitions.csv
       schema: espn_competitions
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: espn_matches
-          output_key: espn_competitions
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: espn_matches
+        output_key: espn_competitions
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -270,11 +270,10 @@ models:
       path: intermediate/football_data_competitions.csv
       schema: football_data_competitions
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: football_data_standings
-          output_key: football_data_competitions
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: football_data_standings
+        output_key: football_data_competitions
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -296,11 +295,10 @@ models:
       path: intermediate/live_soccer_competitions.csv
       schema: live_soccer_competitions
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: live_soccer_standings
-          output_key: live_soccer_competitions
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: live_soccer_standings
+        output_key: live_soccer_competitions
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -322,11 +320,10 @@ models:
       path: intermediate/football_data_areas.csv
       schema: football_data_areas
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: football_data_standings
-          output_key: football_data_areas
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: football_data_standings
+        output_key: football_data_areas
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -348,11 +345,10 @@ models:
       path: intermediate/live_soccer_areas.csv
       schema: live_soccer_areas
     processing:
-        processor: ExtractTablePipeline
-        params:
-          source_key: live_soccer_standings
-          output_key: live_soccer_areas
-          deduplicate: true
+        processor: DerivationProcessor
+        source_key: live_soccer_standings
+        output_key: live_soccer_areas
+        deduplicate: true
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -383,9 +379,8 @@ models:
       path: intermediate/team_registry.csv
       schema: team_registry
     processing:
-        processor: CreateRegistryPipeline
-        params:
-          output_key: teams
+        processor: RegistryProcessor
+        output_key: teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -416,9 +411,8 @@ models:
       path: intermediate/competition_registry.csv
       schema: competition_registry
     processing:
-        processor: CreateRegistryPipeline
-        params:
-          output_key: competitions
+        processor: RegistryProcessor
+        output_key: competitions
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -443,9 +437,8 @@ models:
       path: intermediate/area_registry.csv
       schema: area_registry
     processing:
-        processor: CreateRegistryPipeline
-        params:
-          output_key: areas
+        processor: RegistryProcessor
+        output_key: areas
     static_fields:
       - name: intermediate_at
         value: !date_offset 0

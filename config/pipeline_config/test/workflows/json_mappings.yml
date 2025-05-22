@@ -118,3 +118,20 @@ models:
           goalsFor: goalsFor
           goalsAgainst: goalsAgainst
           goalDifference: goalDifference
+
+  - name: football_data_teams
+    columns_mapping:
+      direct_paths:
+        area_id: area.id
+        area_name: area.name
+        area_code: area.code
+        id: id
+        name: name
+        shortName: shortName
+        tla: tla
+        founded: founded
+        venue: venue
+        created_at: created_at
+        source: source
+        source_type: source_type
+        
