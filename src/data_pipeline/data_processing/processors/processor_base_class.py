@@ -3,14 +3,22 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from . import logger
+from .components import drop_na, deduplicate
 
 
 class Processor(ABC):
     """ Base class for all processors. """
 
-    @abstractmethod
-    def run(self, *args, **kwargs):
+    def run(self, output_key: str, **kwargs) -> pd.DataFrame:
         """ Run the processor. """
+        data = self._run(output_key=output_key, **kwargs)
+        data = drop_na(data, key=output_key, **kwargs)
+        data = deduplicate(data, key=output_key, **kwargs)
+        return data
+
+    @abstractmethod
+    def _run(self, **kwargs) -> pd.DataFrame:
+        """ TODO """
         pass
 
     @staticmethod
