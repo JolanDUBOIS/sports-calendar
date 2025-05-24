@@ -3,6 +3,7 @@ from pathlib import Path
 from src import logger
 from src.data_pipeline.utils import read_yml_file
 from src.data_pipeline.data_processing import build_layer
+from src.data_pipeline.data_validation import validate_stage_schema
 
 
 def test(no: int):
@@ -39,3 +40,9 @@ def test(no: int):
         for file in landing_dir.glob("*"):
             if file.is_file():
                 file.copy(test_landing_dir / file.name)
+
+    elif no == 4:
+        # logger.info("Running data validation...")
+        db_repo = Path("data/repository/test")
+        schema_file_path = Path("config/pipeline_config/test/schemas/intermediate.yml")
+        validate_stage_schema(db_repo, schema_file_path)
