@@ -8,11 +8,11 @@ from .enforce_schema import enforce_schema
 from src.data_pipeline.utils import read_yml_file
 
 
-def validate_stage_schema(db_repo: str, schema_file_path: str) -> None:
+def validate_stage_schema(db_repo: str, schema_file_path: str, log_summary: bool = False) -> None:
     """ Validate one schema file corresponding to one stage. """
     schema_file_path = Path(schema_file_path).resolve()
     schemas = read_yml_file(schema_file_path)
-    stage = schemas.get("stage")
+    stage: str = schemas.get("stage")
 
     db_layer_path = Path(db_repo).resolve() / stage
     if not db_layer_path.exists():
@@ -48,10 +48,11 @@ def validate_stage_schema(db_repo: str, schema_file_path: str) -> None:
                 "exception msg": f"File not in schema."
             }
 
-    log_summary(summary)
+    if log_summary:
+        _log_summary(summary)
     logger.info(f"Data validation for stage {stage} completed.")
 
-def log_summary(summary: dict) -> None:
+def _log_summary(summary: dict) -> None:
     """ Log the summary of data validation. """
     df = pd.DataFrame.from_dict(summary["summary"], orient="index")
     df = df.reset_index().rename(columns={"index": "name"})[["name", "exception", "exception msg", "path"]]

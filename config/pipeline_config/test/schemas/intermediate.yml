@@ -6,6 +6,7 @@ models:
     columns:
       - name: id
         unique: true
+        nullable: false
       - name: date
       - name: name
       - name: shortName
@@ -53,6 +54,7 @@ models:
       - name: season_current_matchday
       - name: id
         unique: true
+        nullable: false
       - name: utcDate
       - name: status
       - name: matchday
@@ -88,11 +90,13 @@ models:
       - name: area_code
       - name: competition_id
         unique: true
+        nullable: false
       - name: competition_name
       - name: competition_code
       - name: competition_type
       - name: season_id
         unique: true
+        nullable: false
       - name: season_startDate
       - name: season_endDate
       - name: season_currentMatchday
@@ -103,6 +107,7 @@ models:
       - name: position
       - name: team_id
         unique: true
+        nullable: false
       - name: team_name
       - name: team_shortName
       - name: team_tla
@@ -123,6 +128,8 @@ models:
     columns:
       - name: team
       - name: team_name
+        unique: true
+        nullable: false
       - name: team_code
       - name: position
       - name: points
@@ -143,7 +150,9 @@ models:
       - name: source
       - name: source_type
       - name: home_team
+        nullable: false
       - name: away_team
+        nullable: false
       - name: home_score
       - name: away_score
       - name: won_penalty
@@ -156,6 +165,7 @@ models:
     columns:
       - name: position
       - name: team_source_name
+        nullable: false
       - name: matches_played
       - name: wins
       - name: draws
@@ -176,7 +186,9 @@ models:
     columns:
       - name: team_id
         unique: true
+        nullable: false
       - name: team_name
+        nullable: false
       - name: team_abbreviation
       - name: team_displayName
       - name: team_shortDisplayName
@@ -186,7 +198,9 @@ models:
     columns:
       - name: team_id
         unique: true
+        nullable: false
       - name: team_name
+        nullable: false
       - name: team_shortName
       - name: team_tla
       - name: intermediate_at
@@ -195,4 +209,103 @@ models:
     columns:
       - name: team_name
         unique: true
+        nullable: false
+      - name: source
+      - name: source_type
       - name: intermediate_at
+
+  - name: espn_competitions
+    columns:
+      - name: competition_id
+        unique: true
+        nullable: false
+      - name: competition_name
+        nullable: false
+      - name: competition_abbreviation
+      - name: competition_midsizeName
+      - name: competition_slug
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: football_data_competitions
+    columns:
+      - name: competition_id
+        unique: true
+        nullable: false
+      - name: competition_name
+        nullable: false
+      - name: competition_code
+      - name: competition_type
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: live_soccer_competitions
+    columns:
+      - name: competition
+        unique: true
+        nullable: false
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: football_data_areas
+    columns:
+      - name: area_id
+        unique: true
+        nullable: false
+      - name: area_name
+        nullable: false
+      - name: area_code
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: live_soccer_areas
+    columns:
+      - name: area
+        unique: true
+        nullable: false
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: team_registry
+    columns:
+      - name: idA
+        nullable: false
+      - name: idB
+        nullable: false
+      - name: sourceA
+        nullable: false
+      - name: sourceB
+        nullable: false
+      - name: _similarity_score
+        nullable: false
+
+  - name: competition_registry
+    columns:
+      - name: idA
+        nullable: false
+      - name: idB
+        nullable: false
+      - name: sourceA
+        nullable: false
+      - name: sourceB
+        nullable: false
+      - name: _similarity_score
+        nullable: false
+
+  - name: area_registry
+    columns:
+      - name: idA
+        nullable: false
+      - name: idB
+        nullable: false
+      - name: sourceA
+        nullable: false
+      - name: sourceB
+        nullable: false
+      - name: _similarity_score
+        nullable: false
