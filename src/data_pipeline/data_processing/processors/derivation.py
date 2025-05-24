@@ -8,7 +8,7 @@ from .components import extract_table
 class DerivationProcessor(Processor):
     """ TODO """
 
-    def run(self, sources: dict[str, pd.DataFrame], source_key: str, output_key: str, **kwargs) -> pd.DataFrame:
+    def _run(self, sources: dict[str, pd.DataFrame], source_key: str, output_key: str, **kwargs) -> pd.DataFrame:
         """ TODO """
         logger.info(f"Running DerivationProcessor for output key: {output_key}")
         data = sources.get(source_key)

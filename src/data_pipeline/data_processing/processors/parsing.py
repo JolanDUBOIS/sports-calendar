@@ -12,7 +12,7 @@ class ParsingProcessor(Processor):
         "live_soccer_matches": [date_normalization],
     }
 
-    def run(self, sources: dict[str, pd.DataFrame], source_key: str, **kwargs) -> pd.DataFrame:
+    def _run(self, sources: dict[str, pd.DataFrame], source_key: str, **kwargs) -> pd.DataFrame:
         """ TODO """
         logger.info(f"Running ParsingProcessor for source key: {source_key}")
         data = sources.get(source_key)

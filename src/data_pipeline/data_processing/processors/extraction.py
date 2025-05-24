@@ -13,7 +13,7 @@ class ExtractionProcessor(Processor):
         "football_data_matches": [date_normalization],
     }
 
-    def run(self, sources: dict[str, list[dict]], source_key: str, columns_mapping: dict[str, str], **kwargs) -> pd.DataFrame:
+    def _run(self, sources: dict[str, list[dict]], source_key: str, columns_mapping: dict[str, str], **kwargs) -> pd.DataFrame:
         """ TODO """
         logger.info(f"Running ExtractionProcessor for source key: {source_key}")
         json_data = sources.get(source_key)
