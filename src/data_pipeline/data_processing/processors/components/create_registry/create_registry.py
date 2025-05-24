@@ -62,22 +62,30 @@ def create_similarity_table(
         dfA = sources_with_prefix[source_keyA]
         dfB = sources_with_prefix[source_keyB]
         logger.debug(f"Processing pair: {source_keyA} x {source_keyB}")
+        logger.debug(f"dfA:\n{dfA.head(20)}")
+        logger.debug(f"dfB:\n{dfB.head(20)}")
+        
+        id_colA = registry_parameters[source_keyA]["id_col"]
+        id_colB = registry_parameters[source_keyB]["id_col"]
 
         pair_registry = _create_similarity_table(
             dfA,
             dfB,
             registry_parameters[source_keyA]["column_variants"],
             registry_parameters[source_keyB]["column_variants"],
-            generic_tokens
+            generic_tokens,
+            id_colA=id_colA,
+            id_colB=id_colB
         )
 
         pair_registry["sourceA"] = registry_parameters[source_keyA]["source"]
         pair_registry["sourceB"] = registry_parameters[source_keyB]["source"]
-        pair_registry["idA"] = dfA[registry_parameters[source_keyA]["id_col"]]
-        pair_registry["idB"] = dfB[registry_parameters[source_keyB]["id_col"]]
+        pair_registry["idA"] = pair_registry[id_colA]
+        pair_registry["idB"] = pair_registry[id_colB]
 
         pair_registry = pair_registry[["idA", "idB", "sourceA", "sourceB", "_similarity_score"]]
         logger.debug(f"Pair registry shape: {pair_registry.shape}")
+        logger.debug(f"Pair registry:\n{pair_registry.head(20)}")
 
         if not pair_registry.empty:
             registries.append(pair_registry)
@@ -91,7 +99,8 @@ def _create_similarity_table(
     dfB: pd.DataFrame,
     column_variants_A: list[str],
     column_variants_B: list[str],
-    generic_tokens: list[str] = None
+    generic_tokens: list[str] = None,
+    **kwargs
 ) -> pd.DataFrame:
     """ TODO """
     merged_df = pd.merge(dfA, dfB, how="cross")

@@ -5,30 +5,60 @@ from . import logger
 
 EXTRACTION_INSTRUCTIONS = {
     "espn_teams": {
-        "team_id": ["home_team_id", "home_team_id"],
-        "team_name": ["home_team_name", "away_team_name"],
-        "team_abbreviation": ["home_team_abbreviation", "away_team_abbreviation"],
-        "team_displayName": ["home_team_displayName", "away_team_displayName"],
-        "team_shortDisplayName": ["home_team_shortDisplayName", "away_team_shortDisplayName"],
-        "source": ["source", "source"],
-        "source_type": ["source_type", "source_type"],
+        "extraction_type": "double",
+        "columns_mapping": {
+            "team_id": ["home_team_id", "home_team_id"],
+            "team_name": ["home_team_name", "away_team_name"],
+            "team_abbreviation": ["home_team_abbreviation", "away_team_abbreviation"],
+            "team_displayName": ["home_team_displayName", "away_team_displayName"],
+            "team_shortDisplayName": ["home_team_shortDisplayName", "away_team_shortDisplayName"],
+            "source": ["source", "source"],
+            "source_type": ["source_type", "source_type"],
+        },
+        "nullable_columns": ["team_abbreviation", "team_displayName", "team_shortDisplayName", "source", "source_type"],
     },
     "live_soccer_teams": {
-        "team_name": ["home_team", "away_team"],
-        "source": ["source", "source"],
-        "source_type": ["source_type", "source_type"],
+        "extraction_type": "double",
+        "columns_mapping": {
+            "team_name": ["home_team", "away_team"],
+            "source": ["source", "source"],
+            "source_type": ["source_type", "source_type"],
+        },
+        "nullable_columns": ["source", "source_type"],
     },
-    "espn_competitions": [
-        "competition_id", "competition_name", "competition_abbreviation",
-        "competition_midsizeName", "competition_slug", "source", "source_type"
-    ],
-    "football_data_competitions": [
-        "competition_id", "competition_name", "competition_code",
-        "competition_type", "source", "source_type"
-    ],
-    "live_soccer_competitions": ["competition", "source", "source_type"],
-    "football_data_areas": ["area_id", "area_name", "area_code", "source", "source_type"],
-    "live_soccer_areas": ["area", "source", "source_type"],
+    "espn_competitions": {
+        "extraction_type": "simple",
+        "columns": [
+            "competition_id", "competition_name", "competition_abbreviation",
+            "competition_midsizeName", "competition_slug", "source", "source_type"
+        ],
+        "nullable_columns": [
+            "competition_abbreviation", "competition_midsizeName", "competition_slug", "source", "source_type"
+        ]
+    },
+    "football_data_competitions": {
+        "extraction_type": "simple",
+        "columns": [
+            "competition_id", "competition_name", "competition_code",
+            "competition_type", "source", "source_type"
+        ],
+        "nullable_columns": ["competition_code", "competition_type", "source", "source_type"]
+    },
+    "live_soccer_competitions": {
+        "extraction_type": "simple",
+        "columns": ["competition", "source", "source_type"],
+        "nullable_columns": ["source", "source_type"]
+    },
+    "football_data_areas": {
+        "extraction_type": "simple",
+        "columns": ["area_id", "area_name", "area_code", "source", "source_type"],
+        "nullable_columns": ["area_code", "source", "source_type"]
+    },
+    "live_soccer_areas": {
+        "extraction_type": "simple",
+        "columns": ["area", "source", "source_type"],
+        "nullable_columns": ["source", "source_type"]
+    },
 }
 
 def extract_table(data: pd.DataFrame, key: str, **kwargs) -> pd.DataFrame:
@@ -40,14 +70,16 @@ def extract_table(data: pd.DataFrame, key: str, **kwargs) -> pd.DataFrame:
     if instructions is None:
         logger.error(f"No extraction instructions found for key: {key}")
         raise ValueError(f"No extraction instructions found for key: {key}")
-    if isinstance(instructions, list):
-        return _simple_extraction(data, instructions, **kwargs)
-    elif isinstance(instructions, dict):
-        return _double_extraction(data, instructions, **kwargs)
+    extraction_type = instructions.pop("extraction_type")
+    if extraction_type == "simple":
+        return _simple_extraction(data, **instructions, **kwargs)
+    elif extraction_type == "double":
+        return _double_extraction(data, **instructions, **kwargs)
 
 def _simple_extraction(
     data: pd.DataFrame,
     columns: list[str],
+    nullable_columns: list[str] = [],
     deduplicate: bool = False
 ) -> pd.DataFrame:
     """ TODO """
@@ -55,11 +87,14 @@ def _simple_extraction(
     if deduplicate:
         logger.debug("Deduplicating data")
         output_data = output_data.drop_duplicates()
+    non_nullable_columns = [col for col in output_data.columns if col not in nullable_columns]
+    output_data.dropna(subset=non_nullable_columns, inplace=True)
     return output_data
 
 def _double_extraction(
     data: pd.DataFrame,
     columns_mapping: dict[str, list[str]],
+    nullable_columns: list[str] = [],
     deduplicate: bool = False
 ) -> pd.DataFrame:
     """ TODO """
@@ -75,4 +110,6 @@ def _double_extraction(
     if deduplicate:
         logger.debug("Deduplicating data")
         output_data = output_data.drop_duplicates()
+    non_nullable_columns = [col for col in output_data.columns if col not in nullable_columns]
+    output_data.dropna(subset=non_nullable_columns, inplace=True)
     return output_data

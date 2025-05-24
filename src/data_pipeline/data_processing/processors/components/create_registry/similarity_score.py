@@ -8,6 +8,12 @@ from . import logger
 
 def strict_is_in(strA: str, strB: str) -> bool:
     """ TODO """
+    if not isinstance(strA, str) or not isinstance(strB, str):
+        logger.debug(f"strA: {strA}, strB: {strB}")
+        logger.debug(f"strA type: {type(strA)}, strB type: {type(strB)}")
+        logger.error("The function strict_is_in only accepts strings.")
+        raise TypeError("The function strict_is_in only accepts strings.")
+
     strA = strA.strip().lower()
     strB = strB.strip().lower()
 
@@ -59,11 +65,12 @@ def calculate_list_similarity_score(listA: list[str], listB: list[str], tokens_t
     scores = []
     listA = delete_duplicates(remove_substrings(normalize_list(listA), tokens_to_remove))
     listB = delete_duplicates(remove_substrings(normalize_list(listB), tokens_to_remove))
-    logger.debug(f"List A variations: {listA}")
-    logger.debug(f"List B variations: {listB}")
     for strA in listA:
+        if not isinstance(strA, str):
+            continue
         for strB in listB:
+            if not isinstance(strB, str):
+                continue
             score = calculate_string_similarity_score(strA, strB)
             scores.append(score)
-    logger.debug(f"Scores: {scores}")
     return max(scores) if scores else 0.0

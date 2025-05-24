@@ -1,4 +1,6 @@
-from .. import logger
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .date_normalization import date_normalization
 from .extract_json import extract_json

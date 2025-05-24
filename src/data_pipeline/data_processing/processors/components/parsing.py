@@ -64,15 +64,15 @@ def _extract_livesoccer_match_data(match_title: str) -> dict:
     if " - " in match_title:
         # Match has started or is finished
         home_data, away_data = match_title.split(" - ")
-        
-        if home_data[-1] == "P":
-            home_data = home_data[:-1]
-            match_data["won_penalty"] = "home"
+
         if home_data[-1].isdigit():
             match_data["home_score"] = int(home_data[-1])
             home_data = home_data[:-1]
+        if home_data[-1] == "P":
+            home_data = home_data[:-1]
+            match_data["won_penalty"] = "home"
         match_data["home_team"] = home_data.strip()
-        
+
         if away_data[0].isdigit():
             match_data["away_score"] = int(away_data[0])
             away_data = away_data[1:]
@@ -80,7 +80,7 @@ def _extract_livesoccer_match_data(match_title: str) -> dict:
             match_data["won_penalty"] = "away"
             away_data = away_data[1:]
         match_data["away_team"] = away_data.strip()
-    
+
     elif " vs " in match_title:
         # Match has not started yet
         home_data, away_data = match_title.split(" vs ")

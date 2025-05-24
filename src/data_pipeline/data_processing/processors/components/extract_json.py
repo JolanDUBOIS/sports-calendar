@@ -7,7 +7,7 @@ def extract_json(data: list[dict], columns_mapping: dict, **kwargs) -> pd.DataFr
     """ Extracts data from JSON files. """
     extracted_data = []
     for item in data:
-        logger.debug(f"Extracting item: {item} with mapping: {columns_mapping}")
+        # logger.debug(f"Extracting item: {item} with mapping: {columns_mapping}")
         extracted_item = _extract_item(item, columns_mapping)
         extracted_data.append(extracted_item)
 
@@ -24,12 +24,10 @@ def _extract_item(json_item: dict, columns_mapping: dict) -> dict:
     # Iterate over the 'iterate' columns
     iterated_mapping = columns_mapping.get("iterate")
     if not iterated_mapping:
-        logger.debug("No iterated mapping found.")
         return extracted_data
 
     path = iterated_mapping.get('path')
     columns = iterated_mapping.get('columns', [])
-    logger.debug(f"Iterating over path: {path} for columns: {columns}")
     list_dict = _extract(json_item, path)
     for item in list_dict:
         for col_name in columns:
@@ -48,6 +46,6 @@ def _extract(d: dict, path: str) -> any:
         try:
             d = d[key]
         except (KeyError, IndexError):
-            logger.debug(f"Key '{key}' not found in dictionary.")
+            # logger.debug(f"Key '{key}' not found in dictionary.")
             return None
     return d
