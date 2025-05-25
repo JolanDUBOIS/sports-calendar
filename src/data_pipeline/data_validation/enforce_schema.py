@@ -13,19 +13,19 @@ def enforce_schema(db_layer_path: Path, model_schema: dict) -> tuple[str, Path, 
         raise ValueError("Model name is missing in the schema.")
     logger.info(f"Validating schema for model: {model_name}")
 
-    model_path = db_layer_path / f"{model_name}.csv"
-    if not model_path.exists():
-        logger.error(f"Model path {model_path} does not exist.")
-        raise FileNotFoundError(f"Model path {model_path} does not exist.")
-    if not model_path.is_file() or not model_path.suffix == ".csv":
-        logger.error(f"Model path {model_path} doesn't exist or is not a CSV file.")
-        raise ValueError(f"Model path {model_path} doesn't exist or is not a CSV file.")
-    data = pd.read_csv(model_path)
-
-    model_columns_schema = model_schema.get("columns")
-    _check_column_schema(model_columns_schema)
-
     try:
+        model_path = db_layer_path / f"{model_name}.csv"
+        if not model_path.exists():
+            logger.error(f"Model path {model_path} does not exist.")
+            raise FileNotFoundError(f"Model path {model_path} does not exist.")
+        if not model_path.is_file() or not model_path.suffix == ".csv":
+            logger.error(f"Model path {model_path} doesn't exist or is not a CSV file.")
+            raise ValueError(f"Model path {model_path} doesn't exist or is not a CSV file.")
+        data = pd.read_csv(model_path) # TODO - USE file_io !!! And filter with version field
+
+        model_columns_schema = model_schema.get("columns")
+        _check_column_schema(model_columns_schema)
+
         enforce_col_schema(data, model_columns_schema)
         logger.info(f"Data validation for {model_name} completed successfully.")
         return model_name, model_path, None

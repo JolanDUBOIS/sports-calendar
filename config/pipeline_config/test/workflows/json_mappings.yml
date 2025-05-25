@@ -125,7 +125,7 @@ models:
         area_id: area.id
         area_name: area.name
         area_code: area.code
-        id: id
+        team_id: id
         name: name
         shortName: shortName
         tla: tla

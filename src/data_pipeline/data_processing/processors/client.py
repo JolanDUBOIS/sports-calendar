@@ -20,7 +20,7 @@ class ClientProcessor(Processor):
         "football-ranking": FootballRankingScraper
     }
 
-    def run(self, source: str, method: str, params: list[dict] = None, **kwargs) -> list[dict] | pd.DataFrame:
+    def _run(self, source: str, method: str, params: list[dict] = None, **kwargs) -> list[dict] | pd.DataFrame:
         """ TODO """
         logger.info(f"Running ClientProcessor for source: {source} and method: {method}")
         client_class = self.sources.get(source)

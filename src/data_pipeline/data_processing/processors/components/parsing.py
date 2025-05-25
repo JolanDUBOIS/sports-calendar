@@ -8,7 +8,7 @@ def parse(data: pd.DataFrame, source_key: str, **kwargs) -> pd.DataFrame:
     parse_function_map = {
         "live_soccer_matches": parse_livesoccer_matches,
         "live_soccer_standings": parse_livesoccer_standings,
-        "football_ranking_fifa_ranking": parse_football_ranking_fifa_ranking,
+        "football_ranking_fifa_rankings": parse_football_ranking_fifa_ranking,
     }
     parse_function = parse_function_map.get(source_key)
 

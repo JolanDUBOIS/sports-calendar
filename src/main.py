@@ -45,4 +45,4 @@ def test(no: int):
         # logger.info("Running data validation...")
         db_repo = Path("data/repository/test")
         schema_file_path = Path("config/pipeline_config/test/schemas/intermediate.yml")
-        validate_stage_schema(db_repo, schema_file_path)
+        validate_stage_schema(db_repo, schema_file_path, log_summary=True)

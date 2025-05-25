@@ -10,7 +10,6 @@ models:
       name: espn_matches
       layer: landing
       path: landing/espn_matches.json
-      mode: append
     processing:
       processor: ClientProcessor
       source: espn
@@ -142,7 +141,6 @@ models:
       name: football_data_matches
       layer: landing
       path: landing/football_data_matches.json
-      mode: append
     processing:
       processor: ClientProcessor
       source: football-data
@@ -202,7 +200,6 @@ models:
       name: football_data_standings
       layer: landing
       path: landing/football_data_standings.json
-      mode: append
     processing:
       processor: ClientProcessor
       source: football-data
@@ -232,7 +229,6 @@ models:
       name: football_data_teams
       layer: landing
       path: landing/football_data_teams.json
-      mode: append
     processing:
       processor: ClientProcessor
       source: football-data
@@ -266,7 +262,6 @@ models:
       name: live_soccer_matches
       layer: landing
       path: landing/live_soccer_matches.csv
-      mode: append
     processing:
       processor: ClientProcessor
       source: livesoccertv
@@ -314,7 +309,6 @@ models:
       name: live_soccer_standings
       layer: landing
       path: landing/live_soccer_standings.csv
-      mode: append
     processing:
       processor: ClientProcessor
       source: livesoccertv
@@ -343,7 +337,6 @@ models:
       name: live_soccer_competitions
       layer: landing
       path: landing/live_soccer_competitions.csv
-      mode: append
     processing:
       processor: ClientProcessor
       source: livesoccertv
@@ -363,7 +356,6 @@ models:
       name: football_ranking_fifa_rankings
       layer: landing
       path: landing/football_ranking_fifa_rankings.csv
-      mode: append
     processing:
       processor: ClientProcessor
       source: football-ranking
