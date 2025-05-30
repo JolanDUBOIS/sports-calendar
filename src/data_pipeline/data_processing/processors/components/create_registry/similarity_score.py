@@ -7,7 +7,7 @@ from . import logger
 
 
 def strict_is_in(strA: str, strB: str) -> bool:
-    """ TODO """
+    """ Check if one string is contained as a whole word within another, case-insensitive. """
     if not isinstance(strA, str) or not isinstance(strB, str):
         logger.debug(f"strA: {strA}, strB: {strB}")
         logger.debug(f"strA type: {type(strA)}, strB type: {type(strB)}")
@@ -40,7 +40,7 @@ def delete_duplicates(list_: list) -> list:
     return list(dict.fromkeys(list_))
 
 def normalize_string(string: str) -> str:
-    """ TODO """
+    """ Normalize a string by removing accents, converting to ASCII, replacing hyphens with spaces, and removing dots. """
     try:
         string = unicodedata.normalize('NFKD', string).encode('ASCII', 'ignore').decode('utf-8')
         return string.replace("-", " ").replace(".", "").strip()

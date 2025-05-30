@@ -13,7 +13,7 @@ def create_registry(
     threshold: float = 50,
     **kwargs
 ) -> dict[str, pd.DataFrame]:
-    """ TODO """
+    """ Create a registry of similar records from multiple sources filtered by a similarity threshold. """
     constants = REGISTRY_CONSTANTS.get(output_key)
     if not constants:
         logger.error(f"Output key {output_key} not found in REGISTRY_CONSTANTS.")
@@ -37,7 +37,7 @@ def create_similarity_table(
     registry_parameters: dict[str, dict],
     generic_tokens: list[str] = None
 ) -> pd.DataFrame:
-    """ TODO """
+    """ Build a similarity table comparing pairs of dataframes from different sources. """
     logger.debug("Starting similarity table creation...")
     sources_with_prefix = {}
     for key, df in sources.items():
@@ -105,7 +105,7 @@ def _create_similarity_table(
     generic_tokens: list[str] = None,
     **kwargs
 ) -> pd.DataFrame:
-    """ TODO """
+    """ Compute similarity scores for all combinations of rows between two dataframes. """
     merged_df = pd.merge(dfA, dfB, how="cross")
     merged_df["_similarity_score"] = merged_df.apply(
         lambda row: calculate_list_similarity_score(
@@ -122,7 +122,7 @@ def _validate_params(
     registry_parameters: dict[str, dict],
     generic_tokens: list[str]
 ) -> None:
-    """ TODO """
+    """ Validate input parameters for source data, registry parameters, and generic tokens. """
     if not isinstance(sources, dict):
         logger.error("Sources should be a dictionary.")
         raise ValueError("Sources should be a dictionary.")
