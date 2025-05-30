@@ -15,10 +15,10 @@ if TYPE_CHECKING:
 
 
 class OutputManager:
-    """ TODO """
+    """ Manage the output data writing process and enforce output constraints. """
 
     def __init__(self, output_spec: OutputSpec):
-        """ TODO """
+        """ Initialize with an output specification and prepare file handler and enforcers. """
         logger.debug(f"Initializing OutputManager with spec: {output_spec}")
         self.output_spec = output_spec
         self.handler = FileHandlerFactory.create_file_handler(self.output_spec.path, tracked=True)
@@ -34,7 +34,7 @@ class OutputManager:
         return enforcers
 
     def write(self, data: IOContent, source_versions: SourceVersions):
-        """ TODO """
+        """ Write processed data to the output file, applying enforcers and saving metadata. """
         try:
             existing_data = self.handler.read()
             full_data = concat_io_content(existing_data, data)
@@ -50,6 +50,6 @@ class OutputManager:
         self.handler.save()
 
     def read_source_versions(self) -> SourceVersions:
-        """ Read source versions from the output metadata. """
+        """ Retrieve the last recorded source versions from output metadata. """
         metadata_entry = self.handler.meta_manager.read_last_write()
         return read_versions(metadata_entry)

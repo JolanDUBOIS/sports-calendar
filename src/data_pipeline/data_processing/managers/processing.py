@@ -24,10 +24,10 @@ class ProcessingSpec:
         )
 
 class ProcessingManager:
-    """ TODO """
+    """ Manage data processing using a specified processing specification. """
 
     def __init__(self, processing_spec: ProcessingSpec):
-        """ TODO """
+        """ Initialize with a processing specification. """
         self.processing_spec = processing_spec
 
     def process(self, sources: dict[str, IOContent]) -> IOContent:
