@@ -35,7 +35,7 @@ def version_filter(
     strategy: SourceVersioningStrategy | None = None,
     source_versions: SourceVersion | None = None
 ) -> IOContent:
-    """ TODO """
+    """ Apply a filter on the data based on the source versioning strategy and source versions. """
     if strategy is None or source_versions is None:
         logger.debug("Skipping version filter as no strategy or source versions provided.")
         return data

@@ -44,7 +44,27 @@ class LayerSpec:
         )
 
 class LayerBuilder:
-    """ TODO """
+    """
+    Responsible for constructing and executing a sequence of models defined in a layer specification.
+
+    This class manages the lifecycle of models within a specific layer of the pipeline, 
+    ensuring they are executed in the correct order according to the stage and model dependencies.
+
+    Attributes:
+        layer_spec (LayerSpec): Specification object detailing the models and their configuration for this layer.
+        repo_path (Path): Filesystem path to the repository root where models and resources reside.
+        models_order (ModelOrder): Ordered iterable of models respecting dependencies and stage order.
+
+    Methods:
+        build(manual: bool = False) -> None:
+            Executes each model in the layer in the predefined order, handling errors and marking failures.
+        
+        from_dict(d: dict, repo_path: str | Path) -> LayerBuilder:
+            Factory method to create a LayerBuilder instance from a dictionary specification.
+        
+        from_yaml(yaml_path: str | Path, repo_path: str | Path) -> LayerBuilder:
+            Factory method to create a LayerBuilder instance from a YAML configuration file.
+    """
 
     def __init__(self, layer_spec: LayerSpec, repo_path: str | Path):
         """ Initialize the LayerBuilder with a layer specification. """
@@ -53,7 +73,18 @@ class LayerBuilder:
         self.models_order = ModelOrder(self.layer_spec.models, self.layer_spec.stage)
 
     def build(self, manual: bool = False) -> None:
-        """ TODO """
+        """
+        Execute all models in this layer according to the specified order.
+
+        This method runs each model's manager sequentially, passing the `manual` flag 
+        to control manual override behaviors if applicable. It captures and logs any 
+        exceptions per model to avoid stopping the entire layer execution, marking 
+        failed models for later inspection or retry.
+
+        Args:
+            manual (bool): If True, run models in manual mode, which may alter execution 
+                behavior such as skipping automated steps or requiring manual confirmation.
+        """
         for model in self.models_order:
             try:
                 model_manager = ModelManager(model, self.repo_path)
@@ -65,12 +96,30 @@ class LayerBuilder:
 
     @classmethod
     def from_dict(cls, d: dict, repo_path: str | Path) -> LayerBuilder:
-        """ Create a LayerBuilder from a dictionary. """
+        """
+        Create a LayerBuilder instance from a dictionary representation of a layer specification.
+
+        Args:
+            d (dict): Dictionary containing the layer configuration data, typically deserialized from JSON or YAML.
+            repo_path (str | Path): Path to the repository where models and related resources are located.
+
+        Returns:
+            LayerBuilder: A new instance initialized with the provided specification.
+        """
         layer_spec = LayerSpec.from_dict(d)
         return cls(layer_spec, repo_path)
 
     @classmethod
     def from_yaml(cls, yaml_path: str | Path, repo_path: str | Path) -> LayerBuilder:
-        """ Create a LayerBuilder from a YAML file. """
+        """
+        Create a LayerBuilder instance from a YAML file containing the layer specification.
+
+        Args:
+            yaml_path (str | Path): Path to the YAML configuration file defining the layer.
+            repo_path (str | Path): Path to the repository where models and related resources are located.
+
+        Returns:
+            LayerBuilder: A new instance initialized from the YAML file's contents.
+        """
         layer_data = read_yml_file(yaml_path)
         return cls.from_dict(layer_data, repo_path)
