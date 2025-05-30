@@ -76,6 +76,9 @@ loggers:
   src.data_pipeline.file_io:
     level: DEBUG
 
+  src.data_pipeline.utils:
+    level: DEBUG
+
   # Imported modules loggers
   googleapiclient.discovery_cache:
     level: DEBUG
