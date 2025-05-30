@@ -6,14 +6,14 @@ from .components import parse, date_normalization
 
 
 class ParsingProcessor(Processor):
-    """ TODO """
+    """ Processor used to parse raw structured data into final schema. """
 
     sources_additional_processes = {
         "live_soccer_matches": [date_normalization],
     }
 
     def _run(self, sources: dict[str, pd.DataFrame], source_key: str, **kwargs) -> pd.DataFrame:
-        """ TODO """
+        """ Run parsing processor for the given source key. """
         logger.info(f"Running ParsingProcessor for source key: {source_key}")
         data = sources.get(source_key)
         if data is None:

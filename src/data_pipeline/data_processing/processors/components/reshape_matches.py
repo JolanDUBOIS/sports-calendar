@@ -5,7 +5,7 @@ from . import logger
 
 
 def reshape_matches(data: pd.DataFrame, source_key, **kwargs) -> pd.DataFrame:
-    """ TODO """
+    """ Reshape matches data according to the source key. """
     logger.debug(f"Reshaping matches data for source: {source_key}")
     reshape_function_map = {
         "espn_matches": reshape_espn_matches,
@@ -19,6 +19,7 @@ def reshape_matches(data: pd.DataFrame, source_key, **kwargs) -> pd.DataFrame:
     return reshape_function(data)
 
 def reshape_espn_matches(data: pd.DataFrame) -> pd.DataFrame: # TODO - Test
+    """ Reshape ESPN matches dataframe to have separate home and away team attributes. """
     home_is_A = data["team_A_homeAway"] == "home"
     home = np.where(home_is_A, "A", "B")
     away = np.where(home_is_A, "B", "A")

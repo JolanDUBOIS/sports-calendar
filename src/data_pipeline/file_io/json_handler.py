@@ -44,7 +44,7 @@ class JSONHandler(FileHandler):
 
     @staticmethod
     def _validate_data(data: list[dict], file_path: Path) -> None:
-        """ TODO """
+        """ Validate that the input data is a list of dictionaries. """
         if not isinstance(data, list):
             logger.error(f"Data must be a list. File handler path: {file_path}")
             raise ValueError(f"Data must be a list. File handler path: {file_path}")

@@ -7,7 +7,7 @@ from .registry import RegistryProcessor
 
 
 class ProcessorFactory:
-    """ TODO """
+    """ Factory class to create processor instances by name. """
 
     processors = {
         "DerivationProcessor": DerivationProcessor,
@@ -19,5 +19,5 @@ class ProcessorFactory:
 
     @classmethod
     def get_processor(cls, name: str) -> Processor:
-        """ TODO """
+        """ Return a processor instance based on the given name. """
         return cls.processors.get(name)()

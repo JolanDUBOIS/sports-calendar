@@ -53,7 +53,7 @@ EXTRACTION_INSTRUCTIONS = {
 }
 
 def extract_table(data: pd.DataFrame, key: str, **kwargs) -> pd.DataFrame:
-    """ TODO """
+    """ Extracts data from a DataFrame based on predefined instructions for the given key. """
     if not isinstance(data, pd.DataFrame):
         logger.error("The source should be a pandas DataFrame.")
         raise ValueError("The source should be a pandas DataFrame.")
@@ -72,7 +72,7 @@ def _simple_extraction(
     columns: list[str],
     deduplicate: bool = False
 ) -> pd.DataFrame:
-    """ TODO """
+    """ Extract specified columns from the DataFrame, optionally deduplicating. """
     output_data = data[columns]
     if deduplicate:
         logger.debug("Deduplicating data")
@@ -84,7 +84,10 @@ def _double_extraction(
     columns_mapping: dict[str, list[str]],
     deduplicate: bool = False
 ) -> pd.DataFrame:
-    """ TODO """
+    """
+    Extracts and renames columns from the DataFrame using a columns mapping.
+    Each key in columns_mapping is the target column name, and the value is a list of source column names.
+    """
     target_columns = columns_mapping.keys()
     output_data = pd.DataFrame(columns=target_columns)
     for columns in zip(*columns_mapping.values()):

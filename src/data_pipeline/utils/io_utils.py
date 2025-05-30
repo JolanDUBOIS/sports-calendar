@@ -38,12 +38,17 @@ def _get_max_field_value_json(data: list[dict], field: str) -> Any:
     return max(item[field] for item in data if item[field] is not None)
 
 
-def concat_io_content(data: IOContent, new_data: IOContent) -> IOContent:
+def concat_io_content(data: IOContent, new_data: IOContent | dict | None) -> IOContent:
     """ Concatenate two data sources. """
-    if isinstance(data, pd.DataFrame) and isinstance(new_data, pd.DataFrame):
+    if new_data is None:
+        logger.warning("New data is None. Returning original data.")
+        return data
+    elif isinstance(data, pd.DataFrame) and isinstance(new_data, pd.DataFrame):
         return pd.concat([data, new_data], ignore_index=True)
     elif isinstance(data, list) and isinstance(new_data, list):
         return data + new_data
+    elif isinstance(data, list) and isinstance(new_data, dict):
+        return data + [new_data]
     else:
         logger.error(f"Unsupported data types: {type(data)} and {type(new_data)}. Expected both to be of the same type.")
         raise TypeError(f"Unsupported data types: {type(data)} and {type(new_data)}. Expected both to be of the same type.")

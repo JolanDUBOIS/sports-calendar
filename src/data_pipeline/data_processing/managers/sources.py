@@ -28,14 +28,14 @@ class SourceSpec:
         )
 
 class SourcesManager:
-    """ TODO """
+    """ Manage the loading and versioning of source data for model processing. """
 
     def __init__(self, sources: list[SourceSpec]):
-        """ TODO """
+        """ Initialize with a list of source specifications. """
         self.sources = sources
 
     def get_loaded_sources(self, source_versions: SourceVersions) -> dict[str, IOContent]:
-        """ TODO """
+        """ Load and return source data, filtered by provided version information. """
         loaded_sources = {}
         for source in self.sources:
             source_version = source_versions.get(source.name)
@@ -43,7 +43,7 @@ class SourcesManager:
         return loaded_sources
 
     def get_new_source_versions(self) -> SourceVersions:
-        """ TODO """        
+        """ Determine and return the latest version cutoff for each versioned source. """        
         source_versions = SourceVersions()
         for source in self.sources:
             if source.versioning_strategy:
@@ -61,7 +61,7 @@ class SourcesManager:
 
     @staticmethod
     def _load_source_data(source: SourceSpec, source_version: SourceVersion | None = None) -> IOContent:
-        """ TODO """
+        """ Read and return data from a source, optionally filtering by version. """
         file_handler = FileHandlerFactory.create_file_handler(source.path, tracked=True)
         data = file_handler.read()
         data = version_filter(

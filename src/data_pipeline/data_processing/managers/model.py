@@ -57,10 +57,19 @@ class ModelSpec:
         )
 
 class ModelManager:
-    """ TODO """
+    """
+    Handles the execution lifecycle of a single model based on its specification.
+
+    This class manages the full workflow for a model:
+    loading sources, processing data, injecting static fields, and writing the output.
+    It respects the model's trigger setting to control whether the model runs automatically
+    or only when triggered manually.
+
+    The main method `run()` executes the processing pipeline according to the model spec.
+    """
 
     def __init__(self, model_spec: ModelSpec, repo_path: str | Path):
-        """ TODO """
+        """ Initialize ModelManager with a model specification and repository path. """
         self.repo_path = Path(repo_path)
         self.model_spec = self._resolve_paths(model_spec)
 
@@ -72,7 +81,20 @@ class ModelManager:
         return spec
 
     def run(self, manual: bool = False) -> None:
-        """ Run the model processing. """
+        """
+        Execute the model processing pipeline.
+
+        The process includes:
+          - Validating the model's trigger setting (manual or automatic).
+          - Loading source data based on the model's source definitions.
+          - Processing the data using the specified processing steps.
+          - Injecting any static fields defined in the model spec.
+          - Writing the processed output and updating source version metadata.
+
+        Args:
+            manual (bool): If True, forces processing of models with manual trigger;
+                           if False, only processes models set to automatic trigger.
+        """
         if not self._validate_trigger(self.model_spec.trigger, manual):
             return
 

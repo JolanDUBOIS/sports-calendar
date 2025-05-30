@@ -7,15 +7,15 @@ from .specs import UniqueSpec, NonNullableSpec
 
 
 class OutputEnforcer(ABC):
-    """ TODO """
+    """ Abstract base class for enforcing constraints on output DataFrames. """
 
     @abstractmethod
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        """ TODO """
+        """ Apply the constraint enforcement to the given DataFrame. """
 
     @staticmethod
     def _check_df(df: pd.DataFrame) -> None:
-        """ Check if df is a valid DataFrame. """
+        """ Check if df is a valid DataFrame, raise error if not. """
         if not isinstance(df, pd.DataFrame):
             logger.error("Input is not a valid DataFrame.")
             raise ValueError("Input is not a valid DataFrame.")

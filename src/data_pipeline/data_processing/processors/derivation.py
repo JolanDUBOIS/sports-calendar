@@ -6,10 +6,10 @@ from .components import extract_table
 
 
 class DerivationProcessor(Processor):
-    """ TODO """
+    """ Processor used to derive structured tables from a source DataFrame. """
 
     def _run(self, sources: dict[str, pd.DataFrame], source_key: str, output_key: str, **kwargs) -> pd.DataFrame:
-        """ TODO """
+        """ Run derivation processor for the given source and output key. """
         logger.info(f"Running DerivationProcessor for output key: {output_key}")
         data = sources.get(source_key)
         if data is None:

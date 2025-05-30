@@ -23,7 +23,13 @@ class DataStage(IntEnum):
 
 
 class ModelOrder:
-    """ TODO """
+    """
+    Manage and iterate over a list of models respecting their dependencies and execution stage.
+
+    This class ensures models are processed in an order where all dependencies of a model
+    within the same stage are completed first. It handles tracking of completed and failed models,
+    and detects circular dependencies to prevent deadlocks.
+    """
 
     def __init__(self, models: list[ModelSpec], stage: str = "landing"):
         self.models = models
@@ -35,11 +41,11 @@ class ModelOrder:
         self.failed = set()
 
     def __iter__(self) -> ModelOrder:
-        """ TODO """
+        """ Return the iterator object itself. """
         return self
 
     def __next__(self) -> ModelSpec:
-        """ TODO """
+        """ Return the next model ready for processing, respecting dependency completion. """
         ready_models = [
             model for model in self.models
             if model.name not in self.completed # Model isn't already completed

@@ -16,7 +16,7 @@ def extract_json(data: list[dict], columns_mapping: dict, **kwargs) -> pd.DataFr
     return data
 
 def _extract_item(json_item: dict, columns_mapping: dict) -> list[dict]:
-    """ TODO """
+    """ Extracts data from a JSON item according to the columns mapping. """
     # Iterate over the 'direct_paths' columns
     direct_data = {}
     for col_name, path in columns_mapping.get("direct_paths", {}).items():

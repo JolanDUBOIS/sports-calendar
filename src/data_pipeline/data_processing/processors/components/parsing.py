@@ -4,7 +4,7 @@ from . import logger
 
 
 def parse(data: pd.DataFrame, source_key: str, **kwargs) -> pd.DataFrame:
-    """ TODO """
+    """ Select and apply the appropriate parsing function based on the source key. """
     parse_function_map = {
         "live_soccer_matches": parse_livesoccer_matches,
         "live_soccer_standings": parse_livesoccer_standings,
@@ -19,7 +19,7 @@ def parse(data: pd.DataFrame, source_key: str, **kwargs) -> pd.DataFrame:
     return parse_function(data)
 
 def parse_livesoccer_matches(data: pd.DataFrame) -> pd.DataFrame:
-    """ TODO """
+    """ Parse live soccer matches data, extracting match details and competition info. """
     new_columns = data['title'].apply(_extract_livesoccer_match_data).apply(pd.Series)
     data = pd.concat([data, new_columns], axis=1)
     new_columns = data['competition_endpoint'].apply(_parse_livesoccer_competition_endpoint).apply(pd.Series)
@@ -27,32 +27,28 @@ def parse_livesoccer_matches(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 def parse_livesoccer_standings(data: pd.DataFrame) -> pd.DataFrame:
-    """ TODO """
+    """ Parse live soccer standings data by extracting competition details. """
     new_columns = data["competition_endpoint"].apply(_parse_livesoccer_competition_endpoint).apply(pd.Series)
     data = pd.concat([data, new_columns], axis=1)
     return data
 
 def parse_football_ranking_fifa_ranking(data: pd.DataFrame) -> pd.DataFrame:
-    """ TODO """
+    """ Parse FIFA football ranking data by extracting team name and code. """
     new_columns = data["team"].apply(_parse_football_ranking_team).apply(pd.Series)
     data = pd.concat([data, new_columns], axis=1)
     return data
 
 def _parse_livesoccer_competition_endpoint(endpoint: str) -> dict:
-    """ TODO """
+    """ Extract area and competition name from competition endpoint string. """
     return {
         "area": endpoint.split("/")[1],
         "competition": endpoint.split("/")[2].replace("-", " ")
     }
 
 def _extract_livesoccer_match_data(match_title: str) -> dict:
-    """ TODO - List the keys of the output dictionary:
-    - home_team
-    - away_team
-    - home_score
-    - away_score
-    - won_penalty
-    - is_final
+    """
+    Extract detailed match data from a match title string.
+    Keys of the output dictionary include: home_team, away_team, home_score, away_score, won_penalty, is_final.
     """
     match_data = {}
     try:
@@ -93,7 +89,7 @@ def _extract_livesoccer_match_data(match_title: str) -> dict:
     return match_data
 
 def _parse_football_ranking_team(team: str) -> dict:
-    """ TODO """
+    """ Extract team name and optional team code from a team string. """
     team = team.split(" (")
     team_name = team[0].strip()
     team_code = team[1].replace(")", "").strip() if len(team) > 1 else None

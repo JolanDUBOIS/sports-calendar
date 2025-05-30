@@ -7,7 +7,6 @@ from . import logger
 
 @dataclass
 class UniqueSpec:
-    """ TODO """
     fields: list[str]
     version_col: str  # has to be a datetime field
     keep: str = "last"  # or "first"
@@ -18,6 +17,13 @@ class UniqueSpec:
         if self.keep not in valid_keep_values:
             logger.error(f"Invalid keep value '{self.keep}'. Valid values are: {valid_keep_values}.")
             raise ValueError(f"Invalid keep value '{self.keep}'. Valid values are: {valid_keep_values}.")
+
+    def __repr__(self):
+        """ String representation of the UniqueSpec. """
+        return (
+            f"UniqueSpec(fields={self.fields}, version_col={self.version_col}, "
+            f"keep={self.keep})"
+        )
 
     @classmethod
     def from_dict(cls, d: dict) -> UniqueSpec:
@@ -30,8 +36,11 @@ class UniqueSpec:
 
 @dataclass
 class NonNullableSpec:
-    """ TODO """
     fields: list[str]
+
+    def __repr__(self):
+        """ String representation of the NonNullableSpec. """
+        return f"NonNullableSpec(fields={self.fields})"
 
     @classmethod
     def from_dict(cls, d: dict) -> NonNullableSpec:
@@ -40,13 +49,19 @@ class NonNullableSpec:
 
 @dataclass
 class OutputSpec:
-    """ Describes output file and expected schema, uniqueness, etc. """
     name: str
     path: Path
     layer: str
     schema: str | None = None
     unique: UniqueSpec | None = None
     non_nullable: NonNullableSpec | None = None
+
+    def __repr__(self):
+        """ String representation of the OutputSpec. """
+        return (
+            f"OutputSpec(name={self.name}, path={self.path}, layer={self.layer}, "
+            f"schema={self.schema}, unique={self.unique}, non_nullable={self.non_nullable})"
+        )
 
     @classmethod
     def from_dict(cls, d: dict) -> OutputSpec:
@@ -56,5 +71,6 @@ class OutputSpec:
             path=Path(d["path"]),
             layer=d["layer"],
             schema=d.get("schema"),
-            unique=UniqueSpec.from_dict(d["unique"]) if "unique" in d else None
+            unique=UniqueSpec.from_dict(d["unique"]) if "unique" in d else None,
+            non_nullable=NonNullableSpec.from_dict(d["non_nullable"]) if "non_nullable" in d else None
         )
