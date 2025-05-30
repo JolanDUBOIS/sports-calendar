@@ -46,6 +46,9 @@ def create_similarity_table(
         except KeyError:
             logger.error(f"Key 'source' not found in DataFrame for source '{key}'.")
             raise KeyError(f"Key 'source' not found in DataFrame for source '{key}'.")
+        except IndexError:
+            logger.info(f"No data found for source '{key}'. Skipping.")
+            continue
         registry_parameters[key]["source"] = source_key
         registry_parameters[key]["column_variants"] = [f"{source_key}_{col}" for col in registry_parameters[key]["column_variants"]]
         registry_parameters[key]["id_col"] = f"{source_key}_{registry_parameters[key]['id_col']}"

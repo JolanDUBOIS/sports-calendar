@@ -4,20 +4,19 @@ import pandas as pd
 
 from . import logger
 from .components import drop_na, deduplicate
+from ...types import IOContent
 
 
 class Processor(ABC):
     """ Base class for all processors. """
 
-    def run(self, output_key: str, **kwargs) -> pd.DataFrame:
+    def run(self, **kwargs) -> IOContent:
         """ Run the processor. """
-        data = self._run(output_key=output_key, **kwargs)
-        data = drop_na(data, key=output_key, **kwargs)
-        data = deduplicate(data, key=output_key, **kwargs)
+        data = self._run(**kwargs)
         return data
 
     @abstractmethod
-    def _run(self, **kwargs) -> pd.DataFrame:
+    def _run(self, **kwargs) -> IOContent:
         """ TODO """
         pass
 

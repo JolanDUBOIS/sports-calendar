@@ -1,78 +1,53 @@
-from typing import Any
+from pathlib import Path
 
 import pandas as pd
 
-from .file_handler import FileHandler
-from src.data_pipeline.file_io import logger
+from . import logger, FileHandler
 
 
 class CSVHandler(FileHandler):
-    """ CSV file handler. """
-
-    def _read_all(self) -> pd.DataFrame:
-        """ Read all data from the CSV file. """
-        return pd.read_csv(self.file_path)
-
-    def _read_newest(self, version_field: str, version_threshold: Any = None) -> pd.DataFrame:
-        """ Read the newest version of the data. """
-        data = pd.read_csv(self.file_path)
-        data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
-        if version_threshold is None:
-            return data.copy()
-        data = data.dropna(subset=[f'_version_{version_field}'])
-        data = data[data[f'_version_{version_field}'] >= version_threshold].copy()
-        data = data.drop(columns=[f'_version_{version_field}'])
-        return data
-
-    def delete_records(self, version_field: str, version_threshold: Any = None, delete_newest: bool = False) -> None:
-        """ Delete records from the CSV file based on the version field and threshold. """
-        data = pd.read_csv(self.file_path)
-        data, version_threshold = self._prepare_version_field(data, version_field, version_threshold)
-        if version_threshold is None:
-            return
-        data = data.dropna(subset=[f'_version_{version_field}'])
-        if delete_newest:
-            data = data[data[f'_version_{version_field}'] <= version_threshold]
-        else:
-            data = data[data[f'_version_{version_field}'] >= version_threshold]
-        data = data.drop(columns=[f'_version_{version_field}'])
-        self.write(data, overwrite=True)
-
-    def _prepare_version_field(
-        self,
-        data: pd.DataFrame,
-        version_field: str,
-        version_threshold: Any
-    ) -> tuple[pd.DataFrame, float|pd.Timestamp|None]:
-        """ Clean and convert the version_field, return cleaned data and parsed threshold. """
-        if version_threshold is None:
-            return data, None
-
-        if version_field not in data.columns:
-            logger.warning(f"Version field '{version_field}' not found in DataFrame.")
-            return data, None
-
-        version_threshold, version_type = self._parse_version_value(version_threshold)
-
-        if version_type == 'numeric':
-            data[f'_version_{version_field}'] = pd.to_numeric(data[version_field], errors='coerce')
-        elif version_type == 'datetime':
-            data[f'_version_{version_field}'] = pd.to_datetime(data[version_field], errors='coerce')
-
-        return data, version_threshold
+    """ CSV file handler for reading and writing CSV files. """
 
     def _append(self, data: pd.DataFrame) -> None:
-        """ Append the data to the CSV file. """
-        data.to_csv(self.file_path, mode='a', header=False, index=False)
+        """ Append data to the CSV file. """
+        if not self.content.empty and set(self.content.columns) != set(data.columns):
+            logger.error("Data columns do not match existing CSV columns.")
+            raise ValueError("Data columns do not match existing CSV columns.")
+        self.content = pd.concat([self.content, data], ignore_index=True)
 
     def _overwrite(self, data: pd.DataFrame) -> None:
-        """ Overwrite the CSV file with the data. """
-        data.to_csv(self.file_path, mode='w', header=True, index=False)
+        """ Overwrite the CSV file with new data. """
+        if not self.content.empty and set(self.content.columns) != set(data.columns):
+            logger.warning("Data columns do not match existing CSV columns. Overwriting with new data.")
+        self.content = data
 
-    def _validate_data(self, data: pd.DataFrame) -> None:
-        """ Validate the data. """
-        if data is None:
-            logger.warning(f"Data is None. File handler path: {self.file_path}")
+    @staticmethod
+    def _read_file(file_path: Path) -> pd.DataFrame:
+        """ Read the CSV file and return its content as a DataFrame. """
+        try:
+            return pd.read_csv(file_path)
+        except pd.errors.EmptyDataError:
+            logger.debug(f"CSV file {file_path} is empty.")
+            return pd.DataFrame()
+        except Exception as e:
+            logger.error(f"Failed to read CSV file {file_path}: {e}")
+            raise e
+
+    @staticmethod
+    def _write_file(file_path: Path, data: pd.DataFrame) -> None:
+        """ Write the DataFrame to a CSV file. """
+        if data is None or data.empty:
+            logger.debug(f"Data is None or empty. File handler path: {file_path}")
+            return
+        try:
+            data.to_csv(file_path, index=False)
+        except Exception as e:
+            logger.error(f"Failed to write CSV file {file_path}: {e}")
+            raise e
+
+    @staticmethod
+    def _validate_data(data: pd.DataFrame, file_path: Path) -> None:
+        """ TODO """
         if not isinstance(data, pd.DataFrame):
-            logger.error(f"Data is not a pandas DataFrame. File handler path: {self.file_path}")
-            raise ValueError(f"Data must be a pandas DataFrame. File handler path: {self.file_path}")
+            logger.error(f"Data must be a pandas DataFrame. File handler path: {file_path}")
+            raise ValueError(f"Data must be a pandas DataFrame. File handler path: {file_path}")

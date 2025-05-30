@@ -18,7 +18,7 @@ models:
       params:
         - competition_slug: uefa.champions
           date_from: !date_offset 0  # Today
-          date_to: !date_offset 14  # 7d from today
+          date_to: !date_offset 14  # 14d from today
         - competition_slug: uefa.europa
           date_from: !date_offset 0
           date_to: !date_offset 14
@@ -149,8 +149,8 @@ models:
       method: query_competition_matches
       params:
         - competition_id: 2013
-          date_from: !date_offset 0  # Today
-          date_to: !date_offset 14  # 7d from today
+          date_from: !date_offset 0
+          date_to: !date_offset 14
         - competition_id: 2016
           date_from: !date_offset 0
           date_to: !date_offset 14

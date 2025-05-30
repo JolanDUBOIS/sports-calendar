@@ -8,6 +8,7 @@ from src.clients import (
     LiveSoccerScraper,
     FootballRankingScraper
 )
+from ...types import IOContent
 
 
 class ClientProcessor(Processor):
@@ -20,7 +21,7 @@ class ClientProcessor(Processor):
         "football-ranking": FootballRankingScraper
     }
 
-    def _run(self, source: str, method: str, params: list[dict] = None, **kwargs) -> list[dict] | pd.DataFrame:
+    def _run(self, source: str, method: str, params: list[dict] = None, **kwargs) -> IOContent:
         """ TODO """
         logger.info(f"Running ClientProcessor for source: {source} and method: {method}")
         client_class = self.sources.get(source)
@@ -32,7 +33,7 @@ class ClientProcessor(Processor):
             params = [{}]
         return self.fetch_data_from_client(client_obj, method, params)
 
-    def fetch_data_from_client(self, client_obj: any, method_name: str, params_list: list[dict]) -> list[dict]|pd.DataFrame|None:
+    def fetch_data_from_client(self, client_obj: any, method_name: str, params_list: list[dict]) -> IOContent:
         """ TODO """
         logger.debug(f"Fetching data from client: {client_obj.__class__.__name__}, method: {method_name}, params: {params_list}")
         method = getattr(client_obj, method_name, None)
@@ -49,7 +50,7 @@ class ClientProcessor(Processor):
         return outputs
 
     @staticmethod
-    def _append_data(data: list[dict]|pd.DataFrame|None, new_data: dict|list[dict]|pd.DataFrame|None) -> list[dict]|pd.DataFrame:
+    def _append_data(data: IOContent, new_data: dict | list[dict] | pd.DataFrame | None) -> IOContent:
         """ TODO """
         if data is None:
             if isinstance(new_data, pd.DataFrame):

@@ -10,10 +10,10 @@ formatters:
     format: "%(asctime)s [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] (%(funcName)s) - %(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
 
-  json:
-    class: pythonjsonlogger.jsonlogger.JsonFormatter
-    format: "%(asctime)s %(levelname)s %(name)s %(filename)s %(lineno)d %(funcName)s %(message)s"
-    datefmt: "%Y-%m-%d %H:%M:%S"
+  # json:
+  #   class: pythonjsonlogger.jsonlogger.JsonFormatter
+  #   format: "%(asctime)s %(levelname)s %(name)s %(filename)s %(lineno)d %(funcName)s %(message)s"
+  #   datefmt: "%Y-%m-%d %H:%M:%S"
 
 handlers:
   console_handler:
@@ -21,96 +21,71 @@ handlers:
     level: INFO
     formatter: simple
 
-  main_debug_handler:
+  file_debug_handler:
     class: logging.FileHandler
     filename: logs/DEBUG.log
     level: DEBUG
     formatter: detailed
 
-  json_debug_handler:
-    class: logging.FileHandler
-    filename: logs/DEBUG.json
-    level: DEBUG
-    formatter: json
-
-  # ingestion_landing_debug_handler:
+  # json_debug_handler:
   #   class: logging.FileHandler
-  #   filename: logs/INGESTION_LANDING_DEBUG.log
+  #   filename: logs/DEBUG.json
   #   level: DEBUG
-  #   formatter: detailed
-
-  # build_intermediate_debug_handler:
-  #   class: logging.FileHandler
-  #   filename: logs/BUILD_INTERMEDIATE_DEBUG.log
-  #   level: DEBUG
-  #   formatter: detailed
+  #   formatter: json
 
 
 loggers:
   # Main modules loggers
   src.calendar:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   src.clients:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   src.config:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   src.db:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   src.selection:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   # Data pipeline loggers
   src.data_pipeline:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   src.data_pipeline.data_processing:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
-  src.data_pipeline.data_validation:
+  src.data_pipeline.data_processing.managers:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
   src.data_pipeline.data_processing.processors:
     level: DEBUG
-    handlers: [console_handler, main_debug_handler, json_debug_handler]
-    propagate: False
 
-  # src.data_pipeline.data_processing.ingestion_landing:
-  #   level: DEBUG
-  #   handlers: [console_handler, ingestion_landing_debug_handler]
-  #   propagate: False
+  src.data_pipeline.data_processing.processors.components:
+    level: DEBUG
 
-  # src.data_pipeline.data_processing.build_intermediate:
-  #   level: DEBUG
-  #   handlers: [console_handler, build_intermediate_debug_handler]
-  #   propagate: False
+  src.data_pipeline.data_processing.versioning:
+    level: DEBUG
+
+  src.data_pipeline.data_validation:
+    level: DEBUG
+
+  src.data_pipeline.file_io:
+    level: DEBUG
+
+  src.data_pipeline.utils:
+    level: DEBUG
 
   # Imported modules loggers
   googleapiclient.discovery_cache:
     level: DEBUG
-    handlers: [main_debug_handler, json_debug_handler]
+    handlers: [file_debug_handler]
     propagate: False
 
 root:
   level: DEBUG
-  handlers: [console_handler, main_debug_handler, json_debug_handler]
+  handlers: [console_handler, file_debug_handler]
   propagate: False
