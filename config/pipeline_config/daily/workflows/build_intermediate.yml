@@ -13,7 +13,7 @@ models:
         path: landing/espn_matches.json
         versioning:
           mode: newest # newest or all
-          on: created_at
+          field: created_at
     dependencies:
       - landing.espn_matches
     output:
@@ -21,9 +21,16 @@ models:
       layer: intermediate
       path: intermediate/espn_matches.csv
       schema: espn_matches
+      unique:
+        fields: [id]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields: [id]
     processing:
         processor: ExtractionProcessor
         source_key: espn_matches
+        output_key: espn_matches
         columns_mapping: !include
           file: json_mappings.yml
           model_name: espn_matches
@@ -39,7 +46,7 @@ models:
         path: landing/football_data_matches.json
         versioning:
           mode: newest
-          on: created_at
+          field: created_at
     dependencies:
       - landing.football_data_matches
     output:
@@ -47,9 +54,16 @@ models:
       layer: intermediate
       path: intermediate/football_data_matches.csv
       schema: football_data_matches
+      unique:
+        fields: [id]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields: [id]
     processing:
         processor: ExtractionProcessor
         source_key: football_data_matches
+        output_key: football_data_matches
         columns_mapping: !include
           file: json_mappings.yml
           model_name: football_data_matches
@@ -65,7 +79,7 @@ models:
         path: landing/football_data_standings.json
         versioning:
           mode: newest
-          on: created_at
+          field: created_at
     dependencies:
       - landing.football_data_standings
     output:
@@ -73,9 +87,16 @@ models:
       layer: intermediate
       path: intermediate/football_data_standings.csv
       schema: football_data_standings
+      unique:
+        fields: [competition_id, season_id, team_id]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields: [competition_id, season_id, team_id]
     processing:
         processor: ExtractionProcessor
         source_key: football_data_standings
+        output_key: football_data_standings
         columns_mapping: !include
           file: json_mappings.yml
           model_name: football_data_standings
@@ -91,7 +112,7 @@ models:
         path: landing/football_ranking_fifa_rankings.csv
         versioning:
           mode: newest
-          on: created_at
+          field: created_at
     dependencies:
       - landing.football_ranking_fifa_rankings
     output:
@@ -99,9 +120,16 @@ models:
       layer: intermediate
       path: intermediate/football_ranking_fifa_rankings.csv
       schema: football_ranking_fifa_rankings
+      unique:
+        fields: [team_name]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields: [team_name]
     processing:
         processor: ParsingProcessor
         source_key: football_ranking_fifa_rankings
+        output_key: football_ranking_fifa_rankings
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -114,7 +142,7 @@ models:
         path: landing/live_soccer_matches.csv
         versioning:
           mode: newest
-          on: created_at
+          field: created_at
     dependencies:
       - landing.live_soccer_matches
     output:
@@ -122,9 +150,12 @@ models:
       layer: intermediate
       path: intermediate/live_soccer_matches.csv
       schema: live_soccer_matches
+      non-nullable:
+        fields: [home_team, away_team]
     processing:
         processor: ParsingProcessor
         source_key: live_soccer_matches
+        output_key: live_soccer_matches
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -137,7 +168,7 @@ models:
         path: landing/live_soccer_standings.csv
         versioning:
           mode: newest
-          on: created_at
+          field: created_at
     dependencies:
       - landing.live_soccer_standings
     output:
@@ -145,9 +176,12 @@ models:
       layer: intermediate
       path: intermediate/live_soccer_standings.csv
       schema: live_soccer_standings
+      non-nullable:
+        fields: [team_source_name]
     processing:
         processor: ParsingProcessor
         source_key: live_soccer_standings
+        output_key: live_soccer_standings
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -160,7 +194,7 @@ models:
         path: intermediate/espn_matches.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.espn_matches
     output:
@@ -168,6 +202,12 @@ models:
       layer: intermediate
       path: intermediate/espn_teams.csv
       schema: espn_teams
+      unique:
+        fields: [team_id]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [team_id, team_name]
     processing:
         processor: DerivationProcessor
         source_key: espn_matches
@@ -185,7 +225,7 @@ models:
         path: landing/football_data_teams.json
         versioning:
           mode: newest
-          on: created_at
+          field: created_at
     dependencies:
       - landing.football_data_teams
     output:
@@ -193,9 +233,16 @@ models:
       layer: intermediate
       path: intermediate/football_data_teams.csv
       schema: football_data_teams
+      unique:
+        fields: [team_id]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [team_id, team_name]
     processing:
         processor: ExtractionProcessor
         source_key: football_data_teams
+        output_key: football_data_teams
         columns_mapping: !include
           file: json_mappings.yml
           model_name: football_data_teams
@@ -211,7 +258,7 @@ models:
         path: intermediate/live_soccer_matches.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.live_soccer_matches
     output:
@@ -219,6 +266,12 @@ models:
       layer: intermediate
       path: intermediate/live_soccer_teams.csv
       schema: live_soccer_teams
+      unique:
+        fields: [team_name]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [team_name]
     processing:
         processor: DerivationProcessor
         source_key: live_soccer_matches
@@ -236,7 +289,7 @@ models:
         path: intermediate/espn_matches.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.espn_matches
     output:
@@ -244,6 +297,12 @@ models:
       layer: intermediate
       path: intermediate/espn_competitions.csv
       schema: espn_competitions
+      unique:
+        fields: [competition_id]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [competition_id, competition_name]
     processing:
         processor: DerivationProcessor
         source_key: espn_matches
@@ -261,7 +320,7 @@ models:
         path: intermediate/football_data_standings.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.football_data_standings
     output:
@@ -269,6 +328,12 @@ models:
       layer: intermediate
       path: intermediate/football_data_competitions.csv
       schema: football_data_competitions
+      unique:
+        fields: [competition_id]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [competition_id, competition_name]
     processing:
         processor: DerivationProcessor
         source_key: football_data_standings
@@ -286,7 +351,7 @@ models:
         path: intermediate/live_soccer_standings.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.live_soccer_standings
     output:
@@ -294,6 +359,12 @@ models:
       layer: intermediate
       path: intermediate/live_soccer_competitions.csv
       schema: live_soccer_competitions
+      unique:
+        fields: [competition]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [competition]
     processing:
         processor: DerivationProcessor
         source_key: live_soccer_standings
@@ -311,7 +382,7 @@ models:
         path: intermediate/football_data_standings.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.football_data_standings
     output:
@@ -319,6 +390,12 @@ models:
       layer: intermediate
       path: intermediate/football_data_areas.csv
       schema: football_data_areas
+      unique:
+        fields: [area_id]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [area_id, area_name]
     processing:
         processor: DerivationProcessor
         source_key: football_data_standings
@@ -336,7 +413,7 @@ models:
         path: intermediate/live_soccer_standings.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.live_soccer_standings
     output:
@@ -344,6 +421,12 @@ models:
       layer: intermediate
       path: intermediate/live_soccer_areas.csv
       schema: live_soccer_areas
+      unique:
+        fields: [area]
+        version_col: intermediate_at
+        keep: first
+      non-nullable:
+        fields: [area]
     processing:
         processor: DerivationProcessor
         source_key: live_soccer_standings
@@ -359,16 +442,19 @@ models:
     sources:
       - name: espn_teams
         path: intermediate/espn_teams.csv
-        versioning:
-          mode: newest
-          on: created_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: football_data_teams
         path: intermediate/football_data_teams.csv
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: live_soccer_teams
         path: intermediate/live_soccer_teams.csv
         versioning:
           mode: newest
-          on: created_at
+          field: intermediate_at
     dependencies:
       - intermediate.espn_teams
       - intermediate.football_data_teams
@@ -378,6 +464,8 @@ models:
       layer: intermediate
       path: intermediate/team_registry.csv
       schema: team_registry
+      non-nullable:
+        fields: [idA, idB, sourceA, sourceB]
     processing:
         processor: RegistryProcessor
         output_key: teams
@@ -391,16 +479,19 @@ models:
     sources:
       - name: espn_competitions
         path: intermediate/espn_competitions.csv
+        versioning:
+          mode: newest
+          field: intermediate_at
       - name: football_data_competitions
         path: intermediate/football_data_competitions.csv
-        versioning:
-          mode: newest
-          on: created_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: live_soccer_competitions
         path: intermediate/live_soccer_competitions.csv
-        versioning:
-          mode: newest
-          on: created_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
     dependencies:
       - intermediate.espn_competitions
       - intermediate.football_data_competitions
@@ -410,6 +501,8 @@ models:
       layer: intermediate
       path: intermediate/competition_registry.csv
       schema: competition_registry
+      non-nullable:
+        fields: [idA, idB, sourceA, sourceB]
     processing:
         processor: RegistryProcessor
         output_key: competitions
@@ -423,11 +516,14 @@ models:
     sources:
       - name: football_data_areas
         path: intermediate/football_data_areas.csv
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: live_soccer_areas
         path: intermediate/live_soccer_areas.csv
-        versioning:
-          mode: newest
-          on: created_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
     dependencies:
       - intermediate.football_data_areas
       - intermediate.live_soccer_areas
@@ -436,6 +532,8 @@ models:
       layer: intermediate
       path: intermediate/area_registry.csv
       schema: area_registry
+      non-nullable:
+        fields: [idA, idB, sourceA, sourceB]
     processing:
         processor: RegistryProcessor
         output_key: areas
