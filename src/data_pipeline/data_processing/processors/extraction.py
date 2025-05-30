@@ -6,7 +6,7 @@ from .components import extract_json, reshape_matches, date_normalization
 
 
 class ExtractionProcessor(Processor):
-    """ TODO """
+    """ Processor used to extract structured data from raw JSON sources. """
 
     sources_additional_processes = {
         "espn_matches": [reshape_matches, date_normalization],
@@ -14,7 +14,7 @@ class ExtractionProcessor(Processor):
     }
 
     def _run(self, sources: dict[str, list[dict]], source_key: str, columns_mapping: dict[str, str], **kwargs) -> pd.DataFrame:
-        """ TODO """
+        """ Run extraction processor for the given source key. """
         logger.info(f"Running ExtractionProcessor for source key: {source_key}")
         json_data = sources.get(source_key)
         if json_data is None:
