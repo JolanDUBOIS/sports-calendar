@@ -1,25 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from enum import IntEnum
 
 from . import logger
+from ..pipeline_stages import DataStage
 
 if TYPE_CHECKING:
     from .managers import ModelSpec
-
-
-class DataStage(IntEnum):
-    LANDING = 0
-    INTERMEDIATE = 1
-    STAGING = 2
-    PRODUCTION = 3
-
-    @classmethod
-    def from_str(cls, name: str) -> DataStage:
-        try:
-            return cls[name.strip().upper()]
-        except KeyError:
-            raise ValueError(f"Invalid DataStage name: {name}")
 
 
 class ModelOrder:
