@@ -10,23 +10,24 @@ if TYPE_CHECKING:
     from src.data_pipeline.file_io import MetadataEntry
 
 
-def read_versions(metadata_entries: list[MetadataEntry]) -> SourceVersions:
-    """ Read source versions from metadata entries. """
+def read_versions(metadata_entry: MetadataEntry) -> SourceVersions:
+    """ Read source versions from metadata entry. """
+    logger.debug(f"Reading source versions from metadata entry: {metadata_entry}.")
     versions = SourceVersions()
-    for entry in metadata_entries:
-        if entry.source_versions:
-            for source_name, version in entry.source_versions.items():
-                try:
-                    versions.append(
-                        key=source_name,
-                        version=SourceVersion(
-                            version_field=version['version_field'],
-                            version_cutoff=version['version_cutoff']
-                        )
+    if metadata_entry.source_versions:
+        for source_name, version in metadata_entry.source_versions.items():
+            version_field = version['version_field']
+            version_cutoff = version['version_cutoff']
+            if version_field is not None and version_cutoff is not None:
+                versions.append(
+                    key=source_name,
+                    version=SourceVersion(
+                        version_field=version_field,
+                        version_cutoff=version_cutoff
                     )
-                except KeyError:
-                    logger.debug(f"Empty version for source '{source_name}' in metadata entry, skipping.")
-
+                )
+            else:
+                logger.debug(f"Empty version for source '{source_name}' in metadata entry, skipping.")
     return versions
 
 def version_filter(
