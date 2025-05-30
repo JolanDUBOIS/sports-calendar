@@ -1,49 +1,9 @@
-from pathlib import Path
 from typing import Any
-from datetime import datetime, timedelta
 
-import yaml
 import pandas as pd
 
 from . import logger
-from .types import IOContent
-
-
-def date_offset_constructor(loader, node):
-    """ Custom YAML constructor to handle date offsets. """
-    days = int(node.value)
-    return (datetime.today() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
-
-def include_constructor(loader, node):
-    """ Custom YAML constructor to include part of another YAML file. """
-    value = loader.construct_mapping(node)
-    file = value["file"]
-    model_name = value["model_name"]
-
-    # Resolve path relative to the current YAML file being loaded
-    base_path = Path(loader.name).parent
-    include_path = base_path / file
-
-    # Load the included YAML content
-    with open(include_path, "r") as f:
-        included_yaml = yaml.safe_load(f)
-
-    # Extract the corresponding model's column mapping
-    for model in included_yaml.get("models", []):
-        if model.get("name") == model_name:
-            return model.get("columns_mapping", {})
-
-    raise ValueError(f"No model named '{model_name}' found in '{file}'")
-
-yaml.add_constructor('!date_offset', date_offset_constructor, Loader=yaml.loader.SafeLoader)
-yaml.add_constructor('!include', include_constructor, Loader=yaml.SafeLoader)
-
-
-def read_yml_file(file_path: Path) -> dict:
-    """ Read a YAML file and return its content as a dictionary. """
-    with file_path.open(mode='r') as file:
-        config = yaml.safe_load(file)
-    return config
+from ..types import IOContent
 
 
 def filter_file_content(data: IOContent, field: str, op: str, value: Any, type: str | None = None) -> IOContent:
@@ -132,35 +92,3 @@ def _is_datetime_string(val: Any) -> bool:
         return True
     except Exception:
         return False
-
-
-def get_max_field_value(data: IOContent, field: str) -> Any:
-    """ Get the maximum value of a field in the data. """
-    if isinstance(data, pd.DataFrame):
-        return _get_max_field_value_df(data, field)
-    elif isinstance(data, list):
-        return max((item.get(field) for item in data if field in item), default=None)
-    else:
-        logger.error(f"Unsupported data type: {type(data)}. Expected pd.DataFrame or list.")
-        raise TypeError(f"Unsupported data type: {type(data)}. Expected pd.DataFrame or list.")
-
-def _get_max_field_value_df(data: pd.DataFrame, field: str) -> Any:
-    """ Get the maximum value of a field in a DataFrame. """
-    if data.empty:
-        logger.warning("DataFrame is empty. Returning None.")
-        return None
-    if field not in data.columns:
-        logger.error(f"Field '{field}' not found in DataFrame columns: {data.columns.tolist()}")
-        raise KeyError(f"Field '{field}' not found in DataFrame columns.")
-    return data[field].max()
-
-def _get_max_field_value_json(data: list[dict], field: str) -> Any:
-    """ Get the maximum value of a field in a list of dictionaries. """
-    if not data:
-        logger.warning("Data is empty. Returning None.")
-        return None
-    if not all(field in item for item in data):
-        logger.error(f"Field '{field}' not found in all items.")
-        raise KeyError(f"Field '{field}' not found in all items.")
-    
-    return max(item[field] for item in data if item[field] is not None)
