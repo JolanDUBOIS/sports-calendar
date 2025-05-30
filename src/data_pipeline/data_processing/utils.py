@@ -1,3 +1,4 @@
+from __future__ import annotations
 import hashlib
 from enum import IntEnum
 from pathlib import Path
@@ -15,7 +16,7 @@ class DataStage(IntEnum):
     PRODUCTION = 3
 
     @classmethod
-    def from_str(cls, name: str) -> "DataStage":
+    def from_str(cls, name: str) -> DataStage:
         try:
             return cls[name.strip().upper()]
         except KeyError:
