@@ -47,7 +47,7 @@ class CSVHandler(FileHandler):
 
     @staticmethod
     def _validate_data(data: pd.DataFrame, file_path: Path) -> None:
-        """ TODO """
+        """ Validate that the input data is a pandas DataFrame. """
         if not isinstance(data, pd.DataFrame):
             logger.error(f"Data must be a pandas DataFrame. File handler path: {file_path}")
             raise ValueError(f"Data must be a pandas DataFrame. File handler path: {file_path}")

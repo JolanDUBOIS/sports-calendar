@@ -17,6 +17,14 @@ class MetadataEntry:
     version: int = 1
     source_versions: dict | None = None
 
+    def __repr__(self):
+        """ Return a string representation of the metadata entry. """
+        return (
+            f"MetadataEntry(timestamp={self.timestamp}, operation={self.operation}, "
+            f"added={self.added}, removed={self.removed}, version={self.version}, "
+            f"source_versions={self.source_versions})"
+        )
+
     def to_dict(self) -> dict:
         """ Convert the entry to a dictionary for JSON serialization. """
         return {
@@ -42,7 +50,7 @@ class MetadataEntry:
 
 
 class MetadataManager:
-    """ TODO """
+    """ Manage reading, writing, and tracking metadata entries for a file. """
 
     def __init__(self, file_path: Path | str):
         """ Initialize the MetadataManager """

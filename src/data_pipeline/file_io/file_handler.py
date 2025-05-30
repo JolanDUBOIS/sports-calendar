@@ -50,7 +50,10 @@ class FileHandler(ABC):
         return self.content
 
     def write(self, data: IOContent, overwrite: bool = False) -> tuple[int, int]:
-        """ TODO """
+        """
+        Write data to the file; overwrite or append depending on the flag.
+        Returns the number of added and removed items.
+        """
         self._validate_data(data, self.path)
         added = len(data)
         if overwrite:
@@ -76,7 +79,10 @@ class FileHandler(ABC):
         logger.info(f"File {self.path} saved successfully.")
 
     def delete(self) -> tuple[int, int]:
-        """ TODO """
+        """
+        Delete the file after user confirmation and clear content.
+        Returns the number of added (0) and removed items.
+        """
         removed = self.__len__()
         self.content = None
         if self.path.exists():
@@ -97,15 +103,14 @@ class FileHandler(ABC):
     @staticmethod
     @abstractmethod
     def _read_file(file_path: Path) -> IOContent:
-        """ TODO """
+        """ Read and return content from the given file path. """
 
     @staticmethod
     @abstractmethod
     def _write_file(file_path: Path, data: IOContent) -> None:
-        """ TODO """
+        """ Write the given data to the specified file path. """
 
     @staticmethod
     @abstractmethod
     def _validate_data(data: IOContent, file_path: Path) -> None:
         """ Validate the data before writing. """
-        pass
