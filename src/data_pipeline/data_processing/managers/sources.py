@@ -34,11 +34,11 @@ class SourcesManager:
         """ Initialize with a list of source specifications. """
         self.sources = sources
 
-    def get_loaded_sources(self, source_versions: SourceVersions) -> dict[str, IOContent]:
+    def get_loaded_sources(self, source_versions: SourceVersions | None = None) -> dict[str, IOContent]:
         """ Load and return source data, filtered by provided version information. """
         loaded_sources = {}
         for source in self.sources:
-            source_version = source_versions.get(source.name)
+            source_version = source_versions.get(source.name) if source_versions else None
             loaded_sources[source.name] = self._load_source_data(source, source_version)
         return loaded_sources
 
@@ -67,6 +67,6 @@ class SourcesManager:
         data = version_filter(
             data=data,
             strategy=source.versioning_strategy,
-            source_versions=source_version
+            source_version=source_version
         )
         return data

@@ -33,10 +33,10 @@ def read_versions(metadata_entry: MetadataEntry) -> SourceVersions:
 def version_filter(
     data: IOContent,
     strategy: SourceVersioningStrategy | None = None,
-    source_versions: SourceVersion | None = None
+    source_version: SourceVersion | None = None
 ) -> IOContent:
     """ Apply a filter on the data based on the source versioning strategy and source versions. """
-    if strategy is None or source_versions is None:
+    if strategy is None or source_version is None:
         logger.debug("Skipping version filter as no strategy or source versions provided.")
         return data
 
@@ -44,13 +44,13 @@ def version_filter(
     if op is None:
         return data
     else:
-        if strategy.field != source_versions.version_field:
-            logger.warning(f"Version field mismatch: strategy field '{strategy.field}' does not match source version field '{source_versions.version_field}'. Skipping filter.")
+        if strategy.field != source_version.version_field:
+            logger.warning(f"Version field mismatch: strategy field '{strategy.field}' does not match source version field '{source_version.version_field}'. Skipping filter.")
             return data
 
         return filter_file_content(
             data=data,
             field=strategy.field,
             op=op,
-            value=source_versions.version_cutoff
+            value=source_version.version_cutoff
         )

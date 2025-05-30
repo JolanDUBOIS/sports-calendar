@@ -127,6 +127,4 @@ class ModelManager:
         if trigger == "manual" and not manual:
             logger.info("Model trigger is set to manual, skipping processing.")
             return False
-        elif trigger == "automatic" and manual:
-            logger.info("Model trigger is set to automatic, processing will continue.")
         return True

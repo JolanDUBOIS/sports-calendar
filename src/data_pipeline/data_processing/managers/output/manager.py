@@ -52,4 +52,7 @@ class OutputManager:
     def read_source_versions(self) -> SourceVersions:
         """ Retrieve the last recorded source versions from output metadata. """
         metadata_entry = self.handler.meta_manager.read_last_write()
-        return read_versions(metadata_entry)
+        if metadata_entry:
+            return read_versions(metadata_entry)
+        else:
+            return None
