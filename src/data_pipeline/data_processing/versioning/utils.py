@@ -1,0 +1,55 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+from . import SourceVersions, SourceVersion, logger
+from src.data_pipeline.utils import filter_file_content
+
+if TYPE_CHECKING:
+    from . import SourceVersioningStrategy
+    from src.data_pipeline.types import IOContent
+    from src.data_pipeline.file_io import MetadataEntry
+
+
+def read_versions(metadata_entries: list[MetadataEntry]) -> SourceVersions:
+    """ Read source versions from metadata entries. """
+    versions = SourceVersions()
+    for entry in metadata_entries:
+        if entry.source_versions:
+            for source_name, version in entry.source_versions.items():
+                try:
+                    versions.append(
+                        key=source_name,
+                        version=SourceVersion(
+                            version_field=version['version_field'],
+                            version_cutoff=version['version_cutoff']
+                        )
+                    )
+                except KeyError:
+                    logger.debug(f"Empty version for source '{source_name}' in metadata entry, skipping.")
+
+    return versions
+
+def version_filter(
+    data: IOContent,
+    strategy: SourceVersioningStrategy | None = None,
+    source_versions: SourceVersion | None = None
+) -> IOContent:
+    """ TODO """
+    if strategy is None or source_versions is None:
+        logger.debug("Skipping version filter as no strategy or source versions provided.")
+        return data
+
+    op = strategy.get_operator()
+    if op is None:
+        return data
+    else:
+        if strategy.field != source_versions.version_field:
+            logger.warning(f"Version field mismatch: strategy field '{strategy.field}' does not match source version field '{source_versions.version_field}'. Skipping filter.")
+            return data
+
+        return filter_file_content(
+            data=data,
+            field=strategy.field,
+            op=op,
+            value=source_versions.version_cutoff
+        )
