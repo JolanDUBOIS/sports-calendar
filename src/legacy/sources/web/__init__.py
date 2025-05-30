@@ -1,2 +1,0 @@
-from .livesoccer_scraper_old import LiveSoccerScraper
-from .football_ranking_scraper import FootballRankingScraper
