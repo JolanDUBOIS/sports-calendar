@@ -43,6 +43,7 @@ class ModelOrder:
                 raise StopIteration
             else:
                 logger.error("Deadlock or unresolved dependencies due to previous failures.")
+                logger.debug(f"Missing models: {self.model_names - (self.completed | self.failed)}")
                 raise ValueError("Deadlock or unresolved dependencies due to previous failures.")
         self.completed.add(ready_models[0].name)
         return ready_models[0]
