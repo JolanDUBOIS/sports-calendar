@@ -126,12 +126,11 @@ models:
         area_name: area.name
         area_code: area.code
         team_id: id
-        name: name
-        shortName: shortName
-        tla: tla
+        team_name: name
+        team_shortName: shortName
+        team_tla: tla
         founded: founded
         venue: venue
         created_at: created_at
         source: source
         source_type: source_type
-        

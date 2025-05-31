@@ -22,11 +22,13 @@ models:
       path: intermediate/espn_matches.csv
       schema: espn_matches
       unique:
-        fields: [id]
+        field_sets:
+          - [id]
         version_col: intermediate_at
         keep: last
       non-nullable:
-        fields: [id]
+        fields:
+          - id
     processing:
         processor: ExtractionProcessor
         source_key: espn_matches
@@ -55,11 +57,13 @@ models:
       path: intermediate/football_data_matches.csv
       schema: football_data_matches
       unique:
-        fields: [id]
+        field_sets:
+          - [id]
         version_col: intermediate_at
         keep: last
       non-nullable:
-        fields: [id]
+        fields:
+          - id
     processing:
         processor: ExtractionProcessor
         source_key: football_data_matches
@@ -88,11 +92,17 @@ models:
       path: intermediate/football_data_standings.csv
       schema: football_data_standings
       unique:
-        fields: [competition_id, season_id, team_id]
+        field_sets:
+          - competition_id
+          - season_id
+          - team_id
         version_col: intermediate_at
         keep: last
       non-nullable:
-        fields: [competition_id, season_id, team_id]
+        fields: 
+          - competition_id
+          - season_id
+          - team_id
     processing:
         processor: ExtractionProcessor
         source_key: football_data_standings
@@ -121,11 +131,13 @@ models:
       path: intermediate/football_ranking_fifa_rankings.csv
       schema: football_ranking_fifa_rankings
       unique:
-        fields: [team_name]
+        field_sets:
+          - [team_name]
         version_col: intermediate_at
         keep: last
       non-nullable:
-        fields: [team_name]
+        fields: 
+          - team_name
     processing:
         processor: ParsingProcessor
         source_key: football_ranking_fifa_rankings
@@ -151,7 +163,9 @@ models:
       path: intermediate/live_soccer_matches.csv
       schema: live_soccer_matches
       non-nullable:
-        fields: [home_team, away_team]
+        fields: 
+          - home_team
+          - away_team
     processing:
         processor: ParsingProcessor
         source_key: live_soccer_matches
@@ -177,7 +191,8 @@ models:
       path: intermediate/live_soccer_standings.csv
       schema: live_soccer_standings
       non-nullable:
-        fields: [team_source_name]
+        fields: 
+          - team_source_name
     processing:
         processor: ParsingProcessor
         source_key: live_soccer_standings
@@ -203,11 +218,14 @@ models:
       path: intermediate/espn_teams.csv
       schema: espn_teams
       unique:
-        fields: [team_id]
+        field_sets:
+          - [team_id]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [team_id, team_name]
+        fields: 
+          - team_id
+          - team_name
     processing:
         processor: DerivationProcessor
         source_key: espn_matches
@@ -234,11 +252,14 @@ models:
       path: intermediate/football_data_teams.csv
       schema: football_data_teams
       unique:
-        fields: [team_id]
+        field_sets:
+          - [team_id]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [team_id, team_name]
+        fields: 
+          - team_id
+          - team_name
     processing:
         processor: ExtractionProcessor
         source_key: football_data_teams
@@ -267,11 +288,13 @@ models:
       path: intermediate/live_soccer_teams.csv
       schema: live_soccer_teams
       unique:
-        fields: [team_name]
+        field_sets:
+          - [team_name]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [team_name]
+        fields:
+          - team_name
     processing:
         processor: DerivationProcessor
         source_key: live_soccer_matches
@@ -298,11 +321,14 @@ models:
       path: intermediate/espn_competitions.csv
       schema: espn_competitions
       unique:
-        fields: [competition_id]
+        field_sets:
+          - [competition_id]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [competition_id, competition_name]
+        fields:
+          - competition_id
+          - competition_name
     processing:
         processor: DerivationProcessor
         source_key: espn_matches
@@ -329,11 +355,14 @@ models:
       path: intermediate/football_data_competitions.csv
       schema: football_data_competitions
       unique:
-        fields: [competition_id]
+        field_sets:
+          - [competition_id]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [competition_id, competition_name]
+        fields:
+          - competition_id
+          - competition_name
     processing:
         processor: DerivationProcessor
         source_key: football_data_standings
@@ -360,11 +389,13 @@ models:
       path: intermediate/live_soccer_competitions.csv
       schema: live_soccer_competitions
       unique:
-        fields: [competition]
+        field_sets:
+          - [competition]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [competition]
+        fields:
+          - competition
     processing:
         processor: DerivationProcessor
         source_key: live_soccer_standings
@@ -391,11 +422,14 @@ models:
       path: intermediate/football_data_areas.csv
       schema: football_data_areas
       unique:
-        fields: [area_id]
+        field_sets:
+          - [area_id]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [area_id, area_name]
+        fields:
+          - area_id
+          - area_name
     processing:
         processor: DerivationProcessor
         source_key: football_data_standings
@@ -422,11 +456,13 @@ models:
       path: intermediate/live_soccer_areas.csv
       schema: live_soccer_areas
       unique:
-        fields: [area]
+        field_sets:
+          - [area]
         version_col: intermediate_at
         keep: first
       non-nullable:
-        fields: [area]
+        fields:
+          - area
     processing:
         processor: DerivationProcessor
         source_key: live_soccer_standings
@@ -442,19 +478,19 @@ models:
     sources:
       - name: espn_teams
         path: intermediate/espn_teams.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: football_data_teams
         path: intermediate/football_data_teams.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: live_soccer_teams
         path: intermediate/live_soccer_teams.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
     dependencies:
       - intermediate.espn_teams
       - intermediate.football_data_teams
@@ -464,8 +500,17 @@ models:
       layer: intermediate
       path: intermediate/team_registry.csv
       schema: team_registry
+      unique:
+        field_sets:
+          - [idA, idB, sourceA, sourceB]
+        version_col: intermediate_at
+        keep: first
       non-nullable:
-        fields: [idA, idB, sourceA, sourceB]
+        fields:
+          - idA
+          - idB
+          - sourceA
+          - sourceB
     processing:
         processor: RegistryProcessor
         output_key: teams
@@ -479,19 +524,19 @@ models:
     sources:
       - name: espn_competitions
         path: intermediate/espn_competitions.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: football_data_competitions
         path: intermediate/football_data_competitions.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: live_soccer_competitions
         path: intermediate/live_soccer_competitions.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
     dependencies:
       - intermediate.espn_competitions
       - intermediate.football_data_competitions
@@ -501,8 +546,17 @@ models:
       layer: intermediate
       path: intermediate/competition_registry.csv
       schema: competition_registry
+      unique:
+        field_sets:
+          - [idA, idB, sourceA, sourceB]
+        version_col: intermediate_at
+        keep: first
       non-nullable:
-        fields: [idA, idB, sourceA, sourceB]
+        fields:
+          - idA
+          - idB
+          - sourceA
+          - sourceB
     processing:
         processor: RegistryProcessor
         output_key: competitions
@@ -516,14 +570,14 @@ models:
     sources:
       - name: football_data_areas
         path: intermediate/football_data_areas.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
       - name: live_soccer_areas
         path: intermediate/live_soccer_areas.csv
-        versioning:
-          mode: newest
-          field: intermediate_at
+        # versioning:
+        #   mode: newest
+        #   field: intermediate_at
     dependencies:
       - intermediate.football_data_areas
       - intermediate.live_soccer_areas
@@ -532,8 +586,17 @@ models:
       layer: intermediate
       path: intermediate/area_registry.csv
       schema: area_registry
+      unique:
+        field_sets:
+          - [idA, idB, sourceA, sourceB]
+        version_col: intermediate_at
+        keep: first
       non-nullable:
-        fields: [idA, idB, sourceA, sourceB]
+        fields:
+          - idA
+          - idB
+          - sourceA
+          - sourceB
     processing:
         processor: RegistryProcessor
         output_key: areas

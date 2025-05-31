@@ -92,13 +92,11 @@ models:
       - name: area_name
       - name: area_code
       - name: competition_id
-        unique: true
         nullable: false
       - name: competition_name
       - name: competition_code
       - name: competition_type
       - name: season_id
-        unique: true
         nullable: false
       - name: season_startDate
       - name: season_endDate
@@ -109,7 +107,6 @@ models:
       - name: group
       - name: position
       - name: team_id
-        unique: true
         nullable: false
       - name: team_name
       - name: team_shortName
@@ -126,6 +123,11 @@ models:
       - name: source
       - name: source_type
       - name: intermediate_at
+    constraints:
+      - unique_sets: 
+          - competition_id
+          - season_id
+          - team_id
 
   - name: football_ranking_fifa_rankings
     path: football_ranking_fifa_rankings.csv
@@ -314,7 +316,7 @@ models:
         nullable: false
 
   - name: area_registry
-    path: team_rearea_registrygistry.csv
+    path: area_registry.csv
     columns:
       - name: idA
         nullable: false
