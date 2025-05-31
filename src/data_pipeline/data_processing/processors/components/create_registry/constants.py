@@ -18,7 +18,7 @@ TEAM_REGISTRY_PARAMETERS = {
         "id_col": "team_name",
     },
     "football_data_teams": {
-        "column_variants": ["name", "shortName"], #, "tla"], # Careful with the TLA
+        "column_variants": ["team_name", "team_shortName"], #, "tla"], # Careful with the TLA
         "id_col": "team_id",
     }
 }

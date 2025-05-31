@@ -57,10 +57,12 @@ class FileHandler(ABC):
         self._validate_data(data, self.path)
         added = len(data)
         if overwrite:
+            logger.debug(f"Overwriting file {self.path} with new data.")
             removed = self.__len__()
             self._overwrite(data)
             return added, removed
         else:
+            logger.debug(f"Appending data to file {self.path}.")
             removed = 0
             self._append(data)
             return added, removed
