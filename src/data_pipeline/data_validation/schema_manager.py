@@ -25,10 +25,11 @@ class ColumnManager:
                 error_msg=f"Model {model} raised an issue: column {self.column_spec.name} is missing in the DataFrame.",
                 constraint="exists"
             )
-        
+
+        col = data[self.column_spec.name]
         if self.column_spec.type:
             try:
-                data[self.column_spec.name] = data[self.column_spec.name].astype(self.column_spec.type)
+                col = col.astype(self.column_spec.type)
             except Exception as e:
                 self._handle_issue(
                     model=model,
@@ -36,18 +37,20 @@ class ColumnManager:
                     constraint="type"
                 )
 
-        
         if self.column_spec.unique:
-            if not data[self.column_spec.name].is_unique:
+            if not col.is_unique:
+                duplicates = col[col.duplicated()].unique()
                 self._handle_issue(
                     model=model,
-                    error_msg=f"Model {model} raised an issue: column {self.column_spec.name} is not unique.",
+                    error_msg=(
+                        f"Model {model} raised an issue: column {self.column_spec.name} is not unique. "
+                        f"First duplicate value: {duplicates[0]}."
+                    ),
                     constraint="unique"
                 )
 
-        
         if not self.column_spec.nullable:
-            if data[self.column_spec.name].isnull().any():
+            if col.isnull().any():
                 self._handle_issue(
                     model=model,
                     error_msg=f"Model {model} raised an issue: column {self.column_spec.name} has null values.",
@@ -77,7 +80,15 @@ class ModelSchemaManager:
         """ TODO """
         model_result = ModelValidationResult(model=self.schema_spec.name)
 
-        data = self.file_handler.read()
+        try:
+            data = self.file_handler.read()
+        except Exception as e:
+            self._handle_fatal_issue(
+                model_result,
+                error_msg=f"Failed to read data for model {self.schema_spec.name}: {e}",
+                raise_on_error=raise_on_error
+            )
+            return model_result
         if not isinstance(data, pd.DataFrame):
             self._handle_fatal_issue(
                 model_result,
