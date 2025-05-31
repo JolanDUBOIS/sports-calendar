@@ -93,9 +93,9 @@ models:
       schema: football_data_standings
       unique:
         field_sets:
-          - competition_id
-          - season_id
-          - team_id
+          - [competition_id]
+          - [season_id]
+          - [team_id]
         version_col: intermediate_at
         keep: last
       non-nullable:
