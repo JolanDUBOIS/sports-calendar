@@ -30,10 +30,10 @@ class UniqueEnforcer(OutputEnforcer):
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply uniqueness enforcement to the DataFrame. """
-        return (
-            df.sort_values(by=self.spec.version_col, ascending=True)
-                .drop_duplicates(subset=self.spec.fields, keep=self.spec.keep)
-        )
+        for field_set in self.spec.field_sets:
+            logger.debug(f"Enforcing uniqueness for field set: {field_set}")
+            df = df.sort_values(by=self.spec.version_col, ascending=True).drop_duplicates(subset=field_set, keep=self.spec.keep)
+        return df
 
 
 class NonNullableEnforcer(OutputEnforcer):

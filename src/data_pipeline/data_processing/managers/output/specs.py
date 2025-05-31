@@ -7,7 +7,7 @@ from . import logger
 
 @dataclass
 class UniqueSpec:
-    fields: list[str]
+    field_sets: list[list[str]]
     version_col: str  # has to be a datetime field
     keep: str = "last"  # or "first"
 
@@ -21,7 +21,7 @@ class UniqueSpec:
     def __repr__(self):
         """ String representation of the UniqueSpec. """
         return (
-            f"UniqueSpec(fields={self.fields}, version_col={self.version_col}, "
+            f"UniqueSpec(field_sets={self.field_sets}, version_col={self.version_col}, "
             f"keep={self.keep})"
         )
 
@@ -29,7 +29,7 @@ class UniqueSpec:
     def from_dict(cls, d: dict) -> UniqueSpec:
         """ Create a UniqueSpec from a dictionary. """
         return cls(
-            fields=d["fields"],
+            field_sets=d["field_sets"],
             version_col=d["version_col"],
             keep=d.get("keep", "last")
         )
@@ -72,5 +72,5 @@ class OutputSpec:
             layer=d["layer"],
             schema=d.get("schema"),
             unique=UniqueSpec.from_dict(d["unique"]) if "unique" in d else None,
-            non_nullable=NonNullableSpec.from_dict(d["non_nullable"]) if "non_nullable" in d else None
+            non_nullable=NonNullableSpec.from_dict(d["non-nullable"]) if "non-nullable" in d else None
         )

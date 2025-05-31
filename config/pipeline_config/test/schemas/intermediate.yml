@@ -3,6 +3,7 @@ stage: intermediate
 
 models:
   - name: espn_matches
+    path: espn_matches.csv
     columns:
       - name: id
         unique: true
@@ -40,6 +41,7 @@ models:
       - name: intermediate_at
 
   - name: football_data_matches
+    path: football_data_matches.csv
     columns:
       - name: area_id
       - name: area_name
@@ -84,18 +86,17 @@ models:
       - name: intermediate_at
 
   - name: football_data_standings
+    path: football_data_standings.csv
     columns:
       - name: area_id
       - name: area_name
       - name: area_code
       - name: competition_id
-        unique: true
         nullable: false
       - name: competition_name
       - name: competition_code
       - name: competition_type
       - name: season_id
-        unique: true
         nullable: false
       - name: season_startDate
       - name: season_endDate
@@ -106,7 +107,6 @@ models:
       - name: group
       - name: position
       - name: team_id
-        unique: true
         nullable: false
       - name: team_name
       - name: team_shortName
@@ -123,8 +123,14 @@ models:
       - name: source
       - name: source_type
       - name: intermediate_at
+    constraints:
+      - unique_sets: 
+          - competition_id
+          - season_id
+          - team_id
 
   - name: football_ranking_fifa_rankings
+    path: football_ranking_fifa_rankings.csv
     columns:
       - name: team
       - name: team_name
@@ -139,6 +145,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_matches
+    path: live_soccer_matches.csv
     columns:
       - name: title
       - name: match_date
@@ -162,6 +169,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_standings
+    path: live_soccer_standings.csv
     columns:
       - name: position
       - name: team_source_name
@@ -183,6 +191,7 @@ models:
       - name: intermediate_at
 
   - name: espn_teams
+    path: espn_teams.csv
     columns:
       - name: team_id
         unique: true
@@ -195,6 +204,7 @@ models:
       - name: intermediate_at
 
   - name: football_data_teams
+    path: football_data_teams.csv
     columns:
       - name: team_id
         unique: true
@@ -206,6 +216,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_teams
+    path: live_soccer_teams.csv
     columns:
       - name: team_name
         unique: true
@@ -215,6 +226,7 @@ models:
       - name: intermediate_at
 
   - name: espn_competitions
+    path: espn_competitions.csv
     columns:
       - name: competition_id
         unique: true
@@ -229,6 +241,7 @@ models:
       - name: intermediate_at
 
   - name: football_data_competitions
+    path: football_data_competitions.csv
     columns:
       - name: competition_id
         unique: true
@@ -242,6 +255,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_competitions
+    path: live_soccer_competitions.csv
     columns:
       - name: competition
         unique: true
@@ -251,6 +265,7 @@ models:
       - name: intermediate_at
 
   - name: football_data_areas
+    path: football_data_areas.csv
     columns:
       - name: area_id
         unique: true
@@ -263,6 +278,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_areas
+    path: live_soccer_areas.csv
     columns:
       - name: area
         unique: true
@@ -272,6 +288,7 @@ models:
       - name: intermediate_at
 
   - name: team_registry
+    path: team_registry.csv
     columns:
       - name: idA
         nullable: false
@@ -285,6 +302,7 @@ models:
         nullable: false
 
   - name: competition_registry
+    path: competition_registry.csv
     columns:
       - name: idA
         nullable: false
@@ -298,6 +316,7 @@ models:
         nullable: false
 
   - name: area_registry
+    path: area_registry.csv
     columns:
       - name: idA
         nullable: false

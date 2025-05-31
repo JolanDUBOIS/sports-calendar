@@ -4,9 +4,10 @@ from pathlib import Path
 from dataclasses import dataclass
 
 from . import logger
-from .order_models import ModelOrder, DataStage
+from .order_models import ModelOrder
 from .managers import ModelManager, ModelSpec
 from ..utils import read_yml_file
+from ..pipeline_stages import DataStage
 
 
 @dataclass
@@ -121,5 +122,5 @@ class LayerBuilder:
         Returns:
             LayerBuilder: A new instance initialized from the YAML file's contents.
         """
-        layer_data = read_yml_file(yaml_path)
+        layer_data = read_yml_file(Path(yaml_path))
         return cls.from_dict(layer_data, repo_path)
