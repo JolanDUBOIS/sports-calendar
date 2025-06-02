@@ -25,6 +25,8 @@ class ModelOrder:
 
         self.completed = set()
         self.failed = set()
+        self.ignored = set()
+        self._build_reverse_deps()
 
     def __iter__(self) -> ModelOrder:
         """ Return the iterator object itself. """
@@ -36,10 +38,13 @@ class ModelOrder:
             model for model in self.models
             if model.name not in self.completed # Model isn't already completed
             and model.name not in self.failed # Model isn't already failed
+            and model.name not in self.ignored # Model isn't ignored
             and self.dependencies[model.name].issubset(self.completed) # All dependencies are completed
         ]
         if not ready_models:
-            if self.completed | self.failed == self.model_names:
+            if self.completed | self.failed | self.ignored == self.model_names:
+                if self.ignored:
+                    logger.warning(f"Ignored models due to failed dependencies: {self.ignored}")
                 raise StopIteration
             else:
                 logger.error("Deadlock or unresolved dependencies due to previous failures.")
@@ -55,6 +60,25 @@ class ModelOrder:
             raise ValueError(f"Model {model.name} is not completed, cannot mark as failed.")
         self.completed.remove(model.name)
         self.failed.add(model.name)
+        self._ignore_deps(model.name)
+
+    def _build_reverse_deps(self) -> None:
+        """ Build a reverse dependency mapping for the models. """
+        self.reverse_deps = {model.name: set() for model in self.models}
+        for model, deps in self.dependencies.items():
+            for dep in deps:
+                self.reverse_deps[dep].add(model)
+
+    def _ignore_deps(self, model_name: str) -> None:
+        """ Recursively ignore dependencies of a failed model. """
+        stack = [model_name]
+        while stack:
+            current = stack.pop()
+            for dependent in self.reverse_deps.get(current, []):
+                if dependent not in self.ignored:
+                    self.ignored.add(dependent)
+                    logger.debug(f"Ignoring model {dependent} due to failure of {model_name}.")
+                    stack.append(dependent)
 
     @staticmethod
     def _get_dependencies(models: list[ModelSpec], stage: str) -> dict[str, set[str]]:
