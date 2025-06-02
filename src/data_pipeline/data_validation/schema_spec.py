@@ -93,6 +93,14 @@ class SchemaSpec:
             logger.error("All elements in models must be ModelSchemaSpec instances.")
             raise TypeError("All elements in models must be ModelSchemaSpec instances.")
 
+    def get(self, model: str) -> ModelSchemaSpec | None:
+        """ Get a model schema by name. """
+        for model_spec in self.models:
+            if model_spec.name == model:
+                return model_spec
+        logger.warning(f"Model '{model}' not found in schema '{self.name}'.")
+        return None
+
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:
         try:

@@ -146,9 +146,15 @@ class LayerSchemaManager:
             model.path = self.repo_path / schema_spec.stage / model.path
         return schema_spec
 
-    def validate(self, raise_on_error: bool = False) -> SchemaValidationResult:
+    def validate(self, raise_on_error: bool = False, model: str | None = None) -> SchemaValidationResult:
         """ TODO """
-        logger.info(f"Validating schema for stage: {self.schema_spec.stage}")
+        if model:
+            logger.info(f"Validating schema for model '{model}' in stage '{self.schema_spec.stage}'.")
+            model_manager = ModelSchemaManager(self.schema_spec.get(model))
+            model_manager.validate(raise_on_error=raise_on_error)
+            return SchemaValidationResult(schema=self.schema_spec.name, results=[model_manager.validate(raise_on_error)])
+
+        logger.info(f"Validating schema for stage '{self.schema_spec.stage}'.")
         schema_result = SchemaValidationResult(schema=self.schema_spec.name)
         for model_spec in self.schema_spec.models:
             model_manager = ModelSchemaManager(model_spec)
