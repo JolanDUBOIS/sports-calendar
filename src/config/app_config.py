@@ -5,14 +5,14 @@ from pathlib import Path
 class AppConfig:
     _instance = None
 
-    def __new__(cls, config_path="config/app_config.yml"):
+    def __new__(cls, config_path=Path("config/app_config.yml")):
         if cls._instance is None:
             cls._instance = super(AppConfig, cls).__new__(cls)
             cls._instance._load_config(config_path)
         return cls._instance
 
-    def _load_config(self, path):
-        with open(path, "r") as f:
+    def _load_config(self, path: Path):
+        with path.open(mode="r") as f:
             self._config = yaml.safe_load(f)
 
     def get(self, key_path, default=None):
