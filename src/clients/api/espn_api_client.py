@@ -16,6 +16,7 @@ class ESPNApiClient(BaseApiClient):
 
     def query_matches(self, competition_slug: str, date_from: str = None, date_to: str = None) -> list[dict]:
         """ TODO """
+        logger.info(f"Querying matches for competition: {competition_slug} from {date_from} to {date_to}.")
         if not date_from:
             date_from = datetime.now().strftime("%Y-%m-%d")
         if not date_to:

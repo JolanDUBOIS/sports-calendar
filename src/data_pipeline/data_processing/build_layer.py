@@ -26,6 +26,14 @@ class LayerSpec:
             logger.error(f"Invalid stage name: {self.stage}")
             raise ValueError(f"Invalid stage name: {self.stage}")
 
+    def get(self, model: str) -> ModelSpec | None:
+        """ Retrieve a model specification by its name. """
+        for model_spec in self.models:
+            if model_spec.name == model:
+                return model_spec
+        logger.warning(f"Model {model} not found in layer {self.name}.")
+        return None
+
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:
         try:
@@ -73,7 +81,7 @@ class LayerBuilder:
         self.repo_path = Path(repo_path)
         self.models_order = ModelOrder(self.layer_spec.models, self.layer_spec.stage)
 
-    def build(self, manual: bool = False) -> None:
+    def build(self, manual: bool = False, model: str | None = None) -> None:
         """
         Execute all models in this layer according to the specified order.
 
@@ -85,15 +93,23 @@ class LayerBuilder:
         Args:
             manual (bool): If True, run models in manual mode, which may alter execution 
                 behavior such as skipping automated steps or requiring manual confirmation.
+            model (str | None): Optional specific model name to run. If provided, only that model is executed (dev purpose).
         """
-        for model in self.models_order:
+        if model:
+            logger.info(f"Building layer for model '{model}' in stage '{self.layer_spec.stage}'.")
+            model_manager = ModelManager(self.layer_spec.get(model), self.repo_path)
+            model_manager.run(manual=manual)
+            return
+
+        logger.info(f"Building layer for stage '{self.layer_spec.stage}'.")
+        for model_spec in self.models_order:
             try:
-                model_manager = ModelManager(model, self.repo_path)
+                model_manager = ModelManager(model_spec, self.repo_path)
                 model_manager.run(manual=manual)
             except Exception as e:
-                logger.error(f"Error processing model {model.name}: {e}")
+                logger.error(f"Error processing model {model_spec.name}: {e}")
                 logger.debug(traceback.format_exc())
-                self.models_order.mark_failed(model)
+                self.models_order.mark_failed(model_spec)
 
     @classmethod
     def from_dict(cls, d: dict, repo_path: str | Path) -> LayerBuilder:

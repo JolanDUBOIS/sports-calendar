@@ -28,28 +28,121 @@ This will create a virtual environment and install all dependencies listed in `p
 
 TODO
 
-### Executing Program
+## Running the Project
 
 The project is run from the command line using Poetry to manage the environment. The basic command structure is:
 
 ```bash
-poetry run python -m src [ARGUMENT]
+poetry run python -m src [COMMAND] [OPTIONS]
 ```
 
-Available arguments:
+The available arguments are:
 
-- `-udb`, `--update-database`
-Updates the repository by querying APIs. This should be run at least 24 hours before running the selection to ensure data freshness.
+### `run-pipeline`
+Runs the data pipeline that fetches, processes, and stores football data from various sources (e.g. scraping, APIs, normalization, writing to internal DB).
 
-- `-fu`, `--full-update`
-Erases and updates the repository by querying APIs. This is a full reset and should only be run by administrators.
+```bash
+poetry run python -m src run-pipeline [OPTIONS]
+```
 
-- `--run-selection`
-Creates the personalized football calendar based on the user’s selection file.
+**Options:**
+- `--repo [test|prod]` – Specify the repository environment (default: `test`)
+- `--stage [landing|intermediate|staging|production]` – Run a specific pipeline stage
+- `--model MODEL_NAME` – Specify a model to run (requires `--stage`)
+- `--manual` – Enable manual mode (default is automatic)
+- `--dry-run` – Simulate the pipeline without making changes
+- `--verbose` – Enable verbose logging
+
+**Examples:**
+```bash
+poetry run python -m src run-pipeline
+poetry run python -m src run-pipeline --repo prod --stage landing --dry-run --verbose
+poetry run python -m src run-pipeline --manual --stage intermediate --model espn_matches
+```
+
+---
+
+### `run-validation`
+Performs data validation checks (e.g. consistency, completeness, structural correctness).
+
+```bash
+poetry run python -m src run-validation [OPTIONS]
+```
+
+**Options:**
+- `--repo [test|prod]` – Specify the repository environment (default: `test`)
+- `--stage [landing|intermediate|staging|production]` – Run validation on a specific stage
+- `--model MODEL_NAME` – Specify a model to validate (requires `--stage`)
+- `--raise-on-error` – Raise exception if validation fails
+- `--verbose` – Enable verbose logging
+
+**Examples:**
+```bash
+poetry run python -m src run-validation --stage production --raise-on-error
+poetry run python -m src run-validation --repo test --stage intermediate
+```
+
+---
+
+### `run-selection`
+Generates a personalized football calendar and syncs it with Google Calendar.
+
+```bash
+poetry run python -m src run-selection
+```
+
+**Options:**
+- `--verbose` – Enable verbose logging
+
+---
+
+### `test`
+Runs a specific test routine.
+
+```bash
+poetry run python -m src test TEST_NAME
+```
+
+---
+
+### `clean` *(not yet implemented)*
+Cleans the specified repository stage.
+
+```bash
+poetry run python -m src clean [--repo REPO] [--stage STAGE]
+```
+
+---
+
+### `revert` *(not yet implemented)*
+Reverts the data repository to a previous state by run ID.
+
+```bash
+poetry run python -m src revert [RUN_ID]
+```
+
+---
+
+### Valid Values
+
+- **Stages**: `landing`, `intermediate`, `staging`, `production`
+- **Repos**: `test`, `prod`
+
+---
+
+### 💡 Tips
+
+- `--model` **requires** `--stage` to be specified.
+- Default `repo` is `test` unless overridden.
+- All commands support `--help` for option hints.
+
+```bash
+poetry run python -m src run-pipeline --help
+```
 
 ## Authors
 
-- Jolan Du Bois — mastr student in AI and football fan
+- Jolan Du Bois — master student in AI and football fan
 - This project is a personal learning exercise and hobby.
 
 ## Planned Features

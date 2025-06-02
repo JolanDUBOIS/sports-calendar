@@ -28,6 +28,7 @@ class FootballDataApiClient(BaseApiClient):
 
     def query_team_matches(self, team_id: int, date_from: str=None, date_to: str=None) -> list[dict]:
         """ TODO """
+        logger.info(f"Querying matches for team ID: {team_id} from {date_from} to {date_to}.")
         date_from = self.parse_date(date_from)
         date_to = self.parse_date(date_to)
         url_fragment = f"/teams/{team_id}/matches"
@@ -40,6 +41,7 @@ class FootballDataApiClient(BaseApiClient):
 
     def query_competition_matches(self, competition_id: int, date_from: str=None, date_to: str=None) -> list[dict]:
         """ TODO """
+        logger.info(f"Querying matches for competition ID: {competition_id} from {date_from} to {date_to}.")
         date_from = self.parse_date(date_from)
         date_to = self.parse_date(date_to)
         url_fragment = f"/competitions/{competition_id}/matches"
