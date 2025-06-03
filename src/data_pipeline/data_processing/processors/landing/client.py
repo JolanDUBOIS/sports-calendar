@@ -1,16 +1,20 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import pandas as pd
 
 from . import logger
-from .processor_base_class import Processor
+from ..processor_base_class import Processor
 from src.clients import (
     ESPNApiClient,
     FootballDataApiClient,
     LiveSoccerScraper,
     FootballRankingScraper
 )
-from ...types import IOContent
-from ...utils import concat_io_content
+from ....utils import concat_io_content
 
+if TYPE_CHECKING:
+    from ....types import IOContent
 
 class ClientProcessor(Processor):
     """ Used to fetch data from client sources and ingest it into the landing zone. """

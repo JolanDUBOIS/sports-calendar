@@ -1,9 +1,6 @@
 from .processor_base_class import Processor
-from .derivation import DerivationProcessor
-from .extraction import ExtractionProcessor
-from .client import ClientProcessor
-from .parsing import ParsingProcessor
-from .registry import RegistryProcessor
+from .landing.client import ClientProcessor
+from .intermediate import DerivationProcessor, ExtractionProcessor, ParsingProcessor, RegistryProcessor
 
 
 class ProcessorFactory:

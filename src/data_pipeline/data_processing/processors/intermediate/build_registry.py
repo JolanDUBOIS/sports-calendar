@@ -1,8 +1,8 @@
 import pandas as pd
 
 from . import logger
-from .processor_base_class import Processor
-from .components import create_registry
+from ..processor_base_class import Processor
+from ..components import create_registry
 
 
 class RegistryProcessor(Processor):

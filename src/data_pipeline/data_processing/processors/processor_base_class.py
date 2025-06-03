@@ -1,9 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 
 import pandas as pd
 
 from . import logger
-from ...types import IOContent
+
+if TYPE_CHECKING:
+    from ...types import IOContent
 
 
 class Processor(ABC):
