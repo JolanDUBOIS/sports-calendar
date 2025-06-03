@@ -1,8 +1,8 @@
 import os
 from dateutil import parser
 
-from src.clients import logger
-from src.clients.api.base_api_client import BaseApiClient
+from . import logger
+from .base_api_client import BaseApiClient
 
 
 class FootballDataApiClient(BaseApiClient):

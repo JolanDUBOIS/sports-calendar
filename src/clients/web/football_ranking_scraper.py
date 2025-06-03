@@ -3,8 +3,8 @@ import re
 import pandas as pd
 from bs4 import Tag
 
-from src.clients import logger
-from src.clients.web.base_scraper import BaseScraper
+from . import logger
+from .base_scraper import BaseScraper
 
 
 class FootballRankingScraper(BaseScraper):

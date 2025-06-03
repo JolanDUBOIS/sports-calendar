@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from src.clients import logger
-from src.clients.utils import generate_date_range
-from src.clients.api.base_api_client import BaseApiClient
+from . import logger
+from .base_api_client import BaseApiClient
+from ..utils import generate_date_range
 
 
 class ESPNApiClient(BaseApiClient):
