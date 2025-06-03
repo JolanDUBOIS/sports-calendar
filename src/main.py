@@ -35,7 +35,7 @@ def run_pipeline_logic(
             logger.error("Stage must be specified when a model is provided.")
             raise ValueError("Stage must be specified when a model is provided.")
         yml_path = config_folder / f"build_{stage}.yml"
-        LayerBuilder.from_yaml(yml_path, repo_path).build(manual=manual, model=model)
+        LayerBuilder.from_yaml(yml_path, repo_path).build(model=model, manual=manual)
         return
 
     stages = [stage] if stage else DataStage.instances()
@@ -46,7 +46,7 @@ def run_pipeline_logic(
             logger.error(f"Configuration file not found: {yml_path}")
             raise FileNotFoundError(f"Configuration file not found: {yml_path}")
         else:
-            LayerBuilder.from_yaml(yml_path, repo_path).build(manual=manual)
+            LayerBuilder.from_yaml(yml_path, repo_path).build(manual=manual, dry_run=dry_run)
 
 def run_validation_logic(
     repo: str = "test",
