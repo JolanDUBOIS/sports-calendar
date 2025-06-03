@@ -5,8 +5,8 @@ from urllib.parse import quote_plus
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
 
-from src.clients import logger
-from src.clients.web.base_scraper import BaseScraper
+from . import logger
+from .base_scraper import BaseScraper
 
 
 class LiveSoccerScraper(BaseScraper):

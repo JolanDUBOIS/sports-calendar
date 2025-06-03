@@ -4,7 +4,7 @@ import traceback
 import cloudscraper
 from bs4 import BeautifulSoup
 
-from src.clients import logger
+from . import logger
 
 class BaseScraper:
     """ TODO """

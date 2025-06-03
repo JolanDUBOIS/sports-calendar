@@ -3,7 +3,7 @@ import traceback
 
 import requests
 
-from src.clients import logger
+from . import logger
 
 
 class BaseApiClient:

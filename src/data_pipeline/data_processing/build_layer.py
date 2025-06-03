@@ -81,7 +81,7 @@ class LayerBuilder:
         self.repo_path = Path(repo_path)
         self.models_order = ModelOrder(self.layer_spec.models, self.layer_spec.stage)
 
-    def build(self, manual: bool = False, model: str | None = None) -> None:
+    def build(self, model: str | None = None, manual: bool = False, dry_run: bool = False) -> None:
         """
         Execute all models in this layer according to the specified order.
 
@@ -91,21 +91,22 @@ class LayerBuilder:
         failed models for later inspection or retry.
 
         Args:
+            model (str | None): Optional specific model name to run. If provided, only that model is executed (dev purpose).
             manual (bool): If True, run models in manual mode, which may alter execution 
                 behavior such as skipping automated steps or requiring manual confirmation.
-            model (str | None): Optional specific model name to run. If provided, only that model is executed (dev purpose).
+            dry_run (bool): If True, simulate the execution without making any changes, useful for testing.
         """
         if model:
             logger.info(f"Building layer for model '{model}' in stage '{self.layer_spec.stage}'.")
             model_manager = ModelManager(self.layer_spec.get(model), self.repo_path)
-            model_manager.run(manual=manual)
+            model_manager.run(manual=manual, dry_run=dry_run)
             return
 
         logger.info(f"Building layer for stage '{self.layer_spec.stage}'.")
         for model_spec in self.models_order:
             try:
                 model_manager = ModelManager(model_spec, self.repo_path)
-                model_manager.run(manual=manual)
+                model_manager.run(manual=manual, dry_run=dry_run)
             except Exception as e:
                 logger.error(f"Error processing model {model_spec.name}: {e}")
                 logger.debug(traceback.format_exc())

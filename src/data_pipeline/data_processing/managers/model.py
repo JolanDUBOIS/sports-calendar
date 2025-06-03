@@ -80,7 +80,7 @@ class ModelManager:
         spec.output.path = self.repo_path / spec.output.path
         return spec
 
-    def run(self, manual: bool = False) -> None:
+    def run(self, manual: bool = False, dry_run: bool = False) -> None:
         """
         Execute the model processing pipeline.
 
@@ -94,6 +94,8 @@ class ModelManager:
         Args:
             manual (bool): If True, forces processing of models with manual trigger;
                            if False, only processes models set to automatic trigger.
+            dry_run (bool): If True, simulates the run without making any changes.
+                            Can be used for testing purposes.
         """
         if not self._validate_trigger(self.model_spec.trigger, manual):
             return
@@ -117,7 +119,10 @@ class ModelManager:
 
         # Write output
         new_source_versions = source_manager.get_new_source_versions()
-        output_manager.write(data, new_source_versions)
+        if not dry_run:
+            output_manager.write(data, new_source_versions)
+        else:
+            logger.info("Dry run mode enabled, output will not be written.")
         
         logger.info(f"Model {self.model_spec.name} processed successfully.")
 

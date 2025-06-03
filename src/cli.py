@@ -28,7 +28,6 @@ def repo_option(workflow: str):
         callback=validate_repo,
     )
 def stage_option(workflow: str):
-    print(f"Validating stage for workflow: {workflow}")
     return typer.Option(
         None,
         "--stage",
