@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from . import logger
-from ..processor_base_class import Processor
+from .. import Processor
 from src.clients import (
     ESPNApiClient,
     FootballDataApiClient,

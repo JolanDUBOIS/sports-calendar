@@ -1,7 +1,7 @@
 import pandas as pd
 
 from . import logger
-from ..processor_base_class import Processor
+from .. import Processor
 from ..components import extract_table
 
 
