@@ -98,8 +98,12 @@ class LayerBuilder:
         """
         if model:
             logger.info(f"Building layer for model '{model}' in stage '{self.layer_spec.stage}'.")
-            model_manager = ModelManager(self.layer_spec.get(model), self.repo_path)
-            model_manager.run(manual=manual, dry_run=dry_run)
+            try:
+                model_manager = ModelManager(self.layer_spec.get(model), self.repo_path)
+                model_manager.run(manual=manual, dry_run=dry_run)
+            except Exception as e:
+                logger.error(f"Error processing model {model}: {e}")
+                logger.debug(traceback.format_exc())
             return
 
         logger.info(f"Building layer for stage '{self.layer_spec.stage}'.")
