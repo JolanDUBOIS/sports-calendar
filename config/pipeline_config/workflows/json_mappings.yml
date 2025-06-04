@@ -126,8 +126,8 @@ models:
         area_name: area.name
         area_code: area.code
         team_id: id
-        name: name
-        shortName: shortName
+        team_name: name
+        team_shortName: shortName
         tla: tla
         founded: founded
         venue: venue
