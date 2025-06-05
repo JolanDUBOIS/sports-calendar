@@ -513,7 +513,7 @@ models:
           - source_B
     processing:
       processor: RegistryProcessor
-      output_key: team_registry
+      entity_type: teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -559,7 +559,7 @@ models:
           - source_B
     processing:
       processor: RegistryProcessor
-      output_key: competition_registry
+      entity_type: competitions
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -599,7 +599,7 @@ models:
           - source_B
     processing:
       processor: RegistryProcessor
-      output_key: area_registry
+      entity_type: areas
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
