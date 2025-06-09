@@ -269,8 +269,8 @@ models:
       - name: source_type
       - name: intermediate_at
 
-  - name: team_registry
-    path: team_registry.csv
+  - name: team_similarity
+    path: team_similarity.csv
     columns:
       - name: id_A
         nullable: false
@@ -284,8 +284,8 @@ models:
         nullable: false
       - name: intermediate_at
 
-  - name: competition_registry
-    path: competition_registry.csv
+  - name: competition_similarity
+    path: competition_similarity.csv
     columns:
       - name: id_A
         nullable: false
@@ -299,8 +299,8 @@ models:
         nullable: false
       - name: intermediate_at
 
-  - name: area_registry
-    path: area_registry.csv
+  - name: area_similarity
+    path: area_similarity.csv
     columns:
       - name: id_A
         nullable: false

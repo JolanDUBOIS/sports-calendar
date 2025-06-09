@@ -5,7 +5,7 @@ import pandas as pd
 
 from . import logger
 from .similarity_score import calculate_list_similarity_score
-from .specs import SourceTableSpec, REGISTRY_SPECS, REFERENCE_SPECS
+from .specs import SourceTableSpec, SIMILARITY_SPECS
 
 
 class SourceTable:
@@ -74,7 +74,7 @@ class RegistryCreation:
 
     def __init__(self, sources: dict[str, pd.DataFrame], entity_type: str):
         """ TODO """
-        self.registry_spec = REGISTRY_SPECS.get(entity_type)
+        self.registry_spec = SIMILARITY_SPECS.get(entity_type)
         self.source_tables = {
             source_name: SourceTable(df, self.registry_spec.get(source_name))
             for source_name, df in sources.items()
@@ -101,6 +101,6 @@ class RegistryCreation:
             raise ValueError(f"No registries created for entity type '{self.registry_spec.entity_type}'.")
         return pd.concat(registries, ignore_index=True)
 
-def create_registry(sources: dict[str, pd.DataFrame], entity_type: str, threshold: float = 50, **kwargs) -> pd.DataFrame:
+def create_similarity_table(sources: dict[str, pd.DataFrame], entity_type: str, threshold: float = 50, **kwargs) -> pd.DataFrame:
     """ TODO """
     return RegistryCreation(sources, entity_type).run(threshold=threshold, **kwargs)
