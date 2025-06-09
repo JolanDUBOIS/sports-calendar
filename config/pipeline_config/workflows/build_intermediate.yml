@@ -472,8 +472,8 @@ models:
       - name: intermediate_at
         value: !date_offset 0
 
-  - name: team_registry
-    description: Create teams similarity registry accross all sources.
+  - name: team_similarity
+    description: Create teams similarity table accross all sources.
     trigger: automatic
     sources:
       - name: espn_teams
@@ -496,10 +496,10 @@ models:
       - intermediate.football_data_teams
       - intermediate.live_soccer_teams
     output:
-      name: team_registry
+      name: team_similarity
       layer: intermediate
-      path: intermediate/team_registry.csv
-      schema: team_registry
+      path: intermediate/team_similarity.csv
+      schema: team_similarity
       unique:
         field_sets:
           - [id_A, id_B, source_A, source_B]
@@ -512,14 +512,14 @@ models:
           - source_A
           - source_B
     processing:
-      processor: RegistryProcessor
+      processor: SimilarityProcessor
       entity_type: teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
 
-  - name: competition_registry
-    description: Create competitions similarity registry accross all sources.
+  - name: competition_similarity
+    description: Create competitions similarity table accross all sources.
     trigger: automatic
     sources:
       - name: espn_competitions
@@ -542,10 +542,10 @@ models:
       - intermediate.football_data_competitions
       - intermediate.live_soccer_competitions
     output:
-      name: competition_registry
+      name: competition_similarity
       layer: intermediate
-      path: intermediate/competition_registry.csv
-      schema: competition_registry
+      path: intermediate/competition_similarity.csv
+      schema: competition_similarity
       unique:
         field_sets:
           - [id_A, id_B, source_A, source_B]
@@ -558,14 +558,14 @@ models:
           - source_A
           - source_B
     processing:
-      processor: RegistryProcessor
+      processor: SimilarityProcessor
       entity_type: competitions
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
 
-  - name: area_registry
-    description: Create areas similarity registry accross all sources.
+  - name: area_similarity
+    description: Create areas similarity table accross all sources.
     trigger: automatic
     sources:
       - name: football_data_areas
@@ -582,10 +582,10 @@ models:
       - intermediate.football_data_areas
       - intermediate.live_soccer_areas
     output:
-      name: area_registry
+      name: area_similarity
       layer: intermediate
-      path: intermediate/area_registry.csv
-      schema: area_registry
+      path: intermediate/area_similarity.csv
+      schema: area_similarity
       unique:
         field_sets:
           - [id_A, id_B, source_A, source_B]
@@ -598,7 +598,7 @@ models:
           - source_A
           - source_B
     processing:
-      processor: RegistryProcessor
+      processor: SimilarityProcessor
       entity_type: areas
     static_fields:
       - name: intermediate_at

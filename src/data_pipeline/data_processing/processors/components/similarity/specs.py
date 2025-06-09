@@ -31,7 +31,7 @@ class SourceTableSpec:
         )
 
 @dataclass
-class RegistrySpec:
+class SimilaritySpec:
     entity_type: str # e.g. competitions, areas, teams
     sources: list[SourceTableSpec]
     generic_tokens: list[str] = field(default_factory=list) # e.g. ["fc", "atletic club"]
@@ -41,26 +41,26 @@ class RegistrySpec:
         for source in self.sources:
             if source.table_name == source_name:
                 return source
-        logger.error(f"Table '{source_name}' not found in registry spec for entity type '{self.entity_type}'.")
-        raise KeyError(f"Table '{source_name}' not found in registry spec for entity type '{self.entity_type}'.")
+        logger.error(f"Table '{source_name}' not found in similarity spec for entity type '{self.entity_type}'.")
+        raise KeyError(f"Table '{source_name}' not found in similarity spec for entity type '{self.entity_type}'.")
 
 @dataclass
-class RegistrySpecs:
-    specs: list[RegistrySpec] = field(default_factory=list)
+class SimilaritySpecs:
+    specs: list[SimilaritySpec] = field(default_factory=list)
 
-    def get(self, entity_type: str) -> RegistrySpec:
-        """ Get a RegistrySpec by its entity type. """
+    def get(self, entity_type: str) -> SimilaritySpec:
+        """ Get a SimilaritySpec by its entity type. """
         for spec in self.specs:
             if spec.entity_type == entity_type:
                 return spec
-        logger.error(f"Registry spec for entity type '{entity_type}' not found.")
-        raise KeyError(f"Registry spec for entity type '{entity_type}' not found.")
+        logger.error(f"Similarity spec for entity type '{entity_type}' not found.")
+        raise KeyError(f"Similarity spec for entity type '{entity_type}' not found.")
 
-    def append(self, spec: RegistrySpec):
-        """ Add a new RegistrySpec to the collection. """
+    def append(self, spec: SimilaritySpec):
+        """ Add a new SimilaritySpec to the collection. """
         if any(existing_spec.entity_type == spec.entity_type for existing_spec in self.specs):
-            logger.error(f"Registry spec for entity type '{spec.entity_type}' already exists.")
-            raise ValueError(f"Registry spec for entity type '{spec.entity_type}' already exists.")
+            logger.error(f"Similarity spec for entity type '{spec.entity_type}' already exists.")
+            raise ValueError(f"Similarity spec for entity type '{spec.entity_type}' already exists.")
         self.specs.append(spec)
 
 @dataclass
@@ -88,11 +88,11 @@ class ReferenceEntitySpecs:
         self.specs.append(spec)
 
 
-def load_entity_specs(path: str | Path) -> tuple[RegistrySpecs, ReferenceEntitySpecs]:
+def load_entity_specs(path: str | Path) -> tuple[SimilaritySpecs, ReferenceEntitySpecs]:
     with open(path, 'r') as f:
         raw_data = yaml.safe_load(f)
 
-    registry_specs = RegistrySpecs()
+    similarity_specs = SimilaritySpecs()
     reference_specs = ReferenceEntitySpecs()
 
     for entity_type, specs in raw_data.items():
@@ -103,7 +103,7 @@ def load_entity_specs(path: str | Path) -> tuple[RegistrySpecs, ReferenceEntityS
         sources = [
             SourceTableSpec.from_dict(source) for source in specs.get("sources", [])
         ]
-        registry_specs.append(RegistrySpec(
+        similarity_specs.append(SimilaritySpec(
             entity_type=entity_type,
             sources=sources,
             **specs.get("registry", {})
@@ -113,8 +113,8 @@ def load_entity_specs(path: str | Path) -> tuple[RegistrySpecs, ReferenceEntityS
             coalesce_rules=specs.get("reference", {}).get("coalesce_rules", {})
         ))
     
-    return registry_specs, reference_specs
+    return similarity_specs, reference_specs
 
-REGISTRY_SPECS, REFERENCE_SPECS = load_entity_specs(
+SIMILARITY_SPECS, REFERENCE_SPECS = load_entity_specs(
     Path(__file__).parent / "entity_resolution_config.yml"
 )

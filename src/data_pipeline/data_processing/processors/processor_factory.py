@@ -1,6 +1,6 @@
 from .processor_base_class import Processor
 from .landing.client import ClientProcessor
-from .intermediate import DerivationProcessor, ExtractionProcessor, ParsingProcessor, RegistryProcessor
+from .intermediate import DerivationProcessor, ExtractionProcessor, ParsingProcessor, SimilarityProcessor
 
 
 class ProcessorFactory:
@@ -11,7 +11,7 @@ class ProcessorFactory:
         "ExtractionProcessor": ExtractionProcessor,
         "ClientProcessor": ClientProcessor,
         "ParsingProcessor": ParsingProcessor,
-        "RegistryProcessor": RegistryProcessor,
+        "SimilarityProcessor": SimilarityProcessor,
     }
 
     @classmethod
