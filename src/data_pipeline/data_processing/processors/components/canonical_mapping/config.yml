@@ -7,10 +7,6 @@ teams:
       id_col: team_name
     - name: football_data_teams
       id_col: team_id
-  coalesce_rules:
-    name: ["espn_teams.team_name", "live_soccer_teams.team_name", "football_data_teams.team_name"]
-    short_name: ["espn_teams.team_shortDisplayName", "football_data_teams.team_shortName"]
-    tla: ["espn_teams.team_abbreviation", "football_data_teams.tla"]
 
 competitions:
   similarity_table: competition_similarity
@@ -21,9 +17,6 @@ competitions:
       id_col: competition
     - name: football_data_competitions
       id_col: competition_id
-  coalesce_rules:
-    name: ["espn_competitions.competition_abbreviation", "football_data_competitions.competition_name", "live_soccer_competitions.competition"]
-    code: ["football_data_competitions.competition_code", "espn_competitions.competition_midsizeName"]
 
 areas:
   similarity_table: area_similarity
@@ -32,6 +25,3 @@ areas:
       id_col: area_id
     - name: live_soccer_areas
       id_col: area
-  coalesce_rules:
-    name: ["football_data_areas.area_name", "live_soccer_areas.area"]
-    code: ["football_data_areas.area_code"]

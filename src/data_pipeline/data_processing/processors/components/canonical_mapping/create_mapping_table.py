@@ -6,7 +6,7 @@ import pandas as pd
 import networkx as nx # type: ignore
 
 from . import logger
-from .specs import SourceEntityTableSpec, SourceEntityTableSpecs, CoalesceRules, CANONICAL_MAPPING_SPECS
+from .specs import SourceEntityTableSpec, SourceEntityTableSpecs, CANONICAL_MAPPING_SPECS
 
 
 class SourceEntityTable:
@@ -151,21 +151,9 @@ class ConnectedComponent:
         return len(sources) == len(self.entities)
 
     def generate_id(self) -> str:
-        """Generate a unique hashed ID for the connected component based on its entities."""
+        """ Generate a unique hashed ID for the connected component based on its entities. """
         raw = "|".join(sorted(f"{entity.id}_{entity.source}" for entity in self.entities))
         return hashlib.sha256(raw.encode()).hexdigest()
-
-    # def get_rows(self, src_tables: SourceEntityTables) -> dict[str, pd.Series]:
-    #     """ Get rows from source entity tables for the entities in the connected component. """
-    #     rows = {}
-    #     for entity in self.entities:
-    #         table = src_tables.get_from_src(entity.source)
-    #         row = table.df[table.df[table.id_col] == entity.id]
-    #         if not row.empty:
-    #             rows[table.name] = row.iloc[0]
-    #         else:
-    #             logger.warning(f"Entity {entity.id} from source {entity.source} not found in its source table.")
-    #     return rows
 
 class SimilarityGraph:
     """ TODO """
@@ -231,24 +219,6 @@ class SimilarityTable:
         ]
 
         return SimilarityGraph(nodes, edges)
-
-# def apply_coalesce_rules(rows: dict[str, pd.Series], coalesce_rules: CoalesceRules) -> pd.Series:
-#     """ TODO """
-#     coalesced_row = pd.Series(dtype="object")
-#     for col_name, source_cols in coalesce_rules.items():
-#         value = None
-#         for source_col in source_cols:
-#             table_name, col = source_col.split(".")
-#             if table_name in rows:
-#                 row = rows[table_name]
-#                 if col not in row:
-#                     logger.error(f"Column '{col}' not found in row from table '{table_name}'.")
-#                     raise KeyError(f"Column '{col}' not found in row from table '{table_name}'.")
-#                 if pd.notna(row[col]):
-#                     value = row[col]
-#                     break
-#         coalesced_row[col_name] = value
-#     return coalesced_row
 
 def merge_components(components: list[ConnectedComponent]) -> pd.DataFrame:
     merged_rows = []

@@ -44,43 +44,10 @@ class SourceEntityTableSpecs:
         )
 
 @dataclass
-class CoalesceRule:
-    col_name: str
-    source_cols: list[str]
-
-@dataclass
-class CoalesceRules:
-    rules: list[CoalesceRule] = field(default_factory=dict)
-
-    def items(self):
-        """ Get the items of the CoalesceRules. """
-        return [(rule.col_name, rule.source_cols) for rule in self.rules]
-
-    def get(self, col_name: str) -> CoalesceRule:
-        """ Get a CoalesceRule by its column name. """
-        for rule in self.rules:
-            if rule.col_name == col_name:
-                return rule
-        logger.error(f"Coalesce rule for column '{col_name}' not found.")
-        raise KeyError(f"Coalesce rule for column '{col_name}' not found.")
-
-    @classmethod
-    def from_dict(cls, d: dict) -> CoalesceRules:
-        """ Create a CoalesceRules from a dictionary. """
-        rules = []
-        for col_name, source_cols in d.items():
-            if not isinstance(source_cols, list):
-                logger.error(f"Invalid format for coalesce rule '{col_name}'. Expected a list of source columns.")
-                raise ValueError(f"Invalid format for coalesce rule '{col_name}'. Expected a list of source columns.")
-            rules.append(CoalesceRule(col_name=col_name, source_cols=source_cols))
-        return cls(rules=rules)
-
-@dataclass
 class CanonicalMappingSpec:
     entity_type: str
     similarity_table: str
     source_entity_tables: SourceEntityTableSpecs
-    coalesce_rules: dict[str, list[str]]
 
     @classmethod
     def from_dict(cls, entity_type: str, d: dict) -> CanonicalMappingSpec:
@@ -88,8 +55,7 @@ class CanonicalMappingSpec:
         return cls(
             entity_type=entity_type,
             similarity_table=d["similarity_table"],
-            source_entity_tables=SourceEntityTableSpecs.from_list(d["source_entity_tables"]),
-            coalesce_rules=d.get("coalesce_rules", {})
+            source_entity_tables=SourceEntityTableSpecs.from_list(d["source_entity_tables"])
         )
 
 @dataclass
