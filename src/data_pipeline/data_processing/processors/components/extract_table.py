@@ -38,10 +38,6 @@ EXTRACTION_INSTRUCTIONS = {
             "competition_type", "source", "source_type"
         ],
     },
-    "live_soccer_competitions": {
-        "extraction_type": "simple",
-        "columns": ["competition", "source", "source_type"],
-    },
     "football_data_areas": {
         "extraction_type": "simple",
         "columns": ["area_id", "area_name", "area_code", "source", "source_type"],
