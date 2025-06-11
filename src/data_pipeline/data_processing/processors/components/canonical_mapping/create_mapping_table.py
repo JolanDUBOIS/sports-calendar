@@ -6,78 +6,6 @@ import pandas as pd
 import networkx as nx # type: ignore
 
 from . import logger
-from .specs import SourceEntityTableSpec, SourceEntityTableSpecs, CANONICAL_MAPPING_SPECS
-
-
-class SourceEntityTable:
-    """ TODO """
-
-    def __init__(self, df: pd.DataFrame, spec: SourceEntityTableSpec):
-        """ TODO """
-        self.df = df
-        self.spec = spec
-
-    @property
-    def source(self) -> str:
-        """ TODO """
-        try:
-            return self.df["source"].iloc[0]
-        except KeyError:
-            logger.error(f"Source column not found in DataFrame for {self.spec.name}.")
-            raise KeyError(f"Source column not found in DataFrame for {self.spec.name}.")
-        except IndexError:
-            logger.error(f"DataFrame for {self.spec.name} is empty.")
-            raise IndexError(f"DataFrame for {self.spec.name} is empty.")
-
-    @property
-    def id_col(self) -> str:
-        """ TODO """
-        return self.spec.id_col
-
-    @property
-    def name(self) -> str:
-        """ TODO """
-        return self.spec.name
-
-@dataclass
-class SourceEntityTables:
-    src_entity_tables: list[SourceEntityTable]
-
-    def __post_init__(self):
-        """ Validate the SourceEntityTables. """
-        sources = {table.source for table in self.src_entity_tables}
-        if len(sources) != len(self.src_entity_tables):
-            logger.error("SourceEntityTables contains duplicate sources.")
-            raise ValueError("SourceEntityTables contains duplicate sources.")
-
-    def get(self, name: str) -> SourceEntityTable:
-        """ Get a SourceEntityTable by its name. """
-        for table in self.src_entity_tables:
-            if table.name == name:
-                return table
-        logger.error(f"Source entity table '{name}' not found.")
-        raise KeyError(f"Source entity table '{name}' not found.")
-
-    def get_from_src(self, source: str) -> SourceEntityTable:
-        """ Get a SourceEntityTable by its source. """
-        for table in self.src_entity_tables:
-            if table.source == source:
-                return table
-        logger.error(f"Source entity table with source '{source}' not found.")
-        raise KeyError(f"Source entity table with source '{source}' not found.")
-
-    @classmethod
-    def from_dict(cls, sources: dict[str, pd.DataFrame], specs: SourceEntityTableSpecs) -> SourceEntityTables:
-        """ Create a SourceEntityTables from a dictionary of DataFrames and specs. """
-        if not isinstance(sources, dict):
-            logger.error("Invalid format for sources. Expected a dictionary of DataFrames.")
-            raise ValueError("Invalid format for sources. Expected a dictionary of DataFrames.")
-
-        src_entity_tables = [
-            SourceEntityTable(sources[spec.name], spec) for spec in specs.specs if spec.name in sources
-        ]
-
-        return cls(src_entity_tables)
 
 
 class Entity:
@@ -230,10 +158,9 @@ def merge_components(components: list[ConnectedComponent]) -> pd.DataFrame:
             merged_rows.append(new_row)
     return pd.DataFrame(merged_rows)
 
-def create_mapping_table(sources: dict[str, pd.DataFrame], entity_type: str, **kwargs) -> pd.DataFrame:
+def create_mapping_table(sources: dict[str, pd.DataFrame], similarity_table: str, **kwargs) -> pd.DataFrame:
     """ TODO """
-    canonical_mapping = CANONICAL_MAPPING_SPECS.get(entity_type)
-    sim_table = SimilarityTable(sources[canonical_mapping.similarity_table])
+    sim_table = SimilarityTable(sources[similarity_table])
 
     sim_table = sim_table.get_best_matches(threshold=kwargs.get("threshold", 0))
     logger.debug(f"Similarity best matches: \n{sim_table.df.head(20)}")
