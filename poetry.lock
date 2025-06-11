@@ -1,25 +1,4 @@
 [[package]]
-name = "altair"
-version = "5.5.0"
-description = "Vega-Altair: A declarative statistical visualization library for Python."
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.dependencies]
-jinja2 = "*"
-jsonschema = ">=3.0"
-narwhals = ">=1.14.2"
-packaging = "*"
-typing-extensions = {version = ">=4.10.0", markers = "python_version < \"3.14\""}
-
-[package.extras]
-all = ["altair-tiles (>=0.3.0)", "anywidget (>=0.9.0)", "numpy", "pandas (>=1.1.3)", "pyarrow (>=11)", "vega-datasets (>=0.9.0)", "vegafusion[embed] (>=1.6.6)", "vl-convert-python (>=1.7.0)"]
-dev = ["duckdb (>=1.0)", "geopandas", "hatch (>=1.13.0)", "ipython", "mistune", "mypy", "pandas-stubs", "pandas (>=1.1.3)", "polars (>=0.20.3)", "pyarrow-stubs", "pytest", "pytest-cov", "pytest-xdist[psutil] (>=3.5,<4.0)", "ruff (>=0.6.0)", "types-jsonschema", "types-setuptools"]
-doc = ["docutils", "jinja2", "myst-parser", "numpydoc", "pillow (>=9,<10)", "pydata-sphinx-theme (>=0.14.1)", "scipy", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinxext-altair"]
-save = ["vl-convert-python (>=1.7.0)"]
-
-[[package]]
 name = "appnope"
 version = "0.1.4"
 description = "Disable App Nap on macOS >= 10.9"
@@ -91,14 +70,6 @@ html5lib = ["html5lib"]
 lxml = ["lxml"]
 
 [[package]]
-name = "blinker"
-version = "1.9.0"
-description = "Fast, simple object-to-object and broadcast signaling"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[[package]]
 name = "cachetools"
 version = "5.5.2"
 description = "Extensible memoizing collections and decorators"
@@ -137,7 +108,7 @@ python-versions = ">=3.7"
 name = "click"
 version = "8.2.1"
 description = "Composable command line interface toolkit"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.10"
 
@@ -161,7 +132,7 @@ requests-toolbelt = ">=0.9.1"
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 
@@ -181,7 +152,7 @@ test = ["pytest"]
 
 [[package]]
 name = "coverage"
-version = "7.8.0"
+version = "7.8.2"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -207,20 +178,6 @@ optional = false
 python-versions = ">=3.8"
 
 [[package]]
-name = "exceptiongroup"
-version = "1.3.0"
-description = "Backport of PEP 654 (exception groups)"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-typing-extensions = {version = ">=4.6.0", markers = "python_version < \"3.13\""}
-
-[package.extras]
-test = ["pytest (>=6)"]
-
-[[package]]
 name = "executing"
 version = "2.2.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -232,34 +189,8 @@ python-versions = ">=3.8"
 tests = ["asttokens (>=2.1.0)", "ipython", "pytest", "coverage", "coverage-enable-subprocess", "littleutils", "rich"]
 
 [[package]]
-name = "gitdb"
-version = "4.0.12"
-description = "Git Object Database"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-smmap = ">=3.0.1,<6"
-
-[[package]]
-name = "gitpython"
-version = "3.1.44"
-description = "GitPython is a Python library used to interact with Git repositories"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-gitdb = ">=4.0.1,<5"
-
-[package.extras]
-test = ["coverage", "ddt (>=1.1.1,!=1.4.3)", "mock", "mypy", "pre-commit", "pytest (>=7.3.1)", "pytest-cov", "pytest-instafail", "pytest-mock", "pytest-sugar", "typing-extensions"]
-doc = ["sphinx (>=7.1.2,<7.2)", "sphinx-rtd-theme", "sphinx-autodoc-typehints"]
-
-[[package]]
 name = "google-api-core"
-version = "2.24.2"
+version = "2.25.0"
 description = "Google API client core library"
 category = "main"
 optional = false
@@ -268,22 +199,19 @@ python-versions = ">=3.7"
 [package.dependencies]
 google-auth = ">=2.14.1,<3.0.0"
 googleapis-common-protos = ">=1.56.2,<2.0.0"
-proto-plus = [
-    {version = ">=1.22.3,<2.0.0", markers = "python_version < \"3.13\""},
-    {version = ">=1.25.0,<2.0.0", markers = "python_version >= \"3.13\""},
-]
+proto-plus = ">=1.22.3,<2.0.0"
 protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<7.0.0"
 requests = ">=2.18.0,<3.0.0"
 
 [package.extras]
-async-rest = ["google-auth[aiohttp] (>=2.35.0,<3.0.dev0)"]
-grpc = ["grpcio (>=1.33.2,<2.0dev)", "grpcio-status (>=1.33.2,<2.0.dev0)", "grpcio (>=1.49.1,<2.0dev)", "grpcio-status (>=1.49.1,<2.0.dev0)"]
-grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
-grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
+async-rest = ["google-auth[aiohttp] (>=2.35.0,<3.0.0)"]
+grpc = ["grpcio (>=1.33.2,<2.0.0)", "grpcio-status (>=1.33.2,<2.0.0)", "grpcio (>=1.49.1,<2.0.0)", "grpcio-status (>=1.49.1,<2.0.0)"]
+grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0.0)"]
+grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.0)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.169.0"
+version = "2.171.0"
 description = "Google API Client Library for Python"
 category = "main"
 optional = false
@@ -298,7 +226,7 @@ uritemplate = ">=3.0.1,<5"
 
 [[package]]
 name = "google-auth"
-version = "2.40.1"
+version = "2.40.3"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -362,7 +290,7 @@ grpc = ["grpcio (>=1.44.0,<2.0.0)"]
 
 [[package]]
 name = "greenlet"
-version = "3.2.2"
+version = "3.2.3"
 description = "Lightweight in-process concurrent programming"
 category = "main"
 optional = false
@@ -464,16 +392,16 @@ test = ["flaky", "ipyparallel", "pre-commit", "pytest-asyncio (>=0.23.5)", "pyte
 
 [[package]]
 name = "ipython"
-version = "8.36.0"
+version = "9.3.0"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
-python-versions = ">=3.10"
+python-versions = ">=3.11"
 
 [package.dependencies]
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
 decorator = "*"
-exceptiongroup = {version = "*", markers = "python_version < \"3.11\""}
+ipython-pygments-lexers = "*"
 jedi = ">=0.16"
 matplotlib-inline = "*"
 pexpect = {version = ">4.3", markers = "sys_platform != \"win32\" and sys_platform != \"emscripten\""}
@@ -485,17 +413,22 @@ typing_extensions = {version = ">=4.6", markers = "python_version < \"3.12\""}
 
 [package.extras]
 black = ["black"]
-doc = ["docrepr", "exceptiongroup", "intersphinx-registry", "ipykernel", "ipython", "matplotlib", "setuptools (>=18.5)", "sphinx-rtd-theme", "sphinx (>=1.3)", "sphinxcontrib-jquery", "tomli", "typing-extensions"]
-kernel = ["ipykernel"]
-nbconvert = ["nbconvert"]
-nbformat = ["nbformat"]
-notebook = ["ipywidgets", "notebook"]
-parallel = ["ipyparallel"]
-qtconsole = ["qtconsole"]
-test = ["pytest", "pytest-asyncio (<0.22)", "testpath", "pickleshare", "packaging"]
-test-extra = ["ipython", "curio", "jupyter-ai", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.23)", "pandas", "trio"]
+doc = ["docrepr", "exceptiongroup", "intersphinx-registry", "ipykernel", "ipython", "matplotlib", "setuptools (>=18.5)", "sphinx_toml (==0.0.4)", "sphinx-rtd-theme", "sphinx (>=1.3)", "typing-extensions"]
+test = ["pytest", "pytest-asyncio (<0.22)", "testpath", "packaging"]
+test-extra = ["ipython", "curio", "jupyter-ai", "matplotlib (!=3.2.0)", "nbformat", "nbclient", "ipykernel", "numpy (>=1.23)", "pandas", "trio"]
 matplotlib = ["matplotlib"]
-all = ["ipython", "ipython"]
+all = ["ipython"]
+
+[[package]]
+name = "ipython-pygments-lexers"
+version = "1.1.1"
+description = "Defines a variety of Pygments lexers for highlighting IPython code."
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+pygments = "*"
 
 [[package]]
 name = "jedi"
@@ -512,49 +445,6 @@ parso = ">=0.8.4,<0.9.0"
 docs = ["Jinja2 (==2.11.3)", "MarkupSafe (==1.1.1)", "Pygments (==2.8.1)", "alabaster (==0.7.12)", "babel (==2.9.1)", "chardet (==4.0.0)", "commonmark (==0.8.1)", "docutils (==0.17.1)", "future (==0.18.2)", "idna (==2.10)", "imagesize (==1.2.0)", "mock (==1.0.1)", "packaging (==20.9)", "pyparsing (==2.4.7)", "pytz (==2021.1)", "readthedocs-sphinx-ext (==2.1.4)", "recommonmark (==0.5.0)", "requests (==2.25.1)", "six (==1.15.0)", "snowballstemmer (==2.1.0)", "sphinx-rtd-theme (==0.4.3)", "sphinx (==1.8.5)", "sphinxcontrib-serializinghtml (==1.1.4)", "sphinxcontrib-websupport (==1.2.4)", "urllib3 (==1.26.4)"]
 qa = ["flake8 (==5.0.4)", "mypy (==0.971)", "types-setuptools (==67.2.0.1)"]
 testing = ["django", "attrs", "colorama", "docopt", "pytest (<9.0.0)"]
-
-[[package]]
-name = "jinja2"
-version = "3.1.6"
-description = "A very fast and expressive template engine."
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-MarkupSafe = ">=2.0"
-
-[package.extras]
-i18n = ["Babel (>=2.7)"]
-
-[[package]]
-name = "jsonschema"
-version = "4.23.0"
-description = "An implementation of JSON Schema validation for Python"
-category = "dev"
-optional = false
-python-versions = ">=3.8"
-
-[package.dependencies]
-attrs = ">=22.2.0"
-jsonschema-specifications = ">=2023.03.6"
-referencing = ">=0.28.4"
-rpds-py = ">=0.7.1"
-
-[package.extras]
-format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
-format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=24.6.0)"]
-
-[[package]]
-name = "jsonschema-specifications"
-version = "2025.4.1"
-description = "The JSON Schema meta-schemas and vocabularies, exposed as a Registry"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.dependencies]
-referencing = ">=0.31.0"
 
 [[package]]
 name = "jupyter-client"
@@ -577,7 +467,7 @@ test = ["coverage", "ipykernel (>=6.14)", "mypy", "paramiko", "pre-commit", "pyt
 
 [[package]]
 name = "jupyter-core"
-version = "5.7.2"
+version = "5.8.1"
 description = "Jupyter core package. A base package on which Jupyter projects rely."
 category = "dev"
 optional = false
@@ -589,16 +479,29 @@ pywin32 = {version = ">=300", markers = "sys_platform == \"win32\" and platform_
 traitlets = ">=5.3"
 
 [package.extras]
-docs = ["myst-parser", "pydata-sphinx-theme", "sphinx-autodoc-typehints", "sphinxcontrib-github-alt", "sphinxcontrib-spelling", "traitlets"]
-test = ["ipykernel", "pre-commit", "pytest-cov", "pytest-timeout", "pytest (<8)"]
+docs = ["intersphinx-registry", "myst-parser", "pydata-sphinx-theme", "sphinx-autodoc-typehints", "sphinxcontrib-spelling", "traitlets"]
+test = ["ipykernel", "pre-commit", "pytest-cov", "pytest-timeout", "pytest (<9)"]
 
 [[package]]
-name = "markupsafe"
-version = "3.0.2"
-description = "Safely add untrusted strings to HTML/XML markup."
-category = "dev"
+name = "markdown-it-py"
+version = "3.0.0"
+description = "Python port of markdown-it. Markdown parsing, done right!"
+category = "main"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.8"
+
+[package.dependencies]
+mdurl = ">=0.1,<1.0"
+
+[package.extras]
+benchmarking = ["psutil", "pytest", "pytest-benchmark"]
+code_style = ["pre-commit (>=3.0,<4.0)"]
+compare = ["commonmark (>=0.9,<1.0)", "markdown (>=3.4,<4.0)", "mistletoe (>=1.0,<2.0)", "mistune (>=2.0,<3.0)", "panflute (>=2.3,<3.0)"]
+linkify = ["linkify-it-py (>=1,<3)"]
+plugins = ["mdit-py-plugins"]
+profiling = ["gprof2dot"]
+rtd = ["mdit-py-plugins", "myst-parser", "pyyaml", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx-book-theme", "jupyter-sphinx"]
+testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 
 [[package]]
 name = "matplotlib-inline"
@@ -612,25 +515,12 @@ python-versions = ">=3.8"
 traitlets = "*"
 
 [[package]]
-name = "narwhals"
-version = "1.40.0"
-description = "Extremely lightweight compatibility layer between dataframe libraries"
-category = "dev"
+name = "mdurl"
+version = "0.1.2"
+description = "Markdown URL utilities"
+category = "main"
 optional = false
-python-versions = ">=3.8"
-
-[package.extras]
-cudf = ["cudf (>=24.10.0)"]
-dask = ["dask[dataframe] (>=2024.8)"]
-duckdb = ["duckdb (>=1.0)"]
-ibis = ["ibis-framework (>=6.0.0)", "packaging", "pyarrow-hotfix", "rich"]
-modin = ["modin"]
-pandas = ["pandas (>=0.25.3)"]
-polars = ["polars (>=0.20.3)"]
-pyarrow = ["pyarrow (>=11.0.0)"]
-pyspark = ["pyspark (>=3.5.0)"]
-pyspark-connect = ["pyspark[connect] (>=3.5.0)"]
-sqlframe = ["sqlframe (>=3.22.0)"]
+python-versions = ">=3.7"
 
 [[package]]
 name = "nest-asyncio"
@@ -641,12 +531,29 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "networkx"
+version = "3.5"
+description = "Python package for creating and manipulating graphs and networks"
+category = "main"
+optional = false
+python-versions = ">=3.11"
+
+[package.extras]
+default = ["numpy (>=1.25)", "scipy (>=1.11.2)", "matplotlib (>=3.8)", "pandas (>=2.0)"]
+developer = ["pre-commit (>=4.1)", "mypy (>=1.15)"]
+doc = ["sphinx (>=8.0)", "pydata-sphinx-theme (>=0.16)", "sphinx-gallery (>=0.18)", "numpydoc (>=1.8.0)", "pillow (>=10)", "texext (>=0.6.7)", "myst-nb (>=1.1)", "intersphinx-registry"]
+example = ["osmnx (>=2.0.0)", "momepy (>=0.7.2)", "contextily (>=1.6)", "seaborn (>=0.13)", "cairocffi (>=1.7)", "igraph (>=0.11)", "scikit-learn (>=1.5)"]
+extra = ["lxml (>=4.6)", "pygraphviz (>=1.14)", "pydot (>=3.0.1)", "sympy (>=1.10)"]
+test = ["pytest (>=7.2)", "pytest-cov (>=4.0)", "pytest-xdist (>=3.0)"]
+test-extras = ["pytest-mpl", "pytest-randomly"]
+
+[[package]]
 name = "numpy"
-version = "2.2.6"
+version = "2.3.0"
 description = "Fundamental package for array computing in Python"
 category = "main"
 optional = false
-python-versions = ">=3.10"
+python-versions = ">=3.11"
 
 [[package]]
 name = "oauthlib"
@@ -663,7 +570,7 @@ signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "packaging"
-version = "24.2"
+version = "25.0"
 description = "Core utilities for Python packages"
 category = "dev"
 optional = false
@@ -671,18 +578,14 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "pandas"
-version = "2.2.3"
+version = "2.3.0"
 description = "Powerful data structures for data analysis, time series, and statistics"
 category = "main"
 optional = false
 python-versions = ">=3.9"
 
 [package.dependencies]
-numpy = [
-    {version = ">=1.22.4", markers = "python_version < \"3.11\""},
-    {version = ">=1.23.2", markers = "python_version == \"3.11\""},
-    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
-]
+numpy = {version = ">=1.23.2", markers = "python_version == \"3.11\""}
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
 tzdata = ">=2022.7"
@@ -736,23 +639,6 @@ python-versions = "*"
 ptyprocess = ">=0.5"
 
 [[package]]
-name = "pillow"
-version = "11.2.1"
-description = "Python Imaging Library (Fork)"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.extras]
-docs = ["furo", "olefile", "sphinx (>=8.2)", "sphinx-copybutton", "sphinx-inline-tabs", "sphinxext-opengraph"]
-fpx = ["olefile"]
-mic = ["olefile"]
-test-arrow = ["pyarrow"]
-tests = ["check-manifest", "coverage (>=7.4.2)", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout", "trove-classifiers (>=2024.10.12)"]
-typing = ["typing-extensions"]
-xmp = ["defusedxml"]
-
-[[package]]
 name = "platformdirs"
 version = "4.3.8"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -804,7 +690,7 @@ testing = ["google-api-core (>=1.31.5)"]
 
 [[package]]
 name = "protobuf"
-version = "6.31.0"
+version = "6.31.1"
 description = ""
 category = "main"
 optional = false
@@ -842,17 +728,6 @@ python-versions = "*"
 tests = ["pytest"]
 
 [[package]]
-name = "pyarrow"
-version = "20.0.0"
-description = "Python library for Apache Arrow"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.extras]
-test = ["pytest", "hypothesis", "cffi", "pytz", "pandas"]
-
-[[package]]
 name = "pyasn1"
 version = "0.6.1"
 description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
@@ -880,26 +755,10 @@ optional = false
 python-versions = ">=3.8"
 
 [[package]]
-name = "pydeck"
-version = "0.9.1"
-description = "Widget for deck.gl maps"
-category = "dev"
-optional = false
-python-versions = ">=3.8"
-
-[package.dependencies]
-jinja2 = ">=2.10.1"
-numpy = ">=1.16.4"
-
-[package.extras]
-carto = ["pydeck-carto"]
-jupyter = ["ipywidgets (>=7,<8)", "traitlets (>=4.3.2)", "ipython (>=5.8.0)", "ipykernel (>=5.1.2)"]
-
-[[package]]
 name = "pygments"
 version = "2.19.1"
 description = "Pygments is a syntax highlighting package written in Python."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.8"
 
@@ -919,22 +778,21 @@ diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pytest"
-version = "8.3.5"
+version = "8.4.0"
 description = "pytest: simple powerful testing with Python"
 category = "dev"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 
 [package.dependencies]
-colorama = {version = "*", markers = "sys_platform == \"win32\""}
-exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
-iniconfig = "*"
-packaging = "*"
+colorama = {version = ">=0.4", markers = "sys_platform == \"win32\""}
+iniconfig = ">=1"
+packaging = ">=20"
 pluggy = ">=1.5,<2"
-tomli = {version = ">=1", markers = "python_version < \"3.11\""}
+pygments = ">=2.7.2"
 
 [package.extras]
-dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
+dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "requests", "setuptools", "xmlschema"]
 
 [[package]]
 name = "python-dateutil"
@@ -948,14 +806,6 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 six = ">=1.5"
 
 [[package]]
-name = "python-decouple"
-version = "3.8"
-description = "Strict separation of settings from code."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "python-dotenv"
 version = "1.1.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -965,17 +815,6 @@ python-versions = ">=3.9"
 
 [package.extras]
 cli = ["click (>=5.0)"]
-
-[[package]]
-name = "python-json-logger"
-version = "3.3.0"
-description = "JSON Log Formatter for the Python Logging Package"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[package.extras]
-dev = ["orjson", "msgspec", "validate-pyproject", "black", "pylint", "mypy", "pytest", "freezegun", "backports.zoneinfo", "tzdata", "build", "mkdocs", "mkdocs-material (>=8.5)", "mkdocs-awesome-pages-plugin", "mdx-truly-sane-lists", "mkdocstrings", "mkdocs-gen-files", "mkdocs-literate-nav", "mike"]
 
 [[package]]
 name = "pytz"
@@ -1024,21 +863,8 @@ python-versions = ">=3.9"
 all = ["numpy"]
 
 [[package]]
-name = "referencing"
-version = "0.36.2"
-description = "JSON Referencing + Python"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.dependencies]
-attrs = ">=22.2.0"
-rpds-py = ">=0.7.0"
-typing-extensions = {version = ">=4.4.0", markers = "python_version < \"3.13\""}
-
-[[package]]
 name = "requests"
-version = "2.32.3"
+version = "2.32.4"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
@@ -1046,7 +872,7 @@ python-versions = ">=3.8"
 
 [package.dependencies]
 certifi = ">=2017.4.17"
-charset-normalizer = ">=2,<4"
+charset_normalizer = ">=2,<4"
 idna = ">=2.5,<4"
 urllib3 = ">=1.21.1,<3"
 
@@ -1081,12 +907,19 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 requests = ">=2.0.1,<3.0.0"
 
 [[package]]
-name = "rpds-py"
-version = "0.25.0"
-description = "Python bindings to Rust's persistent data structures (rpds)"
-category = "dev"
+name = "rich"
+version = "14.0.0"
+description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
+category = "main"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.8.0"
+
+[package.dependencies]
+markdown-it-py = ">=2.2.0"
+pygments = ">=2.13.0,<3.0.0"
+
+[package.extras]
+jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
 name = "rsa"
@@ -1100,20 +933,20 @@ python-versions = "<4,>=3.6"
 pyasn1 = ">=0.1.3"
 
 [[package]]
+name = "shellingham"
+version = "1.5.4"
+description = "Tool to Detect Surrounding Shell"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
 category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
-
-[[package]]
-name = "smmap"
-version = "5.0.2"
-description = "A pure Python implementation of a sliding window memory map manager"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
 
 [[package]]
 name = "soupsieve"
@@ -1177,50 +1010,6 @@ pure-eval = "*"
 tests = ["pytest", "typeguard", "pygments", "littleutils", "cython"]
 
 [[package]]
-name = "streamlit"
-version = "1.45.1"
-description = "A faster way to build and share data apps"
-category = "dev"
-optional = false
-python-versions = "!=3.9.7,>=3.9"
-
-[package.dependencies]
-altair = ">=4.0,<6"
-blinker = ">=1.5.0,<2"
-cachetools = ">=4.0,<6"
-click = ">=7.0,<9"
-gitpython = ">=3.0.7,<3.1.19 || >3.1.19,<4"
-numpy = ">=1.23,<3"
-packaging = ">=20,<25"
-pandas = ">=1.4.0,<3"
-pillow = ">=7.1.0,<12"
-protobuf = ">=3.20,<7"
-pyarrow = ">=7.0"
-pydeck = ">=0.8.0b4,<1"
-requests = ">=2.27,<3"
-tenacity = ">=8.1.0,<10"
-toml = ">=0.10.1,<2"
-tornado = ">=6.0.3,<7"
-typing-extensions = ">=4.4.0,<5"
-watchdog = {version = ">=2.1.5,<7", markers = "platform_system != \"Darwin\""}
-
-[package.extras]
-snowflake = ["snowflake-snowpark-python[modin] (>=1.17.0)", "snowflake-connector-python (>=3.3.0)"]
-
-[[package]]
-name = "streamlit-aggrid"
-version = "1.1.4.post1"
-description = "Streamlit component implementation of ag-grid"
-category = "dev"
-optional = false
-python-versions = ">=3.10"
-
-[package.dependencies]
-pandas = ">=1.4.0"
-python-decouple = "*"
-streamlit = ">=1.2"
-
-[[package]]
 name = "tatsu"
 version = "5.13.1"
 description = "TatSu takes a grammar in a variation of EBNF as input, and outputs a memoizing PEG/Packrat parser in Python."
@@ -1233,36 +1022,8 @@ colorization = ["colorama"]
 parproc = ["rich"]
 
 [[package]]
-name = "tenacity"
-version = "9.1.2"
-description = "Retry code until it succeeds"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.extras]
-doc = ["reno", "sphinx"]
-test = ["pytest", "tornado (>=4.5)", "typeguard"]
-
-[[package]]
-name = "toml"
-version = "0.10.2"
-description = "Python Library for Tom's Obvious, Minimal Language"
-category = "dev"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[[package]]
-name = "tomli"
-version = "2.2.1"
-description = "A lil' TOML parser"
-category = "dev"
-optional = false
-python-versions = ">=3.8"
-
-[[package]]
 name = "tornado"
-version = "6.5"
+version = "6.5.1"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
 category = "dev"
 optional = false
@@ -1281,6 +1042,20 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest-mock", "pytest-mypy-testing", "pytest (>=7.0,<8.2)"]
 
 [[package]]
+name = "typer"
+version = "0.16.0"
+description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+click = ">=8.0.0"
+rich = ">=10.11.0"
+shellingham = ">=1.3.0"
+typing-extensions = ">=3.7.4.3"
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.9.0.20250516"
 description = "Typing stubs for python-dateutil"
@@ -1290,11 +1065,11 @@ python-versions = ">=3.9"
 
 [[package]]
 name = "typing-extensions"
-version = "4.13.2"
-description = "Backported and Experimental Type Hints for Python 3.8+"
+version = "4.14.0"
+description = "Backported and Experimental Type Hints for Python 3.9+"
 category = "main"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 
 [[package]]
 name = "tzdata"
@@ -1306,11 +1081,11 @@ python-versions = ">=2"
 
 [[package]]
 name = "uritemplate"
-version = "4.1.1"
+version = "4.2.0"
 description = "Implementation of RFC 6570 URI Templates"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.9"
 
 [[package]]
 name = "urllib3"
@@ -1327,17 +1102,6 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
-name = "watchdog"
-version = "6.0.0"
-description = "Filesystem events monitoring"
-category = "dev"
-optional = false
-python-versions = ">=3.9"
-
-[package.extras]
-watchmedo = ["PyYAML (>=3.10)"]
-
-[[package]]
 name = "wcwidth"
 version = "0.2.13"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -1347,17 +1111,15 @@ python-versions = "*"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "a5f275b4352c4205ba91762f687687ce2ffff2b52dcf0871f52a39824f2e32ab"
+python-versions = ">=3.11,<3.12"
+content-hash = "52518445af78ae319204cc0ff3ffb4a49f49ba9be8ce1829df69d8981153b803"
 
 [metadata.files]
-altair = []
 appnope = []
 arrow = []
 asttokens = []
 attrs = []
 beautifulsoup4 = []
-blinker = []
 cachetools = []
 certifi = []
 cffi = []
@@ -1369,10 +1131,7 @@ comm = []
 coverage = []
 debugpy = []
 decorator = []
-exceptiongroup = []
 executing = []
-gitdb = []
-gitpython = []
 google-api-core = []
 google-api-python-client = []
 google-auth = []
@@ -1387,23 +1146,21 @@ idna = []
 iniconfig = []
 ipykernel = []
 ipython = []
+ipython-pygments-lexers = []
 jedi = []
-jinja2 = []
-jsonschema = []
-jsonschema-specifications = []
 jupyter-client = []
 jupyter-core = []
-markupsafe = []
+markdown-it-py = []
 matplotlib-inline = []
-narwhals = []
+mdurl = []
 nest-asyncio = []
+networkx = []
 numpy = []
 oauthlib = []
 packaging = []
 pandas = []
 parso = []
 pexpect = []
-pillow = []
 platformdirs = []
 pluggy = []
 prompt-toolkit = []
@@ -1412,46 +1169,36 @@ protobuf = []
 psutil = []
 ptyprocess = []
 pure-eval = []
-pyarrow = []
 pyasn1 = []
 pyasn1-modules = []
 pycparser = []
-pydeck = []
 pygments = []
 pyparsing = []
 pytest = []
 python-dateutil = []
-python-decouple = []
 python-dotenv = []
-python-json-logger = []
 pytz = []
 pywin32 = []
 pyyaml = []
 pyzmq = []
 rapidfuzz = []
-referencing = []
 requests = []
 requests-oauthlib = []
 requests-toolbelt = []
-rpds-py = []
+rich = []
 rsa = []
+shellingham = []
 six = []
-smmap = []
 soupsieve = []
 sqlalchemy = []
 stack-data = []
-streamlit = []
-streamlit-aggrid = []
 tatsu = []
-tenacity = []
-toml = []
-tomli = []
 tornado = []
 traitlets = []
+typer = []
 types-python-dateutil = []
 typing-extensions = []
 tzdata = []
 uritemplate = []
 urllib3 = []
-watchdog = []
 wcwidth = []
