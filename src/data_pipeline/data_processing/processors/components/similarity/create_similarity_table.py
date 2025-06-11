@@ -83,7 +83,8 @@ class RegistryCreation:
     @property
     def _source_pairs(self) -> list[tuple[str, str]]:
         """ TODO """
-        return list(itertools.combinations(list(self.source_tables.keys()), 2))
+        pairs = list(itertools.combinations(list(self.source_tables.keys()), 2))
+        return pairs
 
     def run(self, threshold: float, **kwargs) -> pd.DataFrame:
         """ TODO """
@@ -103,4 +104,5 @@ class RegistryCreation:
 
 def create_similarity_table(sources: dict[str, pd.DataFrame], entity_type: str, threshold: float = 50, **kwargs) -> pd.DataFrame:
     """ TODO """
-    return RegistryCreation(sources, entity_type).run(threshold=threshold, **kwargs)
+    sim_table = RegistryCreation(sources, entity_type).run(threshold=threshold, **kwargs)
+    return sim_table.reset_index(drop=True)

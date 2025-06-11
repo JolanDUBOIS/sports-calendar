@@ -56,44 +56,20 @@ class SimilaritySpecs:
         logger.error(f"Similarity spec for entity type '{entity_type}' not found.")
         raise KeyError(f"Similarity spec for entity type '{entity_type}' not found.")
 
-    def append(self, spec: SimilaritySpec):
+    def append(self, spec: SimilaritySpec) -> None:
         """ Add a new SimilaritySpec to the collection. """
         if any(existing_spec.entity_type == spec.entity_type for existing_spec in self.specs):
             logger.error(f"Similarity spec for entity type '{spec.entity_type}' already exists.")
             raise ValueError(f"Similarity spec for entity type '{spec.entity_type}' already exists.")
         self.specs.append(spec)
 
-@dataclass
-class ReferenceEntitySpec:
-    entity_type: str
-    coalesce_rules: dict[str, list[str]] # e.g., "name": ["espn_teams.name", "football_data_teams.name"]
 
-@dataclass
-class ReferenceEntitySpecs:
-    specs: list[ReferenceEntitySpec] = field(default_factory=list)
-
-    def get(self, entity_type: str) -> ReferenceEntitySpec:
-        """ Get a ReferenceEntitySpec by its entity type. """
-        for spec in self.specs:
-            if spec.entity_type == entity_type:
-                return spec
-        logger.error(f"Reference entity spec for entity type '{entity_type}' not found.")
-        raise KeyError(f"Reference entity spec for entity type '{entity_type}' not found.")
-
-    def append(self, spec: ReferenceEntitySpec):
-        """ Add a new ReferenceEntitySpec to the collection. """
-        if any(existing_spec.entity_type == spec.entity_type for existing_spec in self.specs):
-            logger.error(f"Reference entity spec for entity type '{spec.entity_type}' already exists.")
-            raise ValueError(f"Reference entity spec for entity type '{spec.entity_type}' already exists.")
-        self.specs.append(spec)
-
-
-def load_entity_specs(path: str | Path) -> tuple[SimilaritySpecs, ReferenceEntitySpecs]:
-    with open(path, 'r') as f:
+def load_entity_specs(specs_path: str | Path) -> SimilaritySpecs:
+    specs_path = Path(specs_path)
+    with specs_path.open(mode='r') as f:
         raw_data = yaml.safe_load(f)
 
     similarity_specs = SimilaritySpecs()
-    reference_specs = ReferenceEntitySpecs()
 
     for entity_type, specs in raw_data.items():
         if not isinstance(specs, dict):
@@ -108,13 +84,9 @@ def load_entity_specs(path: str | Path) -> tuple[SimilaritySpecs, ReferenceEntit
             sources=sources,
             **specs.get("registry", {})
         ))
-        reference_specs.append(ReferenceEntitySpec(
-            entity_type=entity_type,
-            coalesce_rules=specs.get("reference", {}).get("coalesce_rules", {})
-        ))
     
-    return similarity_specs, reference_specs
+    return similarity_specs
 
-SIMILARITY_SPECS, REFERENCE_SPECS = load_entity_specs(
-    Path(__file__).parent / "entity_resolution_config.yml"
+SIMILARITY_SPECS = load_entity_specs(
+    Path(__file__).parent / "config.yml"
 )
