@@ -8,3 +8,4 @@ from .extract_table import extract_table
 from .parsing import parse
 from .reshape_matches import reshape_matches
 from .similarity import create_similarity_table
+from .canonical_mapping import create_mapping_table

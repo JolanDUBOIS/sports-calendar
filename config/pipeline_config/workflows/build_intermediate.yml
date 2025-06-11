@@ -376,13 +376,13 @@ models:
     description: Extracts competition information from the Live Soccer standings data.
     trigger: automatic
     sources:
-      - name: live_soccer_standings
-        path: intermediate/live_soccer_standings.csv
+      - name: live_soccer_competitions
+        path: landing/live_soccer_competitions.csv
         versioning:
           mode: newest
-          field: intermediate_at
+          field: created_at
     dependencies:
-      - intermediate.live_soccer_standings
+      - landing.live_soccer_competitions
     output:
       name: live_soccer_competitions
       layer: intermediate
@@ -390,16 +390,15 @@ models:
       schema: live_soccer_competitions
       unique:
         field_sets:
-          - [competition]
+          - [name]
         version_col: intermediate_at
         keep: first
       non-nullable:
         fields:
-          - competition
+          - name
     processing:
-      processor: DerivationProcessor
-      source_key: live_soccer_standings
-      output_key: live_soccer_competitions
+      processor: ParsingProcessor
+      source_key: live_soccer_competitions
       deduplicate: true
     static_fields:
       - name: intermediate_at
@@ -599,6 +598,96 @@ models:
           - source_B
     processing:
       processor: SimilarityProcessor
+      entity_type: areas
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: team_mapping
+    description: Create teams canonical mapping table.
+    trigger: automatic
+    sources:
+      - name: team_similarity
+        path: intermediate/team_similarity.csv
+    dependencies:
+      - intermediate.team_similarity
+    output:
+      name: team_mapping
+      layer: intermediate
+      path: intermediate/team_mapping.csv
+      schema: team_mapping
+      unique:
+        field_sets:
+          - [id, source_id, source]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields:
+          - id
+          - source_id
+          - source
+    processing:
+      processor: CanonicalMappingProcessor
+      entity_type: teams
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: competition_mapping
+    description: Create competitions canonical mapping table.
+    trigger: automatic
+    sources:
+      - name: competition_similarity
+        path: intermediate/competition_similarity.csv
+    dependencies:
+      - intermediate.competition_similarity
+    output:
+      name: competition_mapping
+      layer: intermediate
+      path: intermediate/competition_mapping.csv
+      schema: competition_mapping
+      unique:
+        field_sets:
+          - [id, source_id, source]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields:
+          - id
+          - source_id
+          - source
+    processing:
+      processor: CanonicalMappingProcessor
+      entity_type: competitions
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: area_mapping
+    description: Create areas canonical mapping table.
+    trigger: automatic
+    sources:
+      - name: area_similarity
+        path: intermediate/area_similarity.csv
+    dependencies:
+      - intermediate.area_similarity
+    output:
+      name: area_mapping
+      layer: intermediate
+      path: intermediate/area_mapping.csv
+      schema: area_mapping
+      unique:
+        field_sets:
+          - [id, source_id, source]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+        fields:
+          - id
+          - source_id
+          - source
+    processing:
+      processor: CanonicalMappingProcessor
       entity_type: areas
     static_fields:
       - name: intermediate_at
