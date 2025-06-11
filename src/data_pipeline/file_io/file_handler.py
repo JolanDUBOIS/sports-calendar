@@ -1,5 +1,5 @@
+import copy
 from pathlib import Path
-from typing import TypeAlias, Any
 from abc import ABC, abstractmethod
 
 import pandas as pd
@@ -47,7 +47,7 @@ class FileHandler(ABC):
 
     def read(self) -> IOContent:
         """ Return the content of the file. """
-        return self.content
+        return copy.deepcopy(self.content)
 
     def write(self, data: IOContent, overwrite: bool = False) -> tuple[int, int]:
         """
