@@ -47,6 +47,8 @@ def concat_io_content(data: IOContent, new_data: IOContent | dict | None) -> IOC
         logger.warning("Original data is None. Returning new data.")
         return new_data
     elif isinstance(data, pd.DataFrame) and isinstance(new_data, pd.DataFrame):
+        data = data.astype(str)
+        new_data = new_data.astype(str)
         return pd.concat([data, new_data], ignore_index=True)
     elif isinstance(data, list) and isinstance(new_data, list):
         return data + new_data

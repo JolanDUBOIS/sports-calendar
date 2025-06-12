@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import numpy as np
 import pandas as pd
 
 from . import logger
@@ -33,7 +34,7 @@ class UniqueEnforcer(OutputEnforcer):
         for field_set in self.spec.field_sets:
             logger.debug(f"Enforcing uniqueness for field set: {field_set}")
             df = df.sort_values(by=self.spec.version_col, ascending=True).drop_duplicates(subset=field_set, keep=self.spec.keep)
-        return df
+        return df.reset_index(drop=True)
 
 
 class NonNullableEnforcer(OutputEnforcer):
@@ -45,4 +46,6 @@ class NonNullableEnforcer(OutputEnforcer):
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply non-nullability enforcement to the DataFrame. """
-        return df.dropna(subset=self.spec.fields)
+        pd.set_option('future.no_silent_downcasting', True)
+        df = df.replace({"nan": np.nan, "None": np.nan, "": np.nan})
+        return df.dropna(subset=self.spec.fields).reset_index(drop=True)

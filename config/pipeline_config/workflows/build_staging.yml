@@ -1,0 +1,42 @@
+name: build_staging
+description: This workflow is responsible for orchestrating the data pipeline from the intermediate zone to the staging zone.
+stage: staging
+
+models:
+  - name: regions
+    description: Extracts and stages region data from sources area tables and area_similarity table.
+    trigger: manual
+    sources:
+      - name: football_data_areas
+        path: intermediate/football_data_areas.csv
+      - name: live_soccer_areas
+        path: intermediate/live_soccer_areas.csv
+      - name: area_similarity
+        path: intermediate/area_similarity.csv
+    dependencies:
+      - intermediate.football_data_areas
+      - intermediate.live_soccer_areas
+    output:
+      name: regions
+      layer: staging
+      path: staging/regions.csv
+      schema: regions
+      unique:
+        field_sets:
+          - [id]
+        version_col: staging_at
+        keep: last
+      non-nullable:
+        fieds:
+          - id
+          - name
+          - staging_at
+    processing:
+      processor: ReferenceEntitiesProcessor
+      input_key: area_similarity
+
+
+  - name: competitions
+  - name: teams
+  - name: matches
+  - name: standings

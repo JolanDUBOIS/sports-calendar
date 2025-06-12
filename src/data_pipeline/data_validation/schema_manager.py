@@ -1,4 +1,5 @@
 from __future__ import annotations
+import traceback
 from pathlib import Path
 
 import pandas as pd
@@ -150,16 +151,24 @@ class LayerSchemaManager:
         """ TODO """
         if model:
             logger.info(f"Validating schema for model '{model}' in stage '{self.schema_spec.stage}'.")
-            model_manager = ModelSchemaManager(self.schema_spec.get(model))
-            model_manager.validate(raise_on_error=raise_on_error)
-            return SchemaValidationResult(schema=self.schema_spec.name, results=[model_manager.validate(raise_on_error)])
+            try:
+                model_manager = ModelSchemaManager(self.schema_spec.get(model))
+                model_manager.validate(raise_on_error=raise_on_error)
+                return SchemaValidationResult(schema=self.schema_spec.name, results=[model_manager.validate(raise_on_error)])
+            except Exception as e:
+                logger.error(f"Validation failed for model '{model}': {e}")
+                logger.debug(traceback.format_exc())
 
         logger.info(f"Validating schema for stage '{self.schema_spec.stage}'.")
-        schema_result = SchemaValidationResult(schema=self.schema_spec.name)
-        for model_spec in self.schema_spec.models:
-            model_manager = ModelSchemaManager(model_spec)
-            schema_result.append(model_manager.validate(raise_on_error=raise_on_error))
-        return schema_result
+        try:
+            schema_result = SchemaValidationResult(schema=self.schema_spec.name)
+            for model_spec in self.schema_spec.models:
+                model_manager = ModelSchemaManager(model_spec)
+                schema_result.append(model_manager.validate(raise_on_error=raise_on_error))
+            return schema_result
+        except Exception as e:
+            logger.error(f"Validation failed for stage '{self.schema_spec.stage}': {e}")
+            logger.debug(traceback.format_exc())
 
     @classmethod
     def from_dict(cls, d: dict, repo_path: str | Path) -> LayerSchemaManager:

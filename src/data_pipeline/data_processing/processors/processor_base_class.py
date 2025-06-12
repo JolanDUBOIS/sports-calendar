@@ -1,9 +1,14 @@
+from __future__ import annotations
+import traceback
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 
 import pandas as pd
 
 from . import logger
-from ...types import IOContent
+
+if TYPE_CHECKING:
+    from ...types import IOContent
 
 
 class Processor(ABC):
@@ -11,8 +16,13 @@ class Processor(ABC):
 
     def run(self, **kwargs) -> IOContent:
         """ Run the processor with given arguments and return the output content. """
-        data = self._run(**kwargs)
-        return data
+        try:
+            data = self._run(**kwargs)
+            return data
+        except Exception as e:
+            logger.error(f"Error in processor {self.__class__.__name__}: {e}")
+            logger.debug(traceback.format_exc())
+            raise e
 
     @abstractmethod
     def _run(self, **kwargs) -> IOContent:

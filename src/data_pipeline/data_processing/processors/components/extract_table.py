@@ -7,7 +7,7 @@ EXTRACTION_INSTRUCTIONS = {
     "espn_teams": {
         "extraction_type": "double",
         "columns_mapping": {
-            "team_id": ["home_team_id", "home_team_id"],
+            "team_id": ["home_team_id", "away_team_id"],
             "team_name": ["home_team_name", "away_team_name"],
             "team_abbreviation": ["home_team_abbreviation", "away_team_abbreviation"],
             "team_displayName": ["home_team_displayName", "away_team_displayName"],
@@ -37,10 +37,6 @@ EXTRACTION_INSTRUCTIONS = {
             "competition_id", "competition_name", "competition_code",
             "competition_type", "source", "source_type"
         ],
-    },
-    "live_soccer_competitions": {
-        "extraction_type": "simple",
-        "columns": ["competition", "source", "source_type"],
     },
     "football_data_areas": {
         "extraction_type": "simple",

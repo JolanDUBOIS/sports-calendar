@@ -3,6 +3,7 @@ stage: intermediate
 
 models:
   - name: espn_matches
+    path: espn_matches.csv
     columns:
       - name: id
         unique: true
@@ -39,6 +40,7 @@ models:
       - name: intermediate_at
 
   - name: football_data_matches
+    path: football_data_matches.csv
     columns:
       - name: area_id
       - name: area_name
@@ -82,6 +84,7 @@ models:
       - name: intermediate_at
 
   - name: football_data_standings
+    path: football_data_standings.csv
     columns:
       - name: area_id
       - name: area_name
@@ -120,6 +123,7 @@ models:
       - name: intermediate_at
 
   - name: football_ranking_fifa_rankings
+    path: football_ranking_fifa_rankings.csv
     columns:
       - name: team
       - name: team_name
@@ -132,6 +136,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_matches
+    path: live_soccer_matches.csv
     columns:
       - name: title
       - name: match_date
@@ -153,6 +158,7 @@ models:
       - name: intermediate_at
 
   - name: live_soccer_standings
+    path: live_soccer_standings.csv
     columns:
       - name: position
       - name: team_source_name
@@ -173,6 +179,7 @@ models:
       - name: intermediate_at
 
   - name: espn_teams
+    path: espn_teams.csv
     columns:
       - name: team_id
         unique: true
@@ -183,16 +190,201 @@ models:
       - name: intermediate_at
 
   - name: football_data_teams
+    path: football_data_teams.csv
     columns:
       - name: team_id
         unique: true
       - name: team_name
       - name: team_shortName
-      - name: team_tla
+      - name: tla
       - name: intermediate_at
 
   - name: live_soccer_teams
+    path: live_soccer_teams.csv
     columns:
       - name: team_name
         unique: true
+      - name: intermediate_at
+
+  - name: live_soccer_teams
+    path: live_soccer_teams.csv
+    columns:
+      - name: team_name
+        unique: true
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+  
+  - name: espn_competitions
+    path: espn_competitions.csv
+    columns:
+      - name: competition_id
+        unique: true
+      - name: competition_name
+      - name: competition_abbreviation
+      - name: competition_midsizeName
+      - name: competition_slug
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+  
+  - name: football_data_competitions
+    path: football_data_competitions.csv
+    columns:
+      - name: competition_id
+        unique: true
+      - name: competition_name
+      - name: competition_code
+      - name: competition_type
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: live_soccer_competitions
+    path: live_soccer_competitions.csv
+    columns:
+      - name: section_title
+      - name: name
+        unique: true
+        nullable: false
+      - name: region
+      - name: confederation
+      - name: area
+      - name: competition
+      - name: endpoint
+      - name: source
+      - name: source_type
+      - name: created_at
+      - name: intermediate_at
+
+  - name: football_data_areas
+    path: football_data_areas.csv
+    columns:
+      - name: area_id
+        unique: true
+      - name: area_name
+      - name: area_code
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: live_soccer_areas
+    path: live_soccer_areas.csv
+    columns:
+      - name: area
+        unique: true
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: team_similarity
+    path: team_similarity.csv
+    columns:
+      - name: id_A
+        nullable: false
+      - name: id_B
+        nullable: false
+      - name: source_A
+        nullable: false
+      - name: source_B
+        nullable: false
+      - name: similarity_score
+        nullable: false
+      - name: intermediate_at
+
+  - name: competition_similarity
+    path: competition_similarity.csv
+    columns:
+      - name: id_A
+        nullable: false
+      - name: id_B
+        nullable: false
+      - name: source_A
+        nullable: false
+      - name: source_B
+        nullable: false
+      - name: similarity_score
+        nullable: false
+      - name: intermediate_at
+
+  - name: area_similarity
+    path: area_similarity.csv
+    columns:
+      - name: id_A
+        nullable: false
+      - name: id_B
+        nullable: false
+      - name: source_A
+        nullable: false
+      - name: source_B
+        nullable: false
+      - name: similarity_score
+        nullable: false
+      - name: intermediate_at
+
+  - name: team_mapping
+    path: team_mapping.csv
+    columns:
+      - name: id
+        nullable: false
+      - name: source_id
+        nullable: false
+      - name: source
+        nullable: false
+      - name: intermediate_at
+
+  - name: competition_mapping
+    path: competition_mapping.csv
+    columns:
+      - name: id
+        nullable: false
+      - name: source_id
+        nullable: false
+      - name: source
+        nullable: false
+      - name: intermediate_at
+
+  - name: area_mapping
+    path: area_mapping.csv
+    columns:
+      - name: id
+        nullable: false
+      - name: source_id
+        nullable: false
+      - name: source
+        nullable: false
+      - name: intermediate_at
+
+  - name: team_registry
+    path: team_registry.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+      - name: name
+        nullable: false
+      - name: short_name
+      - name: tla
+      - name: intermediate_at
+
+  - name: competition_registry
+    path: competition_registry.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+      - name: name
+        nullable: false
+      - name: code
+      - name: intermediate_at
+
+  - name: area_registry
+    path: area_registry.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+      - name: name
+        nullable: false
+      - name: code
       - name: intermediate_at

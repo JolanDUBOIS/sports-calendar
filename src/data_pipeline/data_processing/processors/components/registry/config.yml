@@ -1,0 +1,28 @@
+teams:
+  canonical_mapping_table: team_mapping
+  coalesce_rules:
+    name: 
+      source_cols: ["espn_teams.team_name", "live_soccer_teams.team_name", "football_data_teams.team_name"]
+      nullable: false
+    short_name: 
+      source_cols: ["espn_teams.team_shortDisplayName", "football_data_teams.team_shortName"]
+    tla: 
+      source_cols: ["espn_teams.team_abbreviation", "football_data_teams.tla"]
+
+competitions:
+  canonical_mapping_table: competition_mapping
+  coalesce_rules:
+    name: 
+      source_cols: ["espn_competitions.competition_abbreviation", "football_data_competitions.competition_name", "live_soccer_competitions.competition"]
+      nullable: false
+    code: 
+      source_cols: ["football_data_competitions.competition_code", "espn_competitions.competition_midsizeName"]
+
+areas:
+  canonical_mapping_table: area_mapping
+  coalesce_rules:
+    name: 
+      source_cols: ["football_data_areas.area_name", "live_soccer_areas.area"]
+      nullable: false
+    code: 
+      source_cols: ["football_data_areas.area_code"]

@@ -1,8 +1,8 @@
 import pandas as pd
 
 from . import logger
-from .processor_base_class import Processor
-from .components import parse, date_normalization
+from .. import Processor
+from ..components import parse, date_normalization
 
 
 class ParsingProcessor(Processor):
