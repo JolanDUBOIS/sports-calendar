@@ -609,8 +609,17 @@ models:
     sources:
       - name: team_similarity
         path: intermediate/team_similarity.csv
+      - name: espn_teams
+        path: intermediate/espn_teams.csv
+      - name: football_data_teams
+        path: intermediate/football_data_teams.csv
+      - name: live_soccer_teams
+        path: intermediate/live_soccer_teams.csv
     dependencies:
       - intermediate.team_similarity
+      - intermediate.espn_teams
+      - intermediate.football_data_teams
+      - intermediate.live_soccer_teams
     output:
       name: team_mapping
       layer: intermediate
@@ -628,7 +637,7 @@ models:
           - source
     processing:
       processor: CanonicalMappingProcessor
-      entity_type: teams
+      similarity_table: teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -639,8 +648,17 @@ models:
     sources:
       - name: competition_similarity
         path: intermediate/competition_similarity.csv
+      - name: espn_competitions
+        path: intermediate/espn_competitions.csv
+      - name: football_data_competitions
+        path: intermediate/football_data_competitions.csv
+      - name: live_soccer_competitions
+        path: intermediate/live_soccer_competitions.csv
     dependencies:
       - intermediate.competition_similarity
+      - intermediate.espn_competitions
+      - intermediate.football_data_competitions
+      - intermediate.live_soccer_competitions
     output:
       name: competition_mapping
       layer: intermediate
@@ -658,7 +676,7 @@ models:
           - source
     processing:
       processor: CanonicalMappingProcessor
-      entity_type: competitions
+      similarity_table: competitions
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -669,8 +687,14 @@ models:
     sources:
       - name: area_similarity
         path: intermediate/area_similarity.csv
+      - name: football_data_areas
+        path: intermediate/football_data_areas.csv
+      - name: live_soccer_areas
+        path: intermediate/live_soccer_areas.csv
     dependencies:
       - intermediate.area_similarity
+      - intermediate.football_data_areas
+      - intermediate.live_soccer_areas
     output:
       name: area_mapping
       layer: intermediate
@@ -688,6 +712,117 @@ models:
           - source
     processing:
       processor: CanonicalMappingProcessor
+      similarity_table: areas
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: team_registry
+    description: Create teams registry table.
+    trigger: automatic
+    sources:
+      - name: team_mapping
+        path: intermediate/team_mapping.csv
+      - name: espn_teams
+        path: intermediate/espn_teams.csv
+      - name: football_data_teams
+        path: intermediate/football_data_teams.csv
+      - name: live_soccer_teams
+        path: intermediate/live_soccer_teams.csv
+    dependencies:
+      - intermediate.team_mapping
+      - intermediate.espn_teams
+      - intermediate.football_data_teams
+      - intermediate.live_soccer_teams
+    output:
+      name: team_registry
+      layer: intermediate
+      path: intermediate/team_registry.csv
+      schema: team_registry
+      unique:
+        field_sets:
+          - [id]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+          fields:
+            - id
+            - name
+    processing:
+      processor: RegistryProcessor
+      entity_type: teams
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: competition_registry
+    description: Create competitions registry table.
+    trigger: automatic
+    sources:
+      - name: competition_mapping
+        path: intermediate/competition_mapping.csv
+      - name: espn_competitions
+        path: intermediate/espn_competitions.csv
+      - name: football_data_competitions
+        path: intermediate/football_data_competitions.csv
+      - name: live_soccer_competitions
+        path: intermediate/live_soccer_competitions.csv
+    dependencies:
+      - intermediate.competition_mapping
+      - intermediate.espn_competitions
+      - intermediate.football_data_competitions
+      - intermediate.live_soccer_competitions
+    output:
+      name: competition_registry
+      layer: intermediate
+      path: intermediate/competition_registry.csv
+      schema: competition_registry
+      unique:
+        field_sets:
+          - [id]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+          fields:
+            - id
+            - name
+    processing:
+      processor: RegistryProcessor
+      entity_type: competitions
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: area_registry
+    description: Create areas registry table.
+    trigger: automatic
+    sources:
+      - name: area_mapping
+        path: intermediate/area_mapping.csv
+      - name: football_data_areas
+        path: intermediate/football_data_areas.csv
+      - name: live_soccer_areas
+        path: intermediate/live_soccer_areas.csv
+    dependencies:
+      - intermediate.area_mapping
+      - intermediate.football_data_areas
+      - intermediate.live_soccer_areas
+    output:
+      name: area_registry
+      layer: intermediate
+      path: intermediate/area_registry.csv
+      schema: area_registry
+      unique:
+        field_sets:
+          - [id]
+        version_col: intermediate_at
+        keep: last
+      non-nullable:
+          fields:
+            - id
+            - name
+    processing:
+      processor: RegistryProcessor
       entity_type: areas
     static_fields:
       - name: intermediate_at
