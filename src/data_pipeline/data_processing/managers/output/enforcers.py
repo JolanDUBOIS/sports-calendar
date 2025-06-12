@@ -46,5 +46,6 @@ class NonNullableEnforcer(OutputEnforcer):
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply non-nullability enforcement to the DataFrame. """
+        pd.set_option('future.no_silent_downcasting', True)
         df = df.replace({"nan": np.nan, "None": np.nan, "": np.nan})
         return df.dropna(subset=self.spec.fields).reset_index(drop=True)

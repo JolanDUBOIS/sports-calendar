@@ -59,9 +59,17 @@ def _parse_livesoccer_competition_endpoint(endpoint: str) -> dict:
 def _extract_livesoccer_match_data(match_title: str) -> dict:
     """
     Extract detailed match data from a match title string.
-    Keys of the output dictionary include: home_team, away_team, home_score, away_score, won_penalty, is_final.
+    Always returns the keys: home_team, away_team, home_score, away_score, won_penalty, is_final.
     """
-    match_data = {}
+    match_data = {
+        "home_team": None,
+        "away_team": None,
+        "home_score": None,
+        "away_score": None,
+        "won_penalty": None,
+        "is_final": False,
+    }
+
     try:
         match_data["is_final"] = (match_title.split("*")[1].lower() == "final")
     except IndexError:
@@ -117,15 +125,16 @@ def _parse_livesoccer_competition_name(competition_name: str) -> dict:
     """ Extract area and competition name from a competition name string. """
     parts = competition_name.split(" - ")
     if len(parts) == 2:
-        return {
-            "area": parts[0].strip(),
-            "competition": parts[1].strip()
-        }
-    else:
-        return {
-            "area": None,
-            "competition": competition_name.strip()
-        }
+        competition = parts[1].strip()
+        if competition not in ["Men", "Women"]:
+            return {
+                "area": parts[0].strip(),
+                "competition": parts[1].strip()
+            }
+    return {
+        "area": None,
+        "competition": competition_name.strip()
+    }
 
 def _parse_football_ranking_team(team: str) -> dict:
     """ Extract team name and optional team code from a team string. """

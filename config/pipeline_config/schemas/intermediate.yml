@@ -196,7 +196,7 @@ models:
         unique: true
       - name: team_name
       - name: team_shortName
-      - name: team_tla
+      - name: tla
       - name: intermediate_at
 
   - name: live_soccer_teams
@@ -243,10 +243,18 @@ models:
   - name: live_soccer_competitions
     path: live_soccer_competitions.csv
     columns:
-      - name: competition
+      - name: section_title
+      - name: name
         unique: true
+        nullable: false
+      - name: region
+      - name: confederation
+      - name: area
+      - name: competition
+      - name: endpoint
       - name: source
       - name: source_type
+      - name: created_at
       - name: intermediate_at
 
   - name: football_data_areas
@@ -312,4 +320,71 @@ models:
         nullable: false
       - name: similarity_score
         nullable: false
+      - name: intermediate_at
+
+  - name: team_mapping
+    path: team_mapping.csv
+    columns:
+      - name: id
+        nullable: false
+      - name: source_id
+        nullable: false
+      - name: source
+        nullable: false
+      - name: intermediate_at
+
+  - name: competition_mapping
+    path: competition_mapping.csv
+    columns:
+      - name: id
+        nullable: false
+      - name: source_id
+        nullable: false
+      - name: source
+        nullable: false
+      - name: intermediate_at
+
+  - name: area_mapping
+    path: area_mapping.csv
+    columns:
+      - name: id
+        nullable: false
+      - name: source_id
+        nullable: false
+      - name: source
+        nullable: false
+      - name: intermediate_at
+
+  - name: team_registry
+    path: team_registry.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+      - name: name
+        nullable: false
+      - name: short_name
+      - name: tla
+      - name: intermediate_at
+
+  - name: competition_registry
+    path: competition_registry.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+      - name: name
+        nullable: false
+      - name: code
+      - name: intermediate_at
+
+  - name: area_registry
+    path: area_registry.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+      - name: name
+        nullable: false
+      - name: code
       - name: intermediate_at
