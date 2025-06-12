@@ -44,6 +44,10 @@ class SimilaritySpec:
         logger.error(f"Table '{source_name}' not found in similarity spec for entity type '{self.entity_type}'.")
         raise KeyError(f"Table '{source_name}' not found in similarity spec for entity type '{self.entity_type}'.")
 
+    def is_in(self, source_name: str) -> bool:
+        """ Check if a source name is in the similarity spec. """
+        return any(source.table_name == source_name for source in self.sources)
+
 @dataclass
 class SimilaritySpecs:
     specs: list[SimilaritySpec] = field(default_factory=list)
