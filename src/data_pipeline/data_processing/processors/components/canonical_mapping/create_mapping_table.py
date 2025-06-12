@@ -6,6 +6,7 @@ import pandas as pd
 import networkx as nx # type: ignore
 
 from . import logger
+from .specs import EntitySpec, CANONICAL_MAPPING_SPECS
 
 
 class Entity:
@@ -118,10 +119,10 @@ class SimilarityTable:
         """ TODO """
         self.df = df
 
-    def get_best_matches(self, threshold: float = 0) -> SimilarityTable:
+    def get_best_matches(self, threshold: float = 50) -> SimilarityTable:
         """ TODO """
         _df = self.df.copy()
-        _df = _df[_df["similarity_score"] >= threshold]
+        _df = _df[_df["similarity_score"].astype(float) >= threshold]
 
         best_A = _df.groupby(["id_A", "source_A", "source_B"])["similarity_score"].transform("max")
         best_B = _df.groupby(["id_B", "source_A", "source_B"])["similarity_score"].transform("max")
@@ -148,6 +149,40 @@ class SimilarityTable:
 
         return SimilarityGraph(nodes, edges)
 
+class SourceEntityTables:
+    """ TODO """
+
+    def __init__(self, dfs: dict[str, pd.DataFrame], entity_spec: EntitySpec, source_col: str = "source"):
+        """ TODO """
+        self.dfs = self._get_source_dfs(dfs, entity_spec)
+        self.dfs = self._get_reducted_dfs(self.dfs, entity_spec, source_col)
+        self.entity_spec = entity_spec
+        self.source_col = source_col
+
+    def get_concatenated_df(self) -> pd.DataFrame:
+        """ Concatenate all DataFrames into a single DataFrame. """
+        return pd.concat(self.dfs.values(), axis=0, ignore_index=True)
+
+    @staticmethod
+    def _get_source_dfs(dfs: dict[str, pd.DataFrame], entity_spec: EntitySpec) -> dict[str, pd.DataFrame]:
+        """ TODO """
+        return {k: df for k, df in dfs.items() if k in entity_spec.table_names}
+
+    @staticmethod
+    def _get_reducted_dfs(dfs: dict[str, pd.DataFrame], entity_spec: EntitySpec, source_col: str) -> dict[str, pd.DataFrame]:
+        """ Reduce DataFrames to only the necessary columns. """
+        reduced_dfs = {}
+        for name, df in dfs.items():
+            if name not in entity_spec.table_names:
+                logger.error(f"Source '{name}' does not have a corresponding ID column. Skipping.")
+                raise KeyError(f"Source '{name}' does not have a corresponding ID column.")
+            id_col = entity_spec.get(name).id_col
+            if id_col not in df.columns or source_col not in df.columns:
+                logger.error(f"Columns '{id_col}' or '{source_col}' not found in DataFrame '{name}'.")
+                raise KeyError(f"Columns '{id_col}' or '{source_col}' not found in DataFrame '{name}'.")
+            reduced_dfs[name] = df[[id_col, source_col]].rename(columns={id_col: "source_id", source_col: "source"}).copy()
+        return reduced_dfs
+
 def merge_components(components: list[ConnectedComponent]) -> pd.DataFrame:
     merged_rows = []
     for cc in components:
@@ -158,23 +193,40 @@ def merge_components(components: list[ConnectedComponent]) -> pd.DataFrame:
             merged_rows.append(new_row)
     return pd.DataFrame(merged_rows)
 
-def create_mapping_table(sources: dict[str, pd.DataFrame], similarity_table: str, **kwargs) -> pd.DataFrame:
+def add_remaining_entities(df: pd.DataFrame, source_entity_tables: SourceEntityTables) -> pd.DataFrame:
     """ TODO """
-    sim_table = SimilarityTable(sources[similarity_table])
+    main_df = pd.concat([df, source_entity_tables.get_concatenated_df()], ignore_index=True)
+    main_df.drop_duplicates(subset=["source_id", "source"], inplace=True, keep="first")
+    main_df["id"] = main_df.apply(
+        lambda row: _generate_missing_id(row, "id", "source_id")
+            if pd.isna(row["id"]) else row["id"],
+        axis=1
+    )
+    return main_df[["id", "source_id", "source"]].drop_duplicates().reset_index(drop=True)
 
-    sim_table = sim_table.get_best_matches(threshold=kwargs.get("threshold", 0))
+def _generate_missing_id(row: pd.Series, id_col: str, source_col: str) -> str:
+    raw = f"{row[id_col]}_{row[source_col]}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+def create_mapping_table(sources: dict[str, pd.DataFrame], entity_type: str, **kwargs) -> pd.DataFrame:
+    """ TODO """
+    entity_spec = CANONICAL_MAPPING_SPECS.get(entity_type)
+    logger.debug(f"Table names: {entity_spec.table_names}")
+    logger.debug(f"ID columns: {entity_spec.id_cols}")
+    sim_table = SimilarityTable(sources[entity_spec.similarity_table])
+    source_entity_tables = SourceEntityTables(sources, entity_spec, source_col="source")
+
+    sim_table = sim_table.get_best_matches(threshold=kwargs.get("threshold", 50))
     logger.debug(f"Similarity best matches: \n{sim_table.df.head(20)}")
     sim_graph = sim_table.as_graph()
     logger.debug(f"Similarity graph created with {len(sim_graph.nodes)} nodes and {len(sim_graph.edges)} edges.")
     components = sim_graph.connected_components()
-    
-    # ---- Debugging ----
-    logger.debug(f"Found {len(components)} connected components in the similarity graph.")
-    for component in components:
-        logger.debug(f"Component: {component}")
-    # -------------------
 
     valid_components = [cc for cc in components if cc.is_valid()]
+    if len(valid_components) != len(components):
+        logger.warning(f"Some components are invalid (same source appears multiple times). {len(valid_components)} valid components found out of {len(components)} total components.")
 
     merged_df = merge_components(valid_components)
-    return merged_df
+
+    final_df = add_remaining_entities(merged_df, source_entity_tables)
+    return final_df
