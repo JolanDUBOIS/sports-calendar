@@ -1,4 +1,5 @@
 from __future__ import annotations
+from abc import ABC
 from dataclasses import dataclass
 from itertools import permutations
 from pathlib import Path
@@ -6,6 +7,7 @@ from pathlib import Path
 import yaml
 
 from . import logger
+from .specs import ConstraintSpec
 
 
 @dataclass(frozen=True)
@@ -46,13 +48,8 @@ class EntitySpecs:
 
 
 @dataclass(frozen=True)
-class AdminRuleSpec:
+class AdminRuleSpec(ConstraintSpec, ABC):
     entity_type: str
-
-    @classmethod
-    def from_dict(cls, d: dict) -> AdminRuleSpec:
-        """ Create an AdminRuleSpec from a dictionary. """
-        raise NotImplementedError("This method should be implemented in subclasses.")
 
 @dataclass(frozen=True)
 class ForceMatchSpec(AdminRuleSpec):
@@ -110,7 +107,7 @@ def load_admin_specs_from_yaml(path: str | Path) -> list[AdminRuleSpec]:
         try:
             data = yaml.safe_load(f)
             rules = data.get("rules", [])
-            return [AdminRuleFactory.create_admin_spec(spec) for spec in data]
+            return [AdminRuleFactory.create_admin_spec(spec) for spec in rules]
         except yaml.YAMLError as e:
             logger.error(f"Error parsing YAML file: {e}")
             raise ValueError(f"Error parsing YAML file: {e}")

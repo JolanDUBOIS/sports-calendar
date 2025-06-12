@@ -1,12 +1,21 @@
 from __future__ import annotations
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from pathlib import Path
 
 from . import logger
 
 
+class ConstraintSpec(ABC):
+    """ Abstract base class for constraint specifications. """
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, d: dict) -> ConstraintSpec:
+        """ Create a ConstraintSpec from a dictionary. """
+        raise NotImplementedError("Subclasses must implement this method.")
+
 @dataclass
-class UniqueSpec:
+class UniqueSpec(ConstraintSpec):
     field_sets: list[list[str]]
     version_col: str  # has to be a datetime field
     keep: str = "last"  # or "first"
@@ -35,7 +44,7 @@ class UniqueSpec:
         )
 
 @dataclass
-class NonNullableSpec:
+class NonNullableSpec(ConstraintSpec):
     fields: list[str]
 
     def __repr__(self):
@@ -46,31 +55,3 @@ class NonNullableSpec:
     def from_dict(cls, d: dict) -> NonNullableSpec:
         """ Create a NonNullableSpec from a dictionary. """
         return cls(fields=d.get("fields", []))
-
-@dataclass
-class OutputSpec:
-    name: str
-    path: Path
-    layer: str
-    schema: str | None = None
-    unique: UniqueSpec | None = None
-    non_nullable: NonNullableSpec | None = None
-
-    def __repr__(self):
-        """ String representation of the OutputSpec. """
-        return (
-            f"OutputSpec(name={self.name}, path={self.path}, layer={self.layer}, "
-            f"schema={self.schema}, unique={self.unique}, non_nullable={self.non_nullable})"
-        )
-
-    @classmethod
-    def from_dict(cls, d: dict) -> OutputSpec:
-        """ Create an OutputSpec from a dictionary. """
-        return cls(
-            name=d["name"],
-            path=Path(d["path"]),
-            layer=d["layer"],
-            schema=d.get("schema"),
-            unique=UniqueSpec.from_dict(d["unique"]) if "unique" in d else None,
-            non_nullable=NonNullableSpec.from_dict(d["non-nullable"]) if "non-nullable" in d else None
-        )

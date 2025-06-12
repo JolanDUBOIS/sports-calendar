@@ -1,18 +1,21 @@
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar
 
 import numpy as np
 import pandas as pd
 
 from . import logger
-from .specs import UniqueSpec, NonNullableSpec
+from .specs import ConstraintSpec, UniqueSpec, NonNullableSpec
 
 
-class OutputEnforcer(ABC):
-    """ Abstract base class for enforcing constraints on output DataFrames. """
+S = TypeVar("S", bound=ConstraintSpec)
 
-    def __init__(self, spec: UniqueSpec | NonNullableSpec):
+class ConstraintEnforcer(Generic[S], ABC):
+    """ Abstract base class for enforcing constraints on DataFrames. """
+
+    def __init__(self, spec: S):
         """ Initialize the enforcer with the specification. """
-        self.spec = spec
+        self.spec: S = spec
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply the constraint enforcement to the given DataFrame. """
@@ -32,8 +35,12 @@ class OutputEnforcer(ABC):
             raise ValueError("Input is not a valid DataFrame.")
 
 
-class UniqueEnforcer(OutputEnforcer):
+class UniqueEnforcer(ConstraintEnforcer[UniqueSpec]):
     """ Enforces uniqueness in the DataFrame based on specified fields. """
+
+    def __init__(self, spec: UniqueSpec):
+        super().__init__(spec)
+
     def _apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply the specific enforcement logic to the DataFrame. """
         for field_set in self.spec.field_sets:
@@ -42,8 +49,11 @@ class UniqueEnforcer(OutputEnforcer):
         return df.reset_index(drop=True)
 
 
-class NonNullableEnforcer(OutputEnforcer):
+class NonNullableEnforcer(ConstraintEnforcer[NonNullableSpec]):
     """ Enforces non-nullability in the DataFrame based on specified fields. """
+
+    def __init__(self, spec: NonNullableSpec):
+        super().__init__(spec)
 
     def _apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply the specific enforcement logic to the DataFrame. """
