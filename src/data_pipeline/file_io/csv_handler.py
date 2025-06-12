@@ -25,7 +25,7 @@ class CSVHandler(FileHandler):
     def _read_file(file_path: Path) -> pd.DataFrame:
         """ Read the CSV file and return its content as a DataFrame. """
         try:
-            return pd.read_csv(file_path)
+            return pd.read_csv(file_path, dtype=str)
         except pd.errors.EmptyDataError:
             logger.debug(f"CSV file {file_path} is empty.")
             return pd.DataFrame()
