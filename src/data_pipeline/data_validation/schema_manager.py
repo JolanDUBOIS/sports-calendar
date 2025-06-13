@@ -75,9 +75,10 @@ class ModelSchemaManager:
     def __init__(self, schema_spec: ModelSchemaSpec):
         """ TODO """
         self.schema_spec = schema_spec
-        self.file_handler = FileHandlerFactory.create_file_handler(schema_spec.path)
+        self.file_handler = FileHandlerFactory.create_file_handler(self.schema_spec.path)
+        logger.debug(f"Model file path: {self.schema_spec.path}")
 
-    def validate(self, raise_on_error: bool = False) -> ModelValidationResult:
+    def validate(self, raise_on_error: bool = False, **kwargs) -> ModelValidationResult:
         """ TODO """
         model_result = ModelValidationResult(model=self.schema_spec.name)
 
@@ -139,45 +140,24 @@ class LayerSchemaManager:
     def __init__(self, schema_spec: SchemaSpec, repo_path: str | Path):
         """ TODO """
         self.repo_path = Path(repo_path)
-        self.schema_spec = self._resolve_paths(schema_spec)
+        self.schema_spec = schema_spec
 
-    def _resolve_paths(self, schema_spec: SchemaSpec) -> SchemaSpec:
+    def validate(self, **kwargs) -> SchemaValidationResult:
         """ TODO """
-        for model in schema_spec.models:
-            model.path = self.repo_path / schema_spec.stage / model.path
-        return schema_spec
-
-    def validate(self, raise_on_error: bool = False, model: str | None = None) -> SchemaValidationResult:
-        """ TODO """
-        if model:
-            logger.info(f"Validating schema for model '{model}' in stage '{self.schema_spec.stage}'.")
-            try:
-                model_manager = ModelSchemaManager(self.schema_spec.get(model))
-                model_manager.validate(raise_on_error=raise_on_error)
-                return SchemaValidationResult(schema=self.schema_spec.name, results=[model_manager.validate(raise_on_error)])
-            except Exception as e:
-                logger.error(f"Validation failed for model '{model}': {e}")
-                logger.debug(traceback.format_exc())
-
         logger.info(f"Validating schema for stage '{self.schema_spec.stage}'.")
         try:
             schema_result = SchemaValidationResult(schema=self.schema_spec.name)
             for model_spec in self.schema_spec.models:
                 model_manager = ModelSchemaManager(model_spec)
-                schema_result.append(model_manager.validate(raise_on_error=raise_on_error))
+                schema_result.append(model_manager.validate(**kwargs))
             return schema_result
         except Exception as e:
             logger.error(f"Validation failed for stage '{self.schema_spec.stage}': {e}")
             logger.debug(traceback.format_exc())
+        logger.info(f"Schema '{self.schema_spec.name}' validation completed.")
 
     @classmethod
     def from_dict(cls, d: dict, repo_path: str | Path) -> LayerSchemaManager:
         """ Create a LayerSchemaManager from a dictionary. """
         schema_spec = SchemaSpec.from_dict(d)
         return cls(schema_spec=schema_spec, repo_path=repo_path)
-
-    @classmethod
-    def from_yaml(cls, yaml_path: str | Path, repo_path: str | Path) -> LayerSchemaManager:
-        """ Create a LayerSchemaManager from a YAML file. """
-        layer_schema = read_yml_file(Path(yaml_path))
-        return cls.from_dict(layer_schema, repo_path)

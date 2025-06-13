@@ -2,6 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import yaml
+
 from . import logger
 from ..pipeline_stages import DataStage
 
@@ -101,6 +103,11 @@ class SchemaSpec:
         logger.warning(f"Model '{model}' not found in schema '{self.name}'.")
         return None
 
+    def resolve_paths(self, base_path: Path) -> None:
+        """ Resolve model paths relative to the base path. """
+        for model in self.models:
+            model.path = base_path / self.stage / model.path
+
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:
         try:
@@ -118,3 +125,11 @@ class SchemaSpec:
             models=[ModelSchemaSpec.from_dict(model) for model in d.get("models", [])],
             description=d.get("description")
         )
+
+    @classmethod
+    def from_yaml(cls, yaml_path: str | Path) -> SchemaSpec:
+        """ Create a SchemaSpec from a YAML file. """
+        yaml_path = Path(yaml_path)
+        with yaml_path.open(mode='r') as file:
+            data = yaml.safe_load(file)
+        return cls.from_dict(data)
