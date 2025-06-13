@@ -253,9 +253,6 @@ models:
       processor: ExtractionProcessor
       source_key: football_data_teams
       output_key: football_data_teams
-      columns_mapping: !include
-        file: json_mappings.yml
-        model_name: football_data_teams
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
