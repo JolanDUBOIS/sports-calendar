@@ -1,15 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import logger
-from .enforcers import (
-    UniqueEnforcer,
-    NonNullableEnforcer,
-    UniqueSpec,
-    NonNullableSpec
-)
+from .enforcers import ConstraintEnforcerFactory, ConstraintSpecs
 from ..versioning import read_versions
 from ...utils import concat_io_content
 from ...file_io import FileHandlerFactory
@@ -26,14 +21,13 @@ class OutputSpec:
     path: Path
     layer: str
     schema: str | None = None
-    unique: UniqueSpec | None = None
-    non_nullable: NonNullableSpec | None = None
+    constraint_specs: ConstraintSpecs = field(default_factory=ConstraintSpecs)
 
     def __repr__(self):
         """ String representation of the OutputSpec. """
         return (
             f"OutputSpec(name={self.name}, path={self.path}, layer={self.layer}, "
-            f"schema={self.schema}, unique={self.unique}, non_nullable={self.non_nullable})"
+            f"schema={self.schema}, constraint_specs={self.constraint_specs}"
         )
 
     @classmethod
@@ -44,8 +38,7 @@ class OutputSpec:
             path=Path(d["path"]),
             layer=d["layer"],
             schema=d.get("schema"),
-            unique=UniqueSpec.from_dict(d["unique"]) if "unique" in d else None,
-            non_nullable=NonNullableSpec.from_dict(d["non-nullable"]) if "non-nullable" in d else None
+            constraint_specs=ConstraintSpecs.from_dict(d)
         )
 
 class OutputManager:
@@ -61,10 +54,8 @@ class OutputManager:
     def _init_enforcers(self) -> list[ConstraintEnforcer]:
         """ Initialize enforcers based on the output specification. """
         enforcers = []
-        if self.output_spec.unique:
-            enforcers.append(UniqueEnforcer(self.output_spec.unique))
-        if self.output_spec.non_nullable:
-            enforcers.append(NonNullableEnforcer(self.output_spec.non_nullable))
+        for contraint_spec in self.output_spec.constraint_specs:
+            enforcers.append(ConstraintEnforcerFactory.create_enforcer(contraint_spec))
         return enforcers
 
     def write(self, data: IOContent, source_versions: SourceVersions):

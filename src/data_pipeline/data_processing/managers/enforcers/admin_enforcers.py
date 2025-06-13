@@ -1,26 +1,22 @@
 from abc import ABC
-from typing import TYPE_CHECKING, Generic, TypeVar
 
 import pandas as pd
 
 from . import logger
-from .enforcers import ConstraintEnforcer
-if TYPE_CHECKING:
-    from .admin_specs import AdminRuleSpec, ForceMatchSpec, BlockMatchSpec
+from .enforcers import ConstraintEnforcer, S
+from .specs import MatchSpec
 
 
-T = TypeVar("T", bound=AdminRuleSpec)
-
-class AdminEnforcer(ConstraintEnforcer[T], ABC, Generic[T]):
+class AdminEnforcer(ConstraintEnforcer[S], ABC):
     """ Enforces admin rules on the DataFrame based on admin specifications. """
 
-    def __init__(self, spec: T):
+    def __init__(self, spec: S):
         super().__init__(spec)
 
-class ForceMatchEnforcer(AdminEnforcer[ForceMatchSpec]):
+class ForceMatchEnforcer(AdminEnforcer[MatchSpec]):
     """ Enforces force match rules on the DataFrame. """
 
-    def __init__(self, spec: ForceMatchSpec):
+    def __init__(self, spec: MatchSpec):
         super().__init__(spec)
 
     def _apply(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -48,10 +44,10 @@ class ForceMatchEnforcer(AdminEnforcer[ForceMatchSpec]):
             logger.error(f"DataFrame is missing required columns: {expected_cols}")
             raise ValueError(f"DataFrame is missing required columns: {expected_cols}")
 
-class BlockMatchEnforcer(AdminEnforcer[BlockMatchSpec]):
+class BlockMatchEnforcer(AdminEnforcer[MatchSpec]):
     """ Enforces block match rules on the DataFrame. """
 
-    def __init__(self, spec: BlockMatchSpec):
+    def __init__(self, spec: MatchSpec):
         super().__init__(spec)
 
     def _apply(self, df: pd.DataFrame) -> pd.DataFrame:
