@@ -3,10 +3,11 @@ import traceback
 from pathlib import Path
 from dataclasses import dataclass
 
+import yaml
+
 from . import logger
 from .order_models import ModelOrder
 from .managers import ModelManager, ModelSpec
-from ..utils import read_yml_file
 from ..pipeline_stages import DataStage
 
 
@@ -34,6 +35,16 @@ class LayerSpec:
         logger.warning(f"Model {model} not found in layer {self.name}.")
         return None
 
+    def resolve_paths(self, base_path: Path) -> None:
+        """ Resolve model paths relative to the base path. """
+        for model in self.models:
+            try:
+                model.resolve_paths(base_path)
+            except Exception as e:
+                logger.error(f"Error resolving path for model {model.name}: {e}")
+                logger.debug(traceback.format_exc())
+                raise ValueError(f"Failed to resolve path for model {model.name}: {e}")
+
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:
         try:
@@ -51,6 +62,14 @@ class LayerSpec:
             models=[ModelSpec.from_dict(model) for model in d["models"]],
             description=d.get("description")
         )
+
+    @classmethod
+    def from_yaml(cls, yaml_path: str | Path) -> LayerSpec:
+        """ Create a LayerSpec from a YAML file. """
+        yaml_path = Path(yaml_path)
+        with yaml_path.open(mode='r') as file:
+            data = yaml.safe_load(file)
+        return cls.from_dict(data)
 
 class LayerBuilder:
     """
@@ -70,9 +89,6 @@ class LayerBuilder:
         
         from_dict(d: dict, repo_path: str | Path) -> LayerBuilder:
             Factory method to create a LayerBuilder instance from a dictionary specification.
-        
-        from_yaml(yaml_path: str | Path, repo_path: str | Path) -> LayerBuilder:
-            Factory method to create a LayerBuilder instance from a YAML configuration file.
     """
 
     def __init__(self, layer_spec: LayerSpec, repo_path: str | Path):
@@ -81,7 +97,7 @@ class LayerBuilder:
         self.repo_path = Path(repo_path)
         self.models_order = ModelOrder(self.layer_spec.models, self.layer_spec.stage)
 
-    def build(self, model: str | None = None, manual: bool = False, dry_run: bool = False) -> None:
+    def build(self, **kwargs) -> None:
         """
         Execute all models in this layer according to the specified order.
 
@@ -91,57 +107,16 @@ class LayerBuilder:
         failed models for later inspection or retry.
 
         Args:
-            model (str | None): Optional specific model name to run. If provided, only that model is executed (dev purpose).
-            manual (bool): If True, run models in manual mode, which may alter execution 
-                behavior such as skipping automated steps or requiring manual confirmation.
-            dry_run (bool): If True, simulate the execution without making any changes, useful for testing.
+            TODO
+            (in kwargs, manual, dry_run, verbose, reset, etc.)
         """
-        if model:
-            logger.info(f"Building layer for model '{model}' in stage '{self.layer_spec.stage}'.")
-            try:
-                model_manager = ModelManager(self.layer_spec.get(model), self.repo_path)
-                model_manager.run(manual=manual, dry_run=dry_run)
-            except Exception as e:
-                logger.error(f"Error processing model {model}: {e}")
-                logger.debug(traceback.format_exc())
-            return
-
-        logger.info(f"Building layer for stage '{self.layer_spec.stage}'.")
+        logger.info(f"Building layer '{self.layer_spec.stage}'.")
         for model_spec in self.models_order:
             try:
                 model_manager = ModelManager(model_spec, self.repo_path)
-                model_manager.run(manual=manual, dry_run=dry_run)
+                model_manager.run(**kwargs)
             except Exception as e:
                 logger.error(f"Error processing model {model_spec.name}: {e}")
                 logger.debug(traceback.format_exc())
                 self.models_order.mark_failed(model_spec)
-
-    @classmethod
-    def from_dict(cls, d: dict, repo_path: str | Path) -> LayerBuilder:
-        """
-        Create a LayerBuilder instance from a dictionary representation of a layer specification.
-
-        Args:
-            d (dict): Dictionary containing the layer configuration data, typically deserialized from JSON or YAML.
-            repo_path (str | Path): Path to the repository where models and related resources are located.
-
-        Returns:
-            LayerBuilder: A new instance initialized with the provided specification.
-        """
-        layer_spec = LayerSpec.from_dict(d)
-        return cls(layer_spec, repo_path)
-
-    @classmethod
-    def from_yaml(cls, yaml_path: str | Path, repo_path: str | Path) -> LayerBuilder:
-        """
-        Create a LayerBuilder instance from a YAML file containing the layer specification.
-
-        Args:
-            yaml_path (str | Path): Path to the YAML configuration file defining the layer.
-            repo_path (str | Path): Path to the repository where models and related resources are located.
-
-        Returns:
-            LayerBuilder: A new instance initialized from the YAML file's contents.
-        """
-        layer_data = read_yml_file(Path(yaml_path))
-        return cls.from_dict(layer_data, repo_path)
+        logger.info(f"Completed building layer '{self.layer_spec.stage}'.")

@@ -2,4 +2,5 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .build_layer import LayerBuilder
+from .main import run_pipeline
+from .build_layer import LayerSpec

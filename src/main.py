@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from pathlib import Path
 
 from src import logger
-from .data_pipeline import LayerBuilder, LayerSchemaManager, DataStage
+from .data_pipeline import PipelineConfig, DataStage, run_pipeline, run_validation
 
 if TYPE_CHECKING:
     from .data_pipeline import SchemaValidationResult
@@ -23,30 +23,19 @@ def run_pipeline_logic(
     stage: DataStage | None = None,
     model: str | None = None,
     manual: bool = False,
-    dry_run: bool = False, # Not implemented yet
+    dry_run: bool = False,
     verbose: bool = False # Not implemented yet
 ) -> None:
     """ TODO """
-    config_folder = CONFIG_PATH / "workflows"
-    repo_path = DATA_PATH / REPOSITORIES[repo]
-
-    if model:
-        if stage is None:
-            logger.error("Stage must be specified when a model is provided.")
-            raise ValueError("Stage must be specified when a model is provided.")
-        yml_path = config_folder / f"build_{stage}.yml"
-        LayerBuilder.from_yaml(yml_path, repo_path).build(model=model, manual=manual, dry_run=dry_run)
-        return
-
-    stages = [stage] if stage else DataStage.instances()
-    for _stage in stages:
-        yml_path = config_folder / f"build_{_stage}.yml"
-        logger.debug(f"Building layer for stage '{_stage}' using file: {yml_path}")
-        if not yml_path.exists():
-            logger.error(f"Configuration file not found: {yml_path}")
-            raise FileNotFoundError(f"Configuration file not found: {yml_path}")
-        else:
-            LayerBuilder.from_yaml(yml_path, repo_path).build(manual=manual, dry_run=dry_run)
+    pipeline_config = PipelineConfig(repo=repo)
+    run_pipeline(
+        pipeline_config=pipeline_config,
+        stage=stage,
+        model=model,
+        manual=manual,
+        dry_run=dry_run,
+        verbose=verbose
+    )
 
 def run_validation_logic(
     repo: str = "test",
@@ -56,28 +45,14 @@ def run_validation_logic(
     verbose: bool = False # Not implemented yet
 ) -> list[SchemaValidationResult]:
     """ TODO """
-    config_folder = CONFIG_PATH / "schemas"
-    repo_path = DATA_PATH / REPOSITORIES[repo]
-
-    if model:
-        if stage is None:
-            logger.error("Stage must be specified when a model is provided.")
-            raise ValueError("Stage must be specified when a model is provided.")
-        yml_path = config_folder / f"build_{stage}.yml"
-        return [LayerSchemaManager.from_yaml(yml_path, repo_path).validate(raise_on_error=raise_on_error, model=model)]
-
-    stages = [stage] if stage else DataStage.instances()
-    results = []
-    for _stage in stages:
-        yml_path = config_folder / f"{_stage}.yml"
-        logger.debug(f"Validating schema for stage '{_stage}' using file: {yml_path}")
-        if not yml_path.exists():
-            logger.error(f"Schema file not found: {yml_path}")
-            raise FileNotFoundError(f"Schema file not found: {yml_path}")
-        else:
-            results.append(LayerSchemaManager.from_yaml(yml_path, repo_path).validate(raise_on_error=raise_on_error))
-
-    return results
+    pipeline_config = PipelineConfig(repo=repo)
+    return run_validation(
+        pipeline_config=pipeline_config,
+        stage=stage,
+        model=model,
+        raise_on_error=raise_on_error,
+        verbose=verbose
+    )
 
 def run_selection_logic():
     """ TODO """

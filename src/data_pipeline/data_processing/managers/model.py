@@ -42,6 +42,12 @@ class ModelSpec:
             logger.error(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
             raise ValueError(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
 
+    def resolve_paths(self, base_path: Path) -> None:
+        """ Resolve model paths relative to the base path. """
+        for source in self.sources:
+            source.path = base_path / source.path
+        self.output.path = base_path / self.output.path
+
     @classmethod
     def from_dict(cls, d: dict) -> ModelSpec:
         """ Create a ModelSpec from a dictionary. """
@@ -71,16 +77,9 @@ class ModelManager:
     def __init__(self, model_spec: ModelSpec, repo_path: str | Path):
         """ Initialize ModelManager with a model specification and repository path. """
         self.repo_path = Path(repo_path)
-        self.model_spec = self._resolve_paths(model_spec)
+        self.model_spec = model_spec
 
-    def _resolve_paths(self, spec: ModelSpec) -> ModelSpec:
-        """ Resolve paths in the model specification. """
-        for source in spec.sources:
-            source.path = self.repo_path / source.path
-        spec.output.path = self.repo_path / spec.output.path
-        return spec
-
-    def run(self, manual: bool = False, dry_run: bool = False) -> None:
+    def run(self, manual: bool = False, dry_run: bool = False, **kwargs) -> None:
         """
         Execute the model processing pipeline.
 
