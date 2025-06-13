@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 import traceback
 
 from . import logger
-from .schema_spec import SchemaSpec
 from .schema_manager import LayerSchemaManager, ModelSchemaManager
 from .validation_result import SchemaValidationResult
 from .. import DataStage
