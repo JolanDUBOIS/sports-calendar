@@ -33,9 +33,6 @@ models:
       processor: ExtractionProcessor
       source_key: espn_matches
       output_key: espn_matches
-      columns_mapping: !include
-        file: json_mappings.yml
-        model_name: espn_matches
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -68,9 +65,6 @@ models:
       processor: ExtractionProcessor
       source_key: football_data_matches
       output_key: football_data_matches
-      columns_mapping: !include
-        file: json_mappings.yml
-        model_name: football_data_matches
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
@@ -93,9 +87,7 @@ models:
       schema: football_data_standings
       unique:
         field_sets:
-          - [competition_id]
-          - [season_id]
-          - [team_id]
+          - [competition_id, season_id, team_id]
         version_col: intermediate_at
         keep: last
       non-nullable:
@@ -107,9 +99,6 @@ models:
       processor: ExtractionProcessor
       source_key: football_data_standings
       output_key: football_data_standings
-      columns_mapping: !include
-        file: json_mappings.yml
-        model_name: football_data_standings
     static_fields:
       - name: intermediate_at
         value: !date_offset 0
