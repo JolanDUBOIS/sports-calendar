@@ -105,6 +105,8 @@ models:
     sources:
       - name: espn_standings
         path: intermediate/espn_standings.csv
+      - name: espn_competitions
+        path: intermediate/espn_competitions.csv
     dependencies:
       - intermediate.espn_standings
     output:
