@@ -6,8 +6,8 @@ from src.data_pipeline.utils import filter_file_content
 
 if TYPE_CHECKING:
     from . import SourceVersioningStrategy
-    from src.data_pipeline.types import IOContent
-    from src.data_pipeline.file_io import MetadataEntry
+    from ...types import IOContent
+    from ....file_io import MetadataEntry
 
 
 def read_versions(metadata_entry: MetadataEntry) -> SourceVersions:

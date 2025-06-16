@@ -7,7 +7,7 @@ from . import logger
 from .enforcers import ConstraintEnforcerFactory, ConstraintSpecs
 from ..versioning import read_versions
 from ...utils import concat_io_content
-from ...file_io import FileHandlerFactory
+from ....file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
     from .enforcers import ConstraintEnforcer

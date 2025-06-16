@@ -5,7 +5,7 @@ from pathlib import Path
 
 from ..versioning import SourceVersioningStrategy, SourceVersions, SourceVersion, version_filter
 from ...utils import get_max_field_value
-from ...file_io import FileHandlerFactory
+from ....file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
     from ...types import IOContent
