@@ -51,7 +51,7 @@ def run_pipeline(
     verbose: bool = typer.Option(False, "--verbose", help="Run the pipeline in verbose mode.")
 ):
     """ Run the data pipeline. """
-    if model is None and stage is not None:
+    if stage is None and model is not None:
         typer.echo("Error: --model requires --stage to be specified.", err=True)
         raise typer.Exit(code=1)
     run_pipeline_logic(
@@ -72,7 +72,7 @@ def run_validation(
     verbose: bool = typer.Option(False, "--verbose", help="Run the validation in verbose mode.")
 ):
     """ Run the data validation. """
-    if model is None and stage is not None:
+    if stage is None and model is not None:
         typer.echo("Error: --model requires --stage to be specified.", err=True)
         raise typer.Exit(code=1)
     results = run_validation_logic(
