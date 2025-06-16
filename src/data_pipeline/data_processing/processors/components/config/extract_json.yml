@@ -6,6 +6,7 @@ espn_matches:
     shortName: shortName
     season_year: season.year
     venue: venue.displayName
+    stage: season.slug
     competition_id: leagues.0.id
     competition_name: leagues.0.name
     competition_abbreviation: leagues.0.abbreviation

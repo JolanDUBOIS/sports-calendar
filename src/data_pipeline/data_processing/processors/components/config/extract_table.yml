@@ -73,7 +73,7 @@ competitions:
   extraction_type: simple
   columns_mapping:
     id: id
-    standings_id: alternate_id
+    # standings_id: alternate_id
     name: name
     abbreviation: abbreviation
     short_name: short_name
@@ -100,6 +100,7 @@ matches:
     home_team_id: home_team_id
     away_team_id: away_team_id
     season_year: season_year
+    stage: stage
     leg: leg_value
     leg_display: leg_displayValue
     venue: venue

@@ -31,7 +31,7 @@ competitions:
     - table_name: live_soccer_competitions
       source_name: livesoccertv
       id_col: competition
-      match_columns: [competition]
+      match_columns: [name]
     - table_name: football_data_competitions
       source_name: football-data
       id_col: competition_id
