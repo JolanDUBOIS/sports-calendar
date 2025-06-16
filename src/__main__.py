@@ -7,7 +7,14 @@ from .cli import app
 
 load_dotenv()
 
+def log_run_separator():
+    from datetime import datetime
+    separator = "\n" + "=" * 80
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger.debug(f"{separator}\nNew run started at {timestamp}{separator}")
+
 if __name__ == '__main__':
+    log_run_separator()
     try:
         app()
     except Exception as e:
