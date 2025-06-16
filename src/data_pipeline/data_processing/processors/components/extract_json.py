@@ -78,8 +78,8 @@ class IterateMapping:
         """ Applies the iterate mapping to the given data and returns a list of dictionaries. """
         iteration_list = self.path.apply(data)
         if not isinstance(iteration_list, list):
-            logger.error(f"Expected a list at path '{self.path.path}', but got {type(iteration_list).__name__}.")
-            raise ValueError(f"Expected a list at path '{self.path.path}', but got {type(iteration_list).__name__}.")
+            logger.debug(f"Expected a list at path '{self.path.path}', but got {type(iteration_list).__name__}. Returning empty list.")
+            return []
 
         extracted_data = []
         for item in iteration_list:
@@ -126,7 +126,7 @@ def load_columns_mapping_from_yaml(path: str | Path) -> dict[str, ColumnsMapping
 
     if not isinstance(raw_data, dict):
         logger.error("Invalid format for columns mapping. Expected a dictionary.")
-        raise ValueError("Invalid format for columns mapping. Expected a dictionary.")
+        raise TypeError("Invalid format for columns mapping. Expected a dictionary.")
 
     columns_mapping = {}
     for key, value in raw_data.items():
@@ -137,7 +137,7 @@ def load_columns_mapping_from_yaml(path: str | Path) -> dict[str, ColumnsMapping
 
     return columns_mapping
 
-COLUMNS_MAPPING_SPECS = load_columns_mapping_from_yaml(Path(__file__).parent / "config" / "columns_mapping.yml")
+COLUMNS_MAPPING_SPECS = load_columns_mapping_from_yaml(Path(__file__).parent / "config" / "extract_json.yml")
 
 # JSON extraction functions
 
