@@ -2,11 +2,15 @@ import pandas as pd
 
 from . import logger
 from .. import Processor
-from ..components import extract_table
+from ..components import extract_table, remap_columns
 
 
 class DerivationProcessor(Processor):
     """ Processor used to derive structured tables from a source DataFrame. """
+
+    sources_additional_processes = {
+        "standings": [remap_columns],
+    }
 
     def _run(self, sources: dict[str, pd.DataFrame], source_key: str, output_key: str, **kwargs) -> pd.DataFrame:
         """ Run derivation processor for the given source and output key. """
@@ -22,4 +26,11 @@ class DerivationProcessor(Processor):
 
         data = extract_table(data, output_key, **kwargs)
         self._check_dataframe(data)
+
+        logger.debug(f"Output key: {output_key}")
+        additional_processes = self.sources_additional_processes.get(output_key, [])
+        for process in additional_processes:
+            data = process(data, output_key, sources, **kwargs)
+            self._check_dataframe(data)
+
         return data
