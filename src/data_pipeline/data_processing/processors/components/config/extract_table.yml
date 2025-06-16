@@ -16,7 +16,7 @@ espn_teams:
     team_location: team_location
     team_name: team_name
     team_abbreviation: team_abbreviation
-    team_display_name: team_display_name,
+    team_display_name: team_display_name
     team_short_display_name: team_short_display_name
     team_is_national: team_is_national
     source: source
@@ -68,3 +68,55 @@ live_soccer_areas:
     area: area
     source: source
     source_type: source_type
+
+competitions:
+  extraction_type: simple
+  columns_mapping:
+    id: id
+    standings_id: alternate_id
+    name: name
+    abbreviation: abbreviation
+    short_name: short_name
+    has_standings: has_standings
+
+teams:
+  extraction_type: simple
+  columns_mapping:
+    id: team_id
+    name: team_name
+    abbreviation: team_abbreviation
+    display_name: team_display_name
+    short_display_name: team_short_display_name
+    is_national: team_is_national
+    loaction: team_location
+
+matches:
+  extraction_type: simple
+  columns_mapping:
+    id: id
+    competition_id: competition_id
+    date_time_utc: date_time_utc
+    date_time_cet: date_time_cet
+    home_team_id: home_team_id
+    away_team_id: away_team_id
+    season_year: season_year
+    leg: leg_value
+    leg_display: leg_displayValue
+    venue: venue
+
+standings:
+  extraction_type: simple
+  columns_mapping:
+    competition_id: competition_id
+    team_id: team_id
+    position: rank
+    points: points
+    point_diff: point_diff
+    matches_played: played_games
+    wins: wins
+    draws: draws
+    losses: lost
+    goals_for: goals_for
+    goals_against: goals_against
+    deductions: deductions
+    ppg: ppg
