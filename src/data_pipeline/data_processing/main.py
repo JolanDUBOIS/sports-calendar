@@ -31,7 +31,7 @@ def run_pipeline(
 
     # Multiple models
     else:
-        stages = [stage] if stage is None else DataStage.instances()
+        stages = [stage] if stage is not None else DataStage.instances()
         for _stage in stages:
             layer_spec = pipeline_config.get_workflow_config(_stage)
             builder = LayerBuilder(layer_spec, pipeline_config.repo_path)

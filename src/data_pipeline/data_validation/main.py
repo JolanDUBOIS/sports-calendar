@@ -33,7 +33,7 @@ def run_validation(
 
     # Multiple models
     else:
-        stages = [stage] if stage is None else DataStage.instances()
+        stages = [stage] if stage is not None else DataStage.instances()
         results = []
         for _stage in stages:
             schema_spec = pipeline_config.get_schema_config(_stage)
