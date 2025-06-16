@@ -3,7 +3,7 @@ from typing import Any
 import pandas as pd
 
 from . import logger
-from ..types import IOContent
+from ...types import IOContent
 
 
 def get_max_field_value(data: IOContent, field: str) -> Any:

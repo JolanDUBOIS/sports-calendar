@@ -3,9 +3,9 @@ import traceback
 from sqlalchemy import MetaData, func, create_engine, inspect
 from sqlalchemy.orm import sessionmaker, Query
 
-from src.db import logger
+from src.db_legacy import logger
 from src.config import get_config
-from src.db.models import Base, Region, Competition, Team
+from src.db_legacy.models import Base, Region, Competition, Team
 
 
 DATABASE_URL = get_config("database.url", "sqlite:///data/football.db")

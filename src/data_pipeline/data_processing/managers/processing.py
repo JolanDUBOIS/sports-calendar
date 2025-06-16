@@ -6,7 +6,7 @@ from . import logger
 from ..processors import ProcessorFactory
 
 if TYPE_CHECKING:
-    from ...types import IOContent
+    from ....types import IOContent
 
 
 @dataclass

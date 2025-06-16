@@ -2,9 +2,9 @@ import pandas as pd
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from src.db import logger
-from src.db.models import Match, Standing
-from src.db.database import create_session, get_last_version_query
+from src.db_legacy import logger
+from src.db_legacy.models import Match, Standing
+from src.db_legacy.database import create_session, get_last_version_query
 
 
 def query_matches(
