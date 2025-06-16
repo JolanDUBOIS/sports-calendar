@@ -34,7 +34,10 @@ loggers:
   src.config:
     level: DEBUG
 
-  src.db:
+  src.data_access:
+    level: DEBUG
+
+  src.file_io:
     level: DEBUG
 
   src.selection:
@@ -60,9 +63,6 @@ loggers:
     level: DEBUG
 
   src.data_pipeline.data_validation:
-    level: DEBUG
-
-  src.data_pipeline.file_io:
     level: DEBUG
 
   src.data_pipeline.utils:
