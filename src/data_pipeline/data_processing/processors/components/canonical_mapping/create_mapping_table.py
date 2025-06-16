@@ -127,7 +127,7 @@ class SimilarityTable:
         best_A = _df.groupby(["id_A", "source_A", "source_B"])["similarity_score"].transform("max")
         best_B = _df.groupby(["id_B", "source_A", "source_B"])["similarity_score"].transform("max")
 
-        best_df = _df[(_df["similarity_score"] == best_A) & (_df["similarity_score"] == best_B)]
+        best_df = _df[(_df["similarity_score"] == best_A) & (_df["similarity_score"] == best_B)] # TODO - Issue = could leave duplicates if multiple rows have the same max score for the same pair.
         return SimilarityTable(best_df.reset_index(drop=True))
 
     def as_graph(self) -> SimilarityGraph:
