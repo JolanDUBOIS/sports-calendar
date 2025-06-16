@@ -76,8 +76,6 @@ class CanonicalMappingTable:
     def join(self, other: SourceEntityTable) -> CanonicalMappingTable:
         """ Join the canonical mapping table with another source entity table. """
         logger.debug(f"Joining {self.name} with {other.name}.")
-        logger.debug(f"Left DataFrame: {self.df.head(20)}")
-        logger.debug(f"Right DataFrame: {other.df.head(20)}")
         merged_df = pd.merge(
             self.df,
             other.df,
@@ -134,12 +132,7 @@ def create_registry_table(sources: dict[str, pd.DataFrame], entity_type: str, **
     source_tables = SourceEntityTableCollection.from_dict(sources, source_specs)
 
     merged_df = canonical_mapping_table.join_all(source_tables)
-    logger.debug(f"Initial merged DataFrame columns: {merged_df.df.columns.tolist()}")
-    logger.debug(f"Length of merged DataFrame: {len(merged_df.df)}")
-    logger.debug(f"Head of merged DataFrame:\n{merged_df.df[['id', 'source_id', 'source']].head(20)}")
     df = apply_coalesce_rules(merged_df.df, registry_spec.coalesce_rules)
-    logger.debug(f"Head of merged DataFrame after coalesce rules:\n{df.head(20)}")
-    logger.debug(f"Length of DataFrame after applying coalesce rules: {len(df)}")
     df = drop_na(df, ["id"] + registry_spec.coalesce_rules.get_non_nullable_col_name())
     df = force_unique(df, ["id"])
 
