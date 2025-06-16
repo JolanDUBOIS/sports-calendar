@@ -6,7 +6,7 @@ from src.data_pipeline.utils import filter_file_content
 
 if TYPE_CHECKING:
     from . import SourceVersioningStrategy
-    from ...types import IOContent
+    from ....types import IOContent
     from ....file_io import MetadataEntry
 
 

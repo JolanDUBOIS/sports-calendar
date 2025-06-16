@@ -8,7 +8,7 @@ import pandas as pd
 from . import logger
 
 if TYPE_CHECKING:
-    from ...types import IOContent
+    from ....types import IOContent
 
 
 class Processor(ABC):

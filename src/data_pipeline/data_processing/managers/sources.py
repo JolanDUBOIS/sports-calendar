@@ -8,7 +8,7 @@ from ...utils import get_max_field_value
 from ....file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
-    from ...types import IOContent
+    from ....types import IOContent
 
 
 @dataclass

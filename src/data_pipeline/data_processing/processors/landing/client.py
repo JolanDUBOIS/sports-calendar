@@ -14,7 +14,7 @@ from src.clients import (
 from ....utils import concat_io_content
 
 if TYPE_CHECKING:
-    from ....types import IOContent
+    from .....types import IOContent
 
 class ClientProcessor(Processor):
     """ Used to fetch data from client sources and ingest it into the landing zone. """

@@ -12,7 +12,7 @@ from ....file_io import FileHandlerFactory
 if TYPE_CHECKING:
     from .enforcers import ConstraintEnforcer
     from ..versioning import SourceVersions
-    from ...types import IOContent
+    from ....types import IOContent
 
 
 @dataclass
