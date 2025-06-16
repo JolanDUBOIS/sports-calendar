@@ -82,7 +82,7 @@ def _simple_extraction(
     deduplicate: bool = False
 ) -> pd.DataFrame:
     """ Extract specified columns from the DataFrame, optionally deduplicating. """
-    _df = data[list(col_mapping)].rename(columns=col_mapping)
+    _df = data[list(col_mapping.values())].rename(columns={v: k for k, v in col_mapping.items()})
     if deduplicate:
         logger.debug("Deduplicating data")
         _df = _df.drop_duplicates()
