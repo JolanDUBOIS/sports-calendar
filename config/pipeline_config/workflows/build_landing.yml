@@ -135,6 +135,84 @@ models:
       - name: source_type
         value: api
 
+  - name: espn_standings
+    description: Ingests standings information from the ESPN API.
+    trigger: automatic
+    output:
+      name: espn_standings
+      layer: landing
+      path: landing/espn_standings.json
+      mode: append
+    processing:
+      processor: ClientProcessor
+      source: espn
+      method: query_standings
+      params:
+        - competition_slug: uefa.champions
+        - competition_slug: uefa.europa
+        - competition_slug: uefa.europa.conf
+        - competition_slug: uefa.champions_qual
+        - competition_slug: uefa.europa_qual
+        - competition_slug: uefa.europa.conf_qual
+        - competition_slug: uefa.nations
+        - competition_slug: uefa.euro
+        - competition_slug: uefa.euroq
+        - competition_slug: fifa.world
+        - competition_slug: fifa.worldq.caf
+        - competition_slug: fifa.worldq.uefa
+        - competition_slug: fifa.worldq.ofc
+        - competition_slug: fifa.worldq.conmebol
+        - competition_slug: fifa.worldq.afc
+        - competition_slug: fifa.worldq.concacaf
+        - competition_slug: fifa.cwc
+        - competition_slug: conmebol.america
+        - competition_slug: fifa.olympics
+        - competition_slug: fifa.friendly
+        - competition_slug: uefa.weuro
+        - competition_slug: uefa.wchampions
+        - competition_slug: fifa.w.olympics
+        - competition_slug: fifa.wwc
+        - competition_slug: eng.1
+        - competition_slug: esp.1
+        - competition_slug: fra.1
+        - competition_slug: ger.1
+        - competition_slug: ita.1
+        - competition_slug: por.1
+        - competition_slug: nor.1
+        - competition_slug: eng.fa
+        - competition_slug: eng.league_cup
+        - competition_slug: esp.copa_del_rey
+        - competition_slug: ger.dfb_pokal
+        - competition_slug: ita.coppa_italia
+        - competition_slug: fra.coupe_de_france
+    static_fields:
+      - name: created_at
+        value: !date_offset 0
+      - name: source
+        value: espn
+      - name: source_type
+        value: api
+
+  - name: espn_competitions
+    description: Ingests competition information from the ESPN API.
+    trigger: manual
+    output:
+      name: espn_competitions
+      layer: landing
+      path: landing/espn_competitions.json
+      mode: append
+    processing:
+      processor: ClientProcessor
+      source: espn
+      method: query_competitions
+    static_fields:
+      - name: created_at
+        value: !date_offset 0
+      - name: source
+        value: espn
+      - name: source_type
+        value: api
+
   - name: football_data_matches
     description: Ingests match information from the Football Data API.
     trigger: automatic
