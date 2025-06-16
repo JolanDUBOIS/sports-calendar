@@ -1,0 +1,70 @@
+# espn_teams:
+#   extraction_type: double
+#   columns_mapping:
+#     team_id: [home_team_id, away_team_id]
+#     team_name: [home_team_name, away_team_name]
+#     team_abbreviation: [home_team_abbreviation, away_team_abbreviation]
+#     team_displayName: [home_team_displayName, away_team_displayName]
+#     team_shortDisplayName: [home_team_shortDisplayName, away_team_shortDisplayName]
+#     source: [source, source]
+#     source_type: [source_type, source_type]
+
+espn_teams:
+  extraction_type: simple
+  columns_mapping:
+    team_id: team_id
+    team_location: team_location
+    team_name: team_name
+    team_abbreviation: team_abbreviation
+    team_display_name: team_display_name,
+    team_short_display_name: team_short_display_name
+    team_is_national: team_is_national
+    source: source
+    source_type: source_type
+
+live_soccer_teams:
+  extraction_type: double
+  columns_mapping:
+    team_name: [home_team, away_team]
+    source: [source, source]
+    source_type: [source_type, source_type]
+
+espn_competitions:
+  extraction_type: simple
+  columns_mapping:
+    competition_id: competition_id
+    competition_name: competition_name
+    competition_abbreviation: competition_abbreviation
+    competition_midsizeName: competition_midsizeName
+    competition_slug: competition_slug
+    source: source
+    source_type: source_type
+
+football_data_competitions:
+  extraction_type: simple
+  columns_mapping:
+    competition_id: competition_id
+    competition_name: competition_name
+    competition_code: competition_code
+    competition_type: competition_type
+    area_id: area_id
+    area_name: area_name
+    area_code: area_code
+    source: source
+    source_type: source_type
+
+football_data_areas:
+  extraction_type: simple
+  columns_mapping: 
+    area_id: area_id
+    area_name: area_name
+    area_code: area_code
+    source: source
+    source_type: source_type
+
+live_soccer_areas:
+  extraction_type: simple
+  columns_mapping:
+    area: area
+    source: source
+    source_type: source_type
