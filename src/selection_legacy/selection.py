@@ -4,10 +4,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.selection import logger
+from src.selection_legacy import logger
 from src.utils import concatenate_unique_rows
-from src.legacy.sources import DatabaseManager
+# from src.legacy.sources import DatabaseManager
 
+
+DatabaseManager = None
 
 class Selection:
     """ TODO """
