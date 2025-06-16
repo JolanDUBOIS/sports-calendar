@@ -37,6 +37,53 @@ espn_matches:
     source: source
     source_type: source_type
 
+espn_standings:
+  direct_paths:
+    competition_id: id
+    competition_name: name
+    competition_abbreviation: abbreviation
+    season: children.0.standings.season
+    season_display_name: children.0.standings.seasonDisplayName
+    created_at: created_at
+    source: source
+    source_type: source_type
+  iterate:
+    path: children.0.standings.entries
+    columns:
+      team_id: team.id
+      team_location: team.location
+      team_name: team.name
+      team_abbreviation: team.abbreviation
+      team_display_name: team.displayName
+      team_short_display_name: team.shortDisplayName
+      team_is_national: team.isNational
+      played_games: stats.0.value
+      lost: stats.1.value
+      point_diff: stats.2.value
+      points: stats.3.value
+      goals_against: stats.4.value
+      goals_for: stats.5.value
+      draws: stats.6.value
+      wins: stats.7.value
+      deductions: stats.8.value
+      ppg: stats.9.value
+      rank: stats.10.value
+      summary: stats.11.summary
+
+espn_competitions:
+  direct_paths:
+    id: id
+    alternate_id: alternateId
+    name: name
+    abbreviation: abbreviation
+    short_name: shortName
+    midsize_name: midsizeName
+    slug: slug
+    has_standings: hasStandings
+    created_at: created_at
+    source: source
+    source_type: source_type
+
 football_data_matches:
   direct_paths:
     area_id: area.id
