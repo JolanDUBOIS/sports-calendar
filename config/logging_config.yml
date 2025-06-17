@@ -25,26 +25,23 @@ handlers:
 
 loggers:
   # Main modules loggers
-  src.calendar:
-    level: DEBUG
-
-  src.clients:
-    level: DEBUG
-
   src.config:
-    level: DEBUG
-
-  src.data_access:
     level: DEBUG
 
   src.file_io:
     level: DEBUG
 
-  src.selection:
+  src.fixture_pipeline:
+    level: DEBUG
+
+  src.fixture_pipeline.calendar:
     level: DEBUG
 
   # Data pipeline loggers
   src.data_pipeline:
+    level: DEBUG
+
+  src.data_pipeline.clients:
     level: DEBUG
 
   src.data_pipeline.data_processing:
