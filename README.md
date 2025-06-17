@@ -92,6 +92,8 @@ poetry run python -m src run-selection
 ```
 
 **Options:**
+- `--name` – Name of the selection to run
+- `--dry-run` – Simulate the selection without making changes (in the google calendar)
 - `--verbose` – Enable verbose logging
 
 ---
