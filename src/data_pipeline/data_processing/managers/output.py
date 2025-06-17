@@ -74,6 +74,12 @@ class OutputManager:
         self.handler.write(full_data, source_versions=source_versions.to_dict(), overwrite=True)
         self.handler.save()
 
+    def reset(self):
+        """ Reset the output file by deleting it. """
+        logger.debug(f"Resetting output file: {self.output_spec.path}")
+        self.handler.delete(force=True)
+        self.handler.save()
+
     def read_source_versions(self) -> SourceVersions:
         """ Retrieve the last recorded source versions from output metadata. """
         metadata_entry = self.handler.meta_manager.read_last_write()

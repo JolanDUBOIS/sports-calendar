@@ -50,6 +50,7 @@ poetry run python -m src run-pipeline [OPTIONS]
 - `--stage [landing|intermediate|staging|production]` – Run a specific pipeline stage
 - `--model MODEL_NAME` – Specify a model to run (requires `--stage`)
 - `--manual` – Enable manual mode (default is automatic)
+- `--reset` – Reset the file(s) and their metadata before running the pipeline
 - `--dry-run` – Simulate the pipeline without making changes
 - `--verbose` – Enable verbose logging
 

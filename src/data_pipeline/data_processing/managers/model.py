@@ -79,7 +79,7 @@ class ModelManager:
         self.repo_path = Path(repo_path)
         self.model_spec = model_spec
 
-    def run(self, manual: bool = False, dry_run: bool = False, **kwargs) -> None:
+    def run(self, manual: bool = False, dry_run: bool = False, reset: bool = False, **kwargs) -> None:
         """
         Execute the model processing pipeline.
 
@@ -95,6 +95,7 @@ class ModelManager:
                            if False, only processes models set to automatic trigger.
             dry_run (bool): If True, simulates the run without making any changes.
                             Can be used for testing purposes.
+            reset (bool): TODO
         """
         if not self._validate_trigger(self.model_spec.trigger, manual):
             return
@@ -105,7 +106,11 @@ class ModelManager:
         source_manager = SourcesManager(self.model_spec.sources)
         output_manager = OutputManager(self.model_spec.output)
         processing_manager = ProcessingManager(self.model_spec.processing)
-        
+
+        # Reset if specified
+        if reset:
+            output_manager.reset()
+
         # Load sources
         source_versions = output_manager.read_source_versions()
         loaded_sources = source_manager.get_loaded_sources(source_versions=source_versions)

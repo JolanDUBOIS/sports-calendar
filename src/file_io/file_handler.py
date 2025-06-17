@@ -24,14 +24,13 @@ class FileHandler(ABC):
 
     @staticmethod
     def _check_path(file_path: Path) -> None:
-        """ Check if the file path is valid and exists. """
+        """ Check if the file path is valid. """
         if not file_path.parent.exists():
             logger.error(f"The directory {file_path.parent} does not exist.")
             raise FileNotFoundError(f"The directory {file_path.parent} does not exist.")
         if file_path.exists() and not file_path.is_file():
             logger.error(f"The path {file_path} is not a valid file.")
             raise FileNotFoundError(f"The path {file_path} is not a valid file.")
-        file_path.touch(exist_ok=True)
 
     def __len__(self) -> int:
         """ Return the length of the content. """
@@ -80,15 +79,16 @@ class FileHandler(ABC):
         self._write_file(self.path, self.content)
         logger.info(f"File {self.path} saved successfully.")
 
-    def delete(self) -> tuple[int, int]:
+    def delete(self, force: bool = False) -> tuple[int, int]:
         """
         Delete the file after user confirmation and clear content.
         Returns the number of added (0) and removed items.
+        TODO - force
         """
         removed = self.__len__()
         self.content = None
         if self.path.exists():
-            if self._confirm_delete():
+            if force or self._confirm_delete():
                 self.path.unlink()
                 logger.info(f"File {self.path} deleted successfully.")
             else:
