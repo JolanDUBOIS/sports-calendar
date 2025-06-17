@@ -24,6 +24,5 @@ def get_clean_matches(matches: pd.DataFrame) -> pd.DataFrame:
         right_on='competition_id',
         how='left'
     )
-    full_matches["date_time"] = full_matches["date_time"].dt.strftime('%Y-%m-%d %H:%M:%S%z')
 
-    return full_matches[["home_team_name", "away_team_name", "competition_name", "date_time"]]
+    return full_matches[["home_team_name", "away_team_name", "competition_name", "date_time", "stage", "leg", "venue"]]
