@@ -34,7 +34,7 @@ def run_selection(name: str, dry_run: bool = False, **kwargs):
         logger.info("Dry run mode is enabled. No events will be added to the google calendar.")
         return
 
-    google_cal_manager = GoogleCalendarManager(GoogleCalendarAPI(GoogleAuthManager()))
+    google_cal_manager = GoogleCalendarManager.from_defaults()
     google_cal_manager.add_calendar(football_calendar.calendar)
     logger.info(f"Selection {name} has been successfully processed and added to the google calendar.")
 
