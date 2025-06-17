@@ -1,9 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from pathlib import Path
 
 from src import logger
-from .data_pipeline import PipelineConfig, DataStage, run_pipeline, run_validation
+from .data_pipeline import PipelineConfig, run_pipeline, run_validation
 from .fixture_pipeline import run_selection
 
 if TYPE_CHECKING:
@@ -12,51 +11,29 @@ if TYPE_CHECKING:
 
 def run_pipeline_logic(
     repo: str = "test",
-    stage: DataStage | None = None,
-    model: str | None = None,
-    manual: bool = False,
-    dry_run: bool = False,
-    verbose: bool = False # Not implemented yet
+    **kwargs
 ) -> None:
     """ TODO """
     pipeline_config = PipelineConfig(repo=repo)
     run_pipeline(
         pipeline_config=pipeline_config,
-        stage=stage,
-        model=model,
-        manual=manual,
-        dry_run=dry_run,
-        verbose=verbose
+        **kwargs
     )
 
 def run_validation_logic(
     repo: str = "test",
-    stage: DataStage | None = None,
-    model: str | None = None,
-    raise_on_error: bool = False,
-    verbose: bool = False # Not implemented yet
+    **kwargs
 ) -> list[SchemaValidationResult]:
     """ TODO """
     pipeline_config = PipelineConfig(repo=repo)
     return run_validation(
         pipeline_config=pipeline_config,
-        stage=stage,
-        model=model,
-        raise_on_error=raise_on_error,
-        verbose=verbose
+        **kwargs
     )
 
-def run_selection_logic(
-    name: str = "dev",
-    dry_run: bool = False,
-    verbose: bool = False # Not implemented yet
-):
+def run_selection_logic(**kwargs):
     """ TODO """
-    run_selection(
-        name=name,
-        dry_run=dry_run,
-        verbose=verbose
-    )
+    run_selection(**kwargs)
 
 def run_test_logic(name: str):
     """ TODO """
