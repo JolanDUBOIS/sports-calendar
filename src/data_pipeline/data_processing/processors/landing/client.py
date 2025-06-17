@@ -5,7 +5,7 @@ import pandas as pd
 
 from . import logger
 from .. import Processor
-from src.clients import (
+from ....clients import (
     ESPNApiClient,
     FootballDataApiClient,
     LiveSoccerScraper,
