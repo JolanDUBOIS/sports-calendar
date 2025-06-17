@@ -6,3 +6,9 @@ google:
 
 database:
   url: sqlite:///data/football.db
+
+repository:
+  path: data/repository
+
+selections:
+  path: data/selections
