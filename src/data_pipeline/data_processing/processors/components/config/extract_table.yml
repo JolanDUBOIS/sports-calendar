@@ -1,26 +1,27 @@
-# espn_teams:
-#   extraction_type: double
-#   columns_mapping:
-#     team_id: [home_team_id, away_team_id]
-#     team_name: [home_team_name, away_team_name]
-#     team_abbreviation: [home_team_abbreviation, away_team_abbreviation]
-#     team_displayName: [home_team_displayName, away_team_displayName]
-#     team_shortDisplayName: [home_team_shortDisplayName, away_team_shortDisplayName]
-#     source: [source, source]
-#     source_type: [source_type, source_type]
-
 espn_teams:
-  extraction_type: simple
+  extraction_type: double
   columns_mapping:
-    team_id: team_id
-    team_location: team_location
-    team_name: team_name
-    team_abbreviation: team_abbreviation
-    team_display_name: team_display_name
-    team_short_display_name: team_short_display_name
-    team_is_national: team_is_national
-    source: source
-    source_type: source_type
+    team_id: [home_team_id, away_team_id]
+    team_location: [home_team_location, away_team_location]
+    team_name: [home_team_name, away_team_name]
+    team_abbreviation: [home_team_abbreviation, away_team_abbreviation]
+    team_display_name: [home_team_displayName, away_team_displayName]
+    team_short_display_name: [home_team_shortDisplayName, away_team_shortDisplayName]
+    source: [source, source]
+    source_type: [source_type, source_type]
+
+# espn_teams:
+#   extraction_type: simple
+#   columns_mapping:
+#     team_id: team_id
+#     team_location: team_location
+#     team_name: team_name
+#     team_abbreviation: team_abbreviation
+#     team_display_name: team_display_name
+#     team_short_display_name: team_short_display_name
+#     team_is_national: team_is_national
+#     source: source
+#     source_type: source_type
 
 live_soccer_teams:
   extraction_type: double
