@@ -7,8 +7,7 @@ import pandas as pd
 from . import logger
 from .schema_spec import SchemaSpec, ModelSchemaSpec, ColumnSpec
 from .validation_result import SchemaValidationResult, ModelValidationResult, ValidationError, ValidationIssue
-from ...file_io import FileHandlerFactory
-from ..utils import read_yml_file
+from src.file_io import FileHandlerFactory
 
 
 class ColumnManager:
