@@ -47,6 +47,7 @@ def run_pipeline(
     repo: str = repo_option("pipeline"),
     stage: str | None = stage_option("pipeline"),
     model: str | None = model_option("pipeline"),
+    reset: bool = typer.Option(False, "--reset", help="Delete the file(s) and their metadata before running the pipeline."),
     dry_run: bool = typer.Option(False, "--dry-run", help="Run the pipeline in dry run mode."),
     verbose: bool = typer.Option(False, "--verbose", help="Run the pipeline in verbose mode.")
 ):
@@ -54,11 +55,15 @@ def run_pipeline(
     if stage is None and model is not None:
         typer.echo("Error: --model requires --stage to be specified.", err=True)
         raise typer.Exit(code=1)
+    if reset and not confirm_reset():
+        typer.echo("Reset mode aborted by the user.", err=True)
+        raise typer.Exit(code=0)
     run_pipeline_logic(
         repo=repo,
         stage=stage,
         model=model,
         manual=manual,
+        reset=reset,
         dry_run=dry_run,
         verbose=verbose
     )
@@ -118,3 +123,8 @@ def revert(
 ):
     """ Revert the data repository to a previous state. """
     raise NotImplementedError("The revert command is not implemented yet.")
+
+def confirm_reset() -> bool:
+    """ Ask the user for confirmation to proceed with reset mode. """
+    confirmation = typer.confirm("Are you sure you want to proceed with reset mode? This will delete files and metadata.")
+    return confirmation
