@@ -1,58 +1,54 @@
-from pathlib import Path
-
-import yaml
-
 from . import logger
-from .selection import Selection
 from .data_access import get_clean_matches
 from .calendar import (
     FootballCalendar,
     MatchesDetails,
-    GoogleCalendarManager,
-    GoogleCalendarAPI,
-    GoogleAuthManager
+    GoogleCalendarManager
 )
-from ..config import get_config
+from .orchestration import AppConfig
 
 
-def run_selection(name: str, dry_run: bool = False, **kwargs):
+def run_selection(repo: str = "prod", name: str = "dev", dry_run: bool = False, preset: str = "default", **kwargs):
     """ TODO """
     logger.info(f"Running selection for selection {name}.")
-    selections_path = Path(get_config("selections.path"))
-    selection_file = selections_path / f"{name}.yml"
-    selection = load_selection(selection_file)
+
+    app_config = AppConfig(repo=repo)
+    selection = app_config.get_selection(name)
+    selection_params = app_config.get_selection_params(key=preset)
+    gcal_id = app_config.get_gcal_id(key=name)
+
+    if selection is None:
+        logger.error(f"Selection {name} not found in the configuration.")
+        raise ValueError(f"Selection {name} not found in the configuration.")
+    if selection_params is None:
+        logger.error(f"Selection parameters for {preset} not found in the configuration.")
+        raise ValueError(f"Selection parameters for {preset} not found in the configuration.")
+    if gcal_id is None:
+        logger.error(f"Google Calendar ID for {selection.username} not found in the secrets.")
+        raise ValueError(f"Google Calendar ID for {selection.username} not found in the secrets.")
 
     matches = selection.get_matches()
-    logger.debug(f"Matches:\n{matches.tail(20)}")
-    clean_matches = get_clean_matches(matches)
-    logger.debug(f"Clean matches:\n{clean_matches.sort_values(by=['date_time']).tail(20)}")
+    matches = get_clean_matches(matches)
+    matches_details = MatchesDetails.from_dataframe(matches)
 
     football_calendar = FootballCalendar()
-    matches_details = MatchesDetails.from_dataframe(clean_matches)
     football_calendar.add_matches(matches_details)
+
     if dry_run:
         logger.info("Dry run mode is enabled. No events will be added to the google calendar.")
         return
 
-    google_cal_manager = GoogleCalendarManager.from_defaults()
-    google_cal_manager.add_calendar(football_calendar.calendar)
+    google_cal_manager = GoogleCalendarManager.from_defaults(gcal_id)
+    google_cal_manager.add_calendar(football_calendar.calendar, verbose=True)
+
     logger.info(f"Selection {name} has been successfully processed and added to the google calendar.")
 
-def load_selection(path: Path | str) -> Selection:
-    path = Path(path)
-    if not path.exists():
-        logger.error(f"Selection file {path} does not exist.")
-        raise FileNotFoundError(f"Selection file {path} does not exist.")
-    
-    with open(path, 'r') as file:
-        try:
-            data = yaml.safe_load(file)
-        except yaml.YAMLError as e:
-            logger.error(f"Error loading YAML file {path}: {e}")
-            raise ValueError(f"Error loading YAML file {path}: {e}")
+def clear_calendar(scope: str = 'future', key: str = "dev", **kwargs):
+    """ Clear events from the Google Calendar based on the specified scope. """
+    logger.info(f"Clearing calendar events with scope: {scope}")
 
-    if not isinstance(data, dict):
-        logger.error(f"Invalid selection data format in {path}. Expected a dictionary.")
-        raise ValueError(f"Invalid selection data format in {path}. Expected a dictionary.")
+    gcal_id = AppConfig().get_gcal_id(key=key)
+    google_cal_manager = GoogleCalendarManager.from_defaults(gcal_id)
+    google_cal_manager.clear_calendar(scope=scope, verbose=True)
 
-    return Selection.from_dict(data)
+    logger.info(f"Calendar events cleared successfully.")

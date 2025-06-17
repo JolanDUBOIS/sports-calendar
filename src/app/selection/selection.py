@@ -24,9 +24,9 @@ class SelectionItem:
             logger.error("All filters must be instances of SelectionFilter.")
             raise TypeError("All filters must be instances of SelectionFilter.")
 
-    def get_matches(self) -> pd.DataFrame:
+    def get_matches(self, date_from: str | None = None, date_to: str | None = None) -> pd.DataFrame:
         """ Returns matches for the selection item based on its filters. """
-        matches = self._get_unfiltered_matches()
+        matches = self._get_unfiltered_matches(date_from, date_to)
         if matches.empty:
             logger.debug(f"No matches found for {self.entity} with ID {self.entity_id}.")
             return pd.DataFrame()
@@ -34,11 +34,16 @@ class SelectionItem:
             matches = filter.apply(matches)
         return matches
 
-    def _get_unfiltered_matches(self) -> pd.DataFrame:
+    def _get_unfiltered_matches(self, date_from: str | None = None, date_to: str | None = None) -> pd.DataFrame:
         """ TODO """
         team_ids = [self.entity_id] if self.entity == 'team' else None
         competition_ids = [self.entity_id] if self.entity == 'competition' else None
-        return MatchesTable.query(team_ids=team_ids, competition_ids=competition_ids)
+        return MatchesTable.query(
+            team_ids=team_ids,
+            competition_ids=competition_ids,
+            date_from=date_from,
+            date_to=date_to
+        )
 
     @classmethod
     def from_dict(cls, d: dict) -> SelectionItem:
@@ -54,11 +59,11 @@ class Selection:
     username: str | None = None
     items: list[SelectionItem] = field(default_factory=list)
 
-    def get_matches(self) -> pd.DataFrame:
+    def get_matches(self, date_from: str | None = None, date_to: str | None = None) -> pd.DataFrame:
         """ Returns matches for all items in the selection. """
         matches = pd.DataFrame()
         for item in self.items:
-            item_matches = item.get_matches()
+            item_matches = item.get_matches(date_from, date_to)
             if not item_matches.empty:
                 matches = pd.concat([matches, item_matches], ignore_index=True)
         if matches.empty:
