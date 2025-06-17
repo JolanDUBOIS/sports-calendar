@@ -1,7 +1,13 @@
-import typer
-from typer import BadParameter
+import typer # type: ignore
+from typer import BadParameter # type: ignore
 
-from .main import run_pipeline_logic, run_validation_logic, run_selection_logic, run_test_logic
+from .main import (
+    run_pipeline_logic,
+    run_validation_logic,
+    run_selection_logic,
+    clear_calendar_logic,
+    run_test_logic
+)
 from .data_pipeline import DataStage
 
 
@@ -91,14 +97,18 @@ def run_validation(
 
 @app.command()
 def run_selection(
+    repo: str = repo_option("selection", default="prod"),
     name: str = typer.Argument("dev", help="Name of the selection to run."),
     dry_run: bool = typer.Option(False, "--dry-run", help="Run the selection in dry run mode."),
+    preset: str = typer.Option("default", "--preset", help="Use a preset selection configuration."),
     verbose: bool = typer.Option(False, "--verbose", help="Run the selection in verbose mode.")
 ):
     """ Run the data selection. """
     run_selection_logic(
+        repo=repo,
         name=name,
         dry_run=dry_run,
+        preset=preset,
         verbose=verbose
     )
 
@@ -110,7 +120,7 @@ def test(
     run_test_logic(test_name)
 
 @app.command()
-def clean(
+def clean_repository(
     repo: str = repo_option("cleaning"),
     stage: str | None = stage_option("cleaning")
 ):
@@ -123,6 +133,25 @@ def revert(
 ):
     """ Revert the data repository to a previous state. """
     raise NotImplementedError("The revert command is not implemented yet.")
+
+@app.command()
+def clear_calendar(
+    scope: str = typer.Option('future', "--scope", help="Specify which events to clear: 'all', 'future', or 'past.',",
+                               prompt=True,
+                               case_sensitive=False,
+                               show_choices=True),
+    key: str = typer.Argument("dev", help="Key of the calendar to clear."),
+    verbose: bool = typer.Option(False, "--verbose", help="Run the command in verbose mode.")
+):
+    """ Clear events from the Google Calendar. """
+    if scope not in ["all", "future", "past"]:
+        typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
+        raise typer.Exit(code=1)
+    clear_calendar_logic(
+        scope=scope,
+        key=key,
+        verbose=verbose
+    )
 
 def confirm_reset() -> bool:
     """ Ask the user for confirmation to proceed with reset mode. """

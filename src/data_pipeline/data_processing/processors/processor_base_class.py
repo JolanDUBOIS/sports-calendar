@@ -21,8 +21,8 @@ class Processor(ABC):
             return data
         except Exception as e:
             logger.error(f"Error in processor {self.__class__.__name__}: {e}")
-            logger.debug(traceback.format_exc())
-            raise e
+            logger.debug("Traceback:\n%s", traceback.format_exc())
+            raise
 
     @abstractmethod
     def _run(self, **kwargs) -> IOContent:

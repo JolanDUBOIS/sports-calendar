@@ -7,8 +7,7 @@ import pandas as pd
 from . import logger
 from .schema_spec import SchemaSpec, ModelSchemaSpec, ColumnSpec
 from .validation_result import SchemaValidationResult, ModelValidationResult, ValidationError, ValidationIssue
-from ...file_io import FileHandlerFactory
-from ..utils import read_yml_file
+from src.file_io import FileHandlerFactory
 
 
 class ColumnManager:
@@ -153,7 +152,7 @@ class LayerSchemaManager:
             return schema_result
         except Exception as e:
             logger.error(f"Validation failed for stage '{self.schema_spec.stage}': {e}")
-            logger.debug(traceback.format_exc())
+            logger.debug("Traceback:\n%s", traceback.format_exc())
         logger.info(f"Schema '{self.schema_spec.name}' validation completed.")
 
     @classmethod

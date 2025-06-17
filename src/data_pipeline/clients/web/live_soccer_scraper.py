@@ -140,7 +140,7 @@ class LiveSoccerScraper(BaseScraper):
                         matches.append(match_data)
                 except Exception as e:
                     logger.debug(f"Error parsing match row: {e}")
-                    logger.debug(traceback.format_exc())
+                    logger.debug("Traceback:\n%s", traceback.format_exc())
                     continue
 
             # Check if the row contains a date (not a match row)

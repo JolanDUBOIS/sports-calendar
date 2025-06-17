@@ -29,7 +29,7 @@ def run_validation(
             return SchemaValidationResult(schema=schema_spec.name, results=[results])
         except Exception as e:
             logger.error(f"Validation failed for model '{model}': {e}")
-            logger.debug(traceback.format_exc())
+            logger.debug("Traceback:\n%s", traceback.format_exc())
 
     # Multiple models
     else:

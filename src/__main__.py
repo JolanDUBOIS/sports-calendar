@@ -19,4 +19,4 @@ if __name__ == '__main__':
         app()
     except Exception as e:
         logger.error(f"An error occurred while running the application: {e}")
-        logger.debug(traceback.format_exc())
+        logger.debug("Traceback:\n%s", traceback.format_exc())

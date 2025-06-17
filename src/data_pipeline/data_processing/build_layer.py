@@ -42,7 +42,7 @@ class LayerSpec:
                 model.resolve_paths(base_path)
             except Exception as e:
                 logger.error(f"Error resolving path for model {model.name}: {e}")
-                logger.debug(traceback.format_exc())
+                logger.debug("Traceback:\n%s", traceback.format_exc())
                 raise ValueError(f"Failed to resolve path for model {model.name}: {e}")
 
     @staticmethod
