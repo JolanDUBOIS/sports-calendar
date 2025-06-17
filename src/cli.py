@@ -20,9 +20,9 @@ def validate_repo(repo: str) -> str:
         raise BadParameter("Invalid repository. Valid values are 'test' or 'prod'.")
     return repo
 
-def repo_option(workflow: str):
+def repo_option(workflow: str, default: str = "test"):
     return typer.Option(
-        "test",
+        default,
         "--repo",
         help=f"Specify the repository to run the {workflow} on (e.g. 'prod' or 'test').",
         callback=validate_repo,
@@ -86,10 +86,16 @@ def run_validation(
 
 @app.command()
 def run_selection(
+    name: str = typer.Argument("dev", help="Name of the selection to run."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Run the selection in dry run mode."),
     verbose: bool = typer.Option(False, "--verbose", help="Run the selection in verbose mode.")
 ):
     """ Run the data selection. """
-    run_selection_logic()
+    run_selection_logic(
+        name=name,
+        dry_run=dry_run,
+        verbose=verbose
+    )
 
 @app.command()
 def test(

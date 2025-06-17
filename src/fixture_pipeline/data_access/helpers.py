@@ -1,0 +1,29 @@
+import pandas as pd
+
+from .models import TeamsTable, CompetitionsTable
+
+
+def get_clean_matches(matches: pd.DataFrame) -> pd.DataFrame:
+    """ TODO """
+    teams_df = TeamsTable.query().add_prefix('team_')
+    competitions_df = CompetitionsTable.query().add_prefix('competition_')
+
+    full_matches = matches.merge(
+        teams_df.add_prefix('home_'),
+        left_on='home_team_id',
+        right_on='home_team_id',
+        how='left'
+    ).merge(
+        teams_df.add_prefix('away_'),
+        left_on='away_team_id',
+        right_on='away_team_id',
+        how='left'
+    ).merge(
+        competitions_df,
+        left_on='competition_id',
+        right_on='competition_id',
+        how='left'
+    )
+    full_matches["date_time"] = full_matches["date_time"].dt.strftime('%Y-%m-%d %H:%M:%S%z')
+
+    return full_matches[["home_team_name", "away_team_name", "competition_name", "date_time"]]

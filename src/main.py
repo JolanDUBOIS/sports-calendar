@@ -4,19 +4,11 @@ from pathlib import Path
 
 from src import logger
 from .data_pipeline import PipelineConfig, DataStage, run_pipeline, run_validation
+from .fixture_pipeline import run_selection
 
 if TYPE_CHECKING:
     from .data_pipeline import SchemaValidationResult
 
-
-ROOT_PATH = Path(__file__).parent.parent
-CONFIG_PATH = ROOT_PATH / "config" / "pipeline_config"
-DATA_PATH = ROOT_PATH / "data"
-
-REPOSITORIES = {
-    "test": "repository_test",
-    "prod": "repository"
-}
 
 def run_pipeline_logic(
     repo: str = "test",
@@ -54,9 +46,17 @@ def run_validation_logic(
         verbose=verbose
     )
 
-def run_selection_logic():
+def run_selection_logic(
+    name: str = "dev",
+    dry_run: bool = False,
+    verbose: bool = False # Not implemented yet
+):
     """ TODO """
-    raise NotImplementedError("Run selection is not implemented yet.")    
+    run_selection(
+        name=name,
+        dry_run=dry_run,
+        verbose=verbose
+    )
 
 def run_test_logic(name: str):
     """ TODO """
