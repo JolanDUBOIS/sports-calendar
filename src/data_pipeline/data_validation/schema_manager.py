@@ -153,7 +153,7 @@ class LayerSchemaManager:
             return schema_result
         except Exception as e:
             logger.error(f"Validation failed for stage '{self.schema_spec.stage}': {e}")
-            logger.debug(traceback.format_exc())
+            logger.debug("Traceback:\n%s", traceback.format_exc())
         logger.info(f"Schema '{self.schema_spec.name}' validation completed.")
 
     @classmethod

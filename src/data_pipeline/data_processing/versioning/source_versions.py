@@ -14,9 +14,11 @@ class SourceVersion:
     def __post_init__(self) -> None:
         """ Validate version_field and version_cutoff. """
         if not self.version_field or not self.version_cutoff:
+            logger.debug(f"Invalid SourceVersion initialization with field: {self.version_field}, cutoff: {self.version_cutoff}")
             logger.error("version_field and version_cutoff must be provided.")
             raise ValueError("version_field and version_cutoff must be provided.")
         if not isinstance(self.version_field, str) or not isinstance(self.version_cutoff, str):
+            logger.debug(f"Invalid SourceVersion initialization with field: {self.version_field}, cutoff: {self.version_cutoff}")
             logger.error("version_field and version_cutoff must be strings.")
             raise TypeError("version_field and version_cutoff must be strings.")
 

@@ -34,7 +34,7 @@ class BaseScraper:
 
             except Exception as e:
                 logger.error(f"Failed to fetch data from URL: {url}. Error: {e}")
-                logger.debug(traceback.format_exc())
+                logger.debug("Traceback:\n%s", traceback.format_exc())
                 break
 
         if retries >= max_retries:

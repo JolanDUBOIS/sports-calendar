@@ -27,7 +27,7 @@ def run_pipeline(
             model_manager.run(**kwargs)
         except Exception as e:
             logger.error(f"Error processing model {model_spec.name}: {e}")
-            logger.debug(traceback.format_exc())
+            logger.debug("Traceback:\n%s", traceback.format_exc())
 
     # Multiple models
     else:
