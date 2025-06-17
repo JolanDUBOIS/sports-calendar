@@ -59,9 +59,7 @@ class BaseTable(ABC):
 
             # logger.debug(f"Converting column '{col}' to type '{col_type}'")
             try:
-                if col_type == "datetime":
-                    df[col] = pd.to_datetime(df[col], errors="coerce", utc=True)
-                elif col_type == "int":
+                if col_type == "int":
                     df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
                 elif col_type == "float":
                     df[col] = pd.to_numeric(df[col], errors="coerce").astype(float)
@@ -146,13 +144,21 @@ class MatchesTable(BaseTable):
         "competition_id": {"type": "int", "source": "competition_id"},
         "home_team_id": {"type": "int", "source": "home_team_id"},
         "away_team_id": {"type": "int", "source": "away_team_id"},
-        "date_time": {"type": "datetime", "source": "date_time_cet"},
+        "date_time": {"type": "str", "source": "date_time_cet"},
         "venue": {"type": "str", "source": "venue"},
         "stage": {"type": "str", "source": "stage"},
         "leg": {"type": "int", "source": "leg"},
         "channels": {"type": "str", "source": None}
     }
     file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__, tracked=True)
+
+    @classmethod
+    def get_table(cls) -> pd.DataFrame:
+        """ Returns the matches table as a DataFrame. """
+        df = super().get_table()
+        temp_col = pd.to_datetime(df['date_time'], errors='coerce', utc=True)
+        df['date'] = temp_col.dt.date # Bricolage...
+        return df
 
     @classmethod
     def query(
@@ -172,9 +178,10 @@ class MatchesTable(BaseTable):
         if team_ids is not None:
             df = df[(df['home_team_id'].isin(team_ids)) | (df['away_team_id'].isin(team_ids))]
         if date_from is not None:
-            df = df[df['date_time'] >= pd.to_datetime(date_from)]
+            df = df[df['date'] >= pd.to_datetime(date_from)]
         if date_to is not None:
-            df = df[df['date_time'] <= pd.to_datetime(date_to)]
+            df = df[df['date'] <= pd.to_datetime(date_to)]
+        df.drop(columns=['date'], inplace=True)
         return df.reset_index(drop=True)
 
 class StandingsTable(BaseTable):

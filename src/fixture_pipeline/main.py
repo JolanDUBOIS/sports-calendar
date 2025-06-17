@@ -5,7 +5,13 @@ import yaml
 from . import logger
 from .selection import Selection
 from .data_access import get_clean_matches
-from .calendar import FootballCalendar, GoogleCalendarManager
+from .calendar import (
+    FootballCalendar,
+    MatchesDetails,
+    GoogleCalendarManager,
+    GoogleCalendarAPI,
+    GoogleAuthManager
+)
 from ..config import get_config
 
 
@@ -15,18 +21,21 @@ def run_selection(name: str, dry_run: bool = False, **kwargs):
     selections_path = Path(get_config("selections.path"))
     selection_file = selections_path / f"{name}.yml"
     selection = load_selection(selection_file)
+
     matches = selection.get_matches()
-    # logger.debug(f"Matches:\n{matches.head(20)}")
+    logger.debug(f"Matches:\n{matches.tail(20)}")
     clean_matches = get_clean_matches(matches)
-    # logger.debug(f"Clean matches:\n{clean_matches.head(20)}")
-    # logger.debug(f"Clean matches where home_team_name or away_team_name is None:\n{clean_matches[clean_matches['home_team_name'].isna() | clean_matches['away_team_name'].isna()]}")
-    calendar = FootballCalendar()
-    calendar.add_matches(clean_matches)
+    logger.debug(f"Clean matches:\n{clean_matches.sort_values(by=['date_time']).tail(20)}")
+
+    football_calendar = FootballCalendar()
+    matches_details = MatchesDetails.from_dataframe(clean_matches)
+    football_calendar.add_matches(matches_details)
     if dry_run:
         logger.info("Dry run mode is enabled. No events will be added to the google calendar.")
         return
-    google_cal_manager = GoogleCalendarManager()
-    google_cal_manager.add_calendar(calendar)
+
+    google_cal_manager = GoogleCalendarManager(GoogleCalendarAPI(GoogleAuthManager()))
+    google_cal_manager.add_calendar(football_calendar.calendar)
     logger.info(f"Selection {name} has been successfully processed and added to the google calendar.")
 
 def load_selection(path: Path | str) -> Selection:
