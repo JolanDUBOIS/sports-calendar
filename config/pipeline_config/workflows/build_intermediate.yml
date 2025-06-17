@@ -109,8 +109,8 @@ models:
     description: Extracts team information from the ESPN matches data.
     trigger: automatic
     sources:
-      - name: espn_standings
-        path: intermediate/espn_standings.csv
+      - name: espn_matches
+        path: intermediate/espn_matches.csv
         versioning:
           mode: newest
           field: intermediate_at
@@ -132,7 +132,7 @@ models:
           - team_name
     processing:
       processor: DerivationProcessor
-      source_key: espn_standings
+      source_key: espn_matches
       output_key: espn_teams
       deduplicate: true
     static_fields:

@@ -1,3 +1,8 @@
+defaults:
+  date_range: &date_range
+    date_from: !date_offset -200
+    date_to: !date_offset 14
+
 name: ingestion_landing
 description: Ingests data to the landing layer from the different sources (API and Scrapers).
 stage: landing
@@ -17,116 +22,79 @@ models:
       method: query_matches
       params:
         - competition_slug: uefa.champions
-          date_from: !date_offset 0  # Today
-          date_to: !date_offset 14  # 14d from today
+          <<: *date_range
         - competition_slug: uefa.europa
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.europa.conf
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.champions_qual
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.europa_qual
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.europa.conf_qual
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.nations
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.euro
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.euroq
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.world
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.worldq.caf
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.worldq.uefa
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.worldq.ofc
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.worldq.conmebol
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.worldq.afc
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.worldq.concacaf
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.cwc
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: conmebol.america
-          date_from: !date_offset 0
-          date_to: !date_offset 14 
+          <<: *date_range
         - competition_slug: fifa.olympics
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.friendly
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.weuro
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: uefa.wchampions
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.w.olympics
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fifa.wwc
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: eng.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: esp.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fra.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: ger.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: ita.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: por.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: nor.1
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: eng.fa
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: eng.league_cup
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: esp.copa_del_rey
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: ger.dfb_pokal
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: ita.coppa_italia
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
         - competition_slug: fra.coupe_de_france
-          date_from: !date_offset 0
-          date_to: !date_offset 14
+          <<: *date_range
     static_fields:
       - name: created_at
         value: !date_offset 0
