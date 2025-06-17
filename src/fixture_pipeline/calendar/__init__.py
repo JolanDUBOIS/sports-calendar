@@ -2,5 +2,5 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .football_calendar import FootballCalendar
-from .google_calendar_manager import GoogleCalendarManager
+from .football_calendar import FootballCalendar, MatchesDetails
+from .google_calendar import GoogleCalendarManager, GoogleCalendarAPI, GoogleAuthManager
