@@ -29,6 +29,16 @@ class BaseFileHandler(ABC):
         """ Return the file path. """
         return self.file_path
 
+    @property
+    def name(self) -> str:
+        """ Return the name of the file without the directory. """
+        return self.file_path.name
+
+    @property
+    def suffix(self) -> str:
+        """ Return the file suffix (extension). """
+        return self.file_path.suffix.lower()
+
     @staticmethod
     def _check_path(file_path: Path) -> None:
         """ Check if the file path is valid. """
@@ -77,6 +87,13 @@ class BaseFileHandler(ABC):
         else:
             logger.warning(f"File {self.path} does not exist, nothing to delete.")
         self.meta_manager.record_delete(removed=removed)
+
+    def purge(self) -> None:
+        """ TODO - Should only be called in controlled situations... """
+        if self.path.exists():
+            self.path.unlink()
+        self.meta_manager.delete()
+        logger.info(f"File {self.path} purged successfully.")
 
     def _confirm_delete(self) -> bool:
         """ Ask the user to confirm deleting the file. """
