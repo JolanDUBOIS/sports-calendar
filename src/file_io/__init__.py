@@ -2,9 +2,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .file_handler import FileHandler
+from .base_file_handler import BaseFileHandler
 from .csv_handler import CSVHandler
 from .json_handler import JSONHandler
-from .metadata_manager import MetadataManager, MetadataEntry
-from .tracked_file_handler import TrackedFileHandler
-from .file_handler_factory import FileHandlerFactory
+from .factory import FileHandlerFactory
+from .metadata_manager import MetadataEntry

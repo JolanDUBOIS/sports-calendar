@@ -130,6 +130,19 @@ class MetadataManager:
         )
         self.write(entry)
 
+    def record_delete(self, removed: int) -> None:
+        """ Record a delete operation in the metadata. """
+        last_meta = self.read_last()
+        version = last_meta.version + 1 if last_meta else 1
+        entry = MetadataEntry(
+            timestamp=self.get_now(),
+            operation="delete",
+            added=0,
+            removed=removed,
+            version=version
+        )
+        self.write(entry)
+
     @staticmethod
     def get_now() -> str:
         """ Return the current timestamp in ISO format. """
