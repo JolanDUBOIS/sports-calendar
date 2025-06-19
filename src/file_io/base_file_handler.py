@@ -83,9 +83,9 @@ class BaseFileHandler(ABC):
         response = input(f"Are you sure you want to delete the file {self.path}? (yes/y to confirm): ").strip().lower()
         return response in ['yes', 'y']
 
+    @abstractmethod
     def cleanup(self, cutoff: str) -> None:
-        """ TODO """
-        raise NotImplementedError("Cleanup method is not implemented yet.")
+        """ Clean up old data based on the cutoff date (ISO format). """
 
     @abstractmethod
     def _read_file(self) -> IOContent:
@@ -119,3 +119,12 @@ class BaseFileHandler(ABC):
     def _today() -> str:
         """ Return today's date in ISO format. """
         return datetime.now().isoformat(timespec="seconds")
+
+    @staticmethod
+    def _check_iso_format(date_str: str) -> None:
+        """ Check if the date string is in ISO format. """
+        try:
+            datetime.fromisoformat(date_str)
+        except ValueError:
+            logger.error(f"Date string '{date_str}' is not in ISO format.")
+            raise ValueError(f"Date string '{date_str}' is not in ISO format.")
