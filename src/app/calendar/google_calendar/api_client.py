@@ -1,8 +1,9 @@
 import time
 import traceback
+from datetime import datetime
+from icalendar import Event
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from icalendar import Event
 
 from . import logger
 from .auth import GoogleAuthManager
@@ -17,6 +18,18 @@ class GoogleCalendarAPI:
         self.calendar_id = calendar_id
         self.service = build('calendar', 'v3', credentials=self.auth_manager.credentials)
 
+        self._validate_cal_id()
+
+    def _validate_cal_id(self) -> None:
+        """ TODO """
+        try:
+            self.service.calendars().get(calendarId=self.calendar_id).execute()
+        except Exception as e:
+            logger.error(f"Invalid calendar ID: {e}")
+            raise
+
+    # Fetch events
+
     def fetch_events(self, date_from: str | None = None, date_to: str | None = None) -> list:
         """ Fetch events from Google Calendar within a date range """
         try:
@@ -27,9 +40,9 @@ class GoogleCalendarAPI:
                 'maxResults': 2500
             }
             if date_from:
-                params['timeMin'] = date_from
+                params['timeMin'] = self._format_date(date_from)
             if date_to:
-                params['timeMax'] = date_to
+                params['timeMax'] = self._format_date(date_to)
 
             all_events = []
             page_token = None
@@ -50,6 +63,27 @@ class GoogleCalendarAPI:
             logger.error(f"Unexpected error fetching events: {e}")
             logger.debug("Traceback:\n%s", traceback.format_exc())
             raise
+
+    # Add events
+
+    def add_events(
+        self,
+        events: list[Event],
+        date_from: str | None = None,
+        date_to: str | None = None,
+        verbose: bool = False
+    ) -> None:
+        """ Add multiple events to Google Calendar """
+        N_events = len(events)
+        for i, event in enumerate(events):
+            if verbose:
+                print(f"\r{' ' * 80}\rAdding event {i + 1}/{N_events}: {event.get('summary')}", end='\r')
+            if date_from and event.get('dtstart').dt < date_from:
+                continue
+            if date_to and event.get('dtend').dt > date_to:
+                continue
+            self.add_event(event)
+        logger.info(f"Added {N_events} events to Google Calendar.")
 
     def add_event(self, event: Event) -> None:
         """ Add an event to Google Calendar """
@@ -91,6 +125,8 @@ class GoogleCalendarAPI:
                 logger.debug("Traceback:\n%s", traceback.format_exc())
                 raise
 
+    # Delete events
+
     def delete_events(
         self,
         date_from: str | None = None,
@@ -98,17 +134,13 @@ class GoogleCalendarAPI:
         verbose: bool = False
     ) -> None:
         """ Delete events from Google Calendar within a date range """
-        try:
-            events = self.fetch_events(date_from, date_to)
-            N_events = len(events)
-            for i, event in enumerate(events):
-                if verbose:
-                    print(f"\r{' ' * 80}\rDeleting event {i + 1}/{N_events}", end='\r')
-                self.delete_event(event['id'])
-        except Exception as e:
-            logger.error(f"Unexpected error deleting events: {e}")
-            logger.debug("Traceback:\n%s", traceback.format_exc())
-            raise
+        events = self.fetch_events(date_from, date_to)
+        N_events = len(events)
+        for i, event in enumerate(events):
+            if verbose:
+                print(f"\r{' ' * 80}\rDeleting event {i + 1}/{N_events}", end='\r')
+            self.delete_event(event['id'])
+        logger.info(f"Deleted {N_events} events from Google Calendar.")
 
     def delete_event(self, event_id: str) -> None:
         """ Delete a specific event from Google Calendar """
@@ -135,3 +167,13 @@ class GoogleCalendarAPI:
                 logger.error(f"Unexpected error deleting event: {e}")
                 logger.debug("Traceback:\n%s", traceback.format_exc())
                 raise
+
+    # Helpe methods
+
+    def _format_date(self, date: str) -> str:
+        """ Format date to TODO format """
+        try:
+            dt = datetime.fromisoformat(date)
+        except ValueError:
+            dt = datetime.strptime(date, "%Y-%m-%d")
+        return dt.replace(hour=0, minute=0, second=0).isoformat(timespec='seconds') + 'Z'

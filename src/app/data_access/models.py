@@ -5,10 +5,10 @@ import pandas as pd
 from . import logger
 from src import ROOT_PATH
 from src.file_io import FileHandlerFactory, TrackedFileHandler
-from src.config import get_config
+from src.config.manager import base_config
 
 
-REPO_PATH = ROOT_PATH / get_config("repository.path", "data/repository") / "staging"
+REPO_PATH = ROOT_PATH / "data/repository" / "staging" # TODO - TO CHANGE, NEED TO USE base_config FOR THIS !!!! - TODO
 
 class BaseTable(ABC):
     """ Base class for all tables. """
