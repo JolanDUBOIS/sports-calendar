@@ -58,3 +58,12 @@ class JSONHandler(BaseFileHandler):
         if not all(isinstance(d, dict) for d in data):
             logger.error(f"All elements in the data must be dictionaries. File handler path: {self.path}")
             raise ValueError(f"All elements in the data must be dictionaries. File handler path: {self.path}")
+
+    def _add_ctime(self, data: list[dict]) -> list[dict]:
+        """ Add creation time to each dictionary in the list. """
+        for item in data:
+            if "_ctime" in item:
+                logger.error(f"Data already contains '_ctime' key. File handler path: {self.path}")
+                raise ValueError(f"Data already contains '_ctime' key. File handler path: {self.path}")
+            item["_ctime"] = self._today()
+        return data

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+from datetime import datetime
 
 from . import logger
 from .metadata_manager import MetadataManager
@@ -40,16 +41,13 @@ class BaseFileHandler(ABC):
         if not file_path.exists():
             logger.warning(f"The file {file_path} does not exist. It will be created on write.")
 
-    def empty(self) -> bool:
-        """ Check if the file is empty. """
-        return self.__len__() == 0
-
     def read(self) -> IOContent:
         """ Read the content of the file. """
         return self._read_file()
 
     def write(self, data: IOContent, source_versions: dict | None = None, overwrite: bool = False) -> None:
         """ TODO """
+        data = self._add_ctime(data)
         try:
             added = len(data)
             if overwrite:
@@ -112,3 +110,12 @@ class BaseFileHandler(ABC):
     @abstractmethod
     def _validate_data(self, data: IOContent) -> None:
         """ TODO """
+
+    @abstractmethod
+    def _add_ctime(data: IOContent) -> IOContent:
+        """ Add creation time to the data. """
+
+    @staticmethod
+    def _today() -> str:
+        """ Return today's date in ISO format. """
+        return datetime.now().isoformat(timespec="seconds")
