@@ -1,5 +1,4 @@
 import logging
-
 logger = logging.getLogger(__name__)
 
 from .date_normalization import date_normalization

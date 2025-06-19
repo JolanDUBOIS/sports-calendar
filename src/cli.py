@@ -125,10 +125,10 @@ def run_selection(
 
 @app.command()
 def test(
-    test_name: str = typer.Argument(..., help="Name of the test to run.")
+    name: str = typer.Argument(..., help="Name of the test to run.")
 ):
     """ Run a specific test. """
-    run_test_logic(test_name)
+    run_test_logic(name)
 
 @app.command()
 def clean_repository(

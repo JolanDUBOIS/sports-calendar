@@ -1,5 +1,4 @@
 import logging
-
 logger = logging.getLogger(__name__)
 
 from .processor_base_class import Processor
