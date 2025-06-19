@@ -1,56 +1,57 @@
-from pathlib import Path
-
 import pandas as pd
 
-from . import logger, FileHandler
+from . import logger
+from .base_file_handler import BaseFileHandler
 
 
-class CSVHandler(FileHandler):
+class CSVHandler(BaseFileHandler):
     """ CSV file handler for reading and writing CSV files. """
+
+    def _read_file(self) -> pd.DataFrame:
+        """ Read the CSV file and return its content as a DataFrame. """
+        if not self.path.exists():
+            logger.debug(f"CSV file {self.path} does not exist. Returning empty DataFrame.")
+            return pd.DataFrame()
+        try:
+            return pd.read_csv(self.path, dtype=str)
+        except pd.errors.EmptyDataError:
+            logger.debug(f"CSV file {self.path} is empty.")
+            return pd.DataFrame()
+        except Exception as e:
+            logger.error(f"Failed to read CSV file {self.path}: {e}")
+            raise e
 
     def _append(self, data: pd.DataFrame) -> None:
         """ Append data to the CSV file. """
-        if not self.content.empty and set(self.content.columns) != set(data.columns):
-            logger.error("Data columns do not match existing CSV columns.")
-            raise ValueError("Data columns do not match existing CSV columns.")
-        self.content = pd.concat([self.content, data], ignore_index=True)
+        logger.debug(f"Appending data to CSV file: {self.path}")
+        content = self._read_file()
+        if not content.empty and set(content.columns) != set(data.columns):
+            logger.warning("Data columns do not match existing CSV columns. Appending anyway.")
+        content = pd.concat([content, data], ignore_index=True)
+        self._write_file(content)
 
     def _overwrite(self, data: pd.DataFrame) -> None:
         """ Overwrite the CSV file with new data. """
-        if not self.content.empty and set(self.content.columns) != set(data.columns):
-            logger.warning("Data columns do not match existing CSV columns. Overwriting with new data.")
-        self.content = data
+        logger.debug(f"Overwriting CSV file with new data: {self.path}")
+        self._write_file(data)
 
-    @staticmethod
-    def _read_file(file_path: Path) -> pd.DataFrame:
-        """ Read the CSV file and return its content as a DataFrame. """
-        if not file_path.exists():
-            logger.debug(f"CSV file {file_path} does not exist. Returning empty DataFrame.")
-            return pd.DataFrame()
-        try:
-            return pd.read_csv(file_path, dtype=str)
-        except pd.errors.EmptyDataError:
-            logger.debug(f"CSV file {file_path} is empty.")
-            return pd.DataFrame()
-        except Exception as e:
-            logger.error(f"Failed to read CSV file {file_path}: {e}")
-            raise e
-
-    @staticmethod
-    def _write_file(file_path: Path, data: pd.DataFrame) -> None:
+    def _write_file(self, data: pd.DataFrame) -> None:
         """ Write the DataFrame to a CSV file. """
-        if data is None or data.empty:
-            logger.debug(f"Data is None or empty. File handler path: {file_path}")
-            return
+        self._validate_data(data)
         try:
-            data.to_csv(file_path, index=False)
+            data.to_csv(self.path, index=False)
         except Exception as e:
-            logger.error(f"Failed to write CSV file {file_path}: {e}")
+            logger.error(f"Failed to write CSV file {self.path}: {e}")
             raise e
 
-    @staticmethod
-    def _validate_data(data: pd.DataFrame, file_path: Path) -> None:
-        """ Validate that the input data is a pandas DataFrame. """
+    def _get_len(self) -> int:
+        """ Return the length of the content. """
+        content = self._read_file()
+        self._validate_data(content)
+        return len(content)
+
+    def _validate_data(self, data: pd.DataFrame) -> None:
+        """ TODO """
         if not isinstance(data, pd.DataFrame):
-            logger.error(f"Data must be a pandas DataFrame. File handler path: {file_path}")
-            raise ValueError(f"Data must be a pandas DataFrame. File handler path: {file_path}")
+            logger.error(f"Data must be a pandas DataFrame. File handler path: {self.path}")
+            raise ValueError(f"Data must be a pandas DataFrame. File handler path: {self.path}")

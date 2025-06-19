@@ -1,53 +1,60 @@
 import json
-from pathlib import Path
 
-from . import logger, FileHandler
+from . import logger
+from .base_file_handler import BaseFileHandler
 
 
-class JSONHandler(FileHandler):
+class JSONHandler(BaseFileHandler):
     """ JSON file handler for reading and writing JSON files. """
 
-    def _append(self, data: list[dict]) -> None:
-        """ Append data to the JSON file. """
-        self.content.extend(data)
-
-    def _overwrite(self, data: list[dict]) -> None:
-        """ Overwrite the JSON file with new data. """
-        self.content = data
-
-    @staticmethod
-    def _read_file(file_path: Path) -> list[dict]:
+    def _read_file(self) -> list[dict]:
         """ Read the JSON file and return its content. """
+        if not self.path.exists():
+            logger.debug(f"JSON file {self.path} does not exist. Returning empty list.")
+            return []
         try:
-            with file_path.open("r") as f:
+            with self.path.open("r") as f:
                 data = json.load(f)
             return data
         except json.JSONDecodeError:
-            logger.warning(f"JSON file {file_path} is empty.")
+            logger.warning(f"JSON file {self.path} is empty.")
             return []
         except Exception as e:
-            logger.error(f"Failed to read JSON file {file_path}: {e}")
+            logger.error(f"Failed to read JSON file {self.path}: {e}")
             raise e
 
-    @staticmethod
-    def _write_file(file_path: Path, data: list[dict]) -> None:
+    def _append(self, data: list[dict]) -> None:
+        """ Append data to the JSON file. """
+        logger.debug(f"Appending data to JSON file: {self.path}")
+        content = self._read_file()
+        content.extend(data)
+        self._write_file(content)
+
+    def _overwrite(self, data: list[dict]) -> None:
+        """ Overwrite the JSON file with new data. """
+        logger.debug(f"Overwriting JSON file with new data: {self.path}")
+        self._write_file(data)
+
+    def _write_file(self, data: list[dict]) -> None:
         """ Write data to the JSON file. """
-        if data is None:
-            logger.warning(f"Data is None. File handler path: {file_path}")
-            return
+        self._validate_data(data)
         try:
-            with file_path.open("w") as f:
+            with self.path.open("w") as f:
                 json.dump(data, f, indent=4)
         except Exception as e:
-            logger.error(f"Failed to write JSON file {file_path}: {e}")
+            logger.error(f"Failed to write JSON file {self.path}: {e}")
             raise e
+    def _get_len(self) -> int:
+        """ Return the length of the content. """
+        content = self._read_file()
+        self._validate_data(content)
+        return len(content)
 
-    @staticmethod
-    def _validate_data(data: list[dict], file_path: Path) -> None:
-        """ Validate that the input data is a list of dictionaries. """
+    def _validate_data(self, data: list[dict]) -> None:
+        """ TODO """
         if not isinstance(data, list):
-            logger.error(f"Data must be a list. File handler path: {file_path}")
-            raise ValueError(f"Data must be a list. File handler path: {file_path}")
+            logger.error(f"Data must be a list. File handler path: {self.path}")
+            raise ValueError(f"Data must be a list. File handler path: {self.path}")
         if not all(isinstance(d, dict) for d in data):
-            logger.error(f"All elements in the data must be dictionaries. File handler path: {file_path}")
-            raise ValueError(f"All elements in the data must be dictionaries. File handler path: {file_path}")
+            logger.error(f"All elements in the data must be dictionaries. File handler path: {self.path}")
+            raise ValueError(f"All elements in the data must be dictionaries. File handler path: {self.path}")

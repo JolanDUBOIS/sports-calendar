@@ -63,6 +63,9 @@ loggers:
   src.data_pipeline.data_processing.processors.components:
     level: DEBUG
 
+  src.data_pipeline.data_processing.processors.components.extract_json:
+    level: CRITICAL
+
   src.data_pipeline.data_processing.versioning:
     level: DEBUG
 

@@ -4,7 +4,7 @@ import pandas as pd
 
 from . import logger
 from src import ROOT_PATH
-from src.file_io import FileHandlerFactory, TrackedFileHandler
+from src.file_io import FileHandlerFactory, BaseFileHandler
 from src.config.manager import base_config
 
 
@@ -14,7 +14,7 @@ class BaseTable(ABC):
     """ Base class for all tables. """
     __file_name__ = None
     __columns__ = None
-    file_handler: TrackedFileHandler = None
+    file_handler: BaseFileHandler = None
 
     @classmethod
     @abstractmethod
@@ -86,7 +86,7 @@ class RegionsTable(BaseTable):
     """ TODO """
     __file_name__ = "regions.csv"
     __columns__ = None
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__, tracked=True)
+    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
 
     @classmethod
     def query(cls, ids: list = None) -> pd.DataFrame:
@@ -105,7 +105,7 @@ class CompetitionsTable(BaseTable):
         "type": {"type": "bool", "source": None},
         "has_standings": {"type": "bool", "source": "has_standings"}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__, tracked=True)
+    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
 
     @classmethod
     def query(cls, ids: list = None) -> pd.DataFrame:
@@ -126,7 +126,7 @@ class TeamsTable(BaseTable):
         "venue": {"type": "str", "source": None},
         "league_id": {"type": "int", "source": None}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__, tracked=True)
+    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
 
     @classmethod
     def query(cls, ids: list = None) -> pd.DataFrame:
@@ -150,7 +150,7 @@ class MatchesTable(BaseTable):
         "leg": {"type": "int", "source": "leg"},
         "channels": {"type": "str", "source": None}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__, tracked=True)
+    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
 
     @classmethod
     def get_table(cls) -> pd.DataFrame:
@@ -201,7 +201,7 @@ class StandingsTable(BaseTable):
         "goals_against": {"type": "int", "source": "goals_against"},
         "goal_difference": {"type": "int", "source": None}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__, tracked=True)
+    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
 
     @classmethod
     def query(

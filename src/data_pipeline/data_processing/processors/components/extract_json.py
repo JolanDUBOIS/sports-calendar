@@ -5,7 +5,8 @@ from pathlib import Path
 import yaml
 import pandas as pd
 
-from . import logger
+import logging
+logger = logging.getLogger(__name__)
 
 
 # Specifications for columns mapping
