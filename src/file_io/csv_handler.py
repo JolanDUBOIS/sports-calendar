@@ -55,3 +55,11 @@ class CSVHandler(BaseFileHandler):
         if not isinstance(data, pd.DataFrame):
             logger.error(f"Data must be a pandas DataFrame. File handler path: {self.path}")
             raise ValueError(f"Data must be a pandas DataFrame. File handler path: {self.path}")
+
+    def _add_ctime(self, data: pd.DataFrame) -> pd.DataFrame:
+        """ Add a creation time column to the DataFrame. """
+        if '_ctime' in data.columns:
+            logger.error("Data already contains '_ctime' column.")
+            raise ValueError("Data already contains '_ctime' column.")
+        data['_ctime'] = self._today()
+        return data
