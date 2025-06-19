@@ -1,53 +1,84 @@
 version: 1
 
+
 formatters:
   simple:
-    format: "%(asctime)s - %(levelname)s - %(message)s"
+    format: "%(asctime)s [%(levelname)s] %(message)s"
+    datefmt: "%H:%M:%S"
+
   detailed:
-    format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    format: "%(asctime)s [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] (%(funcName)s) - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
 
 handlers:
   console_handler:
     class: logging.StreamHandler
     level: INFO
     formatter: simple
-  debug_handler:
+
+  file_debug_handler:
     class: logging.FileHandler
     filename: logs/DEBUG.log
     level: DEBUG
     formatter: detailed
 
+
 loggers:
-  src.calendar_creation:
+  # Main modules loggers
+  src.config:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.cli_utils:
+
+  src.file_io:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.football_data_source:
+
+  # App loggers
+  src.app:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.live_soccer_source:
+
+  src.app.calendar:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.models:
+
+  src.app.data_access:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
-  src.models_deprecated:
+
+  src.app.selection:
     level: DEBUG
-    handlers: [console_handler, debug_handler]
-    propagate: False
+
+  # Data pipeline loggers
+  src.data_pipeline:
+    level: DEBUG
+
+  src.data_pipeline.clients:
+    level: DEBUG
+
+  src.data_pipeline.data_processing:
+    level: DEBUG
+
+  src.data_pipeline.data_processing.managers:
+    level: DEBUG
+
+  src.data_pipeline.data_processing.processors:
+    level: DEBUG
+
+  src.data_pipeline.data_processing.processors.components:
+    level: DEBUG
+
+  src.data_pipeline.data_processing.versioning:
+    level: DEBUG
+
+  src.data_pipeline.data_validation:
+    level: DEBUG
+
+  src.data_pipeline.utils:
+    level: DEBUG
+
+  # Imported modules loggers
   googleapiclient.discovery_cache:
     level: DEBUG
-    handlers: [debug_handler]
+    handlers: [file_debug_handler]
     propagate: False
 
 root:
   level: DEBUG
-  handlers: [console_handler, debug_handler]
+  handlers: [console_handler, file_debug_handler]
   propagate: False

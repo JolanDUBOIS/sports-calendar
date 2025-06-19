@@ -1,0 +1,16 @@
+gcal-delete:
+  default:
+    date_from: !date_offset 0
+    date_to: !date_offset 14
+  all:
+    date_from: null
+    date_to: null
+  all_past:
+    date_from: null
+    date_to: !date_offset 0
+  all_future:
+    date_from: !date_offset 0
+    date_to: null
+  custom: # Meant to be modified by the dev at will for testing purposes
+    date_from: !date_offset 0
+    date_to: !date_offset 14

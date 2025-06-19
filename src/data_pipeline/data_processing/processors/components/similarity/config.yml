@@ -1,0 +1,49 @@
+teams:
+  sources:
+    - table_name: espn_teams
+      source_name: espn # Not necessary since the source can be found in the table
+      id_col: team_id
+      match_columns: [team_name, team_displayName, team_shortDisplayName]
+    - table_name: live_soccer_teams
+      source_name: livesoccertv
+      id_col: team_name
+      match_columns: [team_name]
+    - table_name: football_data_teams
+      source_name: football-data
+      id_col: team_id
+      match_columns: [team_name, team_shortName]
+
+  registry:
+    generic_tokens: [
+      "FC", "Football Club", "Soccer Club", "SC", "Sporting Club",
+      "AC", "Club", "Associazione Calcio", "SV", "Sportverein",
+      "SS", "Società Sportiva", "CF", "Club de Fútbol", "SK", "Sportklub",
+      "US", "Unione Sportiva", "Union Sportive", "CD", "Club Deportivo", "AFC",
+      "Association Football Club", "AS", "Associazione Sportiva", "Association Sportive",
+    ]
+
+competitions:
+  sources:
+    - table_name: espn_competitions
+      source_name: espn
+      id_col: competition_id
+      match_columns: [competition_name, competition_abbreviation]
+    - table_name: live_soccer_competitions
+      source_name: livesoccertv
+      id_col: competition
+      match_columns: [name]
+    - table_name: football_data_competitions
+      source_name: football-data
+      id_col: competition_id
+      match_columns: [competition_name]
+
+areas:
+  sources:
+    - table_name: live_soccer_areas
+      source_name: livesoccertv
+      id_col: area
+      match_columns: [area]
+    - table_name: football_data_areas
+      source_name: football-data
+      id_col: area_id
+      match_columns: [area_name]

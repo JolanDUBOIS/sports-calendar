@@ -1,7 +1,8 @@
 data/
 logs/
-credentials/
 .env
-poetry.lock
 __pycache__/
 notebooks/
+.coverage
+.secrets/
+.credentials/

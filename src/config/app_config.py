@@ -1,40 +1,34 @@
-import yaml # type: ignore
-from pathlib import Path
-
-from src.config.utils import set_attribute
-
+from . import logger, CONFIG_DIR_PATH
+from .loader import load_yml
 
 class AppConfig:
-    """ Handles loading and accessing application configuration. """
-    
-    REQUIRED_KEYS = {
-        'selection_file_path': {'type': Path},
-        'google_credentials_file_path': {'type': Path},
-        'database_path': {'type': Path}
-    }
-    
-    def __init__(self, config_file: str):
-        """ Initializes the AppConfig object. """        
-        self.config_file = Path(config_file)
-        self._load_config()
-    
-    def _load_config(self):
-        """ Load the configuration file """
-        if not self.config_file.exists():
-            raise FileNotFoundError(f"Config file not found: {self.config_file}")
 
-        with self.config_file.open(mode='r') as file:
-            self.config = yaml.safe_load(file)
-            if self.config is None:
-                raise ValueError(f"Config file {self.config_file} is empty or malformed.")
-        
-        for key, key_info in self.REQUIRED_KEYS.items():
-            value = self.config.get(key)
-            if value is None:
-                raise KeyError(f"Missing required key in config file: {key}")
-            value_type = key_info.get('type', str)
-            set_attribute(self, key.lower(), value, value_type)
+    def __init__(self):
+        self.config_path = CONFIG_DIR_PATH / "app"
+        self._check_config_path()
 
-    def __repr__(self):
-        """ Represent the configuration object. """
-        return f"AppConfig(config_file={self.config_file})"
+        self.scopes = load_yml(self.config_path / "scopes.yml")
+
+    def _check_config_path(self):
+        """ Check if the app config directory exists and contains required files. """
+        if not self.config_path.exists():
+            logger.error(f"App config directory does not exist: {self.config_path}")
+            raise FileNotFoundError(f"App config directory does not exist: {self.config_path}")
+
+        required_files = ["scopes.yml"]
+        for file in required_files:
+            if not (self.config_path / file).exists():
+                logger.error(f"Required file {file} does not exist in app config path.")
+                raise FileNotFoundError(f"Required file {file} does not exist in app config path.")
+
+    def get_scopes(self, key: str) -> any:
+        """ TODO """
+        return self.scopes.get(key)
+
+    def get_gcal_delete_scope(self, key: str) -> dict:
+        """ Get the Google Calendar delete scope for a given key. """
+        delete_scope = self.get_scopes("gcal-delete", {})
+        if key not in delete_scope:
+            logger.error(f"Google Calendar delete scope for key '{key}' not found.")
+            raise KeyError(f"Google Calendar delete scope for key '{key}' not found.")
+        return delete_scope[key]

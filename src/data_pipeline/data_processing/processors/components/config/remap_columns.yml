@@ -1,0 +1,5 @@
+standings:
+  - target_field: competition_id
+    using_table: espn_competitions
+    match_on: alternate_id
+    replace_by: id

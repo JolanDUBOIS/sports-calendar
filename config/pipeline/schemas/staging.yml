@@ -1,0 +1,156 @@
+name: schemas_staging
+stage: staging
+
+models:
+  - name: regions
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: str
+      - name: name
+        nullable: false
+        type: str
+      - name: code
+        type: str
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: competitions
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: str
+      - name: name
+        nullable: false
+        type: str
+      - name: code
+        type: str
+      - name: gender
+        type: str
+        enum: ["F", "M"]
+      - name: region_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: regions
+          column: id
+      - name: type
+        type: str
+        enum: ["league", "cup"]
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: teams
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: str
+      - name: name
+        nullable: false
+        type: str
+      - name: short_name
+        type: str
+      - name: tla
+        type: str
+      - name: gender
+        type: str
+        enum: ["F", "M"]
+      - name: venue
+        type: str
+      - name: league_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: competitions
+          column: id
+          # TODO - Add clause to ensure the league is of type "league"
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: matches
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: str
+      - name: date_time_utc
+        nullable: false
+        type: datetime
+      - name: date_time_cet
+        nullable: false
+        type: datetime
+      - name: home_team_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: teams
+          column: id
+      - name: away_team_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: teams
+          column: id
+      - name: venue
+        type: str
+      - name: competition_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: competitions
+          column: id
+      - name: leg
+        type: str
+      - name: stage
+        type: str
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: standings
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: str
+      - name: competition_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: competitions
+          column: id
+      - name: team_id
+        nullable: false
+        type: str
+        foreign_key:
+          model: teams
+          column: id
+      - name: position
+        nullable: false
+        type: int
+      - name: points
+        nullable: false
+        type: int
+      - name: played_games
+        type: int
+      - name: won_games
+        type: int
+      - name: drawn_games
+        type: int
+      - name: lost_games
+        type: int
+      - name: goals_for
+        type: int
+      - name: goals_against
+        type: int
+      - name: goal_difference
+        type: int
+      - name: staging_at
+        nullable: false
+        type: datetime

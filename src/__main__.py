@@ -1,26 +1,22 @@
-from src.main import run_selection, test
-from src.config import parse_arguments, AppConfig, EnvConfig
-from src.scraper_db import update_database
+import traceback
+from dotenv import load_dotenv
 
+from . import logger
+from .cli import app
+
+
+load_dotenv()
+
+def log_run_separator():
+    from datetime import datetime
+    separator = "\n" + "=" * 80
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger.debug(f"{separator}\nNew run started at {timestamp}{separator}")
 
 if __name__ == '__main__':
-    args = parse_arguments()
-    app_config = AppConfig(args.config_file)
-    env_config = EnvConfig()
-
-    if args.update_database:
-        update_database()
-    
-    elif args.full_update:
-        pass
-
-    elif args.run_selection:
-        run_selection(
-            app_config.selection_file_path,
-            app_config.google_credentials_file_path,
-            env_config.google_calendar_id,
-            save_ics=True
-        )
-
-    elif args.test:
-        test(args.test)
+    log_run_separator()
+    try:
+        app()
+    except Exception as e:
+        logger.error(f"An error occurred while running the application: {e}")
+        logger.debug("Traceback:\n%s", traceback.format_exc())

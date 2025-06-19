@@ -1,0 +1,179 @@
+espn_matches:
+  direct_paths:
+    id: id
+    date: date
+    name: name
+    shortName: shortName
+    season_year: season.year
+    venue: venue.displayName
+    stage: season.slug
+    competition_id: leagues.0.id
+    competition_name: leagues.0.name
+    competition_abbreviation: leagues.0.abbreviation
+    competition_midsizeName: leagues.0.midsizeName
+    competition_slug: leagues.0.slug
+    leg_value: competitions.0.leg.value
+    leg_displayValue: competitions.0.leg.displayValue
+    team_A_id: competitions.0.competitors.0.id
+    team_A_homeAway: competitions.0.competitors.0.homeAway
+    team_A_winner: competitions.0.competitors.0.winner
+    team_A_score: competitions.0.competitors.0.score
+    team_A_abbreviation: competitions.0.competitors.0.team.abbreviation
+    team_A_displayName: competitions.0.competitors.0.team.displayName
+    team_A_shortDisplayName: competitions.0.competitors.0.team.shortDisplayName
+    team_A_name: competitions.0.competitors.0.team.name
+    team_A_location: competitions.0.competitors.0.team.location
+    team_A_venue_id: competitions.0.competitors.0.team.venue.id
+    team_B_id: competitions.0.competitors.1.id
+    team_B_homeAway: competitions.0.competitors.1.homeAway
+    team_B_winner: competitions.0.competitors.1.winner
+    team_B_score: competitions.0.competitors.1.score
+    team_B_abbreviation: competitions.0.competitors.1.team.abbreviation
+    team_B_displayName: competitions.0.competitors.1.team.displayName
+    team_B_shortDisplayName: competitions.0.competitors.1.team.shortDisplayName
+    team_B_name: competitions.0.competitors.1.team.name
+    team_B_location: competitions.0.competitors.1.team.location
+    team_B_venue_id: competitions.0.competitors.1.team.venue.id
+    created_at: created_at
+    source: source
+    source_type: source_type
+
+espn_standings:
+  direct_paths:
+    competition_id: id
+    competition_name: name
+    competition_abbreviation: abbreviation
+    season: children.0.standings.season
+    season_display_name: children.0.standings.seasonDisplayName
+    created_at: created_at
+    source: source
+    source_type: source_type
+  iterate:
+    path: children.0.standings.entries
+    columns:
+      team_id: team.id
+      team_location: team.location
+      team_name: team.name
+      team_abbreviation: team.abbreviation
+      team_display_name: team.displayName
+      team_short_display_name: team.shortDisplayName
+      team_is_national: team.isNational
+      played_games: stats.0.value
+      lost: stats.1.value
+      point_diff: stats.2.value
+      points: stats.3.value
+      goals_against: stats.4.value
+      goals_for: stats.5.value
+      draws: stats.6.value
+      wins: stats.7.value
+      deductions: stats.8.value
+      ppg: stats.9.value
+      rank: stats.10.value
+      summary: stats.11.summary
+
+espn_competitions:
+  direct_paths:
+    id: id
+    alternate_id: alternateId
+    name: name
+    abbreviation: abbreviation
+    short_name: shortName
+    midsize_name: midsizeName
+    slug: slug
+    has_standings: hasStandings
+    created_at: created_at
+    source: source
+    source_type: source_type
+
+football_data_matches:
+  direct_paths:
+    area_id: area.id
+    area_name: area.name
+    area_code: area.code
+    competition_id: competition.id
+    competition_name: competition.name
+    competition_code: competition.code
+    competition_type: competition.type
+    season_id: season.id
+    season_start_date: season.startDate
+    season_end_date: season.endDate
+    season_current_matchday: season.currentMatchday
+    id: id
+    utcDate: utcDate
+    status: status
+    matchday: matchday
+    stage: stage
+    homeTeam_id: homeTeam.id
+    homeTeam_name: homeTeam.name
+    homeTeam_shortName: homeTeam.shortName
+    homeTeam_tla: homeTeam.tla
+    awayTeam_id: awayTeam.id
+    awayTeam_name: awayTeam.name
+    awayTeam_shortName: awayTeam.shortName
+    awayTeam_tla: awayTeam.tla
+    winner: score.winner
+    score_fullTime_home: score.fullTime.home
+    score_fullTime_away: score.fullTime.away
+    score_halfTime_home: score.halfTime.home
+    score_halfTime_away: score.halfTime.away
+    score_regularTime_home: score.regularTime.home
+    score_regularTime_away: score.regularTime.away
+    score_extraTime_home: score.extraTime.home
+    score_extraTime_away: score.extraTime.away
+    score_penalties_home: score.penalties.home
+    score_penalties_away: score.penalties.away
+    created_at: created_at
+    source: source
+    source_type: source_type
+
+football_data_standings:
+  direct_paths:
+    area_id: area.id
+    area_name: area.name
+    area_code: area.code
+    competition_id: competition.id
+    competition_name: competition.name
+    competition_code: competition.code
+    competition_type: competition.type
+    season_id: season.id
+    season_startDate: season.startDate
+    season_endDate: season.endDate
+    season_currentMatchday: season.currentMatchday
+    season_winner: season.winner
+    stage: standings.0.stage
+    type: standings.0.type
+    group: standings.0.group
+    created_at: created_at
+    source: source
+    source_type: source_type
+  iterate:
+    path: standings.0.table
+    columns:
+      position: position
+      team_id: team.id
+      team_name: team.name
+      team_shortName: team.shortName
+      team_tla: team.tla
+      playedGames: playedGames
+      won: won
+      draw: draw
+      lost: lost
+      points: points
+      goalsFor: goalsFor
+      goalsAgainst: goalsAgainst
+      goalDifference: goalDifference
+
+football_data_teams:
+  direct_paths:
+    area_id: area.id
+    area_name: area.name
+    area_code: area.code
+    team_id: id
+    team_name: name
+    team_shortName: shortName
+    tla: tla
+    founded: founded
+    venue: venue
+    created_at: created_at
+    source: source
+    source_type: source_type

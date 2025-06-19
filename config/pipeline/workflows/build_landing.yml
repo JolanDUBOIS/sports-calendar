@@ -1,0 +1,423 @@
+defaults:
+  date_range: &date_range
+    date_from: !date_offset -200
+    date_to: !date_offset 14
+
+name: ingestion_landing
+description: Ingests data to the landing layer from the different sources (API and Scrapers).
+stage: landing
+
+models:
+  - name: espn_matches
+    description: Ingests match information from the ESPN API.
+    trigger: automatic
+    output:
+      name: espn_matches
+      layer: landing
+      path: landing/espn_matches.json
+      mode: append
+    processing:
+      processor: ClientProcessor
+      source: espn
+      method: query_matches
+      params:
+        - competition_slug: uefa.champions
+          <<: *date_range
+        - competition_slug: uefa.europa
+          <<: *date_range
+        - competition_slug: uefa.europa.conf
+          <<: *date_range
+        - competition_slug: uefa.champions_qual
+          <<: *date_range
+        - competition_slug: uefa.europa_qual
+          <<: *date_range
+        - competition_slug: uefa.europa.conf_qual
+          <<: *date_range
+        - competition_slug: uefa.nations
+          <<: *date_range
+        - competition_slug: uefa.euro
+          <<: *date_range
+        - competition_slug: uefa.euroq
+          <<: *date_range
+        - competition_slug: fifa.world
+          <<: *date_range
+        - competition_slug: fifa.worldq.caf
+          <<: *date_range
+        - competition_slug: fifa.worldq.uefa
+          <<: *date_range
+        - competition_slug: fifa.worldq.ofc
+          <<: *date_range
+        - competition_slug: fifa.worldq.conmebol
+          <<: *date_range
+        - competition_slug: fifa.worldq.afc
+          <<: *date_range
+        - competition_slug: fifa.worldq.concacaf
+          <<: *date_range
+        - competition_slug: fifa.cwc
+          <<: *date_range
+        - competition_slug: conmebol.america
+          <<: *date_range
+        - competition_slug: fifa.olympics
+          <<: *date_range
+        - competition_slug: fifa.friendly
+          <<: *date_range
+        - competition_slug: uefa.weuro
+          <<: *date_range
+        - competition_slug: uefa.wchampions
+          <<: *date_range
+        - competition_slug: fifa.w.olympics
+          <<: *date_range
+        - competition_slug: fifa.wwc
+          <<: *date_range
+        - competition_slug: eng.1
+          <<: *date_range
+        - competition_slug: esp.1
+          <<: *date_range
+        - competition_slug: fra.1
+          <<: *date_range
+        - competition_slug: ger.1
+          <<: *date_range
+        - competition_slug: ita.1
+          <<: *date_range
+        - competition_slug: por.1
+          <<: *date_range
+        - competition_slug: nor.1
+          <<: *date_range
+        - competition_slug: eng.fa
+          <<: *date_range
+        - competition_slug: eng.league_cup
+          <<: *date_range
+        - competition_slug: esp.copa_del_rey
+          <<: *date_range
+        - competition_slug: ger.dfb_pokal
+          <<: *date_range
+        - competition_slug: ita.coppa_italia
+          <<: *date_range
+        - competition_slug: fra.coupe_de_france
+          <<: *date_range
+    static_fields:
+      - name: created_at
+        value: !date_offset 0
+      - name: source
+        value: espn
+      - name: source_type
+        value: api
+
+  - name: espn_standings
+    description: Ingests standings information from the ESPN API.
+    trigger: automatic
+    output:
+      name: espn_standings
+      layer: landing
+      path: landing/espn_standings.json
+      mode: append
+    processing:
+      processor: ClientProcessor
+      source: espn
+      method: query_standings
+      params:
+        - competition_slug: uefa.champions
+        - competition_slug: uefa.europa
+        - competition_slug: uefa.europa.conf
+        - competition_slug: uefa.champions_qual
+        - competition_slug: uefa.europa_qual
+        - competition_slug: uefa.europa.conf_qual
+        - competition_slug: uefa.nations
+        - competition_slug: uefa.euro
+        - competition_slug: uefa.euroq
+        - competition_slug: fifa.world
+        - competition_slug: fifa.worldq.caf
+        - competition_slug: fifa.worldq.uefa
+        - competition_slug: fifa.worldq.ofc
+        - competition_slug: fifa.worldq.conmebol
+        - competition_slug: fifa.worldq.afc
+        - competition_slug: fifa.worldq.concacaf
+        - competition_slug: fifa.cwc
+        - competition_slug: conmebol.america
+        - competition_slug: fifa.olympics
+        - competition_slug: fifa.friendly
+        - competition_slug: uefa.weuro
+        - competition_slug: uefa.wchampions
+        - competition_slug: fifa.w.olympics
+        - competition_slug: fifa.wwc
+        - competition_slug: eng.1
+        - competition_slug: esp.1
+        - competition_slug: fra.1
+        - competition_slug: ger.1
+        - competition_slug: ita.1
+        - competition_slug: por.1
+        - competition_slug: nor.1
+        - competition_slug: eng.fa
+        - competition_slug: eng.league_cup
+        - competition_slug: esp.copa_del_rey
+        - competition_slug: ger.dfb_pokal
+        - competition_slug: ita.coppa_italia
+        - competition_slug: fra.coupe_de_france
+    static_fields:
+      - name: created_at
+        value: !date_offset 0
+      - name: source
+        value: espn
+      - name: source_type
+        value: api
+
+  - name: espn_competitions
+    description: Ingests competition information from the ESPN API.
+    trigger: manual
+    output:
+      name: espn_competitions
+      layer: landing
+      path: landing/espn_competitions.json
+      mode: append
+    processing:
+      processor: ClientProcessor
+      source: espn
+      method: query_competitions
+    static_fields:
+      - name: created_at
+        value: !date_offset 0
+      - name: source
+        value: espn
+      - name: source_type
+        value: api
+
+  # - name: football_data_matches
+  #   description: Ingests match information from the Football Data API.
+  #   trigger: automatic
+  #   output:
+  #     name: football_data_matches
+  #     layer: landing
+  #     path: landing/football_data_matches.json
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: football-data
+  #     method: query_competition_matches
+  #     params:
+  #       - competition_id: 2013
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2016
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2021
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2001
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2018
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2015
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2002
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2019
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2003
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2017
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2152
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2014
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #       - competition_id: 2000
+  #         date_from: !date_offset 0
+  #         date_to: !date_offset 14
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: football-data
+  #     - name: source_type
+  #       value: api
+
+  # - name: football_data_standings
+  #   description: Ingests standings information from the Football Data API.
+  #   trigger: automatic
+  #   output:
+  #     name: football_data_standings
+  #     layer: landing
+  #     path: landing/football_data_standings.json
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: football-data
+  #     method: query_standings
+  #     params:
+  #       - competition_id: 2013
+  #       - competition_id: 2016
+  #       - competition_id: 2021
+  #       - competition_id: 2015
+  #       - competition_id: 2002
+  #       - competition_id: 2019
+  #       - competition_id: 2003
+  #       - competition_id: 2017
+  #       - competition_id: 2014
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: football-data
+  #     - name: source_type
+  #       value: api
+
+  # - name: football_data_teams
+  #   description: Ingests team information from the Football Data API.
+  #   trigger: manual
+  #   output:
+  #     name: football_data_teams
+  #     layer: landing
+  #     path: landing/football_data_teams.json
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: football-data
+  #     method: query_teams
+  #     params:
+  #       - competition_id: 2013
+  #       - competition_id: 2016
+  #       - competition_id: 2021
+  #       - competition_id: 2001
+  #       - competition_id: 2018
+  #       - competition_id: 2015
+  #       - competition_id: 2002
+  #       - competition_id: 2019
+  #       - competition_id: 2003
+  #       - competition_id: 2017
+  #       - competition_id: 2152
+  #       - competition_id: 2014
+  #       - competition_id: 2000
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: football-data
+  #     - name: source_type
+  #       value: api
+
+  # - name: live_soccer_matches
+  #   description: Ingests live match information from the Live Soccer Scraper.
+  #   trigger: automatic
+  #   output:
+  #     name: live_soccer_matches
+  #     layer: landing
+  #     path: landing/live_soccer_matches.csv
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: livesoccertv
+  #     method: scrape_matches
+  #     params:
+  #       - competition_endpoint: /france/ligue-1
+  #       - competition_endpoint: /france/coupe-de-france
+  #       - competition_endpoint: /france/super-cup
+  #       - competition_endpoint: /england/premier-league
+  #       - competition_endpoint: /england/fa-cup
+  #       - competition_endpoint: /england/league-cup
+  #       - competition_endpoint: /england/fa-community-shield
+  #       - competition_endpoint: /italy/serie-a
+  #       - competition_endpoint: /italy/coppa-italia
+  #       - competition_endpoint: /italy/supercoppa-italiana
+  #       - competition_endpoint: /spain/primera-division
+  #       - competition_endpoint: /spain/copa-del-rey
+  #       - competition_endpoint: /spain/spanish-super-cup
+  #       - competition_endpoint: /germany/bundesliga
+  #       - competition_endpoint: /germany/german-cup
+  #       - competition_endpoint: /germany/dfl-supercup
+  #       - competition_endpoint: /international/uefa-champions-league
+  #       - competition_endpoint: /international/uefa-europa-league
+  #       - competition_endpoint: /international/uefa-europa-conference-league
+  #       - competition_endpoint: /international/uefa-super-cup
+  #       - competition_endpoint: /international/fifa-club-world-cup
+  #       - competition_endpoint: /international/uefa-european-championship
+  #       - competition_endpoint: /international/uefa-euro-qualifying
+  #       - competition_endpoint: /international/uefa-nations-league
+  #       - competition_endpoint: /international/world-cup
+  #       - competition_endpoint: /international/copa-america
+  #       - competition_endpoint: /international/africa-cup-of-nations
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: livesoccertv
+  #     - name: source_type
+  #       value: scraper
+
+  # - name: live_soccer_standings
+  #   description: Ingests live standings information from the Live Soccer Scraper.
+  #   trigger: automatic
+  #   output:
+  #     name: live_soccer_standings
+  #     layer: landing
+  #     path: landing/live_soccer_standings.csv
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: livesoccertv
+  #     method: scrape_standings
+  #     params: 
+  #       - competition_endpoint: /france/ligue-1
+  #       - competition_endpoint: /england/premier-league
+  #       - competition_endpoint: /italy/serie-a
+  #       - competition_endpoint: /spain/primera-division
+  #       - competition_endpoint: /germany/bundesliga
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: livesoccertv
+  #     - name: source_type
+  #       value: scraper
+
+  # - name: live_soccer_competitions
+  #   description: Ingests live competition information from the Live Soccer Scraper.
+  #   trigger: manual
+  #   source:
+  #     name: livesoccertv
+  #     type: scraper
+  #   output:
+  #     name: live_soccer_competitions
+  #     layer: landing
+  #     path: landing/live_soccer_competitions.csv
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: livesoccertv
+  #     method: scrape_competitions
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: livesoccertv
+  #     - name: source_type
+  #       value: scraper
+
+  # - name: football_ranking_fifa_rankings
+  #   description: Ingests FIFA ranking information from the Football Ranking Scraper.
+  #   trigger: automatic
+  #   output:
+  #     name: football_ranking_fifa_rankings
+  #     layer: landing
+  #     path: landing/football_ranking_fifa_rankings.csv
+  #     mode: append
+  #   processing:
+  #     processor: ClientProcessor
+  #     source: football-ranking
+  #     method: scrape_fifa_rankings
+  #   static_fields:
+  #     - name: created_at
+  #       value: !date_offset 0
+  #     - name: source
+  #       value: football-ranking
+  #     - name: source_type
+  #       value: scraper
