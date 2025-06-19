@@ -8,6 +8,7 @@ from .utils import inject_static_fields
 from .sources import SourcesManager, SourceSpec
 from .output import OutputManager, OutputSpec
 from .processing import ProcessingManager, ProcessingSpec
+from src.config.manager import base_config
 
 
 @dataclass
@@ -42,7 +43,9 @@ class ModelSpec:
             logger.error(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
             raise ValueError(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
 
-    def resolve_paths(self, base_path: Path) -> None:
+        self._resolve_paths(base_config.active_repo.path)
+
+    def _resolve_paths(self, base_path: Path) -> None:
         """ Resolve model paths relative to the base path. """
         for source in self.sources:
             source.path = base_path / source.path
@@ -74,9 +77,8 @@ class ModelManager:
     The main method `run()` executes the processing pipeline according to the model spec.
     """
 
-    def __init__(self, model_spec: ModelSpec, repo_path: str | Path):
-        """ Initialize ModelManager with a model specification and repository path. """
-        self.repo_path = Path(repo_path)
+    def __init__(self, model_spec: ModelSpec):
+        """ Initialize ModelManager with a model specification. """
         self.model_spec = model_spec
 
     def run(self, manual: bool = False, dry_run: bool = False, reset: bool = False, **kwargs) -> None:

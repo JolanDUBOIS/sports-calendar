@@ -136,9 +136,8 @@ class ModelSchemaManager:
 class LayerSchemaManager:
     """ TODO """
 
-    def __init__(self, schema_spec: SchemaSpec, repo_path: str | Path):
+    def __init__(self, schema_spec: SchemaSpec):
         """ TODO """
-        self.repo_path = Path(repo_path)
         self.schema_spec = schema_spec
 
     def validate(self, **kwargs) -> SchemaValidationResult:
@@ -156,7 +155,6 @@ class LayerSchemaManager:
         logger.info(f"Schema '{self.schema_spec.name}' validation completed.")
 
     @classmethod
-    def from_dict(cls, d: dict, repo_path: str | Path) -> LayerSchemaManager:
+    def from_dict(cls, d: dict) -> LayerSchemaManager:
         """ Create a LayerSchemaManager from a dictionary. """
-        schema_spec = SchemaSpec.from_dict(d)
-        return cls(schema_spec=schema_spec, repo_path=repo_path)
+        return cls(schema_spec=SchemaSpec.from_dict(d))
