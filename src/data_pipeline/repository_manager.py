@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from datetime import datetime
 
 from . import logger
 from .pipeline_stages import DataStage
@@ -31,7 +32,7 @@ class StageManager:
 
     def get_handlers(self) -> list[BaseFileHandler]:
         """ Get all file handlers for the stage. """
-        return [FileHandlerFactory.create_handler(file_path) for file_path in self.get_files()]
+        return [FileHandlerFactory.create_file_handler(file_path) for file_path in self.get_files()]
 
     def get_handler(self, filename: str) -> BaseFileHandler | None:
         """ Get a specific file handler by filename. """
@@ -72,11 +73,15 @@ class RepositoryManager:
 
     def get_stage(self, stage: DataStage) -> StageManager:
         """ Get the stage manager for a given stage. """
-        return self.stages.get(stage.name.lower())
+        try:
+            return self.stages[stage.name.lower()]
+        except KeyError:
+            raise ValueError(f"No such stage '{stage}' in repository '{self.name}'.")
 
     def backup(self) -> Path:
         """ Backup all files and subfolders in the repository to the specified path. """
-        backup_path = self.path.parent / f"{self.name}-backup"
+        ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+        backup_path = self.path.parent / f"{self.name}-backup-{ts}"
         shutil.copytree(self.path, backup_path, dirs_exist_ok=True)
         logger.info(f"Backup created at {backup_path}")
         return backup_path
