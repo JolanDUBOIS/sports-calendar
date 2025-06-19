@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from pathlib import Path
 
+from . import logger
 from ..versioning import SourceVersioningStrategy, SourceVersions, SourceVersion, version_filter
 from ...utils import get_max_field_value
 from ....file_io import FileHandlerFactory
@@ -47,7 +48,7 @@ class SourcesManager:
         source_versions = SourceVersions()
         for source in self.sources:
             if source.versioning_strategy:
-                file_handler = FileHandlerFactory.create_file_handler(source.path, tracked=True)
+                file_handler = FileHandlerFactory.create_file_handler(source.path)
                 data = file_handler.read()
                 cutoff = get_max_field_value(data, source.versioning_strategy.field)
                 source_versions.append(
@@ -62,7 +63,7 @@ class SourcesManager:
     @staticmethod
     def _load_source_data(source: SourceSpec, source_version: SourceVersion | None = None) -> IOContent:
         """ Read and return data from a source, optionally filtering by version. """
-        file_handler = FileHandlerFactory.create_file_handler(source.path, tracked=True)
+        file_handler = FileHandlerFactory.create_file_handler(source.path)
         data = file_handler.read()
         data = version_filter(
             data=data,

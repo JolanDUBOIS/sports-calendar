@@ -48,7 +48,7 @@ class OutputManager:
         """ Initialize with an output specification and prepare file handler and enforcers. """
         logger.debug(f"Initializing OutputManager with spec: {output_spec}")
         self.output_spec = output_spec
-        self.handler = FileHandlerFactory.create_file_handler(self.output_spec.path, tracked=True)
+        self.handler = FileHandlerFactory.create_file_handler(self.output_spec.path)
         self.enforcers = self._init_enforcers()
 
     def _init_enforcers(self) -> list[ConstraintEnforcer]:
@@ -72,13 +72,11 @@ class OutputManager:
             full_data = enforcer.apply(full_data)
 
         self.handler.write(full_data, source_versions=source_versions.to_dict(), overwrite=True)
-        self.handler.save()
 
     def reset(self):
         """ Reset the output file by deleting it. """
         logger.debug(f"Resetting output file: {self.output_spec.path}")
         self.handler.delete(force=True)
-        self.handler.save()
 
     def read_source_versions(self) -> SourceVersions:
         """ Retrieve the last recorded source versions from output metadata. """
