@@ -7,6 +7,22 @@ from .base_file_handler import BaseFileHandler
 class JSONHandler(BaseFileHandler):
     """ JSON file handler for reading and writing JSON files. """
 
+    def cleanup(self, cutoff: str) -> None:
+        """ Cleanup the JSON file by removing entries older than the cutoff date (ISO format). """
+        logger.debug(f"Cleaning up JSON file {self.path} with cutoff date {cutoff}")
+        content = self._read_file()
+        self._validate_data(content)
+        if not content:
+            logger.debug(f"JSON file {self.path} is empty. Nothing to clean up.")
+            return
+        self._check_iso_format(cutoff)
+        try:
+            filtered_content = [item for item in content if item['_ctime'] >= cutoff]
+        except KeyError:
+            logger.error("JSON file does not contain '_ctime' key for cleanup.")
+            raise ValueError("JSON file does not contain '_ctime' key for cleanup.")
+        self._write_file(filtered_content)
+
     def _read_file(self) -> list[dict]:
         """ Read the JSON file and return its content. """
         if not self.path.exists():

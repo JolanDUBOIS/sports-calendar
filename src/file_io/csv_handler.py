@@ -7,6 +7,21 @@ from .base_file_handler import BaseFileHandler
 class CSVHandler(BaseFileHandler):
     """ CSV file handler for reading and writing CSV files. """
 
+    def cleanup(self, cutoff: str) -> None:
+        """ Cleanup the CSV file by removing rows older than the cutoff date (ISO format). """
+        logger.debug(f"Cleaning up CSV file {self.path} with cutoff date {cutoff}")
+        content = self._read_file()
+        self._validate_data(content)
+        if content.empty:
+            logger.debug(f"CSV file {self.path} is empty. Nothing to clean up.")
+            return
+        if '_ctime' not in content.columns:
+            logger.error("CSV file does not contain '_ctime' column for cleanup.")
+            raise ValueError("CSV file does not contain '_ctime' column for cleanup.")
+        self._check_iso_format(cutoff)
+        filtered_content = content[content['_ctime'] >= cutoff]
+        self._write_file(filtered_content)
+
     def _read_file(self) -> pd.DataFrame:
         """ Read the CSV file and return its content as a DataFrame. """
         if not self.path.exists():
