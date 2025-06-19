@@ -1,40 +1,24 @@
 from pathlib import Path
 
-import yaml
-
 from . import logger
+from .loader import load_yml
+from src import ROOT_PATH
 
 
-class SecretsManager:
-    _secrets_dir = Path(".secrets")
-    _loaded = False
-    _data = {}
+SECRETS_DIR = ROOT_PATH / ".secrets"
 
-    _expected_files = {
-        "gcal_ids.yml": {"type": dict, "key": "gcal_ids"}
-    }
+class Secrets:
 
-    @classmethod
-    def load_all(cls):
-        """ TODO """
-        if cls._loaded:
-            return
-        for filename, specs in cls._expected_files.items():
-            path = cls._secrets_dir / filename
-            if not path.exists():
-                logger.error(f"Secrets file '{filename}' not found in {cls._secrets_dir}")
-                raise FileNotFoundError(f"Secrets file '{filename}' not found in {cls._secrets_dir}")
-            with open(path, 'r') as f:
-                data = yaml.safe_load(f)
-                expected_type = specs["type"]
-                if not isinstance(data, expected_type):
-                    logger.error(f"Secrets file '{filename}' does not contain expected type {expected_type}")
-                    raise TypeError(f"Secrets file '{filename}' does not contain expected type {expected_type}")
-                cls._data[specs["key"]] = data
-        cls._loaded = True
+    def __init__(self):
+        self.gcal_ids_path = SECRETS_DIR / "gcal_ids.yml"
+        if not self.gcal_ids_path.exists():
+            logger.error(f"Google Calendar IDs file not found: {self.gcal_ids_path}")
+            raise FileNotFoundError(f"Google Calendar IDs file not found: {self.gcal_ids_path}")
+        self.gcal_ids = load_yml(self.gcal_ids_path)
 
-    @classmethod
-    def get(cls, key: str, default=None):
-        """ TODO """
-        cls.load_all()
-        return cls._data.get(key, default)
+    def get_gcal_id(self, key: str) -> str:
+        """ Get the Google Calendar ID for a given key. """
+        if key not in self.gcal_ids:
+            logger.error(f"Google Calendar ID for key '{key}' not found.")
+            raise KeyError(f"Google Calendar ID for key '{key}' not found.")
+        return self.gcal_ids[key]

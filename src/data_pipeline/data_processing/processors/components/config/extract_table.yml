@@ -88,8 +88,8 @@ teams:
     abbreviation: team_abbreviation
     display_name: team_display_name
     short_display_name: team_short_display_name
-    is_national: team_is_national
-    loaction: team_location
+    # is_national: team_is_national
+    location: team_location
 
 matches:
   extraction_type: simple

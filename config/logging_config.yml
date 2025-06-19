@@ -31,10 +31,17 @@ loggers:
   src.file_io:
     level: DEBUG
 
-  src.fixture_pipeline:
+  # App loggers
+  src.app:
     level: DEBUG
 
-  src.fixture_pipeline.calendar:
+  src.app.calendar:
+    level: DEBUG
+
+  src.app.data_access:
+    level: DEBUG
+
+  src.app.selection:
     level: DEBUG
 
   # Data pipeline loggers

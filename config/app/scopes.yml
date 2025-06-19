@@ -1,4 +1,4 @@
-selections_params:
+gcal-delete:
   default:
     date_from: !date_offset 0
     date_to: !date_offset 14

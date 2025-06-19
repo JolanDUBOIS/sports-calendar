@@ -1,7 +1,10 @@
-import logging
+from .logging_config import setup_logging
 
+import logging
 logger = logging.getLogger(__name__)
 
-from .logging_config import setup_logging
-from .app_config import get_config
-from .secrets import SecretsManager
+from pathlib import Path
+from src import ROOT_PATH
+CONFIG_DIR_PATH = ROOT_PATH / Path("config")
+
+from .loader import load_yml

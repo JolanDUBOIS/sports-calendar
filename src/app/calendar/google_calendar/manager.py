@@ -19,36 +19,22 @@ class GoogleCalendarManager:
     def add_calendar(
         self,
         calendar: Calendar,
-        date_from: str | None = None,
-        date_to: str | None = None,
-        verbose: bool = False
+        **kwargs
     ) -> None:
         """ Add a calendar to Google Calendar """
-        N_events = len(calendar.events)
-        for i, event in enumerate(calendar.events):
-            if verbose:
-                print(f"\r{' ' * 80}\rAdding event {i + 1}/{N_events}: {event.get('summary')}", end='\r')
-            try:
-                if date_from and event.get('dtstart').dt < date_from:
-                    continue
-                if date_to and event.get('dtend').dt > date_to:
-                    continue
-                self.api.add_event(event)
-            except Exception as e:
-                logger.error(f"Error adding event {event.get('summary')}: {e}")
-                logger.debug("Traceback:\n%s", traceback.format_exc())
-                raise
-        logger.info(f"Added {len(calendar.events)} events to Google Calendar.")
+        self.api.add_events(events=calendar.events, **kwargs)
 
-    def clear_calendar(self, scope: str = 'future') -> None:
+    def clear_calendar(self, scope: str | None = None, date_from: str | None = None, date_to: str | None = None, verbose: bool = False) -> None:
         """ Clear events from the Google Calendar based on the specified scope """
-        today = datetime.now().isoformat()
-        if scope == 'all':
-            self.api.delete_events()
+        today = datetime.now().date().isoformat()
+        if scope is None:
+            self.api.delete_events(date_from=date_from, date_to=date_to, verbose=verbose)
+        elif scope == 'all':
+            self.api.delete_events(verbose=verbose)
         elif scope == 'future':
-            self.api.delete_events(date_from=today)
+            self.api.delete_events(date_from=today, verbose=verbose)
         elif scope == 'past':
-            self.api.delete_events(date_to=today)
+            self.api.delete_events(date_to=today, verbose=verbose)
         else:
             logger.error(f"Invalid scope '{scope}' specified. Valid options are 'all', 'future', or 'past'.")
             raise ValueError(f"Invalid scope '{scope}' specified. Valid options are 'all', 'future', or 'past'.")

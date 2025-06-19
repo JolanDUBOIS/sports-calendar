@@ -6,6 +6,7 @@ import yaml
 
 from . import logger
 from ..pipeline_stages import DataStage
+from src.config.manager import base_config
 
 
 @dataclass
@@ -94,6 +95,13 @@ class SchemaSpec:
         if not all(isinstance(model, ModelSchemaSpec) for model in self.models):
             logger.error("All elements in models must be ModelSchemaSpec instances.")
             raise TypeError("All elements in models must be ModelSchemaSpec instances.")
+    
+        self._resolve_paths(base_config.active_repo.path)
+
+    def _resolve_paths(self, base_path: Path) -> None:
+        """ Resolve model paths relative to the base path. """
+        for model in self.models:
+            model.path = base_path / self.stage / model.path
 
     def get(self, model: str) -> ModelSchemaSpec | None:
         """ Get a model schema by name. """
@@ -102,11 +110,6 @@ class SchemaSpec:
                 return model_spec
         logger.warning(f"Model '{model}' not found in schema '{self.name}'.")
         return None
-
-    def resolve_paths(self, base_path: Path) -> None:
-        """ Resolve model paths relative to the base path. """
-        for model in self.models:
-            model.path = base_path / self.stage / model.path
 
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:

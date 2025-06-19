@@ -35,16 +35,6 @@ class LayerSpec:
         logger.warning(f"Model {model} not found in layer {self.name}.")
         return None
 
-    def resolve_paths(self, base_path: Path) -> None:
-        """ Resolve model paths relative to the base path. """
-        for model in self.models:
-            try:
-                model.resolve_paths(base_path)
-            except Exception as e:
-                logger.error(f"Error resolving path for model {model.name}: {e}")
-                logger.debug("Traceback:\n%s", traceback.format_exc())
-                raise ValueError(f"Failed to resolve path for model {model.name}: {e}")
-
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:
         try:
@@ -80,21 +70,19 @@ class LayerBuilder:
 
     Attributes:
         layer_spec (LayerSpec): Specification object detailing the models and their configuration for this layer.
-        repo_path (Path): Filesystem path to the repository root where models and resources reside.
         models_order (ModelOrder): Ordered iterable of models respecting dependencies and stage order.
 
     Methods:
         build(manual: bool = False) -> None:
             Executes each model in the layer in the predefined order, handling errors and marking failures.
         
-        from_dict(d: dict, repo_path: str | Path) -> LayerBuilder:
+        from_dict(d: dict) -> LayerBuilder:
             Factory method to create a LayerBuilder instance from a dictionary specification.
     """
 
-    def __init__(self, layer_spec: LayerSpec, repo_path: str | Path):
+    def __init__(self, layer_spec: LayerSpec):
         """ Initialize the LayerBuilder with a layer specification. """
         self.layer_spec = layer_spec
-        self.repo_path = Path(repo_path)
         self.models_order = ModelOrder(self.layer_spec.models, self.layer_spec.stage)
 
     def build(self, **kwargs) -> None:
@@ -113,7 +101,7 @@ class LayerBuilder:
         logger.info(f"Building layer '{self.layer_spec.stage}'.")
         for model_spec in self.models_order:
             try:
-                model_manager = ModelManager(model_spec, self.repo_path)
+                model_manager = ModelManager(model_spec)
                 model_manager.run(**kwargs)
             except Exception as e:
                 logger.error(f"Error processing model {model_spec.name}: {e}")

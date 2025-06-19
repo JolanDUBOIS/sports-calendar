@@ -71,6 +71,7 @@ def extract_table(data: pd.DataFrame, key: str, **kwargs) -> pd.DataFrame:
     if specs is None:
         logger.error(f"No extraction specifications found for key: {key}")
         raise ValueError(f"No extraction specifications found for key: {key}")
+    logger.debug(f"Columns of the DataFrame: {data.columns.tolist()}")
     if specs.is_simple():
         return _simple_extraction(data, specs.columns_mapping, **kwargs)
     else:
