@@ -6,8 +6,11 @@ from . import logger
 from ...types import IOContent
 
 
-def filter_file_content(data: IOContent, field: str, op: str, value: Any, type: str | None = None) -> IOContent:
+def filter_file_content(data: IOContent, field: str, op: str, value: Any | None = None, type: str | None = None) -> IOContent:
     """ Filter the data based on a field, operator, and value. """
+    if value is None:
+        logger.debug("No value provided for filtering. Returning original data.")
+        return data
     if isinstance(data, pd.DataFrame):
         return _filter_df(data, field, op, value)
     elif isinstance(data, list):
