@@ -56,7 +56,6 @@ class SelectionItem:
 @dataclass
 class Selection:
     name: str
-    username: str | None = None
     items: list[SelectionItem] = field(default_factory=list)
 
     def get_matches(self, date_from: str | None = None, date_to: str | None = None) -> pd.DataFrame:
@@ -74,7 +73,5 @@ class Selection:
     def from_dict(cls, d: dict) -> Selection:
         """ Creates a Selection instance from a dictionary. """
         name = d['name']
-        username = d['username']
-        logger.debug(f"Creating Selection {name} for user {username}.")
         items = [SelectionItem.from_dict(item) for item in d.get('items', [])]
-        return cls(name=name, username=username, items=items)
+        return cls(name=name, items=items)
