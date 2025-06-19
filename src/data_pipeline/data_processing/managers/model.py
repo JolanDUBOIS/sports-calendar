@@ -132,10 +132,9 @@ class ModelManager:
         
         logger.info(f"Model {self.model_spec.name} processed successfully.")
 
-    @staticmethod
-    def _validate_trigger(trigger: str, manual: bool) -> bool:
+    def _validate_trigger(self, trigger: str, manual: bool) -> bool:
         """ Validate the trigger for the model. """
         if trigger == "manual" and not manual:
-            logger.info("Model trigger is set to manual, skipping processing.")
+            logger.info(f"Model trigger is set to manual, skipping processing for model: {self.model_spec.name}.")
             return False
         return True
