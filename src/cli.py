@@ -155,7 +155,7 @@ def clear_calendar(
     verbose: bool = typer.Option(False, "--verbose")
 ):
     """ Clear events from the Google Calendar. """
-    if scope not in ["all", "future", "past"]:
+    if scope is not None and scope not in ["all", "future", "past"]:
         typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
         raise typer.Exit(code=1)
     clear_calendar_logic(
