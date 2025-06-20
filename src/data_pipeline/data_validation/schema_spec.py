@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 
 from . import logger
-from ..pipeline_stages import DataStage
+from src.config import DataStage
 from src.config.manager import base_config
 
 
@@ -69,7 +69,7 @@ class ModelSchemaSpec:
         """ Create a ModelSchemaSpec from a dictionary. """
         return cls(
             name=d["name"],
-            path=Path(d["path"]),
+            path=base_config.active_repo.path / d["path"],
             columns=[ColumnSpec.from_dict(col) for col in d.get("columns", [])]
         )
 
@@ -77,7 +77,7 @@ class ModelSchemaSpec:
 class SchemaSpec:
     """ TODO """
     name: str
-    stage: str
+    stage: DataStage
     models: list[ModelSchemaSpec]
     description: str | None = None
 
@@ -86,22 +86,12 @@ class SchemaSpec:
         if not self.name:
             logger.error("Schema name cannot be empty.")
             raise ValueError("Schema name cannot be empty.")
-        if not self._is_valid_stage(self.stage):
-            logger.error(f"Invalid stage name: {self.stage}")
-            raise ValueError(f"Invalid stage name: {self.stage}")
         if not isinstance(self.models, list):
             logger.error("Models must be a list.")
             raise TypeError("Models must be a list.")
         if not all(isinstance(model, ModelSchemaSpec) for model in self.models):
             logger.error("All elements in models must be ModelSchemaSpec instances.")
             raise TypeError("All elements in models must be ModelSchemaSpec instances.")
-    
-        self._resolve_paths(base_config.active_repo.path)
-
-    def _resolve_paths(self, base_path: Path) -> None:
-        """ Resolve model paths relative to the base path. """
-        for model in self.models:
-            model.path = base_path / self.stage / model.path
 
     def get(self, model: str) -> ModelSchemaSpec | None:
         """ Get a model schema by name. """
@@ -111,20 +101,12 @@ class SchemaSpec:
         logger.warning(f"Model '{model}' not found in schema '{self.name}'.")
         return None
 
-    @staticmethod
-    def _is_valid_stage(stage_name: str) -> bool:
-        try:
-            DataStage.from_str(stage_name)
-            return True
-        except ValueError:
-            return False
-
     @classmethod
     def from_dict(cls, d: dict) -> SchemaSpec:
         """ Create a SchemaSpec from a dictionary. """
         return cls(
             name=d["name"],
-            stage=d["stage"],
+            stage=DataStage.from_str(d["stage"]),
             models=[ModelSchemaSpec.from_dict(model) for model in d.get("models", [])],
             description=d.get("description")
         )

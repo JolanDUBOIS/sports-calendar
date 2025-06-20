@@ -7,7 +7,9 @@ from . import logger
 from .enforcers import ConstraintEnforcerFactory, ConstraintSpecs
 from ..versioning import read_versions
 from ...utils import concat_io_content
-from ....file_io import FileHandlerFactory
+from src.file_io import FileHandlerFactory
+from src.config.manager import base_config
+
 
 if TYPE_CHECKING:
     from .enforcers import ConstraintEnforcer
@@ -35,7 +37,7 @@ class OutputSpec:
         """ Create an OutputSpec from a dictionary. """
         return cls(
             name=d["name"],
-            path=Path(d["path"]),
+            path=base_config.active_repo.path / d["path"],
             layer=d["layer"],
             schema=d.get("schema"),
             constraint_specs=ConstraintSpecs.from_dict(d)

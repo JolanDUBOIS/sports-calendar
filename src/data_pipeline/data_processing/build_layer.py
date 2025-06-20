@@ -8,7 +8,7 @@ import yaml
 from . import logger
 from .order_models import ModelOrder
 from .managers import ModelManager, ModelSpec
-from ..pipeline_stages import DataStage
+from ...config.pipeline_stages import DataStage
 
 
 @dataclass

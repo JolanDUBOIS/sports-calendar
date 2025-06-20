@@ -8,7 +8,7 @@ from .main import (
     clear_calendar_logic,
     run_test_logic
 )
-from .data_pipeline import DataStage
+from .config import DataStage
 from .config.manager import base_config
 
 
@@ -77,8 +77,9 @@ def run_pipeline(
         raise typer.Exit(code=0)
 
     base_config.set_active_repo(repo)
+    stage_manager = base_config.active_repo.get_stage(parse_stage(stage)) if stage else None
     run_pipeline_logic(
-        stage=parse_stage(stage),
+        stage_manager=stage_manager,
         model=model,
         manual=manual,
         reset=reset,
@@ -100,8 +101,9 @@ def run_validation(
         raise typer.Exit(code=1)
 
     base_config.set_active_repo(repo)
+    stage_manager = base_config.active_repo.get_stage(parse_stage(stage)) if stage else None
     results = run_validation_logic(
-        stage=parse_stage(stage),
+        stage_manager=stage_manager,
         model=model,
         raise_on_error=raise_on_error,
         verbose=verbose
@@ -137,6 +139,7 @@ def clean_repository(
 ):
     """ Clean the data repository. """
     base_config.set_active_repo(repo)
+    stage_manager = base_config.active_repo.get_stage(parse_stage(stage)) if stage else None
     raise NotImplementedError("The clean command is not implemented yet.")
 
 @app.command()

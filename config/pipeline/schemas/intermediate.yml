@@ -3,7 +3,7 @@ stage: intermediate
 
 models:
   - name: espn_matches
-    path: espn_matches.csv
+    path: intermediate/espn_matches.csv
     columns:
       - name: id
         unique: true
@@ -38,9 +38,68 @@ models:
       - name: source
       - name: source_type
       - name: intermediate_at
+  
+  - name: espn_standings
+    path: intermediate/espn_standings.csv
+    columns:
+      - name: competition_id
+      - name: competition_name
+      - name: competition_abbreviation
+      - name: season
+      - name: season_display_name
+      - name: created_at
+      - name: source
+      - name: source_type
+      - name: team_id
+      - name: team_location
+      - name: team_name
+      - name: team_abbreviation
+      - name: team_display_name
+      - name: team_short_display_name
+      - name: team_is_national
+      - name: played_games
+      - name: lost
+      - name: point_diff
+      - name: points
+      - name: goals_against
+      - name: goals_for
+      - name: draws
+      - name: wins
+      - name: deductions
+      - name: ppg
+      - name: rank
+      - name: summary
+
+  - name: espn_teams
+    path: intermediate/espn_teams.csv
+    columns:
+      - name: team_id
+        unique: true
+      - name: team_name
+      - name: team_abbreviation
+      - name: team_displayName
+      - name: team_shortDisplayName
+      - name: intermediate_at
+  
+  - name: espn_competitions
+    path: intermediate/espn_competitions.csv
+    columns:
+      - name: id
+        unique: true
+      - name: alternate_id
+      - name: name
+      - name: abbreviation
+      - name: short_name
+      - name: midsize_name
+      - name: slug
+      - name: has_standings
+      - name: created_at
+      - name: source
+      - name: source_type
+      - name: intermediate_at
 
   # - name: football_data_matches
-  #   path: football_data_matches.csv
+  #   path: intermediate/football_data_matches.csv
   #   columns:
   #     - name: area_id
   #     - name: area_name
@@ -84,7 +143,7 @@ models:
   #     - name: intermediate_at
 
   # - name: football_data_standings
-  #   path: football_data_standings.csv
+  #   path: intermediate/football_data_standings.csv
   #   columns:
   #     - name: area_id
   #     - name: area_name
@@ -123,7 +182,7 @@ models:
   #     - name: intermediate_at
 
   # - name: football_ranking_fifa_rankings
-  #   path: football_ranking_fifa_rankings.csv
+  #   path: intermediate/football_ranking_fifa_rankings.csv
   #   columns:
   #     - name: team
   #     - name: team_name
@@ -136,7 +195,7 @@ models:
   #     - name: intermediate_at
 
   # - name: live_soccer_matches
-  #   path: live_soccer_matches.csv
+  #   path: intermediate/live_soccer_matches.csv
   #   columns:
   #     - name: title
   #     - name: match_date
@@ -158,7 +217,7 @@ models:
   #     - name: intermediate_at
 
   # - name: live_soccer_standings
-  #   path: live_soccer_standings.csv
+  #   path: intermediate/live_soccer_standings.csv
   #   columns:
   #     - name: position
   #     - name: team_source_name
@@ -178,19 +237,8 @@ models:
   #     - name: competition
   #     - name: intermediate_at
 
-  - name: espn_teams
-    path: espn_teams.csv
-    columns:
-      - name: team_id
-        unique: true
-      - name: team_name
-      - name: team_abbreviation
-      - name: team_displayName
-      - name: team_shortDisplayName
-      - name: intermediate_at
-
   # - name: football_data_teams
-  #   path: football_data_teams.csv
+  #   path: intermediate/football_data_teams.csv
   #   columns:
   #     - name: team_id
   #       unique: true
@@ -200,14 +248,14 @@ models:
   #     - name: intermediate_at
 
   # - name: live_soccer_teams
-  #   path: live_soccer_teams.csv
+  #   path: intermediate/live_soccer_teams.csv
   #   columns:
   #     - name: team_name
   #       unique: true
   #     - name: intermediate_at
 
   # - name: live_soccer_teams
-  #   path: live_soccer_teams.csv
+  #   path: intermediate/live_soccer_teams.csv
   #   columns:
   #     - name: team_name
   #       unique: true
@@ -215,21 +263,8 @@ models:
   #     - name: source_type
   #     - name: intermediate_at
   
-  - name: espn_competitions
-    path: espn_competitions.csv
-    columns:
-      - name: competition_id
-        unique: true
-      - name: competition_name
-      - name: competition_abbreviation
-      - name: competition_midsizeName
-      - name: competition_slug
-      - name: source
-      - name: source_type
-      - name: intermediate_at
-  
   # - name: football_data_competitions
-  #   path: football_data_competitions.csv
+  #   path: intermediate/football_data_competitions.csv
   #   columns:
   #     - name: competition_id
   #       unique: true
@@ -244,7 +279,7 @@ models:
   #     - name: intermediate_at
 
   # - name: live_soccer_competitions
-  #   path: live_soccer_competitions.csv
+  #   path: intermediate/live_soccer_competitions.csv
   #   columns:
   #     - name: section_title
   #     - name: name
@@ -261,7 +296,7 @@ models:
   #     - name: intermediate_at
 
   # - name: football_data_areas
-  #   path: football_data_areas.csv
+  #   path: intermediate/football_data_areas.csv
   #   columns:
   #     - name: area_id
   #       unique: true
@@ -272,7 +307,7 @@ models:
   #     - name: intermediate_at
 
   # - name: live_soccer_areas
-  #   path: live_soccer_areas.csv
+  #   path: intermediate/live_soccer_areas.csv
   #   columns:
   #     - name: area
   #       unique: true
@@ -281,7 +316,7 @@ models:
   #     - name: intermediate_at
 
   # - name: team_similarity
-  #   path: team_similarity.csv
+  #   path: intermediate/team_similarity.csv
   #   columns:
   #     - name: id_A
   #       nullable: false
@@ -296,7 +331,7 @@ models:
   #     - name: intermediate_at
 
   # - name: competition_similarity
-  #   path: competition_similarity.csv
+  #   path: intermediate/competition_similarity.csv
   #   columns:
   #     - name: id_A
   #       nullable: false
@@ -311,7 +346,7 @@ models:
   #     - name: intermediate_at
 
   # - name: area_similarity
-  #   path: area_similarity.csv
+  #   path: intermediate/area_similarity.csv
   #   columns:
   #     - name: id_A
   #       nullable: false
@@ -326,7 +361,7 @@ models:
   #     - name: intermediate_at
 
   # - name: team_mapping
-  #   path: team_mapping.csv
+  #   path: intermediate/team_mapping.csv
   #   columns:
   #     - name: id
   #       nullable: false
@@ -337,7 +372,7 @@ models:
   #     - name: intermediate_at
 
   # - name: competition_mapping
-  #   path: competition_mapping.csv
+  #   path: intermediate/competition_mapping.csv
   #   columns:
   #     - name: id
   #       nullable: false
@@ -348,7 +383,7 @@ models:
   #     - name: intermediate_at
 
   # - name: area_mapping
-  #   path: area_mapping.csv
+  #   path: intermediate/area_mapping.csv
   #   columns:
   #     - name: id
   #       nullable: false
@@ -359,7 +394,7 @@ models:
   #     - name: intermediate_at
 
   # - name: team_registry
-  #   path: team_registry.csv
+  #   path: intermediate/team_registry.csv
   #   columns:
   #     - name: id
   #       unique: true
@@ -371,7 +406,7 @@ models:
   #     - name: intermediate_at
 
   # - name: competition_registry
-  #   path: competition_registry.csv
+  #   path: intermediate/competition_registry.csv
   #   columns:
   #     - name: id
   #       unique: true
@@ -382,7 +417,7 @@ models:
   #     - name: intermediate_at
 
   # - name: area_registry
-  #   path: area_registry.csv
+  #   path: intermediate/area_registry.csv
   #   columns:
   #     - name: id
   #       unique: true

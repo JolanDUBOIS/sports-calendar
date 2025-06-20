@@ -8,7 +8,7 @@ from src.file_io import FileHandlerFactory, BaseFileHandler
 from src.config.manager import base_config
 
 
-REPO_PATH = ROOT_PATH / "data/repository" / "staging" # TODO - TO CHANGE, NEED TO USE base_config FOR THIS !!!! - TODO
+REPO_PATH = base_config.active_repo.path / "staging" # TODO - use repo manager instead
 
 class BaseTable(ABC):
     """ Base class for all tables. """

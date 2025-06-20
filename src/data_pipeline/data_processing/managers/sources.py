@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import logger
 from ..versioning import SourceVersioningStrategy, SourceVersions, SourceVersion, version_filter
 from ...utils import get_max_field_value
-from ....file_io import FileHandlerFactory
+from src.file_io import FileHandlerFactory
+from src.config.manager import base_config
 
 if TYPE_CHECKING:
     from ....types import IOContent
@@ -24,7 +24,7 @@ class SourceSpec:
         """ Create a SourceSpec from a dictionary. """
         return cls(
             name=d["name"],
-            path=Path(d["path"]),
+            path=base_config.active_repo.path / d["path"],
             versioning_strategy=SourceVersioningStrategy.from_dict(d["versioning"]) if "versioning" in d else None
         )
 

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from . import logger, CONFIG_DIR_PATH
-from src.data_pipeline import DataStage
+from .base_config import StageManager
 
 
 class PipelineConfig:
@@ -27,19 +27,17 @@ class PipelineConfig:
                 logger.error(f"Required subdirectory {subdir} does not exist in pipeline config path.")
                 raise FileNotFoundError(f"Required subdirectory {subdir} does not exist in pipeline config path.")
 
-    def get_workflow_config_path(self, stage: DataStage | str) -> Path:
+    def get_workflow_config_path(self, stage: StageManager) -> Path:
         """ Get the path to the workflow configuration file for a given stage. """
-        stage = str(stage)
-        path = self.workflows_path / f"build_{stage}.yml"
+        path = self.workflows_path / f"build_{stage.name}.yml"
         if not path.exists():
             logger.error(f"Workflow config file does not exist: {path}")
             raise FileNotFoundError(f"Workflow config file does not exist: {path}")
         return path
 
-    def get_schema_config_path(self, stage: DataStage | str) -> Path:
+    def get_schema_config_path(self, stage: StageManager) -> Path:
         """ Get the path to the schema configuration file for a given stage. """
-        stage = str(stage)
-        path = self.schemas_path / f"{stage}.yml"
+        path = self.schemas_path / f"{stage.name}.yml"
         if not path.exists():
             logger.error(f"Schema config file does not exist: {path}")
             raise FileNotFoundError(f"Schema config file does not exist: {path}")

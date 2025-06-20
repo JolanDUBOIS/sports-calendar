@@ -4,18 +4,19 @@ from . import logger
 from .schema_manager import LayerSchemaManager, ModelSchemaManager
 from .validation_result import SchemaValidationResult
 from .schema_spec import SchemaSpec
-from .. import DataStage
-from src.config.manager import pipeline_config
+from src.config import StageManager
+from src.config.manager import pipeline_config, base_config
 
 
 def run_validation(
-    stage: DataStage | None = None,
+    stage_manager: StageManager | None = None,
     model: str | None = None,
     **kwargs
 ) -> list[SchemaValidationResult]:
+    active_repo = base_config.active_repo
     # Single model
     if model:
-        schema_spec = SchemaSpec.from_yaml(pipeline_config.get_schema_config_path(stage))
+        schema_spec = SchemaSpec.from_yaml(pipeline_config.get_schema_config_path(stage_manager))
         model_spec = schema_spec.get(model)
         if not model_spec:
             logger.error(f"Model '{model}' not found in schema '{schema_spec.name}'.")
@@ -30,10 +31,10 @@ def run_validation(
 
     # Multiple models
     else:
-        stages = [stage] if stage is not None else DataStage.instances()
+        stage_managers = active_repo.get_stages() if stage_manager is None else [stage_manager]
         results = []
-        for _stage in stages:
-            schema_spec = SchemaSpec.from_yaml(pipeline_config.get_schema_config_path(_stage))
+        for _stage_manager in stage_managers:
+            schema_spec = SchemaSpec.from_yaml(pipeline_config.get_schema_config_path(_stage_manager))
             layer_manager = LayerSchemaManager(schema_spec)
             results.append(layer_manager.validate(**kwargs))
         return results

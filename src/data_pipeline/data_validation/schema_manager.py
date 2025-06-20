@@ -154,7 +154,7 @@ class LayerSchemaManager:
             logger.debug("Traceback:\n%s", traceback.format_exc())
         logger.info(f"Schema '{self.schema_spec.name}' validation completed.")
 
-    @classmethod
-    def from_dict(cls, d: dict) -> LayerSchemaManager:
-        """ Create a LayerSchemaManager from a dictionary. """
-        return cls(schema_spec=SchemaSpec.from_dict(d))
+    # @classmethod
+    # def from_dict(cls, d: dict) -> LayerSchemaManager:
+    #     """ Create a LayerSchemaManager from a dictionary. """
+    #     return cls(schema_spec=SchemaSpec.from_dict(d))

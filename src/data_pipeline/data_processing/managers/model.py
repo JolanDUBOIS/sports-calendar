@@ -8,7 +8,6 @@ from .utils import inject_static_fields
 from .sources import SourcesManager, SourceSpec
 from .output import OutputManager, OutputSpec
 from .processing import ProcessingManager, ProcessingSpec
-from src.config.manager import base_config
 
 
 @dataclass
@@ -42,14 +41,6 @@ class ModelSpec:
         if not self.trigger in valid_triggers:
             logger.error(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
             raise ValueError(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
-
-        self._resolve_paths(base_config.active_repo.path)
-
-    def _resolve_paths(self, base_path: Path) -> None:
-        """ Resolve model paths relative to the base path. """
-        for source in self.sources:
-            source.path = base_path / source.path
-        self.output.path = base_path / self.output.path
 
     @classmethod
     def from_dict(cls, d: dict) -> ModelSpec:

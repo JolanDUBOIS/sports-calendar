@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from . import logger
-from ..pipeline_stages import DataStage
+from src.config import DataStage
 
 if TYPE_CHECKING:
     from .managers import ModelSpec
