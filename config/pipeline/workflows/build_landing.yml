@@ -95,6 +95,8 @@ models:
           <<: *date_range
         - competition_slug: fra.coupe_de_france
           <<: *date_range
+        - competition_slug: uefa.euro_u21
+          <<: *date_range
     static_fields:
       - name: created_at
         value: !date_offset 0
@@ -153,6 +155,7 @@ models:
         - competition_slug: ger.dfb_pokal
         - competition_slug: ita.coppa_italia
         - competition_slug: fra.coupe_de_france
+        - competition_slug: uefa.euro_u21
     static_fields:
       - name: created_at
         value: !date_offset 0
