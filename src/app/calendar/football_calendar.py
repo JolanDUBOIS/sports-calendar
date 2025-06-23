@@ -15,6 +15,7 @@ class MatchDetails:
     away_team_name: str
     date_time: str
     competition_name: str = None
+    competition_abbreviation: str = None
     stage: str = None
     leg: str = None
     location: str = None
@@ -25,10 +26,10 @@ class MatchesDetails:
 
     def __iter__(self):
         return iter(self.matches)
-    
+
     def __len__(self):
         return len(self.matches)
-    
+
     def __getitem__(self, index):
         return self.matches[index]
 
@@ -43,6 +44,7 @@ class MatchesDetails:
                     away_team_name=row['away_team_name'],
                     date_time=row['date_time'],
                     competition_name=cls.clean_value(row.get('competition_name')),
+                    competition_abbreviation=cls.clean_value(row.get('competition_abbreviation')),
                     stage=cls.clean_value(row.get('stage')),
                     leg=cls.clean_value(row.get('leg')),
                     location=cls.clean_value(row.get('venue'))
@@ -72,11 +74,11 @@ class FootballCalendar:
     def add_match(self, match: MatchDetails) -> None:
         """ Add a match to the calendar """
         event = Event()
-        event.add('summary', f"{match.home_team_name} - {match.away_team_name}")
-        
+        event.add('summary', f"{match.home_team_name} - {match.away_team_name}\n({match.competition_abbreviation})")
+
         start = datetime.strptime(match.date_time, "%Y-%m-%d %H:%M:%S%z")
         end = start + timedelta(hours=2)
-        
+
         event.add('dtstart', start)
         event.add('dtend', end)
 

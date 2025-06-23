@@ -25,4 +25,4 @@ def get_clean_matches(matches: pd.DataFrame) -> pd.DataFrame:
         how='left'
     )
 
-    return full_matches[["home_team_name", "away_team_name", "competition_name", "date_time", "stage", "leg", "venue"]]
+    return full_matches[["home_team_name", "away_team_name", "competition_name", "competition_abbreviation", "date_time", "stage", "leg", "venue"]]
