@@ -34,7 +34,7 @@ def run_selection(key: str = "dev", dry_run: bool = False, **kwargs):
 
     google_cal_manager = GoogleCalendarManager.from_defaults(gcal_id)
     google_cal_manager.clear_calendar(scope='future', verbose=True)
-    google_cal_manager.add_calendar(football_calendar.calendar, verbose=True)
+    google_cal_manager.add_calendar(football_calendar.calendar, scope='future', verbose=True)
 
     logger.info(f"Selection {key} has been successfully processed and added to the google calendar.")
 

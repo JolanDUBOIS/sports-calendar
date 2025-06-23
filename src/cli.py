@@ -110,8 +110,8 @@ def run_validation(
 
 @app.command()
 def run_selection(
-    repo: str = repo_option("selection"),
     key: str = typer.Argument("dev"),
+    repo: str = repo_option("selection"),
     dry_run: bool = typer.Option(False, "--dry-run"),
     verbose: bool = typer.Option(False, "--verbose")
 ):

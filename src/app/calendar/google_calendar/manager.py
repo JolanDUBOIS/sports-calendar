@@ -1,5 +1,4 @@
 from __future__ import annotations
-import traceback
 from datetime import datetime
 
 from icalendar import Calendar
@@ -19,10 +18,20 @@ class GoogleCalendarManager:
     def add_calendar(
         self,
         calendar: Calendar,
+        scope: str | None = None,
         **kwargs
     ) -> None:
         """ Add a calendar to Google Calendar """
-        self.api.add_events(events=calendar.events, **kwargs)
+        today = datetime.now().date().isoformat()
+        if scope is None or scope == 'all':
+            self.api.add_events(events=calendar.events, **kwargs)
+        elif scope == 'future':
+            self.api.add_events(events=calendar.events, date_from=today, **kwargs)
+        elif scope == 'past':
+            self.api.add_events(events=calendar.events, date_to=today, **kwargs)
+        else:
+            logger.error(f"Invalid scope '{scope}' specified. Valid options are 'all', 'future', or 'past'.")
+            raise ValueError(f"Invalid scope '{scope}' specified. Valid options are 'all', 'future', or 'past'.")
 
     def clear_calendar(self, scope: str | None = None, date_from: str | None = None, date_to: str | None = None, verbose: bool = False) -> None:
         """ Clear events from the Google Calendar based on the specified scope """

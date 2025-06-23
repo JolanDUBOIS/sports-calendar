@@ -74,13 +74,16 @@ class GoogleCalendarAPI:
         verbose: bool = False
     ) -> None:
         """ Add multiple events to Google Calendar """
+        date_from = datetime.fromisoformat(date_from).date() if date_from else None
+        date_to = datetime.fromisoformat(date_to).date() if date_to else None
+
         N_events = len(events)
         for i, event in enumerate(events):
             if verbose:
                 print(f"\r{' ' * 80}\rAdding event {i + 1}/{N_events}: {event.get('summary')}", end='\r')
-            if date_from and event.get('dtstart').dt < date_from:
+            if date_from and event.get('dtstart').dt.date() < date_from:
                 continue
-            if date_to and event.get('dtend').dt > date_to:
+            if date_to and event.get('dtend').dt.date() > date_to:
                 continue
             self.add_event(event)
         logger.info(f"Added {N_events} events to Google Calendar.")
