@@ -6,3 +6,5 @@ notebooks/
 .coverage
 .secrets/
 .credentials/
+selections/*
+!selections/dev.yml
