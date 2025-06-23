@@ -73,8 +73,5 @@ class CSVHandler(BaseFileHandler):
 
     def _add_ctime(self, data: pd.DataFrame) -> pd.DataFrame:
         """ Add a creation time column to the DataFrame. """
-        if '_ctime' in data.columns:
-            logger.error("Data already contains '_ctime' column.")
-            raise ValueError("Data already contains '_ctime' column.")
         data['_ctime'] = self._today()
         return data
