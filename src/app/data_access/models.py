@@ -3,18 +3,17 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from . import logger
-from src import ROOT_PATH
 from src.file_io import FileHandlerFactory, BaseFileHandler
-from src.config.manager import base_config
+from src.config.registry import config
 
 
-REPO_PATH = ROOT_PATH / "data/repository" / "staging" # TODO - TO CHANGE, NEED TO USE base_config FOR THIS !!!! - TODO
+REPO_PATH = config.active_repo.path / "staging"
 
 class BaseTable(ABC):
     """ Base class for all tables. """
     __file_name__ = None
     __columns__ = None
-    file_handler: BaseFileHandler = None
+    __path__ = None
 
     @classmethod
     @abstractmethod
@@ -28,10 +27,8 @@ class BaseTable(ABC):
         if cls.__columns__ is None:
             logger.error(f"Columns for {cls.__name__} are not defined.")
             raise ValueError(f"Columns for {cls.__name__} are not defined.")
-        if cls.file_handler is None:
-            logger.error(f"File handler for {cls.__name__} is not initialized.")
-            raise ValueError(f"File handler for {cls.__name__} is not initialized.")
-        df = cls.file_handler.read()
+        file_handler = FileHandlerFactory.create_file_handler(cls.__path__)
+        df = file_handler.read()
         df = cls._as_types(df, cls.__columns__)
         cls._check_df(df)
         return df
@@ -86,7 +83,7 @@ class RegionsTable(BaseTable):
     """ TODO """
     __file_name__ = "regions.csv"
     __columns__ = None
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
+    __path__ = REPO_PATH / __file_name__
 
     @classmethod
     def query(cls, ids: list = None) -> pd.DataFrame:
@@ -105,7 +102,7 @@ class CompetitionsTable(BaseTable):
         "type": {"type": "bool", "source": None},
         "has_standings": {"type": "bool", "source": "has_standings"}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
+    __path__ = REPO_PATH / __file_name__
 
     @classmethod
     def query(cls, ids: list = None) -> pd.DataFrame:
@@ -126,7 +123,7 @@ class TeamsTable(BaseTable):
         "venue": {"type": "str", "source": None},
         "league_id": {"type": "int", "source": None}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
+    __path__ = REPO_PATH / __file_name__
 
     @classmethod
     def query(cls, ids: list = None) -> pd.DataFrame:
@@ -150,7 +147,7 @@ class MatchesTable(BaseTable):
         "leg": {"type": "int", "source": "leg"},
         "channels": {"type": "str", "source": None}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
+    __path__ = REPO_PATH / __file_name__
 
     @classmethod
     def get_table(cls) -> pd.DataFrame:
@@ -201,7 +198,7 @@ class StandingsTable(BaseTable):
         "goals_against": {"type": "int", "source": "goals_against"},
         "goal_difference": {"type": "int", "source": None}
     }
-    file_handler = FileHandlerFactory.create_file_handler(REPO_PATH / __file_name__)
+    __path__ = REPO_PATH / __file_name__
 
     @classmethod
     def query(

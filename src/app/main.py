@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
 from . import logger
 from .data_access import get_clean_matches
@@ -9,9 +8,7 @@ from .calendar import (
     GoogleCalendarManager
 )
 from .selection import SelectionManager
-from src.config.manager import secrets
-if TYPE_CHECKING:
-    from src.config.base_config import Repository
+from src.config.registry import config
 
 
 def run_selection(key: str = "dev", dry_run: bool = False, **kwargs):
@@ -19,7 +16,7 @@ def run_selection(key: str = "dev", dry_run: bool = False, **kwargs):
     logger.info(f"Running selection for selection {key}.")
 
     selection = SelectionManager().get_selection(key)
-    gcal_id = secrets.get_gcal_id(key)
+    gcal_id = config.secrets.get_gcal_id(key)
 
     matches = selection.get_matches()
     matches = get_clean_matches(matches)
@@ -42,7 +39,7 @@ def clear_calendar(key: str = "dev", scope: str | None = None, date_from: str | 
     """ Clear events from the Google Calendar based on the specified scope. """
     logger.info(f"Clearing calendar events with scope: {scope}")
 
-    gcal_id = secrets.get_gcal_id(key)
+    gcal_id = config.secrets.get_gcal_id(key)
     google_cal_manager = GoogleCalendarManager.from_defaults(gcal_id)
     google_cal_manager.clear_calendar(scope=scope, date_from=date_from, date_to=date_to, verbose=True)
 

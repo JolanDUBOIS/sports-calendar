@@ -8,7 +8,7 @@ from .utils import inject_static_fields
 from .sources import SourcesManager, SourceSpec
 from .output import OutputManager, OutputSpec
 from .processing import ProcessingManager, ProcessingSpec
-from src.config.manager import base_config
+from src.config.registry import config
 
 
 @dataclass
@@ -43,7 +43,7 @@ class ModelSpec:
             logger.error(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
             raise ValueError(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
 
-        self._resolve_paths(base_config.active_repo.path)
+        self._resolve_paths(config.active_repo.path)
 
     def _resolve_paths(self, base_path: Path) -> None:
         """ Resolve model paths relative to the base path. """

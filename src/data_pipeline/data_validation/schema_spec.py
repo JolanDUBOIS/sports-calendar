@@ -6,7 +6,7 @@ import yaml
 
 from . import logger
 from ..pipeline_stages import DataStage
-from src.config.manager import base_config
+from src.config.registry import config
 
 
 @dataclass
@@ -96,7 +96,7 @@ class SchemaSpec:
             logger.error("All elements in models must be ModelSchemaSpec instances.")
             raise TypeError("All elements in models must be ModelSchemaSpec instances.")
     
-        self._resolve_paths(base_config.active_repo.path)
+        self._resolve_paths(config.active_repo.path)
 
     def _resolve_paths(self, base_path: Path) -> None:
         """ Resolve model paths relative to the base path. """

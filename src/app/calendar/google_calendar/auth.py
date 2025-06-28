@@ -6,7 +6,7 @@ from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 from . import logger
-from src.config.manager import credentials
+from src.config.registry import config
 
 
 class GoogleAuthManager:
@@ -16,7 +16,7 @@ class GoogleAuthManager:
 
     def __init__(self, credentials_file_path: Path | str = None):
         """ TODO """
-        self.credentials_file_path = credentials.client_secret_path if credentials_file_path is None else Path(credentials_file_path)
+        self.credentials_file_path = config.credentials.client_secret_path if credentials_file_path is None else Path(credentials_file_path)
 
     @property
     def credentials(self) -> Credentials:
@@ -27,29 +27,29 @@ class GoogleAuthManager:
             with token_path.open(mode='w') as token:
                 token.write(creds.to_json())
 
-        if credentials.token_path.exists():
+        if config.credentials.token_path.exists():
             try:
-                creds = Credentials.from_authorized_user_file(credentials.token_path, self.SCOPES)
+                creds = Credentials.from_authorized_user_file(config.credentials.token_path, self.SCOPES)
                 if creds and creds.valid:
                     return creds
             except Exception as e:
                 logger.warning(f"Failed to load credentials: {e}")
-                credentials.token_path.unlink(missing_ok=True)
+                config.credentials.token_path.unlink(missing_ok=True)
 
         if creds and creds.expired and creds.refresh_token:
             try:
                 creds.refresh(Request())
-                write_token(credentials.token_path, creds)
+                write_token(config.credentials.token_path, creds)
                 return creds
             except RefreshError:
                 logger.warning("Refresh token expired or revoked. Re-authenticating...")
-                credentials.token_path.unlink(missing_ok=True)
+                config.credentials.token_path.unlink(missing_ok=True)
 
         flow = InstalledAppFlow.from_client_secrets_file(
             self.credentials_file_path,
             self.SCOPES
         )
         creds = flow.run_local_server(port=0, open_browser=False)
-        write_token(credentials.token_path, creds)
+        write_token(config.credentials.token_path, creds)
 
         return creds
