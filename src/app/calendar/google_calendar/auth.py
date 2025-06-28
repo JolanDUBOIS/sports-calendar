@@ -16,7 +16,7 @@ class GoogleAuthManager:
 
     def __init__(self, credentials_file_path: Path | str = None):
         """ TODO """
-        self.credentials_file_path = credentials.client_secret_path if credentials_file_path is None else Path(credentials_file_path)
+        self.credentials_file_path = config.credentials.client_secret_path if credentials_file_path is None else Path(credentials_file_path)
 
     @property
     def credentials(self) -> Credentials:
