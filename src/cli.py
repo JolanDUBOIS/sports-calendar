@@ -1,15 +1,9 @@
 import typer # type: ignore
 from typer import BadParameter # type: ignore
 
-from .main import (
-    run_pipeline_logic,
-    run_validation_logic,
-    run_selection_logic,
-    clear_calendar_logic,
-    run_test_logic
-)
 from .data_pipeline import DataStage
-from .config.manager import base_config
+from .config.registry import config
+from .config.container import Config
 
 
 app = typer.Typer()
@@ -17,6 +11,12 @@ app = typer.Typer()
 # ------------------------
 # Shared Utility Functions
 # ------------------------
+
+def init_config(repo: str | None = None):
+    if not config.is_set():
+        config.set(Config(repo_key=repo))
+    else:
+        raise RuntimeError("Configuration has already been initialized.")
 
 def parse_stage(stage: str | None) -> DataStage | None:
     if stage is None:
@@ -76,7 +76,9 @@ def run_pipeline(
         typer.echo("Reset mode aborted by the user.", err=True)
         raise typer.Exit(code=0)
 
-    base_config.set_active_repo(repo)
+    init_config(repo)
+    
+    from .main import run_pipeline_logic
     run_pipeline_logic(
         stage=parse_stage(stage),
         model=model,
@@ -99,7 +101,9 @@ def run_validation(
         typer.echo("Error: --model requires --stage to be specified.", err=True)
         raise typer.Exit(code=1)
 
-    base_config.set_active_repo(repo)
+    init_config(repo)
+    
+    from .main import run_validation_logic
     results = run_validation_logic(
         stage=parse_stage(stage),
         model=model,
@@ -116,7 +120,9 @@ def run_selection(
     verbose: bool = typer.Option(False, "--verbose")
 ):
     """ Run the data selection. """
-    base_config.set_active_repo(repo)
+    init_config(repo)
+    
+    from .main import run_selection_logic
     run_selection_logic(
         key=key,
         dry_run=dry_run,
@@ -128,6 +134,9 @@ def test(
     name: str = typer.Argument(..., help="Name of the test to run.")
 ):
     """ Run a specific test. """
+    init_config()
+    
+    from .main import run_test_logic
     run_test_logic(name)
 
 @app.command()
@@ -136,7 +145,7 @@ def clean_repository(
     stage: str | None = stage_option("cleaning")
 ):
     """ Clean the data repository. """
-    base_config.set_active_repo(repo)
+    init_config(repo)
     raise NotImplementedError("The clean command is not implemented yet.")
 
 @app.command()
@@ -144,6 +153,7 @@ def revert(
     run_id: str = typer.Argument(None, help="ID of the run to revert to.")
 ):
     """ Revert the data repository to a previous state. """
+    init_config()
     raise NotImplementedError("The revert command is not implemented yet.")
 
 @app.command()
@@ -158,6 +168,10 @@ def clear_calendar(
     if scope is not None and scope not in ["all", "future", "past"]:
         typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
         raise typer.Exit(code=1)
+
+    init_config()
+    
+    from .main import clear_calendar_logic
     clear_calendar_logic(
         key=key,
         scope=scope,

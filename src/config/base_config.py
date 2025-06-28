@@ -40,6 +40,7 @@ class BaseConfig:
 
     def set_active_repo(self, key: str) -> None:
         """ Set the active repository for the current session. """
+        logger.info(f"Setting active repository to '{key}'")
         self._active_repo = self.get_repo(key)
 
     @property
