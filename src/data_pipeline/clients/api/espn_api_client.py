@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from . import logger
 from .base_api_client import BaseApiClient
@@ -32,9 +32,9 @@ class ESPNApiClient(BaseApiClient):
 
     def query_scoreboard(self, sport: str, league: str, date_from: str = None, date_to: str = None, trim: bool = False) -> list[dict]:
         """ TODO """
-        logger.info(f"Querying scoreboard for sport {sport} and competition {league} from {date_from} to {date_to}.")
-        date_from = date_from or datetime.now().strftime("%Y-%m-%d")
-        date_to = date_to or datetime.now().strftime("%Y-%m-%d")
+        logger.info(f"Querying scoreboard for sport {sport} and competition {league} from {date_from[:10]} to {date_to[:10]}.")
+        date_from = date_from or datetime.now(timezone.utc).isoformat(timespec="seconds")
+        date_to = date_to or datetime.now(timezone.utc).isoformat(timespec="seconds")
         url = f"{self.BASE_URL}/site/v2/sports/{sport}/{league}/scoreboard?dates={self.format_date_range(date_from, date_to)}"
         response = self.query_api(url)
         if not response:
@@ -59,11 +59,13 @@ class ESPNApiClient(BaseApiClient):
     def format_date_range(date_from: str, date_to: str) -> str:
         """ TODO """
         try:
-            start_date = datetime.strptime(date_from, "%Y-%m-%d")
+            start_date = datetime.fromisoformat(date_from)
         except ValueError:
-            start_date = datetime.strptime(date_from, "%Y-%m-%d %H:%M:%S")
+            logger.error(f"Invalid date format for date_from: {date_from}.")
+            raise
         try:
-            end_date = datetime.strptime(date_to, "%Y-%m-%d")
+            end_date = datetime.fromisoformat(date_to)
         except ValueError:
-            end_date = datetime.strptime(date_to, "%Y-%m-%d %H:%M:%S")
+            logger.error(f"Invalid date format for date_to: {date_to}.")
+            raise
         return f"{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"

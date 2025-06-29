@@ -1,6 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
+from .date_standardization import date_standardization
 from .date_normalization import date_normalization
 from .extract_json import extract_json
 from .extract_table import extract_table

@@ -6,8 +6,9 @@ from . import logger
 from ...types import IOContent
 
 
-def filter_file_content(data: IOContent, field: str, op: str, value: Any | None = None, type: str | None = None) -> IOContent:
+def filter_file_content(data: IOContent, field: str, op: str, value: Any | None = None) -> IOContent:
     """ Filter the data based on a field, operator, and value. """
+    logger.debug(f"Filtering data with field='{field}', operator='{op}', value='{value}'.")
     if value is None:
         logger.debug("No value provided for filtering. Returning original data.")
         return data
@@ -34,7 +35,7 @@ def _filter_df(data: pd.DataFrame, field: str, op: str, value: Any) -> pd.DataFr
         value = pd.to_datetime(value, errors='coerce')
     else:
         data[f"__temp_filter__{field}"] = data[field]
-    
+
     ops = {
         '==': data[f"__temp_filter__{field}"] == value,
         '!=': data[f"__temp_filter__{field}"] != value,
@@ -43,7 +44,7 @@ def _filter_df(data: pd.DataFrame, field: str, op: str, value: Any) -> pd.DataFr
         '>': data[f"__temp_filter__{field}"] > value,
         '>=': data[f"__temp_filter__{field}"] >= value,
     }
-    
+
     try:
         return data[ops[op]].drop(columns=[f"__temp_filter__{field}"])
     except KeyError:

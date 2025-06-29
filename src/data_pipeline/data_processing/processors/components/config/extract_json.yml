@@ -34,9 +34,9 @@ espn_football_matches:
     team_B_name: competitions.0.competitors.1.team.name
     team_B_location: competitions.0.competitors.1.team.location
     team_B_venue_id: competitions.0.competitors.1.team.venue.id
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at
 
 espn_football_standings:
   direct_paths:
@@ -45,9 +45,9 @@ espn_football_standings:
     competition_abbreviation: abbreviation
     season: children.0.standings.season
     season_display_name: children.0.standings.seasonDisplayName
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at
   iterate:
     path: children.0.standings.entries
     columns:
@@ -81,14 +81,14 @@ espn_football_competitions:
     midsize_name: midsizeName
     slug: slug
     has_standings: hasStandings
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at
 
 espn_f1_events:
   direct_paths:
     id: id
-    # date: date
+    date: date
     name: name
     short_name: shortName
     season_year: season.year
@@ -96,9 +96,9 @@ espn_f1_events:
     circuit_name: circuit.fullName
     circuit_city: circuit.address.city
     circuit_country: circuit.address.country
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at
   iterate:
     path: competitions
     columns:
@@ -147,9 +147,9 @@ football_data_matches:
     score_extraTime_away: score.extraTime.away
     score_penalties_home: score.penalties.home
     score_penalties_away: score.penalties.away
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at
 
 football_data_standings:
   direct_paths:
@@ -168,9 +168,9 @@ football_data_standings:
     stage: standings.0.stage
     type: standings.0.type
     group: standings.0.group
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at
   iterate:
     path: standings.0.table
     columns:
@@ -199,6 +199,6 @@ football_data_teams:
     tla: tla
     founded: founded
     venue: venue
-    created_at: created_at
     source: source
     source_type: source_type
+    created_at: created_at

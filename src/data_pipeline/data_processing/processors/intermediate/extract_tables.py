@@ -2,15 +2,15 @@ import pandas as pd
 
 from . import logger
 from .. import Processor
-from ..components import extract_json, reshape_matches, date_normalization
+from ..components import extract_json, reshape_matches, date_standardization
 
 
 class ExtractionProcessor(Processor):
     """ Processor used to extract structured data from raw JSON sources. """
 
     sources_additional_processes = {
-        "espn_football_matches": [reshape_matches, date_normalization],
-        "espn_f1_events": [date_normalization],
+        "espn_football_matches": [reshape_matches, date_standardization],
+        "espn_f1_events": [date_standardization],
         # "football_data_matches": [date_normalization],
     }
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -84,12 +84,12 @@ class MetadataManager:
 
     def write(self, meta: MetadataEntry) -> None:
         """ Write metadata to the JSON file. """
-        entries  = self.read()
-        entries .append(meta)
+        entries = self.read()
+        entries.append(meta)
         dict_entries = [e.to_dict() for e in entries]
         with self.meta_file.open('w') as file:
             json.dump(dict_entries, file, indent=4)
-    
+
     def delete(self) -> None:
         """ Delete the metadata file. """
         try:
@@ -146,7 +146,7 @@ class MetadataManager:
     @staticmethod
     def get_now() -> str:
         """ Return the current timestamp in ISO format. """
-        return datetime.now().isoformat(timespec="seconds")
+        return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 # The metadata for each modification/reading operation:
 # - Timestamp/datetime of the operation
