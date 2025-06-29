@@ -1,16 +1,16 @@
-# Football Calendar
+# Sport Calendar
 
-Football Calendar is a command-line tool designed for football fans who want to keep track of upcoming matches without the hassle of checking schedules manually. By defining their preferences in a simple configuration file, users get a personalized football events calendar automatically created and synced with their Google Calendar. This way, they never miss a game that matters to them.
+Sport Calendar is a command-line tool designed for sports fans who want to keep track of upcoming matches and events without the hassle of checking schedules manually. By defining their preferences in a simple configuration file, users get a personalized sports events calendar automatically created and synced with their Google Calendar. This way, they never miss a game or event that matters to them.
 
 ## Description
 
-Football Calendar is a personal project written in Python that automates the creation of a customized football events calendar. It retrieves and processes data from multiple APIs and web scrapers, including sources like football-data, ESPN, Football Ranking, and LiveSoccerTV. The focus is on upcoming matches across various leagues and competitions, with data carefully parsed, normalized, and cleaned to ensure accuracy.
+Sport Calendar is a personal project written in Python that automates the creation of a customized sports events calendar. It retrieves and processes data from multiple APIs and web scrapers, including sources like sports-data, ESPN, and LiveSoccerTV. The focus is on upcoming matches and events across various sports, leagues, and competitions, with data carefully parsed, normalized, and cleaned to ensure accuracy.
 
-A key part of the processing pipeline is matching team names and other entities across different data sources to unify information (e.g., recognizing that "PSG" and "Paris Saint Germain" are the same team). Although still under development, the data will eventually be stored in a relational database organized around teams, competitions, matches, and standings following a structured ETL pipeline.
+A key part of the processing pipeline is matching team names, player names, and other entities across different data sources to unify information (e.g., recognizing that "PSG" and "Paris Saint Germain" are the same team). Although still under development, the data will eventually be stored in a relational database organized around teams, players, competitions, matches, and standings following a structured ETL pipeline.
 
-Users define their football preferences in a simple JSON or YAML file, specifying which teams, competitions, or match conditions they want to follow. Based on this selection, the project automatically generates and syncs a personalized calendar with Google Calendar, making it easy for fans to never miss a game.
+Users define their sports preferences in a simple JSON or YAML file, specifying which teams, players, competitions, or match conditions they want to follow. Based on this selection, the project automatically generates and syncs a personalized calendar with Google Calendar, making it easy for fans to never miss a game or event.
 
-Built as a learning tool and for personal use, Football Calendar is an evolving project that combines data engineering, sports fandom, and practical automation.
+Built as a learning tool and for personal use, Sport Calendar is an evolving project that combines data engineering, sports fandom, and practical automation.
 
 ## Getting Started
 
@@ -39,7 +39,7 @@ poetry run python -m src [COMMAND] [OPTIONS]
 The available arguments are:
 
 ### `run-pipeline`
-Runs the data pipeline that fetches, processes, and stores football data from various sources (e.g. scraping, APIs, normalization, writing to internal DB).
+Runs the data pipeline that fetches, processes, and stores sports data from various sources (e.g. scraping, APIs, normalization, writing to internal DB).
 
 ```bash
 poetry run python -m src run-pipeline [OPTIONS]
@@ -86,7 +86,7 @@ poetry run python -m src run-validation --repo test --stage intermediate
 ---
 
 ### `run-selection`
-Generates a personalized football calendar and syncs it with Google Calendar.
+Generates a personalized sports calendar and syncs it with Google Calendar.
 
 ```bash
 poetry run python -m src run-selection
@@ -145,7 +145,7 @@ poetry run python -m src run-pipeline --help
 
 ## Authors
 
-- Jolan Du Bois — master student in AI and football fan
+- Jolan Du Bois — master student in AI and sports fan
 - This project is a personal learning exercise and hobby.
 
 ## Planned Features
