@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from pathlib import Path
 
 import yaml
 import pandas as pd
@@ -6,7 +6,7 @@ import pandas as pd
 from . import logger
 
 
-CONFIG_PATH = "config/date_standardization.yml"
+CONFIG_PATH = Path(__file__).parent / "config" / "date_standardization.yml"
 
 def read_config(path: str) -> dict:
    """ Read YAML configuration file """
@@ -29,7 +29,7 @@ def date_standardization(data: pd.DataFrame, source_key: str, **kwargs) -> pd.Da
         date_format = col_config["format"]
         if date_format == "iso":
             tz_format = col_config.get("tz_format")
-            if tz_format == {"Z", "naive"}:
+            if tz_format in {"Z", "naive"}:
                 standardized_data[col] = pd.to_datetime(standardized_data[col], utc=True)
             elif tz_format == "+00:00":
                 standardized_data[col] = pd.to_datetime(standardized_data[col])

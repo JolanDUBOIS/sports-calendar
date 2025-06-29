@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 from . import logger
 from .metadata_manager import MetadataManager
@@ -118,7 +118,7 @@ class BaseFileHandler(ABC):
     @staticmethod
     def _today() -> str:
         """ Return today's date in ISO format. """
-        return datetime.now().isoformat(timespec="seconds")
+        return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     @staticmethod
     def _check_iso_format(date_str: str) -> None:
