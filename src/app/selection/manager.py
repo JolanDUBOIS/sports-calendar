@@ -13,7 +13,7 @@ class SelectionManager:
         self.selections = {}
         self.load_selections()
 
-    def load_selections(self):
+    def load_selections(self): # TODO - Don't load all selections, only the ones that are needed
         """ Load all selections from the selections directory. """
         if not SELECTIONS_DIR_PATH.exists():
             logger.error(f"Selections directory does not exist: {SELECTIONS_DIR_PATH}")
@@ -22,9 +22,9 @@ class SelectionManager:
             try:
                 _selection = Selection.from_dict(load_yml(selection_file))
                 self.selections[_selection.name] = _selection
+                logger.debug(f"Loaded selection: {_selection.name}.")
             except Exception as e:
                 logger.error(f"Failed to load selection from {selection_file}: {e}")
-                continue
 
     def get_selection(self, name: str) -> Selection:
         """ Get a selection by its name. """
