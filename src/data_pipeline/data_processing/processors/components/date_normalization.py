@@ -6,18 +6,18 @@ from . import logger
 
 
 MAPPING_SOURCE_TO_DATE_PARAMS = {
-    "live_soccer_matches": {"date_column": "source_time", "unit": "ms"},
-    "football_data_matches": {"date_column": "utcDate"},
-    "espn_matches": {"date_column": "date"},
+    # "live_soccer_matches": {"date_column": "source_time", "unit": "ms"},
+    # "football_data_matches": {"date_column": "utcDate"},
+    "espn_football_matches": {"date_column": "date"},
+    "espn_f1_events": {"date_column": "session_date"}
 }
 
 def date_normalization(data: pd.DataFrame, source_key: str, **kwargs) -> pd.DataFrame:
     """ Normalize date format """
     date_params = MAPPING_SOURCE_TO_DATE_PARAMS.get(source_key)
     if not date_params:
-        logger.debug(f"Unknown source name: {source_key}")
+        logger.warning(f"Unknown source name: {source_key}")
         return data
-
     return _normalize_date(data, **date_params)
 
 def _normalize_date(data: pd.DataFrame, date_column: str, unit: str = None) -> pd.DataFrame:

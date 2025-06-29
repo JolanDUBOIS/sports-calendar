@@ -9,8 +9,9 @@ class ExtractionProcessor(Processor):
     """ Processor used to extract structured data from raw JSON sources. """
 
     sources_additional_processes = {
-        "espn_matches": [reshape_matches, date_normalization],
-        "football_data_matches": [date_normalization],
+        "espn_football_matches": [reshape_matches, date_normalization],
+        "espn_f1_events": [date_normalization],
+        # "football_data_matches": [date_normalization],
     }
 
     def _run(self, sources: dict[str, list[dict]], source_key: str, output_key: str, **kwargs) -> pd.DataFrame:
