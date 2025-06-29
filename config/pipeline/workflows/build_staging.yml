@@ -3,19 +3,18 @@ description: This workflow is responsible for orchestrating the data pipeline fr
 stage: staging
 
 models:
-  - name: competitions
+  - name: football_competitions
     description: TODO
     trigger: automatic
     sources:
-      - name: espn_competitions
-        path: intermediate/espn_competitions.csv
+      - name: espn_football_competitions
+        path: intermediate/football/espn_competitions.csv
     dependencies:
-      - intermediate.espn_competitions
+      - intermediate.espn_football_competitions
     output:
       name: competitions
       layer: staging
-      path: staging/competitions.csv
-      schema: competitions
+      path: staging/football/competitions.csv
       unique:
         field_sets:
           - [id]
@@ -27,26 +26,25 @@ models:
           - name
     processing:
       processor: DerivationProcessor # TODO - Technically it's for intermediate but...
-      source_key: espn_competitions
-      output_key: competitions
+      source_key: espn_football_competitions
+      output_key: football_competitions
       deduplicate: true # Shouldn't be necessary
     static_fields:
       - name: staging_at
         value: !date_offset 0
 
-  - name: teams
+  - name: football_teams
     description: TODO
     trigger: automatic
     sources:
-      - name: espn_teams
-        path: intermediate/espn_teams.csv
+      - name: espn_football_teams
+        path: intermediate/football/espn_teams.csv
     dependencies:
-      - intermediate.espn_teams
+      - intermediate.espn_football_teams
     output:
-      name: teams
+      name: football_teams
       layer: staging
-      path: staging/teams.csv
-      schema: teams
+      path: staging/football/teams.csv
       unique:
         field_sets:
           - [id]
@@ -59,26 +57,25 @@ models:
           - abbreviation
     processing:
       processor: DerivationProcessor
-      source_key: espn_teams
-      output_key: teams
+      source_key: espn_football_teams
+      output_key: football_teams
       deduplicate: true
     static_fields:
       - name: staging_at
         value: !date_offset 0
 
-  - name: matches
+  - name: football_matches
     description: TODO
     trigger: automatic
     sources:
-      - name: espn_matches
-        path: intermediate/espn_matches.csv
+      - name: espn_football_matches
+        path: intermediate/football/espn_matches.csv
     dependencies:
-      - intermediate.espn_matches
+      - intermediate.espn_football_matches
     output:
-      name: matches
+      name: football_matches
       layer: staging
-      path: staging/matches.csv
-      schema: matches
+      path: staging/football/matches.csv
       unique:
         field_sets:
           - [id]
@@ -92,28 +89,27 @@ models:
           - away_team_id
     processing:
       processor: DerivationProcessor
-      source_key: espn_matches
-      output_key: matches
+      source_key: espn_football_matches
+      output_key: football_matches
       deduplicate: true
     static_fields:
       - name: staging_at
         value: !date_offset 0
 
-  - name: standings
+  - name: football_standings
     description: TODO
     trigger: automatic
     sources:
-      - name: espn_standings
-        path: intermediate/espn_standings.csv
-      - name: espn_competitions
-        path: intermediate/espn_competitions.csv
+      - name: espn_football_standings
+        path: intermediate/football/espn_standings.csv
+      - name: espn_football_competitions
+        path: intermediate/football/espn_competitions.csv
     dependencies:
-      - intermediate.espn_standings
+      - intermediate.espn_football_standings
     output:
-      name: standings
+      name: football_standings
       layer: staging
-      path: staging/standings.csv
-      schema: standings
+      path: staging/football/standings.csv
       unique:
         field_sets:
           - [competition_id, team_id]
@@ -126,8 +122,38 @@ models:
           - position
     processing:
       processor: DerivationProcessor
-      source_key: espn_standings
-      output_key: standings
+      source_key: espn_football_standings
+      output_key: football_standings
+      deduplicate: true
+    static_fields:
+      - name: staging_at
+        value: !date_offset 0
+
+  - name: f1_events
+    description: TODO
+    trigger: automatic
+    sources:
+      - name: espn_f1_events
+        path: intermediate/f1/espn_events.csv
+    dependencies:
+      - intermediate.espn_f1_events
+    output:
+      name: f1_events
+      layer: staging
+      path: staging/f1/events.csv
+      unique:
+        field_sets:
+          - [id, session_id]
+        version_col: staging_at
+        keep: last
+      non-nullable:
+        fields:
+          - id
+          - session_id
+    processing:
+      processor: DerivationProcessor
+      source_key: espn_f1_events
+      output_key: f1_events
       deduplicate: true
     static_fields:
       - name: staging_at

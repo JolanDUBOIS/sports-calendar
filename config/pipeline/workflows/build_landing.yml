@@ -1,6 +1,6 @@
 defaults:
   date_range: &date_range
-    date_from: !date_offset -200
+    date_from: !date_offset 0
     date_to: !date_offset 14
 
 name: ingestion_landing
@@ -8,95 +8,171 @@ description: Ingests data to the landing layer from the different sources (API a
 stage: landing
 
 models:
-  - name: espn_matches
+  - name: espn_football_matches
     description: Ingests match information from the ESPN API.
     trigger: automatic
     output:
-      name: espn_matches
+      name: espn_football_matches
       layer: landing
-      path: landing/espn_matches.json
+      path: landing/football/espn_matches.json
       mode: append
     processing:
       processor: ClientProcessor
       source: espn
-      method: query_matches
+      method: query_scoreboard
       params:
-        - competition_slug: uefa.champions
+        - sport: soccer
+          league: uefa.champions
           <<: *date_range
-        - competition_slug: uefa.europa
+          trim: true
+        - sport: soccer
+          league: uefa.europa
           <<: *date_range
-        - competition_slug: uefa.europa.conf
+          trim: true
+        - sport: soccer
+          league: uefa.europa.conf
           <<: *date_range
-        - competition_slug: uefa.champions_qual
+          trim: true
+        - sport: soccer
+          league: uefa.champions_qual
           <<: *date_range
-        - competition_slug: uefa.europa_qual
+          trim: true
+        - sport: soccer
+          league: uefa.europa_qual
           <<: *date_range
-        - competition_slug: uefa.europa.conf_qual
+          trim: true
+        - sport: soccer
+          league: uefa.europa.conf_qual
           <<: *date_range
-        - competition_slug: uefa.nations
+          trim: true
+        - sport: soccer
+          league: uefa.nations
           <<: *date_range
-        - competition_slug: uefa.euro
+          trim: true
+        - sport: soccer
+          league: uefa.euro
           <<: *date_range
-        - competition_slug: uefa.euroq
+          trim: true
+        - sport: soccer
+          league: uefa.euroq
           <<: *date_range
-        - competition_slug: fifa.world
+          trim: true
+        - sport: soccer
+          league: fifa.world
           <<: *date_range
-        - competition_slug: fifa.worldq.caf
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.caf
           <<: *date_range
-        - competition_slug: fifa.worldq.uefa
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.uefa
           <<: *date_range
-        - competition_slug: fifa.worldq.ofc
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.ofc
           <<: *date_range
-        - competition_slug: fifa.worldq.conmebol
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.conmebol
           <<: *date_range
-        - competition_slug: fifa.worldq.afc
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.afc
           <<: *date_range
-        - competition_slug: fifa.worldq.concacaf
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.concacaf
           <<: *date_range
-        - competition_slug: fifa.cwc
+          trim: true
+        - sport: soccer
+          league: fifa.cwc
           <<: *date_range
-        - competition_slug: conmebol.america
+          trim: true
+        - sport: soccer
+          league: conmebol.america
           <<: *date_range
-        - competition_slug: fifa.olympics
+          trim: true
+        - sport: soccer
+          league: fifa.olympics
           <<: *date_range
-        - competition_slug: fifa.friendly
+          trim: true
+        - sport: soccer
+          league: fifa.friendly
           <<: *date_range
-        - competition_slug: uefa.weuro
+          trim: true
+        - sport: soccer
+          league: uefa.weuro
           <<: *date_range
-        - competition_slug: uefa.wchampions
+          trim: true
+        - sport: soccer
+          league: uefa.wchampions
           <<: *date_range
-        - competition_slug: fifa.w.olympics
+          trim: true
+        - sport: soccer
+          league: fifa.w.olympics
           <<: *date_range
-        - competition_slug: fifa.wwc
+          trim: true
+        - sport: soccer
+          league: fifa.wwc
           <<: *date_range
-        - competition_slug: eng.1
+          trim: true
+        - sport: soccer
+          league: eng.1
           <<: *date_range
-        - competition_slug: esp.1
+          trim: true
+        - sport: soccer
+          league: esp.1
           <<: *date_range
-        - competition_slug: fra.1
+          trim: true
+        - sport: soccer
+          league: fra.1
           <<: *date_range
-        - competition_slug: ger.1
+          trim: true
+        - sport: soccer
+          league: ger.1
           <<: *date_range
-        - competition_slug: ita.1
+          trim: true
+        - sport: soccer
+          league: ita.1
           <<: *date_range
-        - competition_slug: por.1
+          trim: true
+        - sport: soccer
+          league: por.1
           <<: *date_range
-        - competition_slug: nor.1
+          trim: true
+        - sport: soccer
+          league: nor.1
           <<: *date_range
-        - competition_slug: eng.fa
+          trim: true
+        - sport: soccer
+          league: eng.fa
           <<: *date_range
-        - competition_slug: eng.league_cup
+          trim: true
+        - sport: soccer
+          league: eng.league_cup
           <<: *date_range
-        - competition_slug: esp.copa_del_rey
+          trim: true
+        - sport: soccer
+          league: esp.copa_del_rey
           <<: *date_range
-        - competition_slug: ger.dfb_pokal
+          trim: true
+        - sport: soccer
+          league: ger.dfb_pokal
           <<: *date_range
-        - competition_slug: ita.coppa_italia
+          trim: true
+        - sport: soccer
+          league: ita.coppa_italia
           <<: *date_range
-        - competition_slug: fra.coupe_de_france
+          trim: true
+        - sport: soccer
+          league: fra.coupe_de_france
           <<: *date_range
-        - competition_slug: uefa.euro_u21
+          trim: true
+        - sport: soccer
+          league: uefa.euro_u21
           <<: *date_range
+          trim: true
     static_fields:
       - name: created_at
         value: !date_offset 0
@@ -105,57 +181,133 @@ models:
       - name: source_type
         value: api
 
-  - name: espn_standings
+  - name: espn_football_standings
     description: Ingests standings information from the ESPN API.
     trigger: automatic
     output:
-      name: espn_standings
+      name: espn_football_standings
       layer: landing
-      path: landing/espn_standings.json
+      path: landing/football/espn_standings.json
       mode: append
     processing:
       processor: ClientProcessor
       source: espn
       method: query_standings
       params:
-        - competition_slug: uefa.champions
-        - competition_slug: uefa.europa
-        - competition_slug: uefa.europa.conf
-        - competition_slug: uefa.champions_qual
-        - competition_slug: uefa.europa_qual
-        - competition_slug: uefa.europa.conf_qual
-        - competition_slug: uefa.nations
-        - competition_slug: uefa.euro
-        - competition_slug: uefa.euroq
-        - competition_slug: fifa.world
-        - competition_slug: fifa.worldq.caf
-        - competition_slug: fifa.worldq.uefa
-        - competition_slug: fifa.worldq.ofc
-        - competition_slug: fifa.worldq.conmebol
-        - competition_slug: fifa.worldq.afc
-        - competition_slug: fifa.worldq.concacaf
-        - competition_slug: fifa.cwc
-        - competition_slug: conmebol.america
-        - competition_slug: fifa.olympics
-        - competition_slug: fifa.friendly
-        - competition_slug: uefa.weuro
-        - competition_slug: uefa.wchampions
-        - competition_slug: fifa.w.olympics
-        - competition_slug: fifa.wwc
-        - competition_slug: eng.1
-        - competition_slug: esp.1
-        - competition_slug: fra.1
-        - competition_slug: ger.1
-        - competition_slug: ita.1
-        - competition_slug: por.1
-        - competition_slug: nor.1
-        - competition_slug: eng.fa
-        - competition_slug: eng.league_cup
-        - competition_slug: esp.copa_del_rey
-        - competition_slug: ger.dfb_pokal
-        - competition_slug: ita.coppa_italia
-        - competition_slug: fra.coupe_de_france
-        - competition_slug: uefa.euro_u21
+        - sport: soccer
+          league: uefa.champions
+          trim: true
+        - sport: soccer
+          league: uefa.europa
+          trim: true
+        - sport: soccer
+          league: uefa.europa.conf
+          trim: true
+        - sport: soccer
+          league: uefa.champions_qual
+          trim: true
+        - sport: soccer
+          league: uefa.europa_qual
+          trim: true
+        - sport: soccer
+          league: uefa.europa.conf_qual
+          trim: true
+        - sport: soccer
+          league: uefa.nations
+          trim: true
+        - sport: soccer
+          league: uefa.euro
+          trim: true
+        - sport: soccer
+          league: uefa.euroq
+          trim: true
+        - sport: soccer
+          league: fifa.world
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.caf
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.uefa
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.ofc
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.conmebol
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.afc
+          trim: true
+        - sport: soccer
+          league: fifa.worldq.concacaf
+          trim: true
+        - sport: soccer
+          league: fifa.cwc
+          trim: true
+        - sport: soccer
+          league: conmebol.america
+          trim: true
+        - sport: soccer
+          league: fifa.olympics
+          trim: true
+        - sport: soccer
+          league: fifa.friendly
+          trim: true
+        - sport: soccer
+          league: uefa.weuro
+          trim: true
+        - sport: soccer
+          league: uefa.wchampions
+          trim: true
+        - sport: soccer
+          league: fifa.w.olympics
+          trim: true
+        - sport: soccer
+          league: fifa.wwc
+          trim: true
+        - sport: soccer
+          league: eng.1
+          trim: true
+        - sport: soccer
+          league: esp.1
+          trim: true
+        - sport: soccer
+          league: fra.1
+          trim: true
+        - sport: soccer
+          league: ger.1
+          trim: true
+        - sport: soccer
+          league: ita.1
+          trim: true
+        - sport: soccer
+          league: por.1
+          trim: true
+        - sport: soccer
+          league: nor.1
+          trim: true
+        - sport: soccer
+          league: eng.fa
+          trim: true
+        - sport: soccer
+          league: eng.league_cup
+          trim: true
+        - sport: soccer
+          league: esp.copa_del_rey
+          trim: true
+        - sport: soccer
+          league: ger.dfb_pokal
+          trim: true
+        - sport: soccer
+          league: ita.coppa_italia
+          trim: true
+        - sport: soccer
+          league: fra.coupe_de_france
+          trim: true
+        - sport: soccer
+          league: uefa.euro_u21
+          trim: true
     static_fields:
       - name: created_at
         value: !date_offset 0
@@ -164,18 +316,47 @@ models:
       - name: source_type
         value: api
 
-  - name: espn_competitions
+  - name: espn_football_competitions
     description: Ingests competition information from the ESPN API.
     trigger: manual
     output:
-      name: espn_competitions
+      name: espn_football_competitions
       layer: landing
-      path: landing/espn_competitions.json
+      path: landing/football/espn_competitions.json
       mode: append
     processing:
       processor: ClientProcessor
       source: espn
       method: query_competitions
+      params:
+        - sport: soccer
+          trim: true
+    static_fields:
+      - name: created_at
+        value: !date_offset 0
+      - name: source
+        value: espn
+      - name: source_type
+        value: api
+
+  - name: espn_f1_events
+    description: Ingests F1 event information from the ESPN API.
+    trigger: automatic
+    output:
+      name: espn_f1_events
+      layer: landing
+      path: landing/f1/espn_events.json
+      mode: append
+    processing:
+      processor: ClientProcessor
+      source: espn
+      method: query_scoreboard
+      params:
+        - sport: racing
+          league: f1
+          date_from: !date_offset 0
+          date_to: !date_offset 90
+          trim: true
     static_fields:
       - name: created_at
         value: !date_offset 0

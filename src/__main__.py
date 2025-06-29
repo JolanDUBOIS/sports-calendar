@@ -18,5 +18,5 @@ if __name__ == '__main__':
     try:
         app()
     except Exception as e:
-        logger.error(f"An error occurred while running the application: {e}")
+        logger.error(f"An error occurred while running the application...")
         logger.debug("Traceback:\n%s", traceback.format_exc())

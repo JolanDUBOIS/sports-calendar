@@ -1,97 +1,23 @@
-from abc import ABC, abstractmethod
-
 import pandas as pd
 
-from . import logger
-from src.file_io import FileHandlerFactory, BaseFileHandler
-from src.config.registry import config
+from .base import BaseTable
 
 
-REPO_PATH = config.active_repo.path / "staging"
+## Models
 
-class BaseTable(ABC):
-    """ Base class for all tables. """
-    __file_name__ = None
-    __columns__ = None
-    __path__ = None
-
-    @classmethod
-    @abstractmethod
-    def query(cls, **kwargs) -> pd.DataFrame:
-        """ Abstract method to query data from the table. """
-        raise NotImplementedError(f"{cls.__name__}.query() is not implemented.")
-
-    @classmethod
-    def get_table(cls) -> pd.DataFrame:
-        """ Returns the table as a DataFrame. """
-        if cls.__columns__ is None:
-            logger.error(f"Columns for {cls.__name__} are not defined.")
-            raise ValueError(f"Columns for {cls.__name__} are not defined.")
-        file_handler = FileHandlerFactory.create_file_handler(cls.__path__)
-        df = file_handler.read()
-        df = cls._as_types(df, cls.__columns__)
-        cls._check_df(df)
-        return df
-
-    @staticmethod
-    def _as_types(df: pd.DataFrame, columns: dict) -> pd.DataFrame:
-        """ Convert DataFrame columns to specified types. """
-        rename_map = {v["source"]: k for k, v in columns.items() if v["source"] is not None}
-        df = df.rename(columns=rename_map)
-
-        for col, props in columns.items():
-            src = props.get("source")
-            if col not in df.columns:
-                if src is None:
-                    df[col] = None
-                    continue
-                else:
-                    logger.error(f"Column '{col}' not found in DataFrame.")
-                    raise ValueError(f"Column '{col}' not found in DataFrame.")
-
-            col_type = props.get("type")
-            if not col_type:
-                logger.warning(f"Column '{col}' has no type specified, skipping conversion.")
-                continue
-
-            # logger.debug(f"Converting column '{col}' to type '{col_type}'")
-            try:
-                if col_type == "int":
-                    df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
-                elif col_type == "float":
-                    df[col] = pd.to_numeric(df[col], errors="coerce").astype(float)
-                elif col_type == "bool":
-                    df[col] = df[col].map({'True': True, 'False': False})
-                    df[col] = df[col].astype("boolean")  # Pandas nullable bool
-                else:
-                    df[col] = df[col].astype(col_type)
-            except Exception as e:
-                logger.error(f"Error converting column '{col}' to {col_type}: {e}")
-                raise e
-        
-        return df[[col for col in columns if col in df]]
-
-    @staticmethod
-    def _check_df(df: pd.DataFrame) -> None:
-        """ Check if DataFrame is empty and raise an error if it is. """
-        if df.empty:
-            logger.error("DataFrame is empty.")
-            raise ValueError("DataFrame is empty.")
-        return None
-
-class RegionsTable(BaseTable):
-    """ TODO """
+class FootballRegionsTable(BaseTable):
+    """ Table for storing football region data. """
     __file_name__ = "regions.csv"
     __columns__ = None
-    __path__ = REPO_PATH / __file_name__
+    __sport__ = "football"
 
     @classmethod
-    def query(cls, ids: list = None) -> pd.DataFrame:
-        """ TODO """
+    def query(cls, ids: list | None = None) -> pd.DataFrame:
+        """ Query regions by IDs. """
         raise NotImplementedError("RegionsTable is not implemented yet.")
 
-class CompetitionsTable(BaseTable):
-    """ Table for storing competition data. """
+class FootballCompetitionsTable(BaseTable):
+    """ Table for storing football competition data. """
     __file_name__ = "competitions.csv"
     __columns__ = {
         "id": {"type": "int", "source": "id"},
@@ -102,18 +28,18 @@ class CompetitionsTable(BaseTable):
         "type": {"type": "bool", "source": None},
         "has_standings": {"type": "bool", "source": "has_standings"}
     }
-    __path__ = REPO_PATH / __file_name__
+    __sport__ = "football"
 
     @classmethod
-    def query(cls, ids: list = None) -> pd.DataFrame:
+    def query(cls, ids: list | None = None) -> pd.DataFrame:
         """ Query competitions by IDs. """
         df = cls.get_table()
         if ids is not None:
             df = df[df['id'].isin(ids)]
         return df
 
-class TeamsTable(BaseTable):
-    """ Table for storing team data. """
+class FootballTeamsTable(BaseTable):
+    """ Table for storing football team data. """
     __file_name__ = "teams.csv"
     __columns__ = {
         "id": {"type": "int", "source": "id"},
@@ -123,18 +49,18 @@ class TeamsTable(BaseTable):
         "venue": {"type": "str", "source": None},
         "league_id": {"type": "int", "source": None}
     }
-    __path__ = REPO_PATH / __file_name__
+    __sport__ = "football"
 
     @classmethod
-    def query(cls, ids: list = None) -> pd.DataFrame:
+    def query(cls, ids: list | None = None) -> pd.DataFrame:
         """ Query teams by IDs. """
         df = cls.get_table()
         if ids is not None:
             df = df[df['id'].isin(ids)]
         return df
 
-class MatchesTable(BaseTable):
-    """ Table for storing match data. """
+class FootballMatchesTable(BaseTable):
+    """ Table for storing football match data. """
     __file_name__ = "matches.csv"
     __columns__ = {
         "id": {"type": "int", "source": "id"},
@@ -147,7 +73,7 @@ class MatchesTable(BaseTable):
         "leg": {"type": "int", "source": "leg"},
         "channels": {"type": "str", "source": None}
     }
-    __path__ = REPO_PATH / __file_name__
+    __sport__ = "football"
 
     @classmethod
     def get_table(cls) -> pd.DataFrame:
@@ -160,11 +86,11 @@ class MatchesTable(BaseTable):
     @classmethod
     def query(
         cls,
-        ids: list = None,
-        competition_ids: list = None,
-        team_ids: list = None,
-        date_from: str = None,
-        date_to: str = None
+        ids: list | None = None,
+        competition_ids: list | None = None,
+        team_ids: list | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None
     ) -> pd.DataFrame:
         """ Query matches by various filters. """
         df = cls.get_table()
@@ -181,8 +107,8 @@ class MatchesTable(BaseTable):
         df.drop(columns=['date'], inplace=True)
         return df.reset_index(drop=True)
 
-class StandingsTable(BaseTable):
-    """ Table for storing standings data. """
+class FootballStandingsTable(BaseTable):
+    """ Table for storing football standings data. """
     __file_name__ = "standings.csv"
     __columns__ = {
         "id": {"type": "int", "source": None},
@@ -198,13 +124,13 @@ class StandingsTable(BaseTable):
         "goals_against": {"type": "int", "source": "goals_against"},
         "goal_difference": {"type": "int", "source": None}
     }
-    __path__ = REPO_PATH / __file_name__
+    __sport__ = "football"
 
     @classmethod
     def query(
         cls,
-        competition_ids: list = None,
-        team_ids: list = None
+        competition_ids: list | None = None,
+        team_ids: list | None = None
     ) -> pd.DataFrame:
         """ Query standings by competition and team IDs. """
         df = cls.get_table()
@@ -213,3 +139,46 @@ class StandingsTable(BaseTable):
         if team_ids is not None:
             df = df[df['team_id'].isin(team_ids)]
         return df.reset_index(drop=True)
+
+
+## Manager
+
+class FootballMatchesManager:
+
+    @staticmethod
+    def query(
+        ids: list | None = None,
+        competition_ids: list | None = None,
+        team_ids: list | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None
+    ) -> pd.DataFrame:
+        """ Query football matches with context. """
+        matches = FootballMatchesTable.query(
+            ids=ids,
+            competition_ids=competition_ids,
+            team_ids=team_ids,
+            date_from=date_from,
+            date_to=date_to
+        )
+        teams_df = FootballTeamsTable.query().add_prefix('team_')
+        competitions_df = FootballCompetitionsTable.query().add_prefix('competition_')
+
+        full_matches = matches.merge(
+            teams_df.add_prefix('home_'),
+            left_on='home_team_id',
+            right_on='home_team_id',
+            how='left'
+        ).merge(
+            teams_df.add_prefix('away_'),
+            left_on='away_team_id',
+            right_on='away_team_id',
+            how='left'
+        ).merge(
+            competitions_df,
+            left_on='competition_id',
+            right_on='competition_id',
+            how='left'
+        )
+
+        return full_matches.reset_index(drop=True)
