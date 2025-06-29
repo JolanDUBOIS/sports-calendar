@@ -1,4 +1,4 @@
-espn_matches:
+espn_football_matches:
   direct_paths:
     id: id
     date: date
@@ -38,7 +38,7 @@ espn_matches:
     source: source
     source_type: source_type
 
-espn_standings:
+espn_football_standings:
   direct_paths:
     competition_id: id
     competition_name: name
@@ -71,7 +71,7 @@ espn_standings:
       rank: stats.10.value
       summary: stats.11.summary
 
-espn_competitions:
+espn_football_competitions:
   direct_paths:
     id: id
     alternate_id: alternateId
@@ -84,6 +84,31 @@ espn_competitions:
     created_at: created_at
     source: source
     source_type: source_type
+
+espn_f1_events:
+  direct_paths:
+    id: id
+    # date: date
+    name: name
+    short_name: shortName
+    season_year: season.year
+    circuit_id: circuit.id
+    circuit_name: circuit.fullName
+    circuit_city: circuit.address.city
+    circuit_country: circuit.address.country
+    created_at: created_at
+    source: source
+    source_type: source_type
+  iterate:
+    path: competitions
+    columns:
+      session_id: id
+      session_date: date
+      session_type_id: type.id
+      session_type_abbreviation: type.abbreviation
+
+
+# Legacy
 
 football_data_matches:
   direct_paths:
