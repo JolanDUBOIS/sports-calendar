@@ -94,11 +94,11 @@ class GoogleCalendarAPI:
             'summary': event.get('summary'),
             'description': event.get('description'),
             'start': {
-                'dateTime': event.get('dtstart').dt.isoformat(),
+                'dateTime': event.get('dtstart').dt.isoformat(timespec="seconds"),
                 'timeZone': event.get('dtstart').params.get('TZID', 'UTC')
             },
             'end': {
-                'dateTime': event.get('dtend').dt.isoformat(),
+                'dateTime': event.get('dtend').dt.isoformat(timespec="seconds"),
                 'timeZone': event.get('dtend').params.get('TZID', 'UTC')
             },
             'location': event.get('location'),

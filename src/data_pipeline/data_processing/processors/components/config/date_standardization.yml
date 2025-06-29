@@ -1,0 +1,17 @@
+espn_football_matches:
+  date:
+    format: "iso"
+    tz_format: "Z"
+
+espn_f1_events:
+  date:
+    format: "iso"
+    tz_format: "Z"
+  session_date:
+    format: "iso"
+    tz_format: "Z"
+
+live_soccer_matches:
+  source_time: 
+    format: "timestamp"
+    unit: "ms"

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime, timezone
 
 from icalendar import Calendar
 
@@ -22,7 +22,7 @@ class GoogleCalendarManager:
         **kwargs
     ) -> None:
         """ Add a calendar to Google Calendar """
-        today = datetime.now().date().isoformat()
+        today = datetime.now(timezone.utc).date().isoformat(timespec="seconds")
         if scope is None or scope == 'all':
             self.api.add_events(events=calendar.events, **kwargs)
         elif scope == 'future':
@@ -35,7 +35,7 @@ class GoogleCalendarManager:
 
     def clear_calendar(self, scope: str | None = None, date_from: str | None = None, date_to: str | None = None, verbose: bool = False) -> None:
         """ Clear events from the Google Calendar based on the specified scope """
-        today = datetime.now().date().isoformat()
+        today = datetime.now(timezone.utc).date().isoformat(timespec="seconds")
         if scope is None:
             self.api.delete_events(date_from=date_from, date_to=date_to, verbose=verbose)
         elif scope == 'all':
