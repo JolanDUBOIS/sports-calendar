@@ -21,7 +21,7 @@ class PipelineConfig:
             logger.error(f"Pipeline config directory does not exist: {self.config_path}")
             raise FileNotFoundError(f"Pipeline config directory does not exist: {self.config_path}")
 
-        required_subdirs = ["schemas", "workflows", "admin"]
+        required_subdirs = ["schemas", "workflows"]
         for subdir in required_subdirs:
             if not (self.config_path / subdir).exists():
                 logger.error(f"Required subdirectory {subdir} does not exist in pipeline config path.")
