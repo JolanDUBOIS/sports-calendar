@@ -2,7 +2,6 @@ import traceback
 from dotenv import load_dotenv
 
 from . import logger
-from .cli import app
 
 
 load_dotenv()
@@ -16,6 +15,7 @@ def log_run_separator():
 if __name__ == '__main__':
     log_run_separator()
     try:
+        from .cli import app
         app()
     except Exception as e:
         logger.error(f"An error occurred while running the application...")
