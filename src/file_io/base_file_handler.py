@@ -64,6 +64,7 @@ class BaseFileHandler(ABC):
             removed=removed,
             source_versions=source_versions or {}
         )
+        logger.info(f"Data written to {self.path} successfully.")
 
     def delete(self, force: bool = False) -> None:
         """ Delete data from the file. """
