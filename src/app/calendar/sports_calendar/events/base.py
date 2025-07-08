@@ -8,6 +8,11 @@ from datetime import datetime
 
 class SportsEvent(ABC):
     """ Abstract base class for sports events. """
+    sport: str
+
+    def __repr__(self):
+        """ Return a string representation of the event. """
+        return f"{self.__class__.__name__}(sport={self.sport}, summary={self.summary}, start={self.start}, end={self.end})"
 
     @property
     @abstractmethod
@@ -58,6 +63,17 @@ class SportsEventCollection:
     def __iter__(self):
         """ Iterate over the events in the collection. """
         return iter(self.events)
+
+    def __len__(self) -> int:
+        """ Return the number of events in the collection. """
+        return len(self.events)
+
+    def __repr__(self):
+        """ Return a string representation of the collection with one event per line. """
+        if not self.events:
+            return f"{self.__class__.__name__}(events=[])"
+        indented_events = "\n  ".join(repr(event) for event in self.events)
+        return f"{self.__class__.__name__}([\n  {indented_events}\n])"
 
     def append(self, event: SportsEvent) -> None:
         """ Append a single event to the collection. """
