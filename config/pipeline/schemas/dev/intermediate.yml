@@ -3,7 +3,7 @@ stage: intermediate
 
 models:
   - name: espn_matches
-    path: espn_matches.csv
+    path: intermediate/football/espn_matches.csv
     columns:
       - name: id
         unique: true
@@ -35,6 +35,30 @@ models:
       - name: created_at
       - name: date_time_utc
       - name: date_time_cet
+      - name: source
+      - name: source_type
+      - name: intermediate_at
+
+  - name: espn_teams
+    path: intermediate/football/espn_teams.csv
+    columns:
+      - name: team_id
+        unique: true
+      - name: team_name
+      - name: team_abbreviation
+      - name: team_displayName
+      - name: team_shortDisplayName
+      - name: intermediate_at
+  
+  - name: espn_competitions
+    path: intermediate/football/espn_competitions.csv
+    columns:
+      - name: competition_id
+        unique: true
+      - name: competition_name
+      - name: competition_abbreviation
+      - name: competition_midsizeName
+      - name: competition_slug
       - name: source
       - name: source_type
       - name: intermediate_at
@@ -178,17 +202,6 @@ models:
   #     - name: competition
   #     - name: intermediate_at
 
-  - name: espn_teams
-    path: espn_teams.csv
-    columns:
-      - name: team_id
-        unique: true
-      - name: team_name
-      - name: team_abbreviation
-      - name: team_displayName
-      - name: team_shortDisplayName
-      - name: intermediate_at
-
   # - name: football_data_teams
   #   path: football_data_teams.csv
   #   columns:
@@ -214,19 +227,6 @@ models:
   #     - name: source
   #     - name: source_type
   #     - name: intermediate_at
-  
-  - name: espn_competitions
-    path: espn_competitions.csv
-    columns:
-      - name: competition_id
-        unique: true
-      - name: competition_name
-      - name: competition_abbreviation
-      - name: competition_midsizeName
-      - name: competition_slug
-      - name: source
-      - name: source_type
-      - name: intermediate_at
   
   # - name: football_data_competitions
   #   path: football_data_competitions.csv

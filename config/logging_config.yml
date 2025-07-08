@@ -24,12 +24,6 @@ handlers:
 
 
 loggers:
-  # Main modules loggers
-  src.config:
-    level: DEBUG
-
-  src.file_io:
-    level: DEBUG
 
   # App loggers
   src.app:
@@ -38,10 +32,14 @@ loggers:
   src.app.calendar:
     level: DEBUG
 
-  src.app.data_access:
+  src.app.models:
     level: DEBUG
 
   src.app.selection:
+    level: DEBUG
+
+  # Config logger
+  src.config:
     level: DEBUG
 
   # Data pipeline loggers
@@ -60,12 +58,6 @@ loggers:
   src.data_pipeline.data_processing.processors:
     level: DEBUG
 
-  src.data_pipeline.data_processing.processors.components:
-    level: DEBUG
-
-  src.data_pipeline.data_processing.processors.components.extract_json:
-    level: CRITICAL
-
   src.data_pipeline.data_processing.versioning:
     level: DEBUG
 
@@ -75,10 +67,39 @@ loggers:
   src.data_pipeline.utils:
     level: DEBUG
 
-  # Imported modules loggers
+  # File I/O logger
+  src.file_io:
+    level: DEBUG
+
+  # Specs loggers
+  src.specs:
+    level: DEBUG
+
+  src.specs.config:
+    level: DEBUG
+
+  src.specs.pipeline:
+    level: DEBUG
+
+  src.specs.pipeline.workflows:
+    level: DEBUG
+
+  src.specs.pipeline.schemas:
+    level: DEBUG
+
+  # Tests logger
+  src.tests:
+    level: DEBUG
+
+  # Third party loggers
   googleapiclient.discovery_cache:
     level: DEBUG
     handlers: [file_debug_handler]
+    propagate: False
+
+  urllib3:
+    level: WARNING
+    handlers: []
     propagate: False
 
 root:

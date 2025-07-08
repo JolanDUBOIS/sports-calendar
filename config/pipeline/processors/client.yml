@@ -1,0 +1,43 @@
+landing_football_espn_matches:
+  client_class: ESPNApiClient
+  method: query_scoreboard
+
+landing_football_espn_standings:
+  client_class: ESPNApiClient
+  method: query_standings
+
+landing_football_espn_competitions:
+  client_class: ESPNApiClient
+  method: query_competitions
+
+landing_f1_espn_events:
+  client_class: ESPNApiClient
+  method: query_scoreboard
+
+landing_football_football_data_matches:
+  client_class: FootballDataApiClient
+  method: query_competition_matches
+
+landing_football_football_data_standings:
+  client_class: FootballDataApiClient
+  method: query_standings
+
+landing_football_football_data_teams:
+  client_class: FootballDataApiClient
+  method: query_teams
+
+landing_football_live_soccer_matches:
+  client_class: LiveSoccerScraper
+  method: scrape_matches
+
+landing_football_live_soccer_standings:
+  client_class: LiveSoccerScraper
+  method: scrape_standings
+
+landing_football_live_soccer_competitions:
+  client_class: LiveSoccerScraper
+  method: scrape_competitions
+
+landing_football_football_ranking_fifa_rankings:
+  client_class: FootballRankingScraper
+  method: scrape_fifa_rankings

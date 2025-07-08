@@ -1,0 +1,23 @@
+## Expected processor config:
+# processor: DateStandardizationProcessor
+# config_key: one of the keys in this file
+# input_keys: single key "data"
+# output_keys: /
+
+int_football_espn_matches:
+  date:
+    format: "iso"
+    tz_format: "Z"
+
+int_f1_espn_events:
+  date:
+    format: "iso"
+    tz_format: "Z"
+  session_date:
+    format: "iso"
+    tz_format: "Z"
+
+int_football_live_soccer_matches:
+  source_time: 
+    format: "timestamp"
+    unit: "ms"
