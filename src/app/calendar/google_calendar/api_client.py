@@ -79,8 +79,9 @@ class GoogleCalendarAPI:
 
         N_events = len(events)
         for i, event in enumerate(events):
+            logger.debug(f"Adding event {i + 1}/{N_events}: {event.get('summary')}")
             if verbose:
-                print(f"\r{' ' * 80}\rAdding event {i + 1}/{N_events}: {event.get('summary')}", end='\r')
+                print(f"\r{' ' * 100}\rAdding event {i + 1}/{N_events}: {event.get('summary')}", end='\r')
             if date_from and event.get('dtstart').dt.date() < date_from:
                 continue
             if date_to and event.get('dtend').dt.date() > date_to:
@@ -140,8 +141,9 @@ class GoogleCalendarAPI:
         events = self.fetch_events(date_from, date_to)
         N_events = len(events)
         for i, event in enumerate(events):
+            logger.debug(f"Deleting event {i + 1}/{N_events}: {event.get('summary')}")
             if verbose:
-                print(f"\r{' ' * 80}\rDeleting event {i + 1}/{N_events}", end='\r')
+                print(f"\r{' ' * 100}\rDeleting event {i + 1}/{N_events}", end='\r')
             self.delete_event(event['id'])
         logger.info(f"Deleted {N_events} events from Google Calendar.")
 
