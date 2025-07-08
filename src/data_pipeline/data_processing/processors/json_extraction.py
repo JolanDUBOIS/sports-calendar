@@ -1,12 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from pathlib import Path
 
-import yaml
 import pandas as pd
 
-import logging
-logger = logging.getLogger(__name__)
+from . import logger
+from .base import Processor
+from src.specs import ProcessingIOInfo
 
 
 # Specifications for columns mapping
@@ -31,7 +30,7 @@ class JsonPath:
             try:
                 data = data[key]
             except (KeyError, IndexError, TypeError):
-                logger.debug(f"Key '{key}' not found in data.")
+                # logger.debug(f"Key '{key}' not found in data.")
                 return None
         return data
 
@@ -79,14 +78,14 @@ class IterateMapping:
         """ Applies the iterate mapping to the given data and returns a list of dictionaries. """
         iteration_list = self.path.apply(data)
         if not isinstance(iteration_list, list):
-            logger.debug(f"Expected a list at path '{self.path.path}', but got {type(iteration_list).__name__}. Returning empty list.")
+            # logger.debug(f"Expected a list at path '{self.path.path}', but got {type(iteration_list).__name__}. Returning empty list.")
             return []
 
         extracted_data = []
         for item in iteration_list:
             extracted_data.append(self.columns.apply(item))
 
-        logger.debug(f"Extracted {len(extracted_data)} items from path '{self.path.path}'.")
+        # logger.debug(f"Extracted {len(extracted_data)} items from path '{self.path.path}'.")
         return extracted_data
 
     @classmethod
@@ -120,36 +119,26 @@ class ColumnsMapping:
         return cls(direct_paths, iterate)
 
 
-def load_columns_mapping_from_yaml(path: str | Path) -> dict[str, ColumnsMapping]:
-    path = Path(path)
-    with path.open(mode='r') as file:
-        raw_data = yaml.safe_load(file)
+# JSON extraction
 
-    if not isinstance(raw_data, dict):
-        logger.error("Invalid format for columns mapping. Expected a dictionary.")
-        raise TypeError("Invalid format for columns mapping. Expected a dictionary.")
+class JsonExtractionProcessor(Processor):
+    """ Processor to extract JSON fields into a DataFrame. """
+    config_filename = "json_extraction"
 
-    columns_mapping = {}
-    for key, value in raw_data.items():
-        if not isinstance(value, dict):
-            logger.error(f"Invalid format for columns mapping for key '{key}'. Expected a dictionary.")
-            raise ValueError(f"Invalid format for columns mapping for key '{key}'. Expected a dictionary.")
-        columns_mapping[key] = ColumnsMapping.from_dict(value)
+    @classmethod
+    def _run(cls, data: dict[str, list[dict]], io_info: ProcessingIOInfo, **kwargs) -> pd.DataFrame:
+        """ Extract JSON fields into a DataFrame. """
+        json_data = data.get("data").copy()
+        if json_data is None:
+            logger.error("Input data not found in the provided data dictionary.")
+            raise ValueError("Input data not found in the provided data dictionary.")
 
-    return columns_mapping
+        config = cls.load_config(io_info.config_key)
+        mapping = ColumnsMapping.from_dict(config)
 
-COLUMNS_MAPPING_SPECS = load_columns_mapping_from_yaml(Path(__file__).parent / "config" / "extract_json.yml")
+        extracted_data = []
+        for item in json_data:
+            extracted_data.extend(mapping.apply(item))
+            # logger.debug(f"Extracted {len(extracted_data)} items so far.")
 
-# JSON extraction functions
-
-def extract_json(data: list[dict], output_key: str, **kwargs) -> pd.DataFrame:
-    """ Extracts data from JSON files. """
-    mapping = COLUMNS_MAPPING_SPECS.get(output_key)
-    logger.debug(f"Extracting data with mapping: {mapping}")
-
-    extracted_data = []
-    for item in data:
-        extracted_data.extend(mapping.apply(item))
-        logger.debug(f"Extracted {len(extracted_data)} items so far.")
-
-    return pd.DataFrame(extracted_data)
+        return pd.DataFrame(extracted_data)
