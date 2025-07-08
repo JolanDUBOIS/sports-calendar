@@ -4,7 +4,7 @@ import pandas as pd
 
 from . import logger
 from src.file_io import FileHandlerFactory
-from src.config.registry import config
+from src.config.main import config
 
 
 class BaseTable(ABC):
@@ -31,7 +31,7 @@ class BaseTable(ABC):
             raise ValueError(f"Columns for {cls.__name__} are not defined.")
 
         if cls._file_handler is None:
-            path = config.active_repo.path / "staging" / cls.__sport__ / cls.__file_name__
+            path = config.repository.path / "staging" / cls.__sport__ / cls.__file_name__
             cls._file_handler = FileHandlerFactory.create_file_handler(path)
 
         df = cls._file_handler.read()
