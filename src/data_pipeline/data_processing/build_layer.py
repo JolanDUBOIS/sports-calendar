@@ -1,65 +1,12 @@
 from __future__ import annotations
 import traceback
-from pathlib import Path
 from dataclasses import dataclass
-
-import yaml
 
 from . import logger
 from .order_models import ModelOrder
-from .managers import ModelManager, ModelSpec
-from ..pipeline_stages import DataStage
+from .managers import ModelManager
+from src.specs import LayerSpec
 
-
-@dataclass
-class LayerSpec:
-    name: str
-    stage: str
-    models: list[ModelSpec]
-    description: str | None = None
-
-    def __post_init__(self):
-        """ Validate the layer specification. """
-        if not self.name:
-            logger.error("Layer name cannot be empty.")
-            raise ValueError("Layer name cannot be empty.")
-        if not self._is_valid_stage(self.stage):
-            logger.error(f"Invalid stage name: {self.stage}")
-            raise ValueError(f"Invalid stage name: {self.stage}")
-
-    def get(self, model: str) -> ModelSpec | None:
-        """ Retrieve a model specification by its name. """
-        for model_spec in self.models:
-            if model_spec.name == model:
-                return model_spec
-        logger.warning(f"Model {model} not found in layer {self.name}.")
-        return None
-
-    @staticmethod
-    def _is_valid_stage(stage_name: str) -> bool:
-        try:
-            DataStage.from_str(stage_name)
-            return True
-        except ValueError:
-            return False
-
-    @classmethod
-    def from_dict(cls, d: dict) -> LayerSpec:
-        """ Create a LayerSpec from a dictionary. """
-        return cls(
-            name=d["name"],
-            stage=d["stage"],
-            models=[ModelSpec.from_dict(model) for model in d["models"]],
-            description=d.get("description")
-        )
-
-    @classmethod
-    def from_yaml(cls, yaml_path: str | Path) -> LayerSpec:
-        """ Create a LayerSpec from a YAML file. """
-        yaml_path = Path(yaml_path)
-        with yaml_path.open(mode='r') as file:
-            data = yaml.safe_load(file)
-        return cls.from_dict(data)
 
 class LayerBuilder:
     """
@@ -84,6 +31,7 @@ class LayerBuilder:
         """ Initialize the LayerBuilder with a layer specification. """
         self.layer_spec = layer_spec
         self.models_order = ModelOrder(self.layer_spec.models, self.layer_spec.stage)
+        logger.debug(f"Initialized LayerBuilder with layer spec ({self.layer_spec}) and models order ({self.models_order}).")
 
     def build(self, **kwargs) -> None:
         """
@@ -101,6 +49,7 @@ class LayerBuilder:
         logger.info(f"Building layer '{self.layer_spec.stage}'.")
         for model_spec in self.models_order:
             try:
+                logger.debug(f"Building model: {model_spec.name} in layer '{self.layer_spec.stage}'")
                 model_manager = ModelManager(model_spec)
                 model_manager.run(**kwargs)
             except Exception as e:

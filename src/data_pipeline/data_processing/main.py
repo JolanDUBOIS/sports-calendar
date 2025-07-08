@@ -1,9 +1,9 @@
 import traceback
 
 from . import logger
-from .build_layer import LayerBuilder, ModelManager, LayerSpec
-from .. import DataStage
-from src.config.registry import config
+from .build_layer import LayerBuilder, ModelManager
+from src.datastage import DataStage
+from src.config.main import config
 
 
 def run_pipeline(
@@ -11,9 +11,11 @@ def run_pipeline(
     model: str | None = None,
     **kwargs
 ) -> None:
+    logger.debug(f"Running pipeline with stage: {stage}, model: {model}, kwargs: {kwargs}")
     # Single model
     if model:
-        layer_spec = LayerSpec.from_yaml(config.pipeline.get_workflow_config_path(stage))
+        logger.debug(f"Processing single model: {model} in stage: {stage}")
+        layer_spec = config.get_workflow().get(stage)
         model_spec = layer_spec.get(model)        
         if not model_spec:
             logger.error(f"Model '{model}' not found in layer '{layer_spec.name}'.")
@@ -27,8 +29,10 @@ def run_pipeline(
 
     # Multiple models
     else:
+        logger.debug(f"Processing all models (stage: {stage}).")
         stages = [stage] if stage is not None else DataStage.instances()
         for _stage in stages:
-            layer_spec = LayerSpec.from_yaml(config.pipeline.get_workflow_config_path(_stage))
+            logger.debug(f"Processing stage: {_stage}")
+            layer_spec = config.get_workflow().get(_stage)
             builder = LayerBuilder(layer_spec)
             builder.build(**kwargs)

@@ -5,8 +5,8 @@ from pathlib import Path
 import yaml
 
 from . import logger
-from ..pipeline_stages import DataStage
-from src.config.registry import config
+from src.datastage import DataStage
+from src.config.main import config
 
 
 @dataclass
@@ -96,7 +96,7 @@ class SchemaSpec:
             logger.error("All elements in models must be ModelSchemaSpec instances.")
             raise TypeError("All elements in models must be ModelSchemaSpec instances.")
     
-        self._resolve_paths(config.active_repo.path)
+        self._resolve_paths(config.repository.path)
 
     def _resolve_paths(self, base_path: Path) -> None:
         """ Resolve model paths relative to the base path. """
@@ -114,7 +114,7 @@ class SchemaSpec:
     @staticmethod
     def _is_valid_stage(stage_name: str) -> bool:
         try:
-            DataStage.from_str(stage_name)
+            DataStage(stage_name)
             return True
         except ValueError:
             return False

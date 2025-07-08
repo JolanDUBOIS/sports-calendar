@@ -2,10 +2,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from . import logger
-from ..pipeline_stages import DataStage
+from src.datastage import DataStage
 
 if TYPE_CHECKING:
-    from .managers import ModelSpec
+    from src.specs import ModelSpec
 
 
 class ModelOrder:
@@ -83,7 +83,7 @@ class ModelOrder:
     @staticmethod
     def _get_dependencies(models: list[ModelSpec], stage: str) -> dict[str, set[str]]:
         """ Get the dependencies of the models. """
-        stage = DataStage.from_str(stage)
+        stage = DataStage(stage)
         dependencies = {}
         for model in models:
             dependencies[model.name] = set()
@@ -91,7 +91,7 @@ class ModelOrder:
 
             for dep in model_dependencies:
                 dep_stage, dep_name = dep.split(".")
-                dep_stage = DataStage.from_str(dep_stage)
+                dep_stage = DataStage(dep_stage)
 
                 if dep_stage > stage:
                     logger.error(f"Model {model.name} has a dependency on a model in a later stage: {dep}")
