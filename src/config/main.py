@@ -20,6 +20,8 @@ class Config:
         self.pipeline = PipelineConfig()
         self.secrets = Secrets()
 
+        self._repo_set = False
+
     @property
     def repository(self) -> Repository:
         return self.base.repository
@@ -28,11 +30,18 @@ class Config:
     def environment(self) -> str:
         return self.base.environment
 
-    def set_repo(self, repo_name: str) -> None:
-        """ Set the active repository in the base configuration. """
+    def set_repo(self, repo_name: str | None = None) -> None:
+        """ Set the active repository in the base configuration. Must be called once before using the pipeline. """
+        if self._repo_set:
+            logger.error("Repository has already been set. Cannot change it after initialization.")
+            raise RuntimeError("Repository has already been set. Cannot change it after initialization.")
+        if repo_name is None:
+            repo_name = self.base.repository.name
+
         self.base.set_repo(repo_name)
         logger.info(f"Repository set to: {repo_name}")
         self.pipeline.resolve_paths(self.base.repository.path)
+        self._repo_set = True
 
     def set_environment(self, environment: str) -> None:
         """ Set the active environment in the base configuration. """
