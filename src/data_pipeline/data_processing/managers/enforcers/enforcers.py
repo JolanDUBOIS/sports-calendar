@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from . import logger
-from .specs import ConstraintSpec, UniqueSpec, NonNullableSpec
+from src.specs import ConstraintSpec, UniqueSpec, NonNullableSpec
 
 
 S = TypeVar("S", bound=ConstraintSpec)

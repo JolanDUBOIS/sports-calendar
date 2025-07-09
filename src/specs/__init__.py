@@ -12,5 +12,8 @@ from .pipeline import (
     ProcessingIOInfo,
     SourceSpec,
     SchemaSpec,
-    LayerSchemaSpec
+    LayerSchemaSpec,
+    ConstraintSpec,
+    UniqueSpec,
+    NonNullableSpec
 )

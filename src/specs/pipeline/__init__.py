@@ -8,6 +8,9 @@ from .workflows import (
     OutputSpec,
     ProcessingStepSpec,
     ProcessingIOInfo,
-    SourceSpec
+    SourceSpec,
+    ConstraintSpec,
+    UniqueSpec,
+    NonNullableSpec
 )
 from .schemas import SchemaSpec, LayerSchemaSpec
