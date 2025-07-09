@@ -43,8 +43,6 @@ class DateStandardizationProcessor(Processor):
                 logger.error(f"Unsupported date format: {date_format}")
                 raise ValueError(f"Unsupported date format: {date_format}")
 
-        # Maybe temporary solution to convert datetime to ISO format strings (TODO: check if needed)
-        standardized_data[col] = np.array(dt_series.dt.to_pydatetime())
-        standardized_data[col] = standardized_data[col].apply(lambda x: x.isoformat() if pd.notnull(x) else None)
+        standardized_data[col] = dt_series.apply(lambda x: x.isoformat() if pd.notnull(x) else None)
 
         return standardized_data
