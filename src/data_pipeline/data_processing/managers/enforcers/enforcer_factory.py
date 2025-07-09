@@ -3,9 +3,8 @@ from typing import TYPE_CHECKING
 
 from . import logger
 from .enforcers import ConstraintEnforcer, UniqueEnforcer, NonNullableEnforcer
-from .admin_enforcers import ForceMatchEnforcer, BlockMatchEnforcer
 if TYPE_CHECKING:
-    from .specs import ConstraintSpec
+    from src.specs import ConstraintSpec
 
 
 class ConstraintEnforcerFactory:
@@ -13,9 +12,7 @@ class ConstraintEnforcerFactory:
 
     enforcers_mapping = {
         "unique": UniqueEnforcer,
-        "non-nullable": NonNullableEnforcer,
-        "force_match": ForceMatchEnforcer,
-        "block_match": BlockMatchEnforcer,
+        "non-nullable": NonNullableEnforcer
     }
 
     @classmethod

@@ -22,6 +22,7 @@ def load_yml(path: str | Path) -> dict | list | None:
 
     with open(path, 'r') as file:
         try:
+            logger.debug(f"Loading YAML file: {path}")
             return yaml.safe_load(file)
         except yaml.YAMLError as e:
             logger.error(f"Error loading YAML file {path}: {e}")

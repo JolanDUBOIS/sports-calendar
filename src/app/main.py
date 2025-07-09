@@ -6,7 +6,7 @@ from .calendar import (
     GoogleCalendarManager
 )
 from .selection import SelectionManager, SelectionRunner
-from src.config.registry import config
+from src.config.main import config
 
 
 def run_selection(key: str = "dev", dry_run: bool = False, **kwargs):

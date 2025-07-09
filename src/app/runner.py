@@ -1,8 +1,3 @@
-from collections import defaultdict
-
-import pandas as pd
-
-from . import logger
 from .selection import Selection
 from .selection.selection_resolvers import SelectionResolverFactory
 from .calendar.sports_calendar import SportsEventCollection
@@ -23,4 +18,6 @@ class SelectionRunner:
             item_events = resolver.get_events(item, date_from, date_to)
             transformer = EventTransformerFactory.create_transformer(item.sport)
             events.extend(transformer.batch_transform(item_events))
+        # Deduplicate events
+        events.drop_duplicates(inplace=True)
         return events

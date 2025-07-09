@@ -7,7 +7,10 @@ from googleapiclient.errors import HttpError
 
 from . import logger
 from .auth import GoogleAuthManager
+from src.utils import TemporaryConsolePrinter
 
+
+printer = TemporaryConsolePrinter()
 
 class GoogleCalendarAPI:
     """ TODO """
@@ -79,13 +82,16 @@ class GoogleCalendarAPI:
 
         N_events = len(events)
         for i, event in enumerate(events):
+            logger.debug(f"Adding event {i + 1}/{N_events}: {event.get('summary')}")
             if verbose:
-                print(f"\r{' ' * 80}\rAdding event {i + 1}/{N_events}: {event.get('summary')}", end='\r')
+                printer.print(f"Adding event {i + 1}/{N_events}: {event.get('summary')}")
             if date_from and event.get('dtstart').dt.date() < date_from:
                 continue
             if date_to and event.get('dtend').dt.date() > date_to:
                 continue
             self.add_event(event)
+        if verbose:
+            printer.clear()
         logger.info(f"Added {N_events} events to Google Calendar.")
 
     def add_event(self, event: Event) -> None:
@@ -140,9 +146,12 @@ class GoogleCalendarAPI:
         events = self.fetch_events(date_from, date_to)
         N_events = len(events)
         for i, event in enumerate(events):
+            logger.debug(f"Deleting event {i + 1}/{N_events}: {event.get('summary')}")
             if verbose:
-                print(f"\r{' ' * 80}\rDeleting event {i + 1}/{N_events}", end='\r')
+                printer.print(f"Deleting event {i + 1}/{N_events}")
             self.delete_event(event['id'])
+        if verbose:
+            printer.clear()
         logger.info(f"Deleted {N_events} events from Google Calendar.")
 
     def delete_event(self, event_id: str) -> None:

@@ -6,7 +6,7 @@ from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 from . import logger
-from src.config.registry import config
+from src.config.main import config
 
 
 class GoogleAuthManager:

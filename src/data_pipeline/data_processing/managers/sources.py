@@ -1,32 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from dataclasses import dataclass
-from pathlib import Path
 
-from . import logger
-from ..versioning import SourceVersioningStrategy, SourceVersions, SourceVersion, version_filter
+from ..versioning import SourceVersions, SourceVersion, version_filter
 from ...utils import get_max_field_value
 from ....file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
-    from ....types import IOContent
+    from src.utils import IOContent
+    from src.specs import SourceSpec
 
-
-@dataclass
-class SourceSpec:
-    """Describes a single source input (path, name, versioning info)."""
-    name: str
-    path: Path
-    versioning_strategy: SourceVersioningStrategy | None = None
-
-    @classmethod
-    def from_dict(cls, d: dict) -> SourceSpec:
-        """ Create a SourceSpec from a dictionary. """
-        return cls(
-            name=d["name"],
-            path=Path(d["path"]),
-            versioning_strategy=SourceVersioningStrategy.from_dict(d["versioning"]) if "versioning" in d else None
-        )
 
 class SourcesManager:
     """ Manage the loading and versioning of source data for model processing. """

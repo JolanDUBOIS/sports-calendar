@@ -78,12 +78,34 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "cattrs"
+version = "25.1.1"
+description = "Composable complex class support for attrs and dataclasses."
+category = "main"
+optional = false
+python-versions = ">=3.9"
+
+[package.dependencies]
+attrs = ">=24.3.0"
+typing-extensions = ">=4.12.2"
+
+[package.extras]
+bson = ["pymongo (>=4.4.0)"]
+cbor2 = ["cbor2 (>=5.4.6)"]
+msgpack = ["msgpack (>=1.0.5)"]
+msgspec = ["msgspec (>=0.19.0)"]
+orjson = ["orjson (>=3.10.7)"]
+pyyaml = ["pyyaml (>=6.0)"]
+tomlkit = ["tomlkit (>=0.11.8)"]
+ujson = ["ujson (>=5.10.0)"]
+
+[[package]]
 name = "certifi"
-version = "2025.4.26"
+version = "2025.6.15"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [[package]]
 name = "cffi"
@@ -152,7 +174,7 @@ test = ["pytest"]
 
 [[package]]
 name = "coverage"
-version = "7.8.2"
+version = "7.9.2"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -190,7 +212,7 @@ tests = ["asttokens (>=2.1.0)", "ipython", "pytest", "coverage", "coverage-enabl
 
 [[package]]
 name = "google-api-core"
-version = "2.25.0"
+version = "2.25.1"
 description = "Google API client core library"
 category = "main"
 optional = false
@@ -205,13 +227,13 @@ requests = ">=2.18.0,<3.0.0"
 
 [package.extras]
 async-rest = ["google-auth[aiohttp] (>=2.35.0,<3.0.0)"]
-grpc = ["grpcio (>=1.33.2,<2.0.0)", "grpcio-status (>=1.33.2,<2.0.0)", "grpcio (>=1.49.1,<2.0.0)", "grpcio-status (>=1.49.1,<2.0.0)"]
+grpc = ["grpcio (>=1.33.2,<2.0.0)", "grpcio (>=1.49.1,<2.0.0)", "grpcio-status (>=1.33.2,<2.0.0)", "grpcio-status (>=1.49.1,<2.0.0)"]
 grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0.0)"]
 grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.0)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.171.0"
+version = "2.175.0"
 description = "Google API Client Library for Python"
 category = "main"
 optional = false
@@ -392,7 +414,7 @@ test = ["flaky", "ipyparallel", "pre-commit", "pytest-asyncio (>=0.23.5)", "pyte
 
 [[package]]
 name = "ipython"
-version = "9.3.0"
+version = "9.4.0"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
@@ -549,7 +571,7 @@ test-extras = ["pytest-mpl", "pytest-randomly"]
 
 [[package]]
 name = "numpy"
-version = "2.3.0"
+version = "2.3.1"
 description = "Fundamental package for array computing in Python"
 category = "main"
 optional = false
@@ -557,16 +579,16 @@ python-versions = ">=3.11"
 
 [[package]]
 name = "oauthlib"
-version = "3.2.2"
+version = "3.3.1"
 description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 
 [package.extras]
 rsa = ["cryptography (>=3.0.0)"]
-signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
+signals = ["blinker (>=1.4.0)"]
 
 [[package]]
 name = "packaging"
@@ -578,7 +600,7 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "pandas"
-version = "2.3.0"
+version = "2.3.1"
 description = "Powerful data structures for data analysis, time series, and statistics"
 category = "main"
 optional = false
@@ -756,7 +778,7 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "pygments"
-version = "2.19.1"
+version = "2.19.2"
 description = "Pygments is a syntax highlighting package written in Python."
 category = "main"
 optional = false
@@ -778,7 +800,7 @@ diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pytest"
-version = "8.4.0"
+version = "8.4.1"
 description = "pytest: simple powerful testing with Python"
 category = "dev"
 optional = false
@@ -807,7 +829,7 @@ six = ">=1.5"
 
 [[package]]
 name = "python-dotenv"
-version = "1.1.0"
+version = "1.1.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
 category = "main"
 optional = false
@@ -842,7 +864,7 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "pyzmq"
-version = "26.4.0"
+version = "27.0.0"
 description = "Python bindings for 0MQ"
 category = "dev"
 optional = false
@@ -1057,7 +1079,7 @@ typing-extensions = ">=3.7.4.3"
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.9.0.20250516"
+version = "2.9.0.20250708"
 description = "Typing stubs for python-dateutil"
 category = "main"
 optional = false
@@ -1065,7 +1087,7 @@ python-versions = ">=3.9"
 
 [[package]]
 name = "typing-extensions"
-version = "4.14.0"
+version = "4.14.1"
 description = "Backported and Experimental Type Hints for Python 3.9+"
 category = "main"
 optional = false
@@ -1089,7 +1111,7 @@ python-versions = ">=3.9"
 
 [[package]]
 name = "urllib3"
-version = "2.4.0"
+version = "2.5.0"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 category = "main"
 optional = false
@@ -1112,7 +1134,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.11,<3.12"
-content-hash = "52518445af78ae319204cc0ff3ffb4a49f49ba9be8ce1829df69d8981153b803"
+content-hash = "4e813ea596b69100740ecdc0f415b42e28882b5314c7886f32c2b9ac230240eb"
 
 [metadata.files]
 appnope = []
@@ -1121,6 +1143,7 @@ asttokens = []
 attrs = []
 beautifulsoup4 = []
 cachetools = []
+cattrs = []
 certifi = []
 cffi = []
 charset-normalizer = []

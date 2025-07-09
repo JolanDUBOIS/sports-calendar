@@ -8,7 +8,6 @@ from .base import SportsEvent
 
 class FootballEvent(SportsEvent):
     """ Represents a football match event. """
-
     sport = "football"
 
     def __init__(
@@ -42,7 +41,7 @@ class FootballEvent(SportsEvent):
     @property
     def start(self) -> datetime:
         """ TODO """
-        return datetime.strptime(self.date_time, "%Y-%m-%d %H:%M:%S%z")
+        return datetime.fromisoformat(self.date_time)
 
     @property
     def end(self) -> datetime:

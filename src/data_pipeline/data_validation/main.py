@@ -3,9 +3,8 @@ import traceback
 from . import logger
 from .schema_manager import LayerSchemaManager, ModelSchemaManager
 from .validation_result import SchemaValidationResult
-from .schema_spec import SchemaSpec
-from .. import DataStage
-from src.config.registry import config
+from src.utils import DataStage
+from src.config.main import config
 
 
 def run_validation(
@@ -15,7 +14,7 @@ def run_validation(
 ) -> list[SchemaValidationResult]:
     # Single model
     if model:
-        schema_spec = SchemaSpec.from_yaml(config.pipeline.get_schema_config_path(stage))
+        schema_spec = config.get_schema().get(stage)
         model_spec = schema_spec.get(model)
         if not model_spec:
             logger.error(f"Model '{model}' not found in schema '{schema_spec.name}'.")
@@ -33,7 +32,7 @@ def run_validation(
         stages = [stage] if stage is not None else DataStage.instances()
         results = []
         for _stage in stages:
-            schema_spec = SchemaSpec.from_yaml(config.pipeline.get_schema_config_path(_stage))
+            schema_spec = config.get_schema().get(_stage)
             layer_manager = LayerSchemaManager(schema_spec)
             results.append(layer_manager.validate(**kwargs))
         return results

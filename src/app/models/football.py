@@ -67,7 +67,7 @@ class FootballMatchesTable(BaseTable):
         "competition_id": {"type": "int", "source": "competition_id"},
         "home_team_id": {"type": "int", "source": "home_team_id"},
         "away_team_id": {"type": "int", "source": "away_team_id"},
-        "date_time": {"type": "str", "source": "date_time_cet"},
+        "date_time": {"type": "str", "source": "date"},
         "venue": {"type": "str", "source": "venue"},
         "stage": {"type": "str", "source": "stage"},
         "leg": {"type": "int", "source": "leg"},

@@ -1,9 +1,7 @@
-import typer # type: ignore
-from typer import BadParameter # type: ignore
+import typer
 
-from .data_pipeline import DataStage
-from .config.registry import config
-from .config.container import Config
+from .utils import DataStage
+from .config.main import config
 
 
 app = typer.Typer()
@@ -12,47 +10,21 @@ app = typer.Typer()
 # Shared Utility Functions
 # ------------------------
 
-def init_config(repo: str | None = None):
-    if not config.is_set():
-        config.set(Config(repo_key=repo))
-    else:
-        raise RuntimeError("Configuration has already been initialized.")
-
-def parse_stage(stage: str | None) -> DataStage | None:
-    if stage is None:
-        return None
+def parse_stage(value: str | None) -> DataStage | None:
+    if value is None:
+        return value
     try:
-        return DataStage.from_str(stage)
-    except ValueError:
-        raise BadParameter(f"Invalid stage '{stage}'. Valid stages are: {DataStage.as_str()}.")
+        return DataStage(value)
+    except ValueError as e:
+        raise typer.BadParameter(str(e))
 
 def confirm_reset() -> bool:
     return typer.confirm("Are you sure you want to proceed with reset mode? This will delete files and metadata.")
 
-# ------------------------
-# Option Factories
-# ------------------------
-
-def repo_option(workflow: str, default: str = "prod"):
-    return typer.Option(
-        default,
-        "--repo",
-        help=f"Specify the repository to run the {workflow} on (e.g. 'prod' or 'test')."
-    )
-
-def stage_option(workflow: str):
-    return typer.Option(
-        None,
-        "--stage",
-        help=f"Specify the stage to run the {workflow} on (default is all stages). Valid values are {DataStage.as_str()}."
-    )
-
-def model_option(workflow: str):
-    return typer.Option(
-        None,
-        "--model",
-        help=f"Specify the model to run the {workflow} on (stage must be specified)."
-    )
+def validate_stage_model(stage: str | None, model: str | None):
+    if stage is None and model is not None:
+        typer.echo("Error: --model requires --stage.", err=True)
+        raise typer.Exit(code=1)
 
 # ------------------------
 # CLI Commands
@@ -60,27 +32,28 @@ def model_option(workflow: str):
 
 @app.command()
 def run_pipeline(
+    repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the pipeline on (default in infrastructure.yml config file)."),
+    env: str | None = typer.Option(None, "--env", help="Specify the environment to run the pipeline in (default in runtime.yml config file)."),
+    stage: str | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to run the pipeline on (default is all stages). Valid values are " + ", ".join(DataStage.as_str())),
+    model: str | None = typer.Option(None, "--model", help=f"Specify the model to run the pipeline on (stage must be specified)."),
     manual: bool = typer.Option(False, "--manual"),
-    repo: str = repo_option("pipeline"),
-    stage: str | None = stage_option("pipeline"),
-    model: str | None = model_option("pipeline"),
     reset: bool = typer.Option(False, "--reset"),
     dry_run: bool = typer.Option(False, "--dry-run"),
     verbose: bool = typer.Option(False, "--verbose")
 ):
     """ Run the data pipeline. """
-    if stage is None and model is not None:
-        typer.echo("Error: --model requires --stage to be specified.", err=True)
-        raise typer.Exit(code=1)
+    validate_stage_model(stage, model)
     if reset and not confirm_reset():
         typer.echo("Reset mode aborted by the user.", err=True)
         raise typer.Exit(code=0)
 
-    init_config(repo)
-    
+    config.set_repo(repo)
+    if env is not None:
+        config.set_environment(env)
+
     from .main import run_pipeline_logic
     run_pipeline_logic(
-        stage=parse_stage(stage),
+        stage=stage,
         model=model,
         manual=manual,
         reset=reset,
@@ -90,22 +63,23 @@ def run_pipeline(
 
 @app.command()
 def run_validation(
-    repo: str = repo_option("validation"),
-    stage: str | None = stage_option("validation"),
-    model: str | None = model_option("validation"),
+    repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the validation on (default in infrastructure.yml config file)."),
+    env: str | None = typer.Option(None, "--env", help="Specify the environment to run the validation in (default in runtime.yml config file)."),
+    stage: DataStage | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to run the validation on (default is all stages). Valid values are " + ", ".join(DataStage.as_str())),
+    model: str | None = typer.Option(None, "--model", help=f"Specify the model to run the validation on (stage must be specified)."),
     raise_on_error: bool = typer.Option(False, "--raise-on-error"),
     verbose: bool = typer.Option(False, "--verbose")
 ):
     """ Run the data validation. """
-    if stage is None and model is not None:
-        typer.echo("Error: --model requires --stage to be specified.", err=True)
-        raise typer.Exit(code=1)
+    validate_stage_model(stage, model)
 
-    init_config(repo)
+    config.set_repo(repo)
+    if env is not None:
+        config.set_environment(env)
     
     from .main import run_validation_logic
     results = run_validation_logic(
-        stage=parse_stage(stage),
+        stage=stage,
         model=model,
         raise_on_error=raise_on_error,
         verbose=verbose
@@ -115,13 +89,13 @@ def run_validation(
 @app.command()
 def run_selection(
     key: str = typer.Argument("dev"),
-    repo: str = repo_option("selection"),
+    repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the selection on (default in infrastructure.yml config file)."),
     dry_run: bool = typer.Option(False, "--dry-run"),
     verbose: bool = typer.Option(False, "--verbose")
 ):
     """ Run the data selection. """
-    init_config(repo)
-    
+    config.set_repo(repo)
+
     from .main import run_selection_logic
     run_selection_logic(
         key=key,
@@ -131,21 +105,24 @@ def run_selection(
 
 @app.command()
 def test(
-    name: str = typer.Argument(..., help="Name of the test to run.")
+    name: str = typer.Argument(..., help="Name of the test to run."),
+    repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the tests on (default in infrastructure.yml config file)."),
+    env: str | None = typer.Option(None, "--env", help="Specify the environment to run the tests in (default in runtime.yml config file)."),
 ):
     """ Run a specific test. """
-    init_config()
-    
+    config.set_repo(repo)
+    if env is not None:
+        config.set_environment(env)
+
     from .main import run_test_logic
-    run_test_logic(name)
+    run_test_logic(name=name)
 
 @app.command()
 def clean_repository(
-    repo: str = repo_option("cleaning"),
-    stage: str | None = stage_option("cleaning")
+    repo: str | None,
+    stage: str | None
 ):
     """ Clean the data repository. """
-    init_config(repo)
     raise NotImplementedError("The clean command is not implemented yet.")
 
 @app.command()
@@ -153,7 +130,6 @@ def revert(
     run_id: str = typer.Argument(None, help="ID of the run to revert to.")
 ):
     """ Revert the data repository to a previous state. """
-    init_config()
     raise NotImplementedError("The revert command is not implemented yet.")
 
 @app.command()
@@ -168,8 +144,6 @@ def clear_calendar(
     if scope is not None and scope not in ["all", "future", "past"]:
         typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
         raise typer.Exit(code=1)
-
-    init_config()
     
     from .main import clear_calendar_logic
     clear_calendar_logic(

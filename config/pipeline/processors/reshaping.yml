@@ -1,0 +1,8 @@
+## Expected processor config:
+# processor: ReshapingProcessor
+# config_key: one of the keys in this file
+# input_keys: single key "data"
+# output_keys: /
+
+int_football_espn_matches:
+  func: reshape_espn_matches
