@@ -1,9 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from . import logger
 from ..processors import ProcessorFactory
-from src.types import IOContent
+from src.utils import IOContent
 
 if TYPE_CHECKING:
     from src.specs import ProcessingStepSpec

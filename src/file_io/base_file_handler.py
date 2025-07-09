@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from . import logger
 from .metadata_manager import MetadataManager
-from ..types import IOContent
+from src.utils import IOContent
 
 
 class BaseFileHandler(ABC):

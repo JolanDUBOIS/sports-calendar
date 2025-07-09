@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from . import logger
 from .model import ModelSpec
 from src.specs import BaseModel
-from src.datastage import DataStage
+from src.utils import DataStage
 
 
 @dataclass

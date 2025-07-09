@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from . import logger
 from .layer import LayerSchemaSpec
 from src.specs import BaseModel
-from src.datastage import DataStage
+from src.utils import DataStage
 
 
 @dataclass

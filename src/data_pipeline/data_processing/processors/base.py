@@ -7,7 +7,7 @@ from src.config.main import config
 
 if TYPE_CHECKING:
     from src.specs import ProcessingStepSpec, ProcessingIOInfo
-    from src.types import IOContent
+    from src.utils import IOContent
 
 
 class Processor(ABC):

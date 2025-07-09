@@ -12,8 +12,8 @@ from src.data_pipeline.clients import (
 from src.data_pipeline.utils import concat_io_content
 
 if TYPE_CHECKING:
+    from src.utils import IOContent
     from src.specs import ProcessingIOInfo
-    from src.types import IOContent
     
 
 CLIENT_CLASS_REGISTRY = {

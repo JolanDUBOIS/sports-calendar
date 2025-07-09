@@ -3,7 +3,7 @@ from typing import Any
 import pandas as pd
 
 from . import logger
-from ...types import IOContent
+from src.utils import IOContent
 
 
 def filter_file_content(data: IOContent, field: str, op: str, value: Any | None = None) -> IOContent:

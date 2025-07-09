@@ -1,13 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from . import logger
 from ..versioning import SourceVersions, SourceVersion, version_filter
 from ...utils import get_max_field_value
 from ....file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
-    from src.types import IOContent
+    from src.utils import IOContent
     from src.specs import SourceSpec
 
 

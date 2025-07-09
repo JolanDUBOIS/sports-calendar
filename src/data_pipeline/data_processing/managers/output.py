@@ -10,7 +10,7 @@ from ....file_io import FileHandlerFactory
 if TYPE_CHECKING:
     from .enforcers import ConstraintEnforcer
     from ..versioning import SourceVersions
-    from src.types import IOContent
+    from src.utils import IOContent
     from src.specs import OutputSpec
 
 

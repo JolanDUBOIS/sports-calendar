@@ -20,7 +20,7 @@ class NonNullableSpec(BaseModel):
     kind: Literal["non-nullable"]
     fields: list[str]
 
-# ---- Just a regular Union now ----
+# ---- ConstraintSpec ----
 
 ConstraintSpec = Union[UniqueSpec, NonNullableSpec]
 
