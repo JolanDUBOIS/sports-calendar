@@ -6,6 +6,7 @@
 - [ ] Remove created_at, intermediate_at, staging_at and use only _ctime
 
 ## Long-term
+- [ ] Reintegrate the other sources and setup the whole entity resolution (which was previously abandonned...)
 - [ ] Use docker (is it possible for that kind of app?)
 - [ ] Create a release branch
     - Will be triggered like prod for a few days before pushing to main
