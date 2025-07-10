@@ -38,4 +38,4 @@ class LayerSchemaSpec(BaseModel):
     def resolve_paths(self, base_path: Path | str) -> None:
         """ Resolve the paths of all models in the schema relative to a base path. """
         for model in self.models:
-            model.path = model.resolve_path(base_path)
+            model.resolve_path(base_path)

@@ -5,9 +5,9 @@ from pathlib import Path
 import pandas as pd
 
 from . import logger
-from .schema_spec import SchemaSpec, ModelSchemaSpec, ColumnSpec
 from .validation_result import SchemaValidationResult, ModelValidationResult, ValidationError, ValidationIssue
 from src.file_io import FileHandlerFactory
+from src.specs import LayerSchemaSpec, ModelSchemaSpec, ColumnSpec
 
 
 class ColumnManager:
@@ -73,6 +73,7 @@ class ModelSchemaManager:
 
     def __init__(self, schema_spec: ModelSchemaSpec):
         """ TODO """
+        logger.debug(f"Initializing ModelSchemaManager for model '{schema_spec.name}' with schema_spec: {schema_spec}")
         self.schema_spec = schema_spec
         self.file_handler = FileHandlerFactory.create_file_handler(self.schema_spec.path)
         logger.debug(f"Model file path: {self.schema_spec.path}")
@@ -136,7 +137,7 @@ class ModelSchemaManager:
 class LayerSchemaManager:
     """ TODO """
 
-    def __init__(self, schema_spec: SchemaSpec):
+    def __init__(self, schema_spec: LayerSchemaSpec):
         """ TODO """
         self.schema_spec = schema_spec
 
@@ -157,4 +158,4 @@ class LayerSchemaManager:
     @classmethod
     def from_dict(cls, d: dict) -> LayerSchemaManager:
         """ Create a LayerSchemaManager from a dictionary. """
-        return cls(schema_spec=SchemaSpec.from_dict(d))
+        return cls(schema_spec=LayerSchemaSpec.from_dict(d))

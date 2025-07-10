@@ -13,4 +13,9 @@ from .workflows import (
     UniqueSpec,
     NonNullableSpec
 )
-from .schemas import SchemaSpec, LayerSchemaSpec
+from .schemas import (
+    SchemaSpec,
+    LayerSchemaSpec,
+    ModelSchemaSpec,
+    ColumnSpec
+)
