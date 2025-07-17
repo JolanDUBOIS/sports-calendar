@@ -17,5 +17,6 @@ from .pipeline import (
     ColumnSpec,
     ConstraintSpec,
     UniqueSpec,
-    NonNullableSpec
+    NonNullableSpec,
+    CoerceSpec
 )

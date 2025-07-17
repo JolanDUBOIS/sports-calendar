@@ -6,23 +6,29 @@ from . import logger
 from src.specs import BaseModel
 
 
-# ---- Constraint specs ----
+# ---- Constraint Specs ----
 
 @dataclass
 class UniqueSpec(BaseModel):
-    kind: Literal["unique"]
+    type: Literal["unique"]
     field_sets: list[list[str]]
     version_col: str
     keep: Literal["first", "last"] = "last"
 
 @dataclass
 class NonNullableSpec(BaseModel):
-    kind: Literal["non-nullable"]
+    type: Literal["non-nullable"]
     fields: list[str]
+
+@dataclass
+class CoerceSpec(BaseModel):
+    type: Literal["coerce"]
+    fields: list[str]
+    cast_to: str
 
 # ---- ConstraintSpec ----
 
-ConstraintSpec = Union[UniqueSpec, NonNullableSpec]
+ConstraintSpec = Union[UniqueSpec, NonNullableSpec, CoerceSpec]
 
 # ---- Output spec ----
 
@@ -31,7 +37,7 @@ class OutputSpec(BaseModel):
     name: str
     path: Path
     layer: str
-    constraint_specs: list[ConstraintSpec] = field(default_factory=list)
+    constraints: list[ConstraintSpec] = field(default_factory=list)
 
     def resolve_path(self, base_path: Path | str) -> None:
         base_path = Path(base_path)

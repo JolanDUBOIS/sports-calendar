@@ -11,7 +11,8 @@ from .workflows import (
     SourceSpec,
     ConstraintSpec,
     UniqueSpec,
-    NonNullableSpec
+    NonNullableSpec,
+    CoerceSpec
 )
 from .schemas import (
     SchemaSpec,
