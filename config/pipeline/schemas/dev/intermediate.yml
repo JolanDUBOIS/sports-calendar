@@ -2,16 +2,23 @@ name: schemas_intermediate
 stage: intermediate
 
 models:
-  - name: espn_matches
+  - name: int_football_espn_matches
     path: intermediate/football/espn_matches.csv
     columns:
       - name: id
         unique: true
+        non-nullable: true
       - name: date
       - name: name
       - name: shortName
       - name: season_year
       - name: venue
+      - name: stage
+      - name: competition_id
+      - name: competition_name
+      - name: competition_abbreviation
+      - name: competition_midsizeName
+      - name: competition_slug
       - name: leg_value
       - name: leg_displayValue
       - name: home_team_id
@@ -32,35 +39,103 @@ models:
       - name: away_team_name
       - name: away_team_location
       - name: away_team_venue_id
-      - name: created_at
-      - name: date_time_utc
-      - name: date_time_cet
       - name: source
       - name: source_type
+      - name: created_at
+      - name: intermediate_at
+  
+  - name: int_football_espn_competitions
+    path: intermediate/football/espn_competitions.csv
+    columns:
+      - name: id
+        unique: true
+        non-nullable: true
+      - name: alternate_id
+      - name: name
+        non-nullable: true
+      - name: abbreviation
+      - name: short_name
+      - name: midsize_name
+      - name: slug
+      - name: has_standings
+      - name: source
+      - name: source_type
+      - name: created_at
       - name: intermediate_at
 
-  - name: espn_teams
+  - name: int_football_espn_standings
+    path: intermediate/football/espn_standings.csv
+    columns:
+      - name: competition_id
+        non-nullable: true
+      - name: competition_name
+      - name: competition_abbreviation
+      - name: season
+        non-nullable: true
+      - name: season_display_name
+      - name: team_id
+        non-nullable: true
+      - name: team_location
+      - name: team_name
+      - name: team_abbreviation
+      - name: team_display_name
+      - name: team_short_display_name
+      - name: team_is_national
+      - name: played_games
+      - name: lost
+      - name: point_diff
+      - name: points
+      - name: goals_against
+      - name: goals_for
+      - name: draws
+      - name: wins
+      - name: deductions
+      - name: ppg
+      - name: rank
+        non-nullable: true
+      - name: summary
+      - name: source
+      - name: source_type
+      - name: created_at
+      - name: intermediate_at
+
+  - name: int_football_espn_teams
     path: intermediate/football/espn_teams.csv
     columns:
       - name: team_id
         unique: true
+        non-nullable: true
+      - name: team_location
       - name: team_name
+        non-nullable: true
       - name: team_abbreviation
-      - name: team_displayName
-      - name: team_shortDisplayName
-      - name: intermediate_at
-  
-  - name: espn_competitions
-    path: intermediate/football/espn_competitions.csv
-    columns:
-      - name: competition_id
-        unique: true
-      - name: competition_name
-      - name: competition_abbreviation
-      - name: competition_midsizeName
-      - name: competition_slug
+      - name: team_display_name
+      - name: team_short_display_name
       - name: source
       - name: source_type
+      - name: intermediate_at
+
+  - name: int_f1_espn_events
+    path: intermediate/f1/espn_events.csv
+    columns:
+      - name: id
+        non-nullable: true
+      - name: date
+      - name: name
+      - name: short_name
+      - name: season_year
+      - name: circuit_id
+      - name: circuit_name
+      - name: circuit_city
+      - name: circuit_country
+      - name: session_id
+        non-nullable: true
+      - name: session_date
+      - name: session_type_id
+      - name: session_type_abbreviation
+      - name: source
+      - name: source_type
+      - name: created_at
       - name: intermediate_at
 
   # - name: football_data_matches
