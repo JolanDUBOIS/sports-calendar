@@ -1,6 +1,7 @@
 # Feature Ideas
 
 ## Short-term
+- Test and correct schema validation
 - Unified yaml use (either use load_yaml from loader or use yaml package everywhere)
 - Remove dependencies & use sources instead (pipeline config)
 - Remove created_at, intermediate_at, staging_at and use only _ctime

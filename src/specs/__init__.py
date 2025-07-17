@@ -13,7 +13,10 @@ from .pipeline import (
     SourceSpec,
     SchemaSpec,
     LayerSchemaSpec,
+    ModelSchemaSpec,
+    ColumnSpec,
     ConstraintSpec,
     UniqueSpec,
-    NonNullableSpec
+    NonNullableSpec,
+    CoerceSpec
 )

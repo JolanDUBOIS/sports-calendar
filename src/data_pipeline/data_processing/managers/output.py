@@ -27,7 +27,7 @@ class OutputManager:
     def _init_enforcers(self) -> list[ConstraintEnforcer]:
         """ Initialize enforcers based on the output specification. """
         enforcers = []
-        for contraint_spec in self.output_spec.constraint_specs:
+        for contraint_spec in self.output_spec.constraints:
             enforcers.append(ConstraintEnforcerFactory.create_enforcer(contraint_spec))
         return enforcers
 

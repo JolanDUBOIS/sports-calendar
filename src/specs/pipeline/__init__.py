@@ -11,6 +11,12 @@ from .workflows import (
     SourceSpec,
     ConstraintSpec,
     UniqueSpec,
-    NonNullableSpec
+    NonNullableSpec,
+    CoerceSpec
 )
-from .schemas import SchemaSpec, LayerSchemaSpec
+from .schemas import (
+    SchemaSpec,
+    LayerSchemaSpec,
+    ModelSchemaSpec,
+    ColumnSpec
+)

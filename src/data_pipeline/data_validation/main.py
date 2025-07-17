@@ -29,9 +29,10 @@ def run_validation(
 
     # Multiple models
     else:
-        stages = [stage] if stage is not None else DataStage.instances()
+        stages = [stage] if stage is not None else DataStage.instances()[1:] # Exclude LANDING
         results = []
         for _stage in stages:
+            logger.debug(f"Validating stage: {_stage}")
             schema_spec = config.get_schema().get(_stage)
             layer_manager = LayerSchemaManager(schema_spec)
             results.append(layer_manager.validate(**kwargs))

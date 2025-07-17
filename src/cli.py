@@ -65,7 +65,7 @@ def run_pipeline(
 def run_validation(
     repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the validation on (default in infrastructure.yml config file)."),
     env: str | None = typer.Option(None, "--env", help="Specify the environment to run the validation in (default in runtime.yml config file)."),
-    stage: DataStage | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to run the validation on (default is all stages). Valid values are " + ", ".join(DataStage.as_str())),
+    stage: str | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to run the validation on (default is all stages). Valid values are " + ", ".join(DataStage.as_str())),
     model: str | None = typer.Option(None, "--model", help=f"Specify the model to run the validation on (stage must be specified)."),
     raise_on_error: bool = typer.Option(False, "--raise-on-error"),
     verbose: bool = typer.Option(False, "--verbose")

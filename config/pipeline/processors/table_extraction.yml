@@ -66,7 +66,7 @@ staging_football_standings:
     goals_for: goals_for
     goals_against: goals_against
     deductions: deductions
-    ppg: ppg
+    # ppg: ppg
 
 staging_f1_events:
   extraction_type: simple

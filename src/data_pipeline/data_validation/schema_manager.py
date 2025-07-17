@@ -1,78 +1,21 @@
 from __future__ import annotations
 import traceback
-from pathlib import Path
 
 import pandas as pd
 
 from . import logger
-from .schema_spec import SchemaSpec, ModelSchemaSpec, ColumnSpec
+from .column_manager import ColumnManager
 from .validation_result import SchemaValidationResult, ModelValidationResult, ValidationError, ValidationIssue
 from src.file_io import FileHandlerFactory
+from src.specs import LayerSchemaSpec, ModelSchemaSpec
 
-
-class ColumnManager:
-    """ TODO """
-
-    def __init__(self, column_spec: ColumnSpec):
-        """ Initialize the column manager with a column specification. """
-        self.column_spec = column_spec
-
-    def validate(self, data: pd.DataFrame, model: str) -> None:
-        """ Validate the column against the DataFrame. """
-        if self.column_spec.name not in data.columns:
-            self._handle_issue(
-                model=model,
-                error_msg=f"Model {model} raised an issue: column {self.column_spec.name} is missing in the DataFrame.",
-                constraint="exists"
-            )
-
-        col = data[self.column_spec.name]
-        if self.column_spec.type:
-            try:
-                col = col.astype(self.column_spec.type)
-            except Exception as e:
-                self._handle_issue(
-                    model=model,
-                    error_msg=f"Model {model} raised an issue: column {self.column_spec.name} type is invalid, expected {self.column_spec.type}.",
-                    constraint="type"
-                )
-
-        if self.column_spec.unique:
-            if not col.is_unique:
-                duplicates = col[col.duplicated()].unique()
-                self._handle_issue(
-                    model=model,
-                    error_msg=(
-                        f"Model {model} raised an issue: column {self.column_spec.name} is not unique. "
-                        f"First duplicate value: {duplicates[0]}."
-                    ),
-                    constraint="unique"
-                )
-
-        if not self.column_spec.nullable:
-            if col.isnull().any():
-                self._handle_issue(
-                    model=model,
-                    error_msg=f"Model {model} raised an issue: column {self.column_spec.name} has null values.",
-                    constraint="nullable"
-                )
-    
-    def _handle_issue(self, model: str, error_msg: str, constraint: str) -> None:
-        """ Handle validation issues. """
-        issue = ValidationIssue(
-            model=model,
-            column=self.column_spec.name,
-            error=error_msg,
-            constraint=constraint
-        )
-        logger.error(issue.error)
-        raise ValidationError(issue)
 
 class ModelSchemaManager:
     """ TODO """
 
     def __init__(self, schema_spec: ModelSchemaSpec):
         """ TODO """
+        logger.debug(f"Initializing ModelSchemaManager for model '{schema_spec.name}' with schema_spec: {schema_spec}")
         self.schema_spec = schema_spec
         self.file_handler = FileHandlerFactory.create_file_handler(self.schema_spec.path)
         logger.debug(f"Model file path: {self.schema_spec.path}")
@@ -136,7 +79,7 @@ class ModelSchemaManager:
 class LayerSchemaManager:
     """ TODO """
 
-    def __init__(self, schema_spec: SchemaSpec):
+    def __init__(self, schema_spec: LayerSchemaSpec):
         """ TODO """
         self.schema_spec = schema_spec
 
@@ -157,4 +100,4 @@ class LayerSchemaManager:
     @classmethod
     def from_dict(cls, d: dict) -> LayerSchemaManager:
         """ Create a LayerSchemaManager from a dictionary. """
-        return cls(schema_spec=SchemaSpec.from_dict(d))
+        return cls(schema_spec=LayerSchemaSpec.from_dict(d))
