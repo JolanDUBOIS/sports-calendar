@@ -30,6 +30,8 @@ def validate_stage_model(stage: str | None, model: str | None):
 # CLI Commands
 # ------------------------
 
+### Pipeline Commands
+
 @app.command()
 def run_pipeline(
     repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the pipeline on (default in infrastructure.yml config file)."),
@@ -51,8 +53,8 @@ def run_pipeline(
     if env is not None:
         config.set_environment(env)
 
-    from .main import run_pipeline_logic
-    run_pipeline_logic(
+    from .data_pipeline import run_pipeline as run_pipeline_func
+    run_pipeline_func(
         stage=stage,
         model=model,
         manual=manual,
@@ -77,14 +79,26 @@ def run_validation(
     if env is not None:
         config.set_environment(env)
     
-    from .main import run_validation_logic
-    results = run_validation_logic(
+    from .data_pipeline import run_validation as run_validation_func
+    results = run_validation_func(
         stage=stage,
         model=model,
         raise_on_error=raise_on_error,
         verbose=verbose
     )
     # TODO - Display results
+
+@app.command()
+def clean_repository(
+    repo: str | None,
+    stage: str | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to clean (default is all stages). Valid values are " + ", ".join(DataStage.as_str()))
+):
+    """ Clean the data repository. """
+    config.set_repo(repo)
+    raise NotImplementedError("The clean command is not implemented yet.")
+
+
+### Application Commands
 
 @app.command()
 def run_selection(
@@ -96,41 +110,12 @@ def run_selection(
     """ Run the data selection. """
     config.set_repo(repo)
 
-    from .main import run_selection_logic
-    run_selection_logic(
+    from .app import run_selection as run_selection_func
+    run_selection_func(
         key=key,
         dry_run=dry_run,
         verbose=verbose
     )
-
-@app.command()
-def test(
-    name: str = typer.Argument(..., help="Name of the test to run."),
-    repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the tests on (default in infrastructure.yml config file)."),
-    env: str | None = typer.Option(None, "--env", help="Specify the environment to run the tests in (default in runtime.yml config file)."),
-):
-    """ Run a specific test. """
-    config.set_repo(repo)
-    if env is not None:
-        config.set_environment(env)
-
-    from .main import run_test_logic
-    run_test_logic(name=name)
-
-@app.command()
-def clean_repository(
-    repo: str | None,
-    stage: str | None
-):
-    """ Clean the data repository. """
-    raise NotImplementedError("The clean command is not implemented yet.")
-
-@app.command()
-def revert(
-    run_id: str = typer.Argument(None, help="ID of the run to revert to.")
-):
-    """ Revert the data repository to a previous state. """
-    raise NotImplementedError("The revert command is not implemented yet.")
 
 @app.command()
 def clear_calendar(
@@ -145,11 +130,33 @@ def clear_calendar(
         typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
         raise typer.Exit(code=1)
     
-    from .main import clear_calendar_logic
-    clear_calendar_logic(
+    from .app import clear_calendar as clear_calendar_func
+    clear_calendar_func(
         key=key,
         scope=scope,
         date_from=date_from,
         date_to=date_to,
         verbose=verbose
     )
+
+
+### Other Commands
+
+@app.command()
+def test(
+    name: str = typer.Argument(..., help="Name of the test to run."),
+    repo: str | None = typer.Option(None, "--repo", help="Specify the repository to run the tests on (default in infrastructure.yml config file)."),
+    env: str | None = typer.Option(None, "--env", help="Specify the environment to run the tests in (default in runtime.yml config file)."),
+):
+    """ Run a specific test. """
+    config.set_repo(repo)
+    if env is not None:
+        config.set_environment(env)
+    raise NotImplementedError(f"The test command is not implemented yet.")
+
+@app.command()
+def revert(
+    run_id: str = typer.Argument(None, help="ID of the run to revert to.")
+):
+    """ Revert the data repository to a previous state. """
+    raise NotImplementedError("The revert command is not implemented yet.")
