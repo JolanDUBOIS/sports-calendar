@@ -18,15 +18,16 @@ models:
       name: staging_football_competitions
       layer: staging
       path: staging/football/competitions.csv
-      unique:
-        field_sets:
-          - [id]
-        version_col: staging_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
-          - name
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - name
 
     processing:
       - processor: TableExtractionProcessor
@@ -55,16 +56,17 @@ models:
       name: staging_football_teams
       layer: staging
       path: staging/football/teams.csv
-      unique:
-        field_sets:
-          - [id]
-        version_col: staging_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
-          - name
-          - abbreviation
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - name
+            - abbreviation
 
     processing:
       - processor: TableExtractionProcessor
@@ -93,17 +95,19 @@ models:
       name: staging_football_matches
       layer: staging
       path: staging/football/matches.csv
-      unique:
-        field_sets:
-          - [id]
-        version_col: staging_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
-          - competition_id
-          - home_team_id
-          - away_team_id
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - competition_id
+            - home_team_id
+            - away_team_id
+            - date
 
     processing:
       - processor: TableExtractionProcessor
@@ -132,16 +136,30 @@ models:
       name: staging_football_standings
       layer: staging
       path: staging/football/standings.csv
-      unique:
-        field_sets:
-          - [competition_id, team_id]
-        version_col: staging_at
-        keep: last
-      non-nullable:
-        fields:
-          - competition_id
-          - team_id
-          - position
+      constraints:
+        - type: unique
+          field_sets:
+            - [competition_id, team_id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - competition_id
+            - team_id
+            - position
+        - type: coerce
+          fields:
+            - position
+            - points
+            - point_diff
+            - matches_played
+            - wins
+            - draws
+            - losses
+            - goals_for
+            - goals_against
+            - deductions
+          cast_to: int
   
     processing:
       - processor: TableExtractionProcessor
@@ -170,15 +188,16 @@ models:
       name: staging_f1_events
       layer: staging
       path: staging/f1/events.csv
-      unique:
-        field_sets:
-          - [id, session_id]
-        version_col: staging_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
-          - session_id
+      constraints:
+        - type: unique
+          field_sets:
+            - [session_id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - session_id
     
     processing:
       - processor: TableExtractionProcessor
