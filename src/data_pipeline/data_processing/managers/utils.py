@@ -6,7 +6,7 @@ import pandas as pd
 from . import logger
 
 if TYPE_CHECKING:
-    from ....types import IOContent
+    from src.utils import IOContent
 
 
 def inject_static_fields(data: IOContent, static_fields: list[dict] | None = None) -> IOContent:

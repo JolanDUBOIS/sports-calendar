@@ -1,10 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from dataclasses import dataclass, field
-from pathlib import Path
 
 from . import logger
-from .enforcers import ConstraintEnforcerFactory, ConstraintSpecs
+from .enforcers import ConstraintEnforcerFactory
 from ..versioning import read_versions
 from ...utils import concat_io_content
 from ....file_io import FileHandlerFactory
@@ -12,34 +10,9 @@ from ....file_io import FileHandlerFactory
 if TYPE_CHECKING:
     from .enforcers import ConstraintEnforcer
     from ..versioning import SourceVersions
-    from ....types import IOContent
+    from src.utils import IOContent
+    from src.specs import OutputSpec
 
-
-@dataclass
-class OutputSpec:
-    name: str
-    path: Path
-    layer: str
-    schema: str | None = None
-    constraint_specs: ConstraintSpecs = field(default_factory=ConstraintSpecs)
-
-    def __repr__(self):
-        """ String representation of the OutputSpec. """
-        return (
-            f"OutputSpec(name={self.name}, path={self.path}, layer={self.layer}, "
-            f"schema={self.schema}, constraint_specs={self.constraint_specs}"
-        )
-
-    @classmethod
-    def from_dict(cls, d: dict) -> OutputSpec:
-        """ Create an OutputSpec from a dictionary. """
-        return cls(
-            name=d["name"],
-            path=Path(d["path"]),
-            layer=d["layer"],
-            schema=d.get("schema"),
-            constraint_specs=ConstraintSpecs.from_dict(d)
-        )
 
 class OutputManager:
     """ Manage the output data writing process and enforce output constraints. """
@@ -54,7 +27,7 @@ class OutputManager:
     def _init_enforcers(self) -> list[ConstraintEnforcer]:
         """ Initialize enforcers based on the output specification. """
         enforcers = []
-        for contraint_spec in self.output_spec.constraint_specs:
+        for contraint_spec in self.output_spec.constraints:
             enforcers.append(ConstraintEnforcerFactory.create_enforcer(contraint_spec))
         return enforcers
 

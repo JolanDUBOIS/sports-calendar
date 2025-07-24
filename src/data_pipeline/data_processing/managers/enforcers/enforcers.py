@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Callable
 
 import numpy as np
 import pandas as pd
 
 from . import logger
-from .specs import ConstraintSpec, UniqueSpec, NonNullableSpec
+from src.specs import ConstraintSpec, UniqueSpec, NonNullableSpec, CoerceSpec
 
 
 S = TypeVar("S", bound=ConstraintSpec)
@@ -60,3 +60,37 @@ class NonNullableEnforcer(ConstraintEnforcer[NonNullableSpec]):
         pd.set_option('future.no_silent_downcasting', True)
         df = df.replace({"nan": np.nan, "None": np.nan, "": np.nan})
         return df.dropna(subset=self.spec.fields).reset_index(drop=True)
+
+
+class CoerceEnforcer(ConstraintEnforcer[CoerceSpec]):
+    """ Enforces type constraints on the DataFrame. """
+
+    _CASTERS: dict[str, Callable[[pd.Series], pd.Series]] = {
+        "int": lambda s: pd.to_numeric(s, errors="raise").astype("Int64"),
+        "float": lambda s: pd.to_numeric(s, errors="raise"),
+        "str": lambda s: s.astype(str),
+        "bool": lambda s: s.astype(bool),
+        "datetime": lambda s: pd.to_datetime(s, errors="raise"),
+    }
+
+    def __init__(self, spec: CoerceSpec):
+        super().__init__(spec)
+
+    def _apply(self, df: pd.DataFrame) -> pd.DataFrame:
+        """ Apply the specific enforcement logic to the DataFrame. """
+        if self.spec.cast_to not in self._CASTERS:
+            logger.error(f"Unknown cast type: {self.spec.cast_to}")
+            raise ValueError(f"Unknown cast type: {self.spec.cast_to}")
+
+        caster = self._CASTERS[self.spec.cast_to]
+        for field in self.spec.fields:
+            if field not in df.columns:
+                logger.error(f"Field '{field}' not found in DataFrame.")
+                raise ValueError(f"Field '{field}' not found in DataFrame.")
+            try:
+                df[field] = caster(df[field])
+            except Exception as e:
+                logger.error(f"Failed to coerce field '{field}' to type '{self.spec.cast_to}': {e}")
+                raise ValueError(f"Failed to coerce field '{field}' to type '{self.spec.cast_to}': {e}")
+
+        return df.reset_index(drop=True)

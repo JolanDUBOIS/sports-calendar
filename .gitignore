@@ -1,8 +1,9 @@
+__pycache__/
 data/
 logs/
-.env
-__pycache__/
+legacy/
 notebooks/
+.env
 .coverage
 .secrets/
 .credentials/

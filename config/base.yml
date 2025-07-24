@@ -1,9 +1,10 @@
+repo: dev
+env: dev
+
 repositories:
   prod:
     path: data/repository
-
   dev:
     path: data/repository-dev
-
   test:
     path: data/repository-test

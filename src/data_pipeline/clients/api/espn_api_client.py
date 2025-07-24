@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from . import logger
 from .base_api_client import BaseApiClient
@@ -7,49 +7,48 @@ from ..utils import remove_keys as deep_remove_keys
 
 DEFAULT_KEYS_TO_REMOVE = {
     "competitions": ["links", "logos"],
-    "matches": ["geoBroadcasts", "broadcasts", "headlines", "odds"],
+    "scoreboard": ["geoBroadcasts", "broadcasts", "headlines", "odds", "logos", "links"],
     "standings": ["logos", "links"]
 }
 
 class ESPNApiClient(BaseApiClient):
     """ TODO """
 
-    base_url = "https://site.api.espn.com/apis/v2/sports/soccer/"
-    site_base_url = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
+    BASE_URL = "https://site.api.espn.com/apis"
 
     def __init__(self, **kwargs):
         """ TODO """
         super().__init__(**kwargs)
 
-    def query_competitions(self, trim: bool = False) -> list[dict]:
+    def query_competitions(self, sport: str, trim: bool = False) -> list[dict]:
         """ TODO """
         logger.info("Querying competitions from ESPN API.")
-        url = "https://site.api.espn.com/apis/site/v2/leagues/dropdown?lang=en&sport=soccer"
+        url = f"{self.BASE_URL}/site/v2/leagues/dropdown?lang=en&sport={sport}"
         response = self.query_api(url)
         if not response:
             return []
         competitions = response.get("leagues", [])
         return deep_remove_keys(competitions, DEFAULT_KEYS_TO_REMOVE["competitions"]) if trim else competitions
 
-    def query_matches(self, competition_slug: str, date_from: str = None, date_to: str = None, trim: bool = False) -> list[dict]:
+    def query_scoreboard(self, sport: str, league: str, date_from: str = None, date_to: str = None, trim: bool = False) -> list[dict]:
         """ TODO """
-        logger.info(f"Querying matches for competition: {competition_slug} from {date_from} to {date_to}.")
-        date_from = date_from or datetime.now().strftime("%Y-%m-%d")
-        date_to = date_to or datetime.now().strftime("%Y-%m-%d")
-        url = f"{self.site_base_url}{competition_slug}/scoreboard?dates={self.format_date_range(date_from, date_to)}"
+        logger.info(f"Querying scoreboard for sport {sport} and competition {league} from {date_from[:10]} to {date_to[:10]}.")
+        date_from = date_from or datetime.now(timezone.utc).isoformat(timespec="seconds")
+        date_to = date_to or datetime.now(timezone.utc).isoformat(timespec="seconds")
+        url = f"{self.BASE_URL}/site/v2/sports/{sport}/{league}/scoreboard?dates={self.format_date_range(date_from, date_to)}"
         response = self.query_api(url)
         if not response:
             return []
         leagues = response.get("leagues", [])
-        matches = response.get("events", [])
-        for event in matches:
+        events = response.get("events", [])
+        for event in events:
             event["leagues"] = leagues
-        return deep_remove_keys(matches, DEFAULT_KEYS_TO_REMOVE["matches"]) if trim else matches
+        return deep_remove_keys(events, DEFAULT_KEYS_TO_REMOVE["scoreboard"]) if trim else events
 
-    def query_standings(self, competition_slug: str, trim: bool = False) -> list[dict]:
+    def query_standings(self, sport: str, league: str, trim: bool = False) -> list[dict]:
         """ TODO """
-        logger.info(f"Querying standings for competition: {competition_slug}.")
-        url = f"{self.base_url}{competition_slug}/standings"
+        logger.info(f"Querying standings for for sport {sport} and competition {league}.")
+        url = f"{self.BASE_URL}/v2/sports/{sport}/{league}/standings"
         response = self.query_api(url)
         if not response:
             return []
@@ -60,11 +59,13 @@ class ESPNApiClient(BaseApiClient):
     def format_date_range(date_from: str, date_to: str) -> str:
         """ TODO """
         try:
-            start_date = datetime.strptime(date_from, "%Y-%m-%d")
+            start_date = datetime.fromisoformat(date_from)
         except ValueError:
-            start_date = datetime.strptime(date_from, "%Y-%m-%d %H:%M:%S")
+            logger.error(f"Invalid date format for date_from: {date_from}.")
+            raise
         try:
-            end_date = datetime.strptime(date_to, "%Y-%m-%d")
+            end_date = datetime.fromisoformat(date_to)
         except ValueError:
-            end_date = datetime.strptime(date_to, "%Y-%m-%d %H:%M:%S")
+            logger.error(f"Invalid date format for date_to: {date_to}.")
+            raise
         return f"{start_date.strftime('%Y%m%d')}-{end_date.strftime('%Y%m%d')}"

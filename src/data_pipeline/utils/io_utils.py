@@ -3,7 +3,7 @@ from typing import Any
 import pandas as pd
 
 from . import logger
-from ...types import IOContent
+from src.utils import IOContent
 
 
 def get_max_field_value(data: IOContent, field: str) -> Any:
@@ -54,5 +54,7 @@ def concat_io_content(data: IOContent, new_data: IOContent | dict | None) -> IOC
     elif isinstance(data, list) and isinstance(new_data, dict):
         return data + [new_data]
     else:
+        logger.debug(f"Data: {data}")
+        logger.debug(f"New data: {new_data}")
         logger.error(f"Unsupported data types: {type(data)} and {type(new_data)}. Expected both to be of the same type.")
         raise TypeError(f"Unsupported data types: {type(data)} and {type(new_data)}. Expected both to be of the same type.")

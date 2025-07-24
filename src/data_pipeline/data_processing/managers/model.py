@@ -1,69 +1,15 @@
 from __future__ import annotations
-from typing import Any
-from pathlib import Path
-from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from . import logger
 from .utils import inject_static_fields
-from .sources import SourcesManager, SourceSpec
-from .output import OutputManager, OutputSpec
-from .processing import ProcessingManager, ProcessingSpec
-from src.config.registry import config
+from .sources import SourcesManager
+from .output import OutputManager
+from .processing import ProcessingManager
 
+if TYPE_CHECKING:
+    from src.specs import ModelSpec
 
-@dataclass
-class ModelSpec:
-    """ Describes the full model (name, sources, output, processing). """
-    name: str
-    trigger: str
-    sources: list[SourceSpec]  # Can be empty
-    dependencies: list[str]  # Can be empty
-    output: OutputSpec
-    processing: ProcessingSpec
-    description: str | None = None
-    static_fields: list[dict[str, Any]] | None = None
-
-    def __post_init__(self):
-        """ Validate the model specification. """
-        if not self.name:
-            logger.error("Model name cannot be empty.")
-            raise ValueError("Model name cannot be empty.")
-        if not self.trigger:
-            logger.error("Model trigger cannot be empty.")
-            raise ValueError("Model trigger cannot be empty.")
-        if not self.output:
-            logger.error("Model must have an output specification.")
-            raise ValueError("Model must have an output specification.")
-        if not self.processing:
-            logger.error("Model must have a processing specification.")
-            raise ValueError("Model must have a processing specification.")
-
-        valid_triggers = ["automatic", "manual"]
-        if not self.trigger in valid_triggers:
-            logger.error(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
-            raise ValueError(f"Invalid trigger '{self.trigger}'. Valid triggers are: {valid_triggers}.")
-
-        self._resolve_paths(config.active_repo.path)
-
-    def _resolve_paths(self, base_path: Path) -> None:
-        """ Resolve model paths relative to the base path. """
-        for source in self.sources:
-            source.path = base_path / source.path
-        self.output.path = base_path / self.output.path
-
-    @classmethod
-    def from_dict(cls, d: dict) -> ModelSpec:
-        """ Create a ModelSpec from a dictionary. """
-        return cls(
-            name=d["name"],
-            trigger=d["trigger"],
-            sources=[SourceSpec.from_dict(s) for s in d.get("sources", [])],
-            dependencies=d.get("dependencies", []),
-            output=OutputSpec.from_dict(d["output"]),
-            processing=ProcessingSpec.from_dict(d["processing"]),
-            description=d.get("description"),
-            static_fields=d.get("static_fields", [])
-        )
 
 class ModelManager:
     """
@@ -119,9 +65,10 @@ class ModelManager:
 
         # Process data
         processed_data = processing_manager.process(sources=loaded_sources)
+        output_io_content = processed_data.get(self.model_spec.output.name)
 
         # Inject static fields
-        data = inject_static_fields(processed_data, self.model_spec.static_fields)
+        data = inject_static_fields(output_io_content, self.model_spec.static_fields)
 
         # Write output
         new_source_versions = source_manager.get_new_source_versions()

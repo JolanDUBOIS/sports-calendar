@@ -1,0 +1,84 @@
+## Expected processor config:
+# processor: TableExtractionProcessor
+# config_key: one of the keys in this file
+# input_keys: single key "data"
+# output_keys: /
+
+int_football_espn_teams:
+  extraction_type: double
+  columns_mapping:
+    team_id: [home_team_id, away_team_id]
+    team_location: [home_team_location, away_team_location]
+    team_name: [home_team_name, away_team_name]
+    team_abbreviation: [home_team_abbreviation, away_team_abbreviation]
+    team_display_name: [home_team_displayName, away_team_displayName]
+    team_short_display_name: [home_team_shortDisplayName, away_team_shortDisplayName]
+    source: [source, source]
+    source_type: [source_type, source_type]
+
+staging_football_competitions:
+  extraction_type: simple
+  columns_mapping:
+    id: id
+    # standings_id: alternate_id
+    name: name
+    abbreviation: abbreviation
+    short_name: short_name
+    has_standings: has_standings
+
+staging_football_teams:
+  extraction_type: simple
+  columns_mapping:
+    id: team_id
+    name: team_name
+    abbreviation: team_abbreviation
+    display_name: team_display_name
+    short_display_name: team_short_display_name
+    # is_national: team_is_national
+    location: team_location
+
+staging_football_matches:
+  extraction_type: simple
+  columns_mapping:
+    id: id
+    date: date
+    competition_id: competition_id
+    home_team_id: home_team_id
+    away_team_id: away_team_id
+    season_year: season_year
+    stage: stage
+    leg: leg_value
+    leg_display: leg_displayValue
+    venue: venue
+
+staging_football_standings:
+  extraction_type: simple
+  columns_mapping:
+    competition_id: competition_id
+    team_id: team_id
+    position: rank
+    points: points
+    point_diff: point_diff
+    matches_played: played_games
+    wins: wins
+    draws: draws
+    losses: lost
+    goals_for: goals_for
+    goals_against: goals_against
+    deductions: deductions
+    # ppg: ppg
+
+staging_f1_events:
+  extraction_type: simple
+  columns_mapping:
+    id: id
+    name: name
+    short_name: short_name
+    season_year: season_year
+    circuit_id: circuit_id
+    circuit_name: circuit_name
+    circuit_city: circuit_city
+    circuit_country: circuit_country
+    session_id: session_id
+    session_date: session_date
+    session_type: session_type_abbreviation

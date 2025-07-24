@@ -1,0 +1,210 @@
+name: schemas_staging
+stage: staging
+
+models:
+  # - name: regions
+  #   path: staging/football/regions.csv
+  #   columns:
+  #     - name: id
+  #       unique: true
+  #       nullable: false
+  #       type: str
+  #     - name: name
+  #       nullable: false
+  #       type: str
+  #     - name: code
+  #       type: str
+  #     - name: staging_at
+  #       nullable: false
+  #       type: datetime
+
+  - name: football_competitions
+    path: staging/football/competitions.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: int
+      - name: name
+        nullable: false
+        type: str
+      - name: abbreviation
+        type: str
+      # - name: gender
+      #   type: str
+      #   enum: ["F", "M"]
+      # - name: region_id
+      #   nullable: false
+      #   type: str
+      #   foreign_key:
+      #     model: regions
+      #     column: id
+      # - name: type
+      #   type: str
+      #   enum: ["league", "cup"]
+      - name: short_name
+        type: str
+      - name: has_standings
+        type: bool
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: football_teams
+    path: staging/football/teams.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: int
+      - name: name
+        nullable: false
+        type: str
+      - name: abbreviation
+        type: str
+      - name: display_name
+        type: str
+      - name: short_display_name
+        type: str
+      # - name: gender
+      #   type: str
+      #   enum: ["F", "M"]
+      - name: location
+        type: str
+      # - name: league_id
+      #   nullable: false
+      #   type: str
+      #   foreign_key:
+      #     model: competitions
+      #     column: id
+      #     # TODO - Add clause to ensure the league is of type "league"
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: football_matches
+    path: staging/football/matches.csv
+    columns:
+      - name: id
+        unique: true
+        nullable: false
+        type: int
+      - name: date
+        nullable: false
+        type: datetime
+      - name: home_team_id
+        nullable: false
+        type: int
+        foreign_key:
+          model: teams
+          column: id
+      - name: away_team_id
+        nullable: false
+        type: int
+        foreign_key:
+          model: teams
+          column: id
+      - name: venue
+        type: str
+      - name: competition_id
+        nullable: false
+        type: int
+        foreign_key:
+          model: competitions
+          column: id
+      - name: leg
+        type: str
+      - name: leg_display
+        type: str
+      - name: stage
+        type: str
+      - name: season_year
+        type: int
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: football_standings
+    path: staging/football/standings.csv
+    columns:
+      # - name: id
+      #   unique: true
+      #   nullable: false
+      #   type: str
+      - name: competition_id
+        nullable: false
+        type: int
+        foreign_key:
+          model: competitions
+          column: id
+      - name: team_id
+        nullable: false
+        type: int
+        foreign_key:
+          model: teams
+          column: id
+      - name: position
+        nullable: false
+        type: int
+      - name: points
+        nullable: false
+        type: int
+      - name: point_diff
+        type: int
+      - name: matches_played
+        type: int
+      - name: wins
+        type: int
+      - name: draws
+        type: int
+      - name: losses
+        type: int
+      - name: goals_for
+        type: int
+      - name: goals_against
+        type: int
+      - name: deductions
+        type: int
+      # - name: ppg
+      #   type: float
+      - name: staging_at
+        nullable: false
+        type: datetime
+
+  - name: f1_events
+    path: staging/f1/events.csv
+    columns:
+      - name: id
+        nullable: false
+        type: int
+      - name: session_id
+        unique: true
+        nullable: false
+        type: int
+      - name: name
+        nullable: false
+        type: str
+      - name: short_name
+        type: str
+      - name: season_year
+        type: int
+      - name: circuit_id
+        nullable: false
+        type: int
+        # foreign_key:
+        #   model: f1_circuits
+        #   column: id
+      - name: circuit_name
+        type: str
+      - name: circuit_city
+        type: str
+      - name: circuit_country
+        type: str
+      - name: session_date
+        nullable: false
+        type: datetime
+      - name: session_type
+        type: str
+      - name: staging_at
+        nullable: false
+        type: datetime
