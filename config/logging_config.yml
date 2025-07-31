@@ -10,6 +10,11 @@ formatters:
     format: "%(asctime)s [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] (%(funcName)s) - %(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
 
+  json:
+    "()": pythonjsonlogger.jsonlogger.JsonFormatter
+    format: '%(created)f %(asctime)s %(levelname)s %(name)s %(filename)s %(lineno)d %(funcName)s %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
 handlers:
   console_handler:
     class: logging.StreamHandler
@@ -22,9 +27,13 @@ handlers:
     level: DEBUG
     formatter: detailed
 
+  file_debug_json_handler:
+    class: logging.FileHandler
+    filename: logs/DEBUG.json
+    level: DEBUG
+    formatter: json
 
 loggers:
-
   # App loggers
   src.app:
     level: DEBUG
@@ -104,5 +113,5 @@ loggers:
 
 root:
   level: DEBUG
-  handlers: [console_handler, file_debug_handler]
+  handlers: [console_handler, file_debug_handler, file_debug_json_handler]
   propagate: False

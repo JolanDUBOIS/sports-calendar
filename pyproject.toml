@@ -23,6 +23,7 @@ RapidFuzz = "^3.13.0"
 typer = "^0.16.0"
 networkx = "^3.5"
 cattrs = "^25.1.1"
+python-json-logger = "^3.3.0"
 
 [tool.poetry.dev-dependencies]
 ipykernel = "^6.29.5"
