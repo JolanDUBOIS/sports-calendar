@@ -1,5 +1,6 @@
 import logging.config
 import yaml
+from pythonjsonlogger import jsonlogger
 
 
 def setup_logging(config_file):
