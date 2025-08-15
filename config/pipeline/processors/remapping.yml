@@ -1,5 +1,5 @@
 ## Expected processor config:
-# processor: RemapingProcessor
+# processor: RemappingProcessor
 # config_key: one of the keys in this file
 # input_keys: one key "data" and each key "using_table" in the designated config
 # output_keys: /
