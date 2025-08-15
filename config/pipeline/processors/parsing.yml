@@ -1,5 +1,5 @@
 ## Expected processor config:
-# processor: RemapingProcessor
+# processor: ParsingProcessor
 # config_key: one of the keys in this file
 # input_keys: single key "data"
 # output_keys: /
