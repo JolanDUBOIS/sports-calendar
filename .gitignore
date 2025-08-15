@@ -5,6 +5,7 @@ legacy/
 notebooks/
 .env
 .coverage
+.vscode/
 .secrets/
 .credentials/
 selections/*
