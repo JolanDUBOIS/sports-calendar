@@ -59,7 +59,7 @@ class FootballFilterApplier(FilterApplier):
         if standings.duplicated(subset=['team_id']).any():
             logger.error("Standings contain duplicate team IDs.")
             raise ValueError("Standings contain duplicate team IDs.")
-        return standings[standings['ranking'] <= filter.ranking]['team_id'].unique()
+        return standings[standings['position'] <= filter.ranking]['team_id'].unique()
 
     # Stage Filter
     def _apply_stage_filter(self, filter: StageFilter, matches: pd.DataFrame) -> pd.DataFrame:

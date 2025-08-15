@@ -29,14 +29,15 @@ models:
       name: int_football_espn_matches
       layer: intermediate
       path: intermediate/football/espn_matches.csv
-      unique:
-        field_sets:
-          - [id]
-        version_col: intermediate_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
 
     processing:
       - processor: JsonExtractionProcessor
@@ -46,7 +47,7 @@ models:
             data: landing_football_espn_matches
           output_key: int_football_espn_matches_step1
 
-      - processor: ReshapeProcessor
+      - processor: ReshapingProcessor
         io_info:
           config_key: int_football_espn_matches
           input_keys: 
@@ -82,15 +83,16 @@ models:
       name: int_football_espn_competitions
       layer: intermediate
       path: intermediate/football/espn_competitions.csv
-      unique:
-        field_sets:
-          - [id]
-        version_col: intermediate_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
-          - name
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - name
 
     processing:
       - processor: JsonExtractionProcessor
@@ -122,17 +124,18 @@ models:
       name: int_football_espn_standings
       layer: intermediate
       path: intermediate/football/espn_standings.csv
-      unique:
-        field_sets:
-          - [competition_id, season, team_id]
-        version_col: intermediate_at
-        keep: last
-      non-nullable:
-        fields: 
-          - competition_id
-          - season
-          - team_id
-          - rank
+      constraints:
+        - type: unique
+          field_sets:
+            - [competition_id, season, team_id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields: 
+            - competition_id
+            - season
+            - team_id
+            - rank
 
     processing:
       - processor: JsonExtractionProcessor
@@ -164,15 +167,16 @@ models:
       name: int_football_espn_teams
       layer: intermediate
       path: intermediate/football/espn_teams.csv
-      unique:
-        field_sets:
-          - [team_id]
-        version_col: intermediate_at
-        keep: first
-      non-nullable:
-        fields: 
-          - team_id
-          - team_name
+      constraints:
+        - type: unique
+          field_sets:
+            - [team_id]
+          version_col: intermediate_at
+          keep: first
+        - type: non-nullable
+          fields:
+            - team_id
+            - team_name
 
     processing:
       - processor: TableExtractionProcessor
@@ -204,15 +208,16 @@ models:
       name: int_f1_espn_events
       layer: intermediate
       path: intermediate/f1/espn_events.csv
-      unique:
-        field_sets:
-          - [id, session_id]
-        version_col: intermediate_at
-        keep: last
-      non-nullable:
-        fields:
-          - id
-          - session_id
+      constraints:
+        - type: unique
+          field_sets:
+            - [id, session_id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - session_id
 
     processing:
       - processor: JsonExtractionProcessor
