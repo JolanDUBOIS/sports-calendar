@@ -128,9 +128,12 @@ models:
     sources:
       - name: int_football_espn_standings
         path: intermediate/football/espn_standings.csv
+      - name: int_football_espn_competitions
+        path: intermediate/football/espn_competitions.csv
       
     dependencies:
       - intermediate.int_football_espn_standings
+      - intermediate.int_football_espn_competitions
 
     output:
       name: staging_football_standings
@@ -167,8 +170,15 @@ models:
           config_key: staging_football_standings
           input_keys:
             data: int_football_espn_standings
+          output_key: staging_football_standings_step1
+      - processor: RemappingProcessor
+        io_info:
+          config_key: staging_football_standings
+          input_keys:
+            data: staging_football_standings_step1
+            competitions: int_football_espn_competitions
           output_key: staging_football_standings
-    
+
     static_fields:
       - name: staging_at
         value: !date_offset 0
