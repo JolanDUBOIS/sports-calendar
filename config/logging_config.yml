@@ -22,16 +22,22 @@ handlers:
     formatter: simple
 
   file_debug_handler:
-    class: logging.FileHandler
+    class: logging.handlers.TimedRotatingFileHandler
     filename: logs/DEBUG.log
     level: DEBUG
     formatter: detailed
+    when: midnight         # rotate at midnight
+    interval: 1            # every 1 day
+    backupCount: 30        # keep 30 old logs
 
   file_debug_json_handler:
-    class: logging.FileHandler
+    class: logging.handlers.TimedRotatingFileHandler
     filename: logs/DEBUG.json
     level: DEBUG
     formatter: json
+    when: midnight
+    interval: 1
+    backupCount: 30
 
 loggers:
   # App loggers
