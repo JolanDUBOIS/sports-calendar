@@ -1,12 +1,27 @@
+# Python cache
 __pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+.env
+
+# Coverage reports
+.coverage
+
+# IDE / editor files
+.vscode/
+
+# Secrets / credentials
+.secrets/
+.credentials/
+
+# Data / logs / legacy files
 data/
 logs/
 legacy/
 notebooks/
-.env
-.coverage
-.vscode/
-.secrets/
-.credentials/
+
+# Selections (ignore everything except dev.yml)
 selections/*
 !selections/dev.yml
