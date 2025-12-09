@@ -1,6 +1,6 @@
 import logging.config
 import yaml
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import jsonlogger # type: ignore
 
 
 def setup_logging(config_file):
