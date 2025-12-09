@@ -53,6 +53,10 @@ class TableExtractionProcessor(Processor):
         config = cls.load_config(io_info.config_key)
         spec = ExtractionSpec.from_dict(config)
 
+        if df.empty:
+            logger.warning("Input DataFrame is empty. No extraction will be performed.")
+            return df
+
         if spec.is_simple():
             return cls._simple_extraction(df, spec.columns_mapping)
         else:

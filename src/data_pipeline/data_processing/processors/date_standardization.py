@@ -17,6 +17,9 @@ class DateStandardizationProcessor(Processor):
         if df is None:
             logger.error("Input data not found in the provided data dictionary.")
             raise ValueError("Input data not found in the provided data dictionary.")
+        if df.empty:
+            logger.warning("Input DataFrame is empty. No standardization will be performed.")
+            return df
 
         config = cls.load_config(io_info.config_key)
 

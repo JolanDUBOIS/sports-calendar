@@ -20,6 +20,9 @@ class ConstraintEnforcer(Generic[S], ABC):
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         """ Apply the constraint enforcement to the given DataFrame. """
         self._check_df(df)
+        if df.empty:
+            logger.warning("Nothing to enforce: DataFrame is empty.")
+            return df
         return self._apply(df)
 
     @abstractmethod
