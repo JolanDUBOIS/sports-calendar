@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import yaml
 
-from . import logger
+from ..config import logger
 
 
 def date_offset_constructor(loader, node):
