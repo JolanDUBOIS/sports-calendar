@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from src.utils import IOContent
 
 
-def load_processor_configs(path: Path) -> dict[str, Any]:
+def load_processor_configs(path: Path) -> dict[str, dict[str, Any]]:
     """ Load processors from the specified path. """
     processors_config = {}
     for file in path.glob("*.yml"):
@@ -24,6 +24,7 @@ def load_processor_configs(path: Path) -> dict[str, Any]:
     return processors_config
 
 processor_configs = load_processor_configs(CONFIG_DIR_PATH / "pipeline" / "shared" / "processors")
+processor_config_overrides: dict[str, dict[str, Any]] = {}  # Override dict for tests / temporary changes
 
 class Processor(ABC):
     """ Base class for all processors. """
@@ -52,7 +53,7 @@ class Processor(ABC):
     @classmethod
     def load_config(cls, config_key: str) -> dict | list:
         """ Load configuration for the processor. """
-        config_data = processor_configs.get(cls.config_filename, {})
+        config_data = {**processor_configs, **processor_config_overrides}.get(cls.config_filename, {})
         if config_key not in config_data:
             logger.error(f"Configuration key '{config_key}' not found in processor configuration.")
             raise KeyError(f"Configuration key '{config_key}' not found in processor configuration.")
