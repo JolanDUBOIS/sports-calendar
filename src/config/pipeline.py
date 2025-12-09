@@ -129,8 +129,9 @@ class ProcessorsConfig:
 class PipelineConfig:
     """ Loads and provides access to the pipeline configuration. """
 
-    def __init__(self, environment: str):
+    def __init__(self, repository: Path, environment: str):
         self.config_path = CONFIG_DIR_PATH / "pipeline"
+        self.repository = repository
         self.environment = environment # TODO - Check valid environment (for later, when environment is removed from base maybe?? Not sure...)
         if not self.config_path.exists():
             logger.error(f"Pipeline config directory does not exist: {self.config_path}")
@@ -140,13 +141,10 @@ class PipelineConfig:
     def load_sub_configs(self):
         """ Load all sub-configurations for workflows, schemas, and processors. """
         self.workflows = WorkflowsConfig(self.config_path / self.environment / "workflows")
+        self.workflows.resolve_paths(self.repository)  
         self.schemas = SchemasConfig(self.config_path / self.environment / "schemas")
+        self.schemas.resolve_paths(self.repository)
         self.processors = ProcessorsConfig(self.config_path / "shared" / "processors")
-
-    def resolve_paths(self, repo_path: Path | str):
-        """ Resolve paths for all sub-configurations. """
-        self.workflows.resolve_paths(repo_path)
-        self.schemas.resolve_paths(repo_path)
 
     def get_workflow(self) -> WorkflowSpec:
         """ TODO """

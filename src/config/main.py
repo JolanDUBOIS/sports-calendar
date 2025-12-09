@@ -15,9 +15,7 @@ class Config:
 
     def __init__(self):
         self.base = BaseConfig()
-        self.pipeline = PipelineConfig(self.base.environment)
-
-        self._repo_set = False
+        self._pipeline: PipelineConfig | None = None
 
     @property
     def repository(self) -> Path:
@@ -27,11 +25,16 @@ class Config:
     def environment(self) -> str:
         return self.base.environment
 
+    @property
+    def pipeline(self) -> PipelineConfig:
+        if self._pipeline is None:
+            self._pipeline = PipelineConfig(self.base.repository, self.base.environment)
+        return self._pipeline
+
     def set_repo(self, repo: Path) -> None:
         """ Set the active repository in the base configuration. Must be called once before using the pipeline. Cannot be called multiple times. """
-        # TODO - This behavior needs to be rethought, setting the repo shouldn't be compulsory and should work several times
         self.base.set_repo(repo)
-        self.pipeline.resolve_paths(repo)
+        self._pipeline = None  # Reset pipeline to force re-initialization with new repo
 
     def set_environment(self, environment: str) -> None:
         """ Set the active environment in the base configuration. """
