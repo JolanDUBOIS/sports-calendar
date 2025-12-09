@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 
 from . import logger
 from .base import BaseConfig, Repository
-from .credentials import Credentials
 from .pipeline import PipelineConfig
 
 if TYPE_CHECKING:
@@ -15,7 +14,6 @@ class Config:
 
     def __init__(self):
         self.base = BaseConfig()
-        self.credentials = Credentials()
         self.pipeline = PipelineConfig()
 
         self._repo_set = False
