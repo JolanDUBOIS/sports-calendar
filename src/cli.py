@@ -49,7 +49,8 @@ def run_pipeline(
         typer.echo("Reset mode aborted by the user.", err=True)
         raise typer.Exit(code=0)
 
-    config.set_repo(repo)
+    if repo is not None:
+        config.set_repo(repo)
     if env is not None:
         config.set_environment(env)
 
@@ -74,8 +75,8 @@ def run_validation(
 ):
     """ Run the data validation. """
     validate_stage_model(stage, model)
-
-    config.set_repo(repo)
+    if repo is not None:
+        config.set_repo(repo)
     if env is not None:
         config.set_environment(env)
     
@@ -94,7 +95,8 @@ def clean_repository(
     stage: str | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to clean (default is all stages). Valid values are " + ", ".join(DataStage.as_str()))
 ):
     """ Clean the data repository. """
-    config.set_repo(repo)
+    if repo is not None:
+        config.set_repo(repo)
     raise NotImplementedError("The clean command is not implemented yet.")
 
 
@@ -149,7 +151,8 @@ def test(
     env: str | None = typer.Option(None, "--env", help="Specify the environment to run the tests in (default in runtime.yml config file)."),
 ):
     """ Run a specific test. """
-    config.set_repo(repo)
+    if repo is not None:
+        config.set_repo(repo)
     if env is not None:
         config.set_environment(env)
     raise NotImplementedError(f"The test command is not implemented yet.")
