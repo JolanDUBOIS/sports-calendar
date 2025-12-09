@@ -55,7 +55,7 @@ def run_pipeline(
     if env is not None:
         config.set_environment(env)
 
-    from .data_pipeline import run_pipeline as run_pipeline_func
+    from .pipeline import run_pipeline as run_pipeline_func
     run_pipeline_func(
         config=config,
         stage=stage,
@@ -84,7 +84,7 @@ def run_validation(
     if env is not None:
         config.set_environment(env)
     
-    from .data_pipeline import run_validation as run_validation_func
+    from .pipeline import run_validation as run_validation_func
     results = run_validation_func(
         config=config,
         stage=stage,

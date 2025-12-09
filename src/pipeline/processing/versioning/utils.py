@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from . import SourceVersions, SourceVersion, logger
-from src.data_pipeline.utils import filter_file_content
+from src.pipeline.utils import filter_file_content
 
 if TYPE_CHECKING:
     from . import SourceVersioningStrategy

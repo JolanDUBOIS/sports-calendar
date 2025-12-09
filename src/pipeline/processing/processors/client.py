@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING, Any
 
 from . import logger
 from .base import Processor
-from src.data_pipeline.clients import (
+from src.pipeline.clients import (
     ESPNApiClient,
     FootballDataApiClient,
     LiveSoccerScraper,
     FootballRankingScraper
 )
-from src.data_pipeline.utils import concat_io_content
+from src.pipeline.utils import concat_io_content
 
 if TYPE_CHECKING:
     from src.utils import IOContent
