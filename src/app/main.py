@@ -9,7 +9,11 @@ from .selection import SelectionManager, SelectionRunner
 from src.config import Secrets
 
 
-def run_selection(key: str = "dev", dry_run: bool = False, **kwargs):
+def run_selection(
+    key: str = "dev",
+    dry_run: bool = False,
+    **kwargs
+):
     """ TODO """
     logger.info(f"Running selection for selection {key}.")
 
@@ -17,17 +21,18 @@ def run_selection(key: str = "dev", dry_run: bool = False, **kwargs):
     runner = SelectionRunner(selection)
     events = runner.run()
 
-    football_calendar = SportsCalendar()
-    football_calendar.add_events(events)
+    sports_calendar = SportsCalendar()
+    sports_calendar.add_events(events)
 
     if dry_run:
         logger.info("Dry run mode is enabled. No events will be added to the google calendar.")
+        logger.debug(f"Calendar events to be added:\n{sports_calendar}")
         return
 
     gcal_id = Secrets().get_gcal_id(key)
     google_cal_manager = GoogleCalendarManager.from_defaults(gcal_id)
     google_cal_manager.clear_calendar(scope='future', verbose=True)
-    google_cal_manager.add_calendar(football_calendar.calendar, scope='future', verbose=True)
+    google_cal_manager.add_calendar(sports_calendar.calendar, scope='future', verbose=True)
 
     logger.info(f"Selection {key} has been successfully processed and added to the google calendar.")
 

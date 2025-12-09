@@ -31,3 +31,11 @@ class SportsCalendar:
         with open(path, 'wb') as f:
             f.write(self.calendar.to_ical())
         logger.info(f"Calendar saved to {path}")
+
+    def __str__(self):
+        """ String representation of the calendar (first 10 events) """
+        events = list(self.calendar.subcomponents)
+        event_strs = [str(event) for event in events[:10]]
+        if len(events) > 10:
+            event_strs.append(f"... and {len(events) - 10} more events.")
+        return "\n".join(event_strs)

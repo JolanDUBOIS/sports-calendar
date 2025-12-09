@@ -1,7 +1,7 @@
 import typer
 
 from .utils import DataStage
-from .config.main import config
+from .config import Config
 
 
 app = typer.Typer()
@@ -49,6 +49,7 @@ def run_pipeline(
         typer.echo("Reset mode aborted by the user.", err=True)
         raise typer.Exit(code=0)
 
+    config = Config()
     if repo is not None:
         config.set_repo(repo)
     if env is not None:
@@ -56,6 +57,7 @@ def run_pipeline(
 
     from .data_pipeline import run_pipeline as run_pipeline_func
     run_pipeline_func(
+        config=config,
         stage=stage,
         model=model,
         manual=manual,
@@ -75,6 +77,8 @@ def run_validation(
 ):
     """ Run the data validation. """
     validate_stage_model(stage, model)
+
+    config = Config()
     if repo is not None:
         config.set_repo(repo)
     if env is not None:
@@ -82,6 +86,7 @@ def run_validation(
     
     from .data_pipeline import run_validation as run_validation_func
     results = run_validation_func(
+        config=config,
         stage=stage,
         model=model,
         raise_on_error=raise_on_error,
@@ -95,6 +100,7 @@ def clean_repository(
     stage: str | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to clean (default is all stages). Valid values are " + ", ".join(DataStage.as_str()))
 ):
     """ Clean the data repository. """
+    config = Config()
     if repo is not None:
         config.set_repo(repo)
     raise NotImplementedError("The clean command is not implemented yet.")
@@ -110,7 +116,12 @@ def run_selection(
     verbose: bool = typer.Option(False, "--verbose")
 ):
     """ Run the data selection. """
-    config.set_repo(repo)
+    config = Config()
+    if repo is not None:
+        config.set_repo(repo)
+
+    from .app import BaseTable
+    BaseTable.configure(config.repository)
 
     from .app import run_selection as run_selection_func
     run_selection_func(
@@ -151,6 +162,7 @@ def test(
     env: str | None = typer.Option(None, "--env", help="Specify the environment to run the tests in (default in runtime.yml config file)."),
 ):
     """ Run a specific test. """
+    config = Config()
     if repo is not None:
         config.set_repo(repo)
     if env is not None:

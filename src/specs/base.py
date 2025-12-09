@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import cattrs
 from yaml import dump
 
-from src.config import load_yml
+from src.utils import load_yml
 
 
 T = TypeVar('T', bound='BaseModel')

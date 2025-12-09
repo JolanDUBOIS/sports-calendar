@@ -7,6 +7,6 @@ from pathlib import Path
 from src import ROOT_PATH
 CONFIG_DIR_PATH = ROOT_PATH / Path("config")
 
-from .loader import load_yml
+from .main import Config
 from .secrets import Secrets
 from .credentials import Credentials

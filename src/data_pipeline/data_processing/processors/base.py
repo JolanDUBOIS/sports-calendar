@@ -1,14 +1,29 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
+from pathlib import Path
 from abc import ABC, abstractmethod
 
 from . import logger
-from src.config.main import config
+from src.config import CONFIG_DIR_PATH
+from src.utils import load_yml
 
 if TYPE_CHECKING:
     from src.specs import ProcessingStepSpec, ProcessingIOInfo
     from src.utils import IOContent
 
+
+def load_processor_configs(path: Path) -> dict[str, Any]:
+    """ Load processors from the specified path. """
+    processors_config = {}
+    for file in path.glob("*.yml"):
+        if not file.is_file():
+            logger.warning(f"Skipping non-file entry in processors directory: {file}")
+            continue
+        config = load_yml(file)
+        processors_config[file.stem] = config
+    return processors_config
+
+processor_configs = load_processor_configs(CONFIG_DIR_PATH / "pipeline" / "shared" / "processors")
 
 class Processor(ABC):
     """ Base class for all processors. """
@@ -37,7 +52,7 @@ class Processor(ABC):
     @classmethod
     def load_config(cls, config_key: str) -> dict | list:
         """ Load configuration for the processor. """
-        config_data = config.pipeline.get_processor(cls.config_filename)
+        config_data = processor_configs.get(cls.config_filename, {})
         if config_key not in config_data:
             logger.error(f"Configuration key '{config_key}' not found in processor configuration.")
             raise KeyError(f"Configuration key '{config_key}' not found in processor configuration.")

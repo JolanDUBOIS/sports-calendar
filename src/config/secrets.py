@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from . import logger
-from .loader import load_yml
 from src import ROOT_PATH
+from src.utils.loader import load_yml
 
 
 SECRETS_DIR = ROOT_PATH / ".secrets"

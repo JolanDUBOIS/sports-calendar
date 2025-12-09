@@ -1,10 +1,10 @@
+from pathlib import Path
 from abc import ABC, abstractmethod
 
 import pandas as pd
 
 from . import logger
 from src.file_io import FileHandlerFactory
-from src.config.main import config
 
 
 class BaseTable(ABC):
@@ -13,6 +13,11 @@ class BaseTable(ABC):
     __columns__ = None
     __sport__ = None
     _file_handler = None
+    _repo_path = None
+
+    @classmethod
+    def configure(cls, repo_path: Path):
+        cls._repo_path = repo_path
 
     @classmethod
     @abstractmethod
@@ -31,7 +36,7 @@ class BaseTable(ABC):
             raise ValueError(f"Columns for {cls.__name__} are not defined.")
 
         if cls._file_handler is None:
-            path = config.repository / "staging" / cls.__sport__ / cls.__file_name__
+            path = cls._repo_path / "staging" / cls.__sport__ / cls.__file_name__
             cls._file_handler = FileHandlerFactory.create_file_handler(path)
 
         df = cls._file_handler.read()

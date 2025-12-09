@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Any
 
 from . import logger, CONFIG_DIR_PATH
-from .loader import load_yml
 from .constants import ENV
+from src.utils.loader import load_yml
 from src.specs import (
     WorkflowSpec,
     LayerSpec,
@@ -30,7 +30,6 @@ class PipelineConfig:
 
         self.workflow = self.load_workflow(self.config_path / self.environment / "workflows")
         self.schema = self.load_schema(self.config_path / self.environment / "schemas")
-        self.processors = self.load_processors(self.config_path / "shared" / "processors")
 
         self.workflow.resolve_paths(self.repository)
         self.schema.resolve_paths(self.repository)
@@ -62,18 +61,6 @@ class PipelineConfig:
             raise ValueError(f"Failed to load schemas from {path}: {e}")
 
     @staticmethod
-    def load_processors(path: Path) -> dict[str, Any]:
-        """ Load processors from the specified path. """
-        processors_config = {}
-        for file in path.glob("*.yml"):
-            if not file.is_file():
-                logger.warning(f"Skipping non-file entry in processors directory: {file}")
-                continue
-            config = load_yml(file)
-            processors_config[file.stem] = config
-        return processors_config
-
-    @staticmethod
     def _load_yaml_configs(path: Path) -> list[dict[str, Any]]:
         """ Load and validate the configuration from the specified path. """
         configs = []
@@ -83,7 +70,3 @@ class PipelineConfig:
                 continue
             configs.append(load_yml(file))
         return configs
-
-    def get_processor(self, name: str) -> dict[str, Any]:
-        """ Get a specific processor configuration by name. """
-        return self.processors.get(name)

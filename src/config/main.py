@@ -1,13 +1,7 @@
-from __future__ import annotations
 from pathlib import Path
-from typing import TYPE_CHECKING
 
-from . import logger
 from .base import BaseConfig
 from .pipeline import PipelineConfig
-
-if TYPE_CHECKING:
-    from src.specs import WorkflowSpec, SchemaSpec
 
 
 class Config:
@@ -40,5 +34,3 @@ class Config:
         """ Set the active environment in the base configuration. """
         self.base.set_environment(environment)
         self._pipeline = None  # Reset pipeline to force re-initialization with new environment
-
-config = Config()

@@ -3,10 +3,11 @@ import traceback
 from . import logger
 from .build_layer import LayerBuilder, ModelManager
 from src.utils import DataStage
-from src.config.main import config
+from src.config import Config
 
 
 def run_pipeline(
+    config: Config,
     stage: DataStage | None = None,
     model: str | None = None,
     **kwargs
