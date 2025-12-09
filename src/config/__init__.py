@@ -8,3 +8,4 @@ from src import ROOT_PATH
 CONFIG_DIR_PATH = ROOT_PATH / Path("config")
 
 from .loader import load_yml
+from .secrets import Secrets

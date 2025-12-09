@@ -5,7 +5,6 @@ from . import logger
 from .base import BaseConfig, Repository
 from .credentials import Credentials
 from .pipeline import PipelineConfig
-from .secrets import Secrets
 
 if TYPE_CHECKING:
     from src.specs import WorkflowSpec, SchemaSpec
@@ -18,7 +17,6 @@ class Config:
         self.base = BaseConfig()
         self.credentials = Credentials()
         self.pipeline = PipelineConfig()
-        self.secrets = Secrets()
 
         self._repo_set = False
 
