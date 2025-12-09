@@ -15,7 +15,7 @@ class Config:
 
     def __init__(self):
         self.base = BaseConfig()
-        self.pipeline = PipelineConfig()
+        self.pipeline = PipelineConfig(self.base.environment)
 
         self._repo_set = False
 
@@ -39,10 +39,10 @@ class Config:
 
     def get_workflow(self) -> WorkflowSpec:
         """ Get the workflow configuration for the active environment. """
-        return self.pipeline.get_workflow(self.base.environment)
+        return self.pipeline.get_workflow()
 
     def get_schema(self) -> SchemaSpec:
         """ Get the schema configuration for the active environment. """
-        return self.pipeline.get_schema(self.base.environment)
+        return self.pipeline.get_schema()
 
 config = Config()

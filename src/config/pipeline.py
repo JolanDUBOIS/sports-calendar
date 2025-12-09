@@ -25,11 +25,6 @@ class BaseConfigLoader:
         if not self.path.exists():
             logger.error(f"Config directory does not exist: {self.path}")
             raise FileNotFoundError(f"Config directory does not exist: {self.path}")
-        required_subdirs = ENV
-        for subdir in required_subdirs:
-            if not (self.path / subdir).exists():
-                logger.error(f"Required subdirectory {subdir} does not exist in config path.")
-                raise FileNotFoundError(f"Required subdirectory {subdir} does not exist in config path.")
 
     def _load_valid(self, path: Path) -> Any:
         """ Load and validate the configuration from the specified path. """
@@ -47,10 +42,7 @@ class WorkflowsConfig(BaseConfigLoader):
 
     def __init__(self, path: Path):
         super().__init__(path)
-
-        self.env_workflows: dict[str, WorkflowSpec] = {
-            env: self.load(self.path / env) for env in ENV
-        }
+        self.workflow: WorkflowSpec = self.load(path)
 
     def load(self, path: Path) -> WorkflowSpec:
         """ TODO """
@@ -67,16 +59,12 @@ class WorkflowsConfig(BaseConfigLoader):
 
     def resolve_paths(self, repo_path: Path | str):
         """ Resolve paths for all workflows in the configuration. """
-        for workflow in self.env_workflows.values():
-            for layer in workflow.layers:
-                layer.resolve_paths(repo_path)
+        for layer in self.workflow.layers:
+            layer.resolve_paths(repo_path)
 
-    def get_workflow(self, environment: str) -> WorkflowSpec:
-        """ Get the workflow set for a specific environment. """
-        if environment not in ENV:
-            logger.error(f"Invalid environment '{environment}'. Valid environments are: {', '.join(ENV)}")
-            raise ValueError(f"Invalid environment '{environment}'. Valid environments are: {', '.join(ENV)}")
-        return self.env_workflows.get(environment)
+    def get_workflow(self) -> WorkflowSpec: # TODO - to remove
+        """ TODO """
+        return self.workflow
 
 
 class SchemasConfig(BaseConfigLoader):
@@ -84,10 +72,7 @@ class SchemasConfig(BaseConfigLoader):
 
     def __init__(self, path: Path):
         super().__init__(path)
-
-        self.env_schemas: dict[str, SchemaSpec] = {
-            env: self.load(self.path / env) for env in ENV
-        }
+        self.schema: SchemaSpec = self.load(path)
 
     def load(self, path: Path) -> SchemaSpec:
         """ Load schemas from the specified path. """
@@ -104,15 +89,11 @@ class SchemasConfig(BaseConfigLoader):
 
     def resolve_paths(self, repo_path: Path | str):
         """ Resolve paths for all schemas in the configuration. """
-        for schema in self.env_schemas.values():
-            schema.resolve_paths(repo_path)
+        self.schema.resolve_paths(repo_path)
 
-    def get_schema(self, environment: str | None = None) -> SchemaSpec:
-        """ Get the schema set for a specific environment. """
-        if environment not in ENV:
-            logger.error(f"Invalid environment '{environment}'. Valid environments are: {', '.join(ENV)}")
-            raise ValueError(f"Invalid environment '{environment}'. Valid environments are: {', '.join(ENV)}")
-        return self.env_schemas.get(environment, SchemaSpec(layers=[]))
+    def get_schema(self) -> SchemaSpec: # TODO - to remove
+        """ TODO """
+        return self.schema
 
 
 class ProcessorsConfig:
@@ -148,8 +129,9 @@ class ProcessorsConfig:
 class PipelineConfig:
     """ Loads and provides access to the pipeline configuration. """
 
-    def __init__(self):
+    def __init__(self, environment: str):
         self.config_path = CONFIG_DIR_PATH / "pipeline"
+        self.environment = environment # TODO - Check valid environment (for later, when environment is removed from base maybe?? Not sure...)
         if not self.config_path.exists():
             logger.error(f"Pipeline config directory does not exist: {self.config_path}")
             raise FileNotFoundError(f"Pipeline config directory does not exist: {self.config_path}")
@@ -157,22 +139,22 @@ class PipelineConfig:
 
     def load_sub_configs(self):
         """ Load all sub-configurations for workflows, schemas, and processors. """
-        self.workflows = WorkflowsConfig(self.config_path / "workflows")
-        self.schemas = SchemasConfig(self.config_path / "schemas")
-        self.processors = ProcessorsConfig(self.config_path / "processors")
+        self.workflows = WorkflowsConfig(self.config_path / self.environment / "workflows")
+        self.schemas = SchemasConfig(self.config_path / self.environment / "schemas")
+        self.processors = ProcessorsConfig(self.config_path / "shared" / "processors")
 
     def resolve_paths(self, repo_path: Path | str):
         """ Resolve paths for all sub-configurations. """
         self.workflows.resolve_paths(repo_path)
         self.schemas.resolve_paths(repo_path)
 
-    def get_workflow(self, environment: str | None = None) -> WorkflowSpec:
-        """ Get the workflow configuration for a specific environment. """
-        return self.workflows.get_workflow(environment)
+    def get_workflow(self) -> WorkflowSpec:
+        """ TODO """
+        return self.workflows.get_workflow()
 
-    def get_schema(self, environment: str | None = None) -> SchemaSpec:
-        """ Get the schema configuration for a specific environment. """
-        return self.schemas.get_schema(environment)
+    def get_schema(self) -> SchemaSpec:
+        """ TODO """
+        return self.schemas.get_schema()
 
     def get_processor(self, name: str) -> dict[str, Any]:
         """ Get a specific processor configuration by name. """

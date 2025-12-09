@@ -10,10 +10,10 @@ formatters:
     format: "%(asctime)s [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] (%(funcName)s) - %(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
 
-  json:
-    "()": pythonjsonlogger.jsonlogger.JsonFormatter
-    format: '%(created)f %(asctime)s %(levelname)s %(name)s %(filename)s %(lineno)d %(funcName)s %(message)s'
-    datefmt: '%Y-%m-%d %H:%M:%S'
+  # json:
+  #   "()": pythonjsonlogger.jsonlogger.JsonFormatter
+  #   format: '%(created)f %(asctime)s %(levelname)s %(name)s %(filename)s %(lineno)d %(funcName)s %(message)s'
+  #   datefmt: '%Y-%m-%d %H:%M:%S'
 
 handlers:
   console_handler:
@@ -30,14 +30,14 @@ handlers:
     interval: 1            # every 1 day
     backupCount: 30        # keep 30 old logs
 
-  file_debug_json_handler:
-    class: logging.handlers.TimedRotatingFileHandler
-    filename: logs/DEBUG.json
-    level: DEBUG
-    formatter: json
-    when: midnight
-    interval: 1
-    backupCount: 30
+  # file_debug_json_handler:
+  #   class: logging.handlers.TimedRotatingFileHandler
+  #   filename: logs/DEBUG.json
+  #   level: DEBUG
+  #   formatter: json
+  #   when: midnight
+  #   interval: 1
+  #   backupCount: 30
 
 loggers:
   # App loggers
@@ -119,5 +119,5 @@ loggers:
 
 root:
   level: DEBUG
-  handlers: [console_handler, file_debug_handler, file_debug_json_handler]
+  handlers: [console_handler, file_debug_handler] #, file_debug_json_handler]
   propagate: False
