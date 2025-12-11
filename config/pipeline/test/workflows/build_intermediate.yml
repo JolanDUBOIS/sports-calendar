@@ -1,0 +1,238 @@
+name: build_intermediate
+description: |
+  This workflow is responsible for orchestrating the data pipeline from the landing zone to the intermediate zone.
+  It includes tasks for data validation, transformation, parsing, reshaping and loading into the intermediate storage.
+stage: intermediate
+
+# Documentation (not sure where to write this yet):
+# The name of a model (as well as in sources and output) follows the pattern: <layer>_<sport>_<source>_<name> (easier to match with the path, intermediate can be shortened to int)
+# The config keys should generally take the name of the model they are used in. In case of multiple models using the same config, the config key should be more generic (to the user's preference).
+# Input and output keys (inside processing) follow the pattern: <model_name>_<step_number> (e.g. int_football_espn_matches_step1, int_football_espn_matches_step2, etc.).
+# The final output key has to match the output name (same for the sources)...
+
+models:
+  - name: int_football_espn_matches
+    description: Extracts match information from the ESPN json data.
+    trigger: automatic
+
+    sources:
+      - name: landing_football_espn_matches
+        path: landing/football/espn_matches.json
+        versioning:
+          mode: newest # newest or all
+          field: created_at
+
+    dependencies:
+      - landing.landing_football_espn_matches
+
+    output:
+      name: int_football_espn_matches
+      layer: intermediate
+      path: intermediate/football/espn_matches.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+
+    processing:
+      - processor: JsonExtractionProcessor
+        io_info:
+          config_key: int_football_espn_matches
+          input_keys: 
+            data: landing_football_espn_matches
+          output_key: int_football_espn_matches_step1
+
+      - processor: ReshapingProcessor
+        io_info:
+          config_key: int_football_espn_matches
+          input_keys: 
+            data: int_football_espn_matches_step1
+          output_key: int_football_espn_matches_step2
+
+      - processor: DateStandardizationProcessor
+        io_info:
+          config_key: int_football_espn_matches
+          input_keys: 
+            data: int_football_espn_matches_step2
+          output_key: int_football_espn_matches
+
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: int_football_espn_competitions
+    description: Extracts competition information from the ESPN json data.
+    trigger: automatic
+
+    sources:
+      - name: landing_football_espn_competitions
+        path: landing/football/espn_competitions.json
+        versioning:
+          mode: newest
+          field: created_at
+  
+    dependencies:
+      - landing.landing_football_espn_competitions
+
+    output:
+      name: int_football_espn_competitions
+      layer: intermediate
+      path: intermediate/football/espn_competitions.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - name
+
+    processing:
+      - processor: JsonExtractionProcessor
+        io_info:
+          config_key: int_football_espn_competitions
+          input_keys:
+            data: landing_football_espn_competitions
+          output_key: int_football_espn_competitions
+
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: int_football_espn_standings
+    description: Extracts standings information from the ESPN json data.
+    trigger: automatic
+
+    sources:
+      - name: landing_football_espn_standings
+        path: landing/football/espn_standings.json
+        versioning:
+          mode: newest
+          field: created_at
+
+    dependencies:
+      - landing.landing_football_espn_standings
+
+    output:
+      name: int_football_espn_standings
+      layer: intermediate
+      path: intermediate/football/espn_standings.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [competition_id, season, team_id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields: 
+            - competition_id
+            - season
+            - team_id
+            - rank
+
+    processing:
+      - processor: JsonExtractionProcessor
+        io_info:
+          config_key: int_football_espn_standings
+          input_keys:
+            data: landing_football_espn_standings
+          output_key: int_football_espn_standings
+
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: int_football_espn_teams
+    description: Extracts team information from the ESPN matches data.
+    trigger: automatic
+
+    sources:
+      - name: intermediate_football_espn_matches
+        path: intermediate/football/espn_matches.csv
+        versioning:
+          mode: newest
+          field: intermediate_at
+
+    dependencies:
+      - intermediate.int_football_espn_matches
+
+    output:
+      name: int_football_espn_teams
+      layer: intermediate
+      path: intermediate/football/espn_teams.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [team_id]
+          version_col: intermediate_at
+          keep: first
+        - type: non-nullable
+          fields:
+            - team_id
+            - team_name
+
+    processing:
+      - processor: TableExtractionProcessor
+        io_info:
+          config_key: int_football_espn_teams
+          input_keys:
+            data: intermediate_football_espn_matches
+          output_key: int_football_espn_teams
+
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
+
+  - name: int_f1_espn_events
+    description: Extracts F1 event information from the ESPN json data.
+    trigger: automatic
+
+    sources:
+      - name: landing_f1_espn_events
+        path: landing/f1/espn_events.json
+        versioning:
+          mode: newest
+          field: created_at
+
+    dependencies:
+      - landing.landing_f1_espn_events
+
+    output:
+      name: int_f1_espn_events
+      layer: intermediate
+      path: intermediate/f1/espn_events.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [id, session_id]
+          version_col: intermediate_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - session_id
+
+    processing:
+      - processor: JsonExtractionProcessor
+        io_info:
+          config_key: int_f1_espn_events
+          input_keys:
+            data: landing_f1_espn_events
+          output_key: int_f1_espn_events_step1
+      - processor: DateStandardizationProcessor
+        io_info:
+          config_key: int_f1_espn_events
+          input_keys:
+            data: int_f1_espn_events_step1
+          output_key: int_f1_espn_events
+
+    static_fields:
+      - name: intermediate_at
+        value: !date_offset 0
