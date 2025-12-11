@@ -1,9 +1,9 @@
 import pytest
 
 from src.config import Config
-from src.pipeline.processing.main import run_pipeline
+from src.pipeline.processing import run_pipeline
 
 
 def test_run_pipeline_single_model():
-    config = Config()
-    run_pipeline(config=config, stage="processing", model="model_a")
+    config = Config(repository="data/repository-test", environment="test")
+    run_pipeline(config=config)
