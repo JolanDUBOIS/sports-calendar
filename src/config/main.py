@@ -40,8 +40,8 @@ class BaseConfig(ABC):
 class Config(BaseConfig):
     """ TODO """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._pipeline: PipelineConfig | None = None
 
     @property
