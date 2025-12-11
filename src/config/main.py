@@ -1,59 +1,70 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
+from abc import ABC
+from pathlib import Path
 
-from . import logger
-from .base import BaseConfig, Repository
-from .credentials import Credentials
+import yaml
+
+from . import logger, CONFIG_DIR_PATH
 from .pipeline import PipelineConfig
-from .secrets import Secrets
-
-if TYPE_CHECKING:
-    from src.specs import WorkflowSpec, SchemaSpec
+from .constants import ENV, DEFAULT_ENV
 
 
-class Config:
+class BaseConfig(ABC):
     """ TODO """
 
-    def __init__(self):
-        self.base = BaseConfig()
-        self.credentials = Credentials()
-        self.pipeline = PipelineConfig()
-        self.secrets = Secrets()
+    def __init__(self, repository: Path | str | None = None, environment: str | None = None):
+        self.base_config_path = CONFIG_DIR_PATH / "base.yml"
+        if not self.base_config_path.exists():
+            logger.error(f"Base config file does not exist: {self.base_config_path}")
+            raise FileNotFoundError(f"Base config file does not exist: {self.base_config_path}")
+        
+        self._load_yml()
 
-        self._repo_set = False
+        self.repository = repository or self._data.get("repository")
+        self.environment = environment or self._data.get("environment", DEFAULT_ENV)
+
+        if not isinstance(self.repository, Path):
+            self.repository = Path(self.repository)
+        if not self.repository.exists():
+            logger.error(f"Repository path does not exist: {self.repository}")
+            raise FileNotFoundError(f"Repository path does not exist: {self.repository}")
+
+        if not isinstance(self.environment, str) or self.environment not in ENV:
+            logger.error(f"Invalid environment '{self.environment}'. Must be one of: {', '.join(ENV)}")
+            raise ValueError(f"Invalid environment '{self.environment}'. Must be one of: {', '.join(ENV)}")
+
+    def _load_yml(self) -> None:
+        """Load the YAML config file and store the raw data."""
+        with open(self.base_config_path, "r") as f:
+            self._data = yaml.safe_load(f) or {}
+
+class Config(BaseConfig):
+    """ TODO """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._pipeline: PipelineConfig | None = None
 
     @property
-    def repository(self) -> Repository:
-        return self.base.repository
+    def pipeline(self) -> PipelineConfig:
+        if self._pipeline is None:
+            self._pipeline = PipelineConfig(self.repository, self.environment)
+        return self._pipeline
 
-    @property
-    def environment(self) -> str:
-        return self.base.environment
-
-    def set_repo(self, repo_name: str | None = None) -> None:
-        """ Set the active repository in the base configuration. Must be called once before using the pipeline. """
-        if self._repo_set:
-            logger.error("Repository has already been set. Cannot change it after initialization.")
-            raise RuntimeError("Repository has already been set. Cannot change it after initialization.")
-        if repo_name is None:
-            repo_name = self.base.repository.name
-
-        self.base.set_repo(repo_name)
-        logger.info(f"Repository set to: {repo_name}")
-        self.pipeline.resolve_paths(self.base.repository.path)
-        self._repo_set = True
+    def set_repo(self, repo: Path | str) -> None:
+        """ Set the repository path in the base configuration. """
+        repo_path = Path(repo)
+        if not repo_path.exists():
+            logger.error(f"Repository path does not exist: {repo_path}")
+            raise FileNotFoundError(f"Repository path does not exist: {repo_path}")
+        self.repository = repo_path
+        self._pipeline = None  # Reset pipeline to force re-initialization with new repo
+        logger.info(f"Repository path set to: {self.repository}")
 
     def set_environment(self, environment: str) -> None:
         """ Set the active environment in the base configuration. """
-        self.base.set_environment(environment)
-        logger.info(f"Environment set to: {environment}")
-
-    def get_workflow(self) -> WorkflowSpec:
-        """ Get the workflow configuration for the active environment. """
-        return self.pipeline.get_workflow(self.base.environment)
-
-    def get_schema(self) -> SchemaSpec:
-        """ Get the schema configuration for the active environment. """
-        return self.pipeline.get_schema(self.base.environment)
-
-config = Config()
+        if environment not in ENV:
+            logger.error(f"Invalid environment '{environment}'. Must be one of: {ENV}")
+            raise ValueError(f"Invalid environment '{environment}'. Must be one of: {ENV}")
+        self.environment = environment
+        self._pipeline = None  # Reset pipeline to force re-initialization with new environment
+        logger.info(f"Environment set to: {self.environment}")
