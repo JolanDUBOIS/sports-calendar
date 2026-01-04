@@ -19,9 +19,8 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 
 # Copy the rest of the project
 COPY src /app/src
-COPY logs /app/logs
-COPY .secrets /app/.secrets
-COPY .credentials /app/.credentials
 COPY config /app/config
 COPY selections /app/selections
-COPY .env /app/.env
+
+# Create logs directory if not exists/mounted
+RUN mkdir -p /app/logs
