@@ -1,7 +1,0 @@
-repositories:
-  - name: prod
-    path: data/repository
-  - name: dev
-    path: data/repository-dev
-  - name: test
-    path: data/repository-test

@@ -1,35 +1,40 @@
-[tool.poetry]
-name = "football-calendar"
+[project]
+name = "sports-calendar-dev"
 version = "0.1.0"
-description = "Football calendar project"
-authors = ["Jolan <jolan11.dubois@gmail.com>"]
-packages = [{include = "src"}]
+description = ""
+authors = [
+    {name = "JolanDUBOIS",email = "jolan11.dubois@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "icalendar (>=6.3.2,<7.0.0)",
+    "requests (>=2.32.5,<3.0.0)",
+    "beautifulsoup4 (>=4.14.3,<5.0.0)",
+    "cloudscraper (>=1.2.71,<2.0.0)",
+    "google-api-python-client (>=2.187.0,<3.0.0)",
+    "google-auth-httplib2 (>=0.3.0,<0.4.0)",
+    "google-auth-oauthlib (>=1.2.3,<2.0.0)",
+    "ics (>=0.7.2,<0.8.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "sqlalchemy (>=2.0.45,<3.0.0)",
+    "rapidfuzz (>=3.14.3,<4.0.0)",
+    "typer (>=0.20.0,<0.21.0)",
+    "networkx (>=3.6.1,<4.0.0)",
+    "cattrs (>=25.3.0,<26.0.0)",
+    "python-json-logger (>=4.0.0,<5.0.0)"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.11,<3.12"
-PyYAML = "^6.0.2"
-icalendar = "^6.1.0"
-pandas = "^2.2.3"
-requests = "^2.32.3"
-beautifulsoup4 = "^4.12.3"
-cloudscraper = "^1.2.71"
-google-api-python-client = "^2.160.0"
-google-auth-httplib2 = "^0.2.0"
-google-auth-oauthlib = "^1.2.1"
-ics = "^0.7.2"
-python-dotenv = "^1.1.0"
-SQLAlchemy = "^2.0.40"
-RapidFuzz = "^3.13.0"
-typer = "^0.16.0"
-networkx = "^3.5"
-cattrs = "^25.1.1"
-python-json-logger = "^3.3.0"
-
-[tool.poetry.dev-dependencies]
-ipykernel = "^6.29.5"
-coverage = "^7.8.0"
-pytest = "^8.3.5"
+[tool.poetry]
+package-mode = false
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
+]

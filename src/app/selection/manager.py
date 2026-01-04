@@ -2,7 +2,7 @@ from src import ROOT_PATH
 
 from . import logger
 from .selection import Selection
-from src.config import load_yml
+from src.utils import load_yml
 
 
 SELECTIONS_DIR_PATH = ROOT_PATH / "selections"
