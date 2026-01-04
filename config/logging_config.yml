@@ -102,6 +102,10 @@ loggers:
   src.specs.pipeline.schemas:
     level: DEBUG
 
+  # Utils loggers
+  src.utils:
+    level: DEBUG
+
   # Tests logger
   src.tests:
     level: DEBUG

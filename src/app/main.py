@@ -1,21 +1,24 @@
 from __future__ import annotations
 
-from . import logger
+from . import logger, BaseTable
 from .calendar import (
     SportsCalendar,
     GoogleCalendarManager
 )
 from .selection import SelectionManager, SelectionRunner
-from src.config import Secrets
+from src.config import Config, Secrets
 
 
 def run_selection(
+    config: Config,
     key: str = "dev",
     dry_run: bool = False,
     **kwargs
 ):
     """ TODO """
     logger.info(f"Running selection for selection {key}.")
+
+    BaseTable.configure(config.repository)
 
     selection = SelectionManager().get_selection(key)
     runner = SelectionRunner(selection)
