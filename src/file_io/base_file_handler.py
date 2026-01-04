@@ -33,13 +33,13 @@ class BaseFileHandler(ABC):
     def _check_path(file_path: Path) -> None:
         """ Check if the file path is valid. """
         if not file_path.parent.exists():
-            logger.error(f"The directory {file_path.parent} does not exist.")
-            raise FileNotFoundError(f"The directory {file_path.parent} does not exist.")
+            logger.warning(f"The directory {file_path.parent} does not exist. Creating it.")
+            file_path.parent.mkdir(parents=True, exist_ok=True)
         if file_path.exists() and not file_path.is_file():
             logger.error(f"The path {file_path} is not a valid file.")
             raise FileNotFoundError(f"The path {file_path} is not a valid file.")
         if not file_path.exists():
-            logger.warning(f"The file {file_path} does not exist. It will be created on write.")
+            logger.debug(f"The file {file_path} does not exist. It will be created on write.")
 
     def read(self) -> IOContent:
         """ Read the content of the file. """
