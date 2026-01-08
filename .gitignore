@@ -28,3 +28,6 @@ config/selections/*
 
 # Gitkeep files
 !.gitkeep
+
+# Distribution / build files
+dist/
