@@ -1,5 +1,4 @@
 from __future__ import annotations
-import traceback
 
 import pandas as pd
 
@@ -92,9 +91,8 @@ class LayerSchemaManager:
                 model_manager = ModelSchemaManager(model_spec)
                 schema_result.append(model_manager.validate(**kwargs))
             return schema_result
-        except Exception as e:
-            logger.error(f"Validation failed for stage '{self.schema_spec.stage}': {e}")
-            logger.debug("Traceback:\n%s", traceback.format_exc())
+        except Exception:
+            logger.exception(f"Validation failed for stage '{self.schema_spec.stage}'.")
         logger.info(f"Schema '{self.schema_spec.name}' validation completed.")
 
     @classmethod

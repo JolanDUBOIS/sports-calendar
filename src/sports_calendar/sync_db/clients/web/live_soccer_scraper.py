@@ -1,4 +1,3 @@
-import traceback
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus
 
@@ -138,9 +137,8 @@ class LiveSoccerScraper(BaseScraper):
                     match_data = self._parse_match_row(row, current_date)
                     if match_data:
                         matches.append(match_data)
-                except Exception as e:
-                    logger.debug(f"Error parsing match row: {e}")
-                    logger.debug("Traceback:\n%s", traceback.format_exc())
+                except Exception:
+                    logger.exception(f"Error parsing match row. Skipping row: {row}")
                     continue
 
             # Check if the row contains a date (not a match row)

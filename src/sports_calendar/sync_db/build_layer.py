@@ -1,6 +1,4 @@
 from __future__ import annotations
-import traceback
-from dataclasses import dataclass
 
 from . import logger
 from .order_models import ModelOrder
@@ -25,8 +23,7 @@ class LayerBuilder:
                 logger.debug(f"Building model: {model_spec.name} in layer '{self.layer_spec.stage}'")
                 model_manager = ModelManager(model_spec)
                 model_manager.run(**kwargs)
-            except Exception as e:
-                logger.error(f"Error processing model {model_spec.name}: {e}")
-                logger.debug(traceback.format_exc())
+            except Exception:
+                logger.exception(f"Error processing model {model_spec.name} in layer '{self.layer_spec.stage}'. Marking as failed.")
                 self.models_order.mark_failed(model_spec)
         logger.info(f"Completed building layer '{self.layer_spec.stage}'.")

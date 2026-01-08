@@ -1,4 +1,3 @@
-import traceback
 from typing import Any
 from dataclasses import dataclass, field
 
@@ -42,7 +41,6 @@ class SourceVersions:
         """ Append a new SourceVersion for a given source name. """
         if key in self.source_versions:
             logger.error(f"Source '{key}' already exists in source_versions.")
-            logger.debug(f"Call stack:\n{''.join(traceback.format_stack())}")
             raise KeyError(f"Source '{key}' already exists in source_versions.")
         self.source_versions[key] = version
 

@@ -1,5 +1,3 @@
-import traceback
-
 from . import logger
 from .definitions import load_schema
 from .schema_manager import LayerSchemaManager, ModelSchemaManager
@@ -28,9 +26,8 @@ def run_validation(
             model_manager = ModelSchemaManager(model_spec)
             results = model_manager.validate(**kwargs)
             return SchemaValidationResult(schema=schema_spec.name, results=[results])
-        except Exception as e:
-            logger.error(f"Validation failed for model '{model}': {e}")
-            logger.debug("Traceback:\n%s", traceback.format_exc())
+        except Exception:
+            logger.exception(f"Validation failed for model '{model}'.")
 
     # Multiple models
     else:

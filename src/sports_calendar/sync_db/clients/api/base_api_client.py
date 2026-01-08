@@ -1,5 +1,4 @@
 import time
-import traceback
 
 import requests
 
@@ -39,9 +38,8 @@ class BaseApiClient:
                     logger.debug(f"Response content: {response.content}")
                     return None
 
-            except Exception as e:
-                logger.error(f"Failed to fetch data from URL: {url}. Error: {e}")
-                logger.debug("Traceback:\n%s", traceback.format_exc())
+            except Exception:
+                logger.exception(f"Failed to fetch data from URL: {url}. Attempt {retries}/{max_retries}. Retrying in {delay} seconds...")
                 break
 
         if retries >= max_retries:

@@ -1,5 +1,4 @@
 import time
-import traceback
 from datetime import datetime
 from icalendar import Event
 from googleapiclient.discovery import build
@@ -62,9 +61,8 @@ class GoogleCalendarAPI:
                     break
 
             return all_events
-        except Exception as e:
-            logger.error(f"Unexpected error fetching events: {e}")
-            logger.debug("Traceback:\n%s", traceback.format_exc())
+        except Exception:
+            logger.exception(f"Unexpected error fetching events.")
             raise
 
     # Add events
@@ -129,9 +127,8 @@ class GoogleCalendarAPI:
                     else:
                         logger.error("Max attempts reached. Could not add event due to rate limit.")
                         raise e
-            except Exception as e:
-                logger.error(f"Unexpected error adding event: {e}")
-                logger.debug("Traceback:\n%s", traceback.format_exc())
+            except Exception:
+                logger.exception("Unexpected error adding event.")
                 raise
 
     # Delete events
@@ -175,9 +172,8 @@ class GoogleCalendarAPI:
                     else:
                         logger.error("Max attempts reached. Could not delete event due to rate limit.")
                         raise e
-            except Exception as e:
-                logger.error(f"Unexpected error deleting event: {e}")
-                logger.debug("Traceback:\n%s", traceback.format_exc())
+            except Exception:
+                logger.exception("Unexpected error deleting event.")
                 raise
 
     # Helpe methods

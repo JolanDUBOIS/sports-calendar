@@ -1,5 +1,4 @@
 import time
-import traceback
 
 import cloudscraper
 from bs4 import BeautifulSoup
@@ -32,9 +31,8 @@ class BaseScraper:
                     logger.error(f"Failed to fetch data from URL: {url}. Status code: {response.status_code}")
                     return None
 
-            except Exception as e:
-                logger.error(f"Failed to fetch data from URL: {url}. Error: {e}")
-                logger.debug("Traceback:\n%s", traceback.format_exc())
+            except Exception:
+                logger.exception(f"Failed to fetch data from URL: {url}. Attempt {retries}/{max_retries}. Retrying in {delay} seconds...")
                 break
 
         if retries >= max_retries:

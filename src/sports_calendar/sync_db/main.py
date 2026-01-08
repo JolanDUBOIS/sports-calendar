@@ -1,5 +1,3 @@
-import traceback
-
 from . import logger
 from .definitions import load_workflow
 from .build_layer import LayerBuilder, ModelManager
@@ -27,9 +25,8 @@ def run_pipeline(
         try:
             model_manager = ModelManager(model_spec)
             model_manager.run(**kwargs)
-        except Exception as e:
-            logger.error(f"Error processing model {model_spec.name}: {e}")
-            logger.debug("Traceback:\n%s", traceback.format_exc())
+        except Exception:
+            logger.exception(f"Error processing model {model_spec.name} in layer '{layer_spec.name}'.")
 
     # Multiple models
     else:
