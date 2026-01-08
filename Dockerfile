@@ -11,16 +11,13 @@ RUN apt-get update && apt-get install -y curl build-essential && rm -rf /var/lib
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
 
-# Copy only dependency files first for caching
-COPY pyproject.toml poetry.lock* /app/
+# Copy the project
+COPY pyproject.toml poetry.lock* README.md /app/
+COPY src /app/src
+COPY config /app/config
 
 # Install dependencies (no virtualenv)
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
-
-# Copy the rest of the project
-COPY src /app/src
-COPY config /app/config
-COPY selections /app/selections
 
 # Create logs directory if not exists/mounted
 RUN mkdir -p /app/logs

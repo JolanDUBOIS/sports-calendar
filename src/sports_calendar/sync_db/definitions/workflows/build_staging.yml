@@ -1,0 +1,217 @@
+name: dev_build_staging
+description: This workflow is responsible for orchestrating the data pipeline from the intermediate zone to the staging zone.
+stage: staging
+
+models:
+  - name: staging_football_competitions
+    description: Extracts football competitions from the intermediate zone and prepares them for the staging zone.
+
+    sources:
+      - name: int_football_espn_competitions
+        path: intermediate/football/espn_competitions.csv
+
+    dependencies:
+      - intermediate.int_football_espn_competitions
+
+    output:
+      name: staging_football_competitions
+      layer: staging
+      path: staging/football/competitions.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - name
+
+    processing:
+      - processor: TableExtractionProcessor
+        io_info:
+          config_key: staging_football_competitions
+          input_keys:
+            data: int_football_espn_competitions
+          output_key: staging_football_competitions
+
+    static_fields:
+      - name: staging_at
+        value: !date_offset 0
+
+  - name: staging_football_teams
+    description: Extracts football teams from the intermediate zone and prepares them for the staging zone.
+
+    sources:
+      - name: int_football_espn_teams
+        path: intermediate/football/espn_teams.csv
+
+    dependencies:
+      - intermediate.int_football_espn_teams
+
+    output:
+      name: staging_football_teams
+      layer: staging
+      path: staging/football/teams.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - name
+            - abbreviation
+
+    processing:
+      - processor: TableExtractionProcessor
+        io_info:
+          config_key: staging_football_teams
+          input_keys:
+            data: int_football_espn_teams
+          output_key: staging_football_teams
+
+    static_fields:
+      - name: staging_at
+        value: !date_offset 0
+
+  - name: staging_football_matches
+    description: Extracts football matches from the intermediate zone and prepares them for the staging zone.
+
+    sources:
+      - name: int_football_espn_matches
+        path: intermediate/football/espn_matches.csv
+
+    dependencies:
+      - intermediate.int_football_espn_matches
+
+    output:
+      name: staging_football_matches
+      layer: staging
+      path: staging/football/matches.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - competition_id
+            - home_team_id
+            - away_team_id
+            - date
+
+    processing:
+      - processor: TableExtractionProcessor
+        io_info:
+          config_key: staging_football_matches
+          input_keys:
+            data: int_football_espn_matches
+          output_key: staging_football_matches
+
+    static_fields:
+      - name: staging_at
+        value: !date_offset 0
+
+  - name: staging_football_standings
+    description: Extracts football standings from the intermediate zone and prepares them for the staging zone.
+
+    sources:
+      - name: int_football_espn_standings
+        path: intermediate/football/espn_standings.csv
+      - name: int_football_espn_competitions
+        path: intermediate/football/espn_competitions.csv
+      
+    dependencies:
+      - intermediate.int_football_espn_standings
+      - intermediate.int_football_espn_competitions
+
+    output:
+      name: staging_football_standings
+      layer: staging
+      path: staging/football/standings.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [competition_id, team_id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - competition_id
+            - team_id
+            - position
+        - type: coerce
+          fields:
+            - position
+            - points
+            - point_diff
+            - matches_played
+            - wins
+            - draws
+            - losses
+            - goals_for
+            - goals_against
+            - deductions
+          cast_to: int
+  
+    processing:
+      - processor: TableExtractionProcessor
+        io_info:
+          config_key: staging_football_standings
+          input_keys:
+            data: int_football_espn_standings
+          output_key: staging_football_standings_step1
+      - processor: RemappingProcessor
+        io_info:
+          config_key: staging_football_standings
+          input_keys:
+            data: staging_football_standings_step1
+            competitions: int_football_espn_competitions
+          output_key: staging_football_standings
+
+    static_fields:
+      - name: staging_at
+        value: !date_offset 0
+  
+  - name: staging_f1_events
+    description: Extracts Formula 1 events from the intermediate zone and prepares them for the staging zone.
+
+    sources:
+      - name: int_f1_espn_events
+        path: intermediate/f1/espn_events.csv
+    
+    dependencies:
+      - intermediate.int_f1_espn_events
+    
+    output:
+      name: staging_f1_events
+      layer: staging
+      path: staging/f1/events.csv
+      constraints:
+        - type: unique
+          field_sets:
+            - [session_id]
+          version_col: staging_at
+          keep: last
+        - type: non-nullable
+          fields:
+            - id
+            - session_id
+    
+    processing:
+      - processor: TableExtractionProcessor
+        io_info:
+          config_key: staging_f1_events
+          input_keys:
+            data: int_f1_espn_events
+          output_key: staging_f1_events
+    
+    static_fields:
+      - name: staging_at
+        value: !date_offset 0
