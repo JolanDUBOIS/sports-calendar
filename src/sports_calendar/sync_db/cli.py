@@ -17,7 +17,6 @@ sync_db = typer.Typer(help="Commands to run and manage the data synchronization 
 def main(
     stage: str | None = typer.Option(None, "--stage", callback=parse_stage, help="Specify the stage to run the pipeline on (default is all stages). Valid values are " + ", ".join(DataStage.as_str())),
     model: str | None = typer.Option(None, "--model", help=f"Specify the model to run the pipeline on (stage must be specified)."),
-    manual: bool = typer.Option(False, "--manual"),
     reset: bool = typer.Option(False, "--reset"),
     dry_run: bool = typer.Option(False, "--dry-run")
 ):
@@ -25,7 +24,6 @@ def main(
     run_pipeline(
         stage=stage,
         model=model,
-        manual=manual,
         reset=reset,
         dry_run=dry_run
     )

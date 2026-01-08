@@ -10,7 +10,6 @@ stage: landing
 models:
   - name: landing_football_espn_matches
     description: Ingests match information from the ESPN API.
-    trigger: automatic
 
     output:
       name: landing_football_espn_matches
@@ -187,7 +186,6 @@ models:
 
   - name: landing_football_espn_standings
     description: Ingests standings information from the ESPN API.
-    trigger: automatic
 
     output:
       name: landing_football_espn_standings
@@ -326,7 +324,6 @@ models:
 
   - name: landing_football_espn_competitions
     description: Ingests competition information from the ESPN API.
-    trigger: manual
 
     output:
       name: landing_football_espn_competitions
@@ -353,7 +350,6 @@ models:
 
   - name: landing_f1_espn_events
     description: Ingests F1 event information from the ESPN API.
-    trigger: automatic
 
     output:
       name: landing_f1_espn_events
@@ -383,7 +379,6 @@ models:
 
   # - name: landing_football_football_data_matches
   #   description: Ingests match information from the Football Data API.
-  #   trigger: automatic
 
   #   output:
   #     name: landing_football_football_data_matches
@@ -434,7 +429,6 @@ models:
 
   # - name: landing_football_football_data_standings
   #   description: Ingests standings information from the Football Data API.
-  #   trigger: automatic
 
   #   output:
   #     name: landing_football_football_data_standings
@@ -468,7 +462,6 @@ models:
 
   # - name: landing_football_football_data_teams
   #   description: Ingests team information from the Football Data API.
-  #   trigger: manual
 
   #   output:
   #     name: landing_football_football_data_teams
@@ -506,7 +499,6 @@ models:
 
   # - name: landing_football_live_soccer_matches
   #   description: Ingests match information from the Live Soccer Scraper.
-  #   trigger: automatic
 
   #   output:
   #     name: landing_football_live_soccer_matches
@@ -558,7 +550,6 @@ models:
 
   # - name: landing_football_live_soccer_standings
   #   description: Ingests live standings information from the Live Soccer Scraper.
-  #   trigger: automatic
 
   #   output:
   #     name: landing_football_live_soccer_standings
@@ -588,7 +579,6 @@ models:
 
   # - name: landing_football_live_soccer_competitions
   #   description: Ingests live competition information from the Live Soccer Scraper.
-  #   trigger: manual
 
   #   output:
   #     name: landing_football_live_soccer_competitions
@@ -612,7 +602,6 @@ models:
 
   # - name: landing_football_football_ranking_fifa_rankings
   #   description: Ingests FIFA rankings from the Football Ranking Scraper.
-  #   trigger: automatic
 
   #   output:
   #     name: landing_football_football_ranking_fifa_rankings

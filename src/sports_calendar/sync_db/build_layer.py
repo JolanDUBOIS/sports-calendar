@@ -9,23 +9,7 @@ from .definitions.specs import LayerSpec
 
 
 class LayerBuilder:
-    """
-    Responsible for constructing and executing a sequence of models defined in a layer specification.
-
-    This class manages the lifecycle of models within a specific layer of the pipeline, 
-    ensuring they are executed in the correct order according to the stage and model dependencies.
-
-    Attributes:
-        layer_spec (LayerSpec): Specification object detailing the models and their configuration for this layer.
-        models_order (ModelOrder): Ordered iterable of models respecting dependencies and stage order.
-
-    Methods:
-        build(manual: bool = False) -> None:
-            Executes each model in the layer in the predefined order, handling errors and marking failures.
-        
-        from_dict(d: dict) -> LayerBuilder:
-            Factory method to create a LayerBuilder instance from a dictionary specification.
-    """
+    """ TODO """
 
     def __init__(self, layer_spec: LayerSpec):
         """ Initialize the LayerBuilder with a layer specification. """
@@ -34,18 +18,7 @@ class LayerBuilder:
         logger.debug(f"Initialized LayerBuilder with layer spec ({self.layer_spec}) and models order ({self.models_order}).")
 
     def build(self, **kwargs) -> None:
-        """
-        Execute all models in this layer according to the specified order.
-
-        This method runs each model's manager sequentially, passing the `manual` flag 
-        to control manual override behaviors if applicable. It captures and logs any 
-        exceptions per model to avoid stopping the entire layer execution, marking 
-        failed models for later inspection or retry.
-
-        Args:
-            TODO
-            (in kwargs, manual, dry_run, verbose, reset, etc.)
-        """
+        """ TODO """
         logger.info(f"Building layer '{self.layer_spec.stage}'.")
         for model_spec in self.models_order:
             try:

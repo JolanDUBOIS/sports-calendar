@@ -5,7 +5,6 @@ stage: staging
 models:
   - name: staging_football_competitions
     description: Extracts football competitions from the intermediate zone and prepares them for the staging zone.
-    trigger: automatic
 
     sources:
       - name: int_football_espn_competitions
@@ -43,7 +42,6 @@ models:
 
   - name: staging_football_teams
     description: Extracts football teams from the intermediate zone and prepares them for the staging zone.
-    trigger: automatic
 
     sources:
       - name: int_football_espn_teams
@@ -82,7 +80,6 @@ models:
 
   - name: staging_football_matches
     description: Extracts football matches from the intermediate zone and prepares them for the staging zone.
-    trigger: automatic
 
     sources:
       - name: int_football_espn_matches
@@ -123,7 +120,6 @@ models:
 
   - name: staging_football_standings
     description: Extracts football standings from the intermediate zone and prepares them for the staging zone.
-    trigger: automatic
 
     sources:
       - name: int_football_espn_standings
@@ -185,7 +181,6 @@ models:
   
   - name: staging_f1_events
     description: Extracts Formula 1 events from the intermediate zone and prepares them for the staging zone.
-    trigger: automatic
 
     sources:
       - name: int_f1_espn_events

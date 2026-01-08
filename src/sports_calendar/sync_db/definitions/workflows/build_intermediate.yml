@@ -13,7 +13,6 @@ stage: intermediate
 models:
   - name: int_football_espn_matches
     description: Extracts match information from the ESPN json data.
-    trigger: automatic
 
     sources:
       - name: landing_football_espn_matches
@@ -67,7 +66,6 @@ models:
 
   - name: int_football_espn_competitions
     description: Extracts competition information from the ESPN json data.
-    trigger: automatic
 
     sources:
       - name: landing_football_espn_competitions
@@ -108,7 +106,6 @@ models:
 
   - name: int_football_espn_standings
     description: Extracts standings information from the ESPN json data.
-    trigger: automatic
 
     sources:
       - name: landing_football_espn_standings
@@ -151,7 +148,6 @@ models:
 
   - name: int_football_espn_teams
     description: Extracts team information from the ESPN matches data.
-    trigger: automatic
 
     sources:
       - name: intermediate_football_espn_matches
@@ -192,7 +188,6 @@ models:
 
   - name: int_f1_espn_events
     description: Extracts F1 event information from the ESPN json data.
-    trigger: automatic
 
     sources:
       - name: landing_f1_espn_events

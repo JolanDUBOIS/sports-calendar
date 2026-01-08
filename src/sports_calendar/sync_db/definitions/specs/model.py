@@ -11,7 +11,6 @@ from sports_calendar.sc_core import SpecModel
 @dataclass
 class ModelSpec(SpecModel):
     name: str
-    trigger: str
     output: OutputSpec
     processing: list[ProcessingStepSpec]
     sources: list[SourceSpec] = field(default_factory=list)
