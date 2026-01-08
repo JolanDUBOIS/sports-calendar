@@ -34,7 +34,7 @@ sync-db: setup
 
 .PHONY: sync-calendar
 sync-calendar: setup
-	$(POETRY) run sports-calendar sync-calendar jolan
+	$(POETRY) run sports-calendar sync-calendar dev
 
 # ------------------
 # Docker targets
@@ -50,11 +50,11 @@ docker-sync-db: docker-build
 
 .PHONY: docker-sync-calendar
 docker-sync-calendar: docker-build
-	$(DOCKER_RUN) $(POETRY) run sports-calendar sync-calendar jolan
+	$(DOCKER_RUN) $(POETRY) run sports-calendar sync-calendar dev
 
 .PHONY: docker-all
 docker-all: docker-build
 	$(DOCKER_RUN) bash -c "\
 		poetry run sports-calendar sync-db && \
-		poetry run sports-calendar sync-calendar jolan \
+		poetry run sports-calendar sync-calendar dev \
 	"
