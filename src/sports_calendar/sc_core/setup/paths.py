@@ -34,7 +34,6 @@ class Paths:
                 cls.DB_DIR = DEV_DEFAULT_DB_DIR
             else:
                 cls.DB_DIR = Path(user_data_dir(cls.APP_NAME))
-        cls.DB_DIR.mkdir(parents=True, exist_ok=True)
 
         if DEV_DEFAULT_CONFIG_DIR.exists():
             cls.CONFIG_DIR = DEV_DEFAULT_CONFIG_DIR

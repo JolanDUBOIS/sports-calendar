@@ -1,6 +1,7 @@
 import typer
 
 from . import logger
+from .initialize import init
 from .sync_db import sync_db
 from .sync_calendar import sync_calendar, clear_cal
 from .validate_db import validate_db
@@ -14,12 +15,16 @@ app.add_typer(sync_calendar, name="sync-calendar", help="Commands to manage cale
 app.add_typer(clear_cal, name="clear-calendar", help="Commands to clear events from the Google Calendar.")
 app.add_typer(validate_db, name="validate-db", help="Commands to validate the database.")
 
+app.command(name="init")(init)
+
 @app.callback()
-def main():
+def main(ctx: typer.Context):
     """
-    Initialize logging and paths before any subcommand runs.
-    This runs once before any command or subcommand.
+    Initialize logging and paths before any subcommand runs, except 'init'.
     """
+    if ctx.invoked_subcommand == "init":
+        return
+
     Paths.initialize(app_name="sports-calendar")
     setup_logging(config_file=Paths.LOG_CONFIG_FILE, log_dir=Paths.LOG_DIR)
     Paths.log_paths(logger=logger)
