@@ -1,0 +1,104 @@
+version: 1
+
+
+formatters:
+  simple:
+    format: "%(asctime)s [%(levelname)s] %(message)s"
+    datefmt: "%H:%M:%S"
+
+  detailed:
+    format: "%(asctime)s [%(levelname)s] [%(name)s] [%(filename)s:%(lineno)d] (%(funcName)s) - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+handlers:
+  console_handler:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+
+  file_debug_handler:
+    class: logging.FileHandler
+    filename: "__LOG_FILE__"
+    level: DEBUG
+    formatter: detailed
+
+loggers:
+  sports_calendar:
+    level: DEBUG
+
+  # Core loggers
+  sports_calendar.sc_core:
+    level: DEBUG
+
+  sports_calendar.sc_core.file_io:
+    level: DEBUG
+
+  sports_calendar.sc_core.setup:
+    level: DEBUG
+
+  # Sync Calendar loggers
+  sports_calendar.sync_calendar:
+    level: DEBUG
+
+  sports_calendar.sync_calendar.calendar:
+    level: DEBUG
+
+  sports_calendar.sync_calendar.config:
+    level: DEBUG
+
+  sports_calendar.sync_calendar.models:
+    level: DEBUG
+
+  sports_calendar.sync_calendar.selection:
+    level: DEBUG
+
+  # Sync DB loggers
+  sports_calendar.sync_db:
+    level: DEBUG
+
+  sports_calendar.sync_db.clients:
+    level: DEBUG
+
+  sports_calendar.sync_db.definitions:
+    level: DEBUG
+
+  sports_calendar.sync_db.definitions.specs:
+    level: DEBUG
+
+  sports_calendar.sync_db.managers:
+    level: DEBUG
+
+  sports_calendar.sync_db.processors:
+    level: DEBUG
+
+  sports_calendar.sync_db.utils:
+    level: DEBUG
+
+  sports_calendar.sync_db.versioning:
+    level: DEBUG
+
+  # Validate DB loggers
+  sports_calendar.validate_db:
+    level: DEBUG
+
+  sports_calendar.validate_db.definitions:
+    level: DEBUG
+  
+  sports_calendar.validate_db.definitions.specs:
+    level: DEBUG
+
+  # Third party loggers
+  googleapiclient.discovery_cache:
+    level: DEBUG
+    handlers: [file_debug_handler]
+    propagate: False
+
+  urllib3:
+    level: WARNING
+    handlers: []
+    propagate: False
+
+root:
+  level: DEBUG
+  handlers: [console_handler, file_debug_handler]
+  propagate: False

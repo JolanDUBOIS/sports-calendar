@@ -13,8 +13,8 @@ __pycache__/
 .vscode/
 
 # Secrets / credentials
-.secrets/*
-.credentials/*
+config/.secrets/*
+config/.credentials/*
 
 # Data / logs / legacy files
 data/
@@ -23,8 +23,8 @@ legacy/
 notebooks/
 
 # Selections (ignore everything except dev.yml)
-selections/*
-!selections/dev.yml
+config/selections/*
+!config/selections/dev.yml
 
 # Gitkeep files
 !.gitkeep
