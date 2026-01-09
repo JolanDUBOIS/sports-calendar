@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from . import logger
-from sports_calendar.sc_core.file_io import FileHandlerFactory
+from sports_calendar.core.file_io import FileHandlerFactory
 
 
 class BaseTable(ABC):

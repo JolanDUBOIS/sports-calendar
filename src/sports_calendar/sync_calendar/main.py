@@ -8,7 +8,7 @@ from .calendar import (
 from .models import BaseTable
 from .config import Secrets
 from .selection import SelectionManager, SelectionRunner
-from sports_calendar.sc_core import Paths
+from sports_calendar.core import Paths
 
 
 def run_selection(

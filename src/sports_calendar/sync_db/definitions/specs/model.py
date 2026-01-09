@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from .source import SourceSpec
 from .output import OutputSpec
 from .processing import ProcessingStepSpec
-from sports_calendar.sc_core import SpecModel
+from sports_calendar.core import SpecModel
 
 
 @dataclass

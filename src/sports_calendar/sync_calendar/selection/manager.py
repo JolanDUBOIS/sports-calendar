@@ -1,6 +1,6 @@
 from . import logger
 from .selection import Selection
-from sports_calendar.sc_core import load_yml, Paths
+from sports_calendar.core import load_yml, Paths
 
 
 class SelectionManager:

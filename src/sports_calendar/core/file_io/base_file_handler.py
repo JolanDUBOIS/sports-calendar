@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from . import logger
 from .metadata_manager import MetadataManager
-from sports_calendar.sc_core import IOContent
+from sports_calendar.core import IOContent
 
 
 class BaseFileHandler(ABC):

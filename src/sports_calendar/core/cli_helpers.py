@@ -1,7 +1,7 @@
 import functools
 import typer
 
-from sports_calendar.sc_core import DataStage
+from sports_calendar.core import DataStage
 
 
 def confirm_if_reset(func):

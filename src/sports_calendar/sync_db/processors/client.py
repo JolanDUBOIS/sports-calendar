@@ -12,7 +12,7 @@ from sports_calendar.sync_db.clients import (
 from sports_calendar.sync_db.utils import concat_io_content
 
 if TYPE_CHECKING:
-    from sports_calendar.sc_core import IOContent
+    from sports_calendar.core import IOContent
     from sports_calendar.sync_db.definitions.specs import ProcessingIOInfo
     
 

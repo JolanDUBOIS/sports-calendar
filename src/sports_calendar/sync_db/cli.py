@@ -1,8 +1,8 @@
 import typer
 
 from .main import run_pipeline
-from sports_calendar.sc_core import DataStage
-from sports_calendar.sc_core.cli_helpers import (
+from sports_calendar.core import DataStage
+from sports_calendar.core.cli_helpers import (
     parse_stage,
     confirm_if_reset,
     require_stage_if_model,

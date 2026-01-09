@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import cattrs
 from yaml import dump
 
-from sports_calendar.sc_core import load_yml
+from sports_calendar.core import load_yml
 
 
 T = TypeVar('T', bound='SpecModel')
