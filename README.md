@@ -1,157 +1,258 @@
-# Sport Calendar
+# Sports Calendar
 
 Sport Calendar is a command-line tool designed for sports fans who want to keep track of upcoming matches and events without the hassle of checking schedules manually. By defining their preferences in a simple configuration file, users get a personalized sports events calendar automatically created and synced with their Google Calendar. This way, they never miss a game or event that matters to them.
 
-## Description
+## Scope & Limitations
 
-Sport Calendar is a personal project written in Python that automates the creation of a customized sports events calendar. It retrieves and processes data from multiple APIs and web scrapers, including sources like sports-data, ESPN, and LiveSoccerTV. The focus is on upcoming matches and events across various sports, leagues, and competitions, with data carefully parsed, normalized, and cleaned to ensure accuracy.
+Sport Calendar is a personal project written in Python that automates the creation of a customized sports events calendar. It retrieves and processes data from the unofficial ESPN API (#TODO - Link to the "documentations"). The focus is on upcoming matches and events across various sports, leagues, and competitions, with data carefully parsed, normalized, and cleaned to ensure accuracy.
 
-A key part of the processing pipeline is matching team names, player names, and other entities across different data sources to unify information (e.g., recognizing that "PSG" and "Paris Saint Germain" are the same team). Although still under development, the data will eventually be stored in a relational database organized around teams, players, competitions, matches, and standings following a structured ETL pipeline.
-
-Users define their sports preferences in a simple JSON or YAML file, specifying which teams, players, competitions, or match conditions they want to follow. Based on this selection, the project automatically generates and syncs a personalized calendar with Google Calendar, making it easy for fans to never miss a game or event.
+Users define their sports preferences in a simple YAML file, specifying which teams, players, competitions, or match conditions they want to follow. Based on this selection, the project automatically generates and syncs a personalized calendar with Google Calendar, making it easy for fans to never miss a game or event.
 
 Built as a learning tool and for personal use, Sport Calendar is an evolving project that combines data engineering, sports fandom, and practical automation.
 
-## Getting Started
+## Features
 
-### Dependencies
+- Retrieves upcoming sports events from the unofficial ESPN API
+- Normalizes and cleans raw data to ensure consistent and reliable event information
+- Allows users to define custom sports preferences via YAML configuration files
+- Generates personalized calendars based on user-defined selections
+- Synchronizes events with Google Calendar using the Google Calendar API
+- Supports multiple calendars through configurable calendar identifiers
 
-This project uses [Poetry](https://python-poetry.org/) for dependency management. To install all required packages, first make sure Poetry is installed, then run:
+## User Requirements
+
+To install and run Sports Calendar, the following requirements must be met:
+
+- Python **3.11+**
+- [`pipx`](https://pipx.pypa.io/stable/) installed
+
+## Installing
+
+Install Sports Calendar globally using `pipx`:
 
 ```bash
+pipx install git+https://github.com/JolanDUBOIS/sports-calendar.git --python python3.11
+```
+
+To reinstall or update an existing installation:
+
+```bash
+pipx install --force git+https://github.com/JolanDUBOIS/sports-calendar.git
+```
+
+After installation, the `sports-calendar` command will be available system-wide.
+Run `sports-calendar --help` to see available commands.
+
+## Configuration
+
+Before using Sports Calendar, the application must have a configuration directory set up. Start by running:
+
+```bash
+sports-calendar init
+```
+This will create a template `logging.yml` file in the user configuration directory **only if it does not already exist**. For normal usage, no modifications are required. Advanced users can customize logging; see the [Python logging documentation](https://docs.python.org/3/library/logging.html)
+for details.
+
+The application also requires the following configuration items, each documented separately:
+- Google API credentials
+- One or more Google Calendar IDs
+- At least one selection file
+
+Refer to the dedicated guides for setup:
+- [Google credentials setup](docs/google-credentials.md)
+- [Google Calendar IDs](docs/google-calendars.md)
+- [Selections format](docs/selections.md)
+
+**Note for collaborators:** If someone already has Sports Calendar configured, they can help you get started. You provide your selection (as a YAML file or description), and they will:
+
+1. Add the selection to their `selections/` folder.
+2. Create a dedicated Google Calendar for it.
+3. Add the calendar to their `.secrets/gcal_ids.yml`.
+4. Share the calendar with you.
+
+You can then link the shared calendar to your Google account and start using Sports Calendar without setting up credentials or configuration yourself.
+
+## Usage 
+
+All commands can be listed by running:
+
+```bash
+sports-calendar --help
+```
+
+Below is a brief overview of the main commands.
+
+### `sports-calendar sync-db`
+
+```bash
+sports-calendar sync-db
+```
+
+Fetches the latest sports event data from the configured sources and updates the local database.
+
+**Expected outcome:** new or updated event data stored in the runtime data directories.
+
+**Advanced options (mostly for developers or power users):**
+- `--stage`: Run the pipeline on a specific stage (`landing`, `intermediate`, `staging`)
+- `--model`: Specify a model to run (requires `--stage`)
+- `--reset`: Reset data for the selected stage before processing
+- `--dry-run`: Run the pipeline without modifying files
+
+### `sports-calendar sync-calendar`
+
+```bash
+sports-calendar sync-calendar <calendar-key>
+```
+
+Updates the specified Google Calendar with events from the corresponding selection. All future events are first removed and then the new events are added; some events may be deleted and re-added as part of this process.
+
+**Expected outcome:** the calendar reflects the latest events for the selection.
+
+**Advanced option (mostly for developers or power users):**
+- `--dry-run`: Run the selection process without synchronizing with the google calendar (to check validity of the selection file for instance)
+
+### `sports-calendar clear-calendar`
+
+```bash
+sports-calendar clear-calendar <calendar-key> [--scope all|future|past] [--date-from YYYY-MM-DD] [--date-to YYYY-MM-DD]
+```
+
+Removes all events from the specified Google Calendar.
+
+**Expected outcome:** all events in the defined scope are deleted.
+
+**Notes:**
+- Default behavior deletes all events.
+- `--scope` can be used to limit deletion to all, future, or past events.
+- `--date-from` and `--date-to` refine the date range (used only if `--scope` is not specified).
+
+### `sports-calendar validate-db`
+
+Currently not implemented.
+
+## Runtime Directory Structure
+
+### Configuration Locations
+
+Configuration files are stored in the user config directory:
+
+- **Linux**: `~/.config/sports-calendar/`
+- **macOS**: `~/Library/Application Support/sports-calendar/`
+- **Windows**: `C:\Users\<your-username>\AppData\Roaming\sports-calendar\`
+
+### Runtime Storage Layout
+
+Sports event data is stored in the user data directory:
+
+- **Linux**: `~/.local/share/sports-calendar/`
+- **macOS**: `~/Library/Application Support/sports-calendar/data/`
+- **Windows**: `C:\Users\<your-username>\AppData\Local\sports-calendar\data\`
+
+Future releases may allow overriding this location via the CLI.
+
+### Logs
+
+Application logs are stored in the user state directory:
+
+- **Linux**: `~/.local/state/sports-calendar/logs/`
+- **macOS**: `~/Library/Application Support/sports-calendar/logs/`
+- **Windows**: `C:\Users\<your-username>\AppData\Local\sports-calendar\logs\`
+
+### Tree Overview
+
+```text
+<user_config_dir>/sports-calendar/
+├── .credentials
+│   ├── client_secret.json
+│   └── token.json
+├── .secrets
+│   └── gcal_ids.yml
+├── selections
+│   ├── main-selection.json
+│   └── second-selection.yml
+├── logging.yml
+<user_data_dir>/sports-calendar/
+├── landing       # Raw data from sources
+│   ├── sportA
+│   │   ├── .meta/
+│   │   └── espn_DATA.json
+│   └── sportB
+├── intermediate # Processed and normalized data
+│   ├── sportA
+│   │   ├── .meta/
+│   │   └── espn_DATA.csv
+│   └── sportB
+├── staging      # Final stage for calendar synchronization
+│   ├── sportA
+│   │   ├── .meta/
+│   │   └── espn_DATA.csv
+│   └── sportB
+<user_state_dir>/sports-calendar/logs/
+└── sports-calendar-YYYY-mm-DD.log      # All logs
+```
+
+## Development
+
+These instructions are for developers or contributors who want to modify, extend, or experiment with the project.
+
+### Requirements
+
+- Python **3.11+** ofc
+- [Poetry](https://python-poetry.org/) for dependency management (tested with version 2.2.1; other recent versions likely work).
+- Docker (optional, for containerized execution).
+
+### Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/JolanDUBOIS/sports-calendar.git
+cd sports-calendar
 poetry install
 ```
 
-This will create a virtual environment and install all dependencies listed in `pyproject.toml`.
+### Configuration for Development
 
-### Installing
+The `./config/` folder already contains:
+- `logging.yml` — logging configuration
+- `.secrets/` — empty directory for calendar IDs
+- `.credentials/` — empty directory for Google API credentials
+- `selections/dev.yml` — example selection file (quite detailed)
 
-TODO
+Environment variables (optional for development):
+- `DB_DIR` — override the default data directory (`./data`)
+- `FOOTBALL_DATA_API_TOKEN` — required only if using the football-data.org client
 
-## Running the Project
+### Commands
 
-The project is run from the command line using Poetry to manage the environment. The basic command structure is:
-
-```bash
-poetry run python -m src [COMMAND] [OPTIONS]
-```
-
-The available arguments are:
-
-### `run-pipeline`
-Runs the data pipeline that fetches, processes, and stores sports data from various sources (e.g. scraping, APIs, normalization, writing to internal DB).
+#### Local (Python + Poetry)
 
 ```bash
-poetry run python -m src run-pipeline [OPTIONS]
+poetry run sports-calendar sync-db
+poetry run sports-calendar sync-calendar dev
 ```
 
-**Options:**
-- `--repo [test|prod]` – Specify the repository environment (default: `test`)
-- `--stage [landing|intermediate|staging|production]` – Run a specific pipeline stage
-- `--model MODEL_NAME` – Specify a model to run (requires `--stage`)
-- `--manual` – Enable manual mode (default is automatic)
-- `--reset` – Reset the file(s) and their metadata before running the pipeline
-- `--dry-run` – Simulate the pipeline without making changes
-- `--verbose` – Enable verbose logging
+The included Makefile provides shortcuts for the most common tasks:
+- `make setup` — sets up the environment and installs dependencies
+- `make sync-db` — updates the local database
+- `make sync-calendar` — synchronizes the `dev` selection with Google Calendar
+- `make all` — runs both `sync-db` and `sync-calendar`
 
-**Examples:**
-```bash
-poetry run python -m src run-pipeline
-poetry run python -m src run-pipeline --repo prod --stage landing --dry-run --verbose
-poetry run python -m src run-pipeline --manual --stage intermediate --model espn_matches
-```
+#### Docker
 
----
+The project can be containerized for reproducible environments:
+- `make docker-build` — build the Docker image
+- `make docker-sync-db` — run database sync inside Docker
+- `make docker-sync-calendar` — run calendar sync inside Docker
+- `make docker-all` — run both steps inside Docker
 
-### `run-validation`
-Performs data validation checks (e.g. consistency, completeness, structural correctness).
+### Additional information
 
-```bash
-poetry run python -m src run-validation [OPTIONS]
-```
-
-**Options:**
-- `--repo [test|prod]` – Specify the repository environment (default: `test`)
-- `--stage [landing|intermediate|staging|production]` – Run validation on a specific stage
-- `--model MODEL_NAME` – Specify a model to validate (requires `--stage`)
-- `--raise-on-error` – Raise exception if validation fails
-- `--verbose` – Enable verbose logging
-
-**Examples:**
-```bash
-poetry run python -m src run-validation --stage production --raise-on-error
-poetry run python -m src run-validation --repo test --stage intermediate
-```
-
----
-
-### `run-selection`
-Generates a personalized sports calendar and syncs it with Google Calendar.
-
-```bash
-poetry run python -m src run-selection
-```
-
-**Options:**
-- `--name` – Name of the selection to run
-- `--dry-run` – Simulate the selection without making changes (in the google calendar)
-- `--verbose` – Enable verbose logging
-
----
-
-### `test`
-Runs a specific test routine.
-
-```bash
-poetry run python -m src test TEST_NAME
-```
-
----
-
-### `clean` *(not yet implemented)*
-Cleans the specified repository stage.
-
-```bash
-poetry run python -m src clean [--repo REPO] [--stage STAGE]
-```
-
----
-
-### `revert` *(not yet implemented)*
-Reverts the data repository to a previous state by run ID.
-
-```bash
-poetry run python -m src revert [RUN_ID]
-```
-
----
-
-### Valid Values
-
-- **Stages**: `landing`, `intermediate`, `staging`, `production`
-- **Repos**: `test`, `prod`
-
----
-
-### 💡 Tips
-
-- `--model` **requires** `--stage` to be specified.
-- Default `repo` is `test` unless overridden.
-- All commands support `--help` for option hints.
-
-```bash
-poetry run python -m src run-pipeline --help
-```
+- The data pipeline is divided into `landing`, `intermediate`, and `staging` stages. Modifying these workflows requires understanding how data is retrieved and processed; format changes or API behavior may break the pipeline.
+- Several API clients are implemented (ESPN, football-data.org, football-ranking.com, LiveSoccerTV), but merging data from multiple sources is complex. Only ESPN is fully supported for production use.
+- Configuration files and selection YAMLs are flexible, but deep modifications may require studying the code and workflow carefully.
 
 ## Authors
 
 - Jolan Du Bois — master student in AI and sports fan
 - This project is a personal learning exercise and hobby.
-
-## Planned Features
-
-- Automated deletion of old data and metadata from the repository
-- Complete test coverage, especially for boundary value cases
-- Automated deletion of old logs
-- Add developer tools for the data pipeline (e.g., add or remove models or layers, build models)
-- Improve error handling throughout the entire data pipeline, including boundary and edge cases
