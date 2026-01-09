@@ -10,6 +10,8 @@ Users define their sports preferences in a simple YAML file, specifying which te
 
 Built as a learning tool and for personal use, Sport Calendar is an evolving project that combines data engineering, sports fandom, and practical automation.
 
+Currently, only **football** and **F1** events are supported, but the architecture is designed to accommodate more sports in future releases.
+
 ## Features
 
 - Retrieves upcoming sports events from the unofficial ESPN API
