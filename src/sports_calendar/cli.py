@@ -1,6 +1,7 @@
 import typer
 
 from . import logger
+from .__version__ import __version__
 from .initialize import init
 from .sync_db import sync_db
 from .sync_calendar import sync_calendar, clear_cal
@@ -17,8 +18,17 @@ app.add_typer(validate_db, name="validate-db", help="Commands to validate the da
 
 app.command(name="init")(init)
 
+
+def version_callback(value: bool):
+    if value:
+        typer.echo(f"sports-calendar {__version__}")
+        raise typer.Exit()
+
 @app.callback()
-def main(ctx: typer.Context):
+def main(
+    ctx: typer.Context,
+    version: bool = typer.Option(None, "--version", "-v", help="Show the version and exit.", is_eager=True, callback=version_callback),
+):
     """
     Initialize logging and paths before any subcommand runs, except 'init'.
     """
