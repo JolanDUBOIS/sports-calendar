@@ -39,6 +39,8 @@ class TableMeta(type):
         new_cls = super().__new__(cls, name, bases, namespace)
         if name != "Table":
             cls._registry.append(new_cls)
+        logger.debug(f"Registered table class: {name} with columns: {list(columns.keys())}")
+        logger.debug(f"Current table registry: {[table.__name__ for table in cls._registry]}")
         return new_cls
 
 
@@ -97,8 +99,16 @@ class BaseTable(ABC, metaclass=TableMeta):
             logger.warning(f"Table {cls.__table__} contains extra columns not defined in schema: {extra_cols}")
             df = df.drop(columns=list(extra_cols))
         
-        cls._df = df
+        cls._df = df.copy()
         return df.copy()
+
+    @classmethod
+    def select(cls, *columns: str) -> TableView:
+        return cls._view().select(*columns)
+
+    @classmethod
+    def values(cls, column: str) -> pd.Series:
+        return cls._view().values(column)
 
     @staticmethod
     def _astype(df: pd.DataFrame, col: Column, src: str) -> pd.Series:
@@ -115,7 +125,7 @@ class BaseTable(ABC, metaclass=TableMeta):
         return df[src]
 
     @classmethod
-    def query(cls, *filters: Filter | CombinedFilter) -> pd.DataFrame:
+    def query(cls, *filters: Filter | CombinedFilter) -> TableView:
         return cls._view().query(*filters)
 
     @classmethod
@@ -146,6 +156,16 @@ class TableView:
     def get(self) -> pd.DataFrame:
         return self._df.copy()
 
+    def select(self, *columns: str) -> TableView:
+        validate(all(col in self._columns for col in columns), f"One or more selected columns not found in TableView {self.__table__}.", logger, KeyError)
+        selected_df = self._df[list(columns)].copy()
+        selected_columns = {col: self._columns[col] for col in columns}
+        return TableView(selected_df, selected_columns, f"{self.__table__}_selected")
+
+    def values(self, column: str) -> pd.Series:
+        validate(column in self._columns, f"Column {column} not found in TableView {self.__table__}.", logger, KeyError)
+        return self._df[column].copy()
+
     def query(self, *filters: Filter | CombinedFilter) -> TableView:
         df = self.get()
 
@@ -161,20 +181,46 @@ class TableView:
     def join(
         self,
         other: type[BaseTable] | TableView,
-        left_on: str,
-        right_on: str,
+        left_on: str | list[str],
+        right_on: str | list[str],
         how: str = "left",
         left_alias: str | None = None,
         right_alias: str | None = None
     ) -> TableView:
         logger.debug(f"Joining TableView {self.__table__} with {other.__str__()} on {left_on} = {right_on} using {how} join.")
-        # Merge DataFrames
+
+        # Prefixes
         left_prefix = f"{left_alias}." if left_alias is not None else f"{self.__table__}."
         right_prefix = f"{right_alias}." if right_alias is not None else f"{other.__table__}."
         validate(left_prefix != right_prefix, "Left and right table aliases must be different to avoid column name collisions.", logger, ValueError)
         left_df = self.get().add_prefix(left_prefix)
         right_df = other.get().add_prefix(right_prefix)
-        joined_df = pd.merge(left_df, right_df, left_on=f"{left_prefix}{left_on}", right_on=f"{right_prefix}{right_on}", how=how)
+
+        # Join Keys
+        left_keys = [left_on] if isinstance(left_on, str) else list(left_on)
+        right_keys = [right_on] if isinstance(right_on, str) else list(right_on)
+        validate(len(left_keys) == len(right_keys), "Number of left and right join keys must match.", logger, ValueError)
+        left_on = [f"{left_prefix}{key}" for key in left_keys]
+        right_on = [f"{right_prefix}{key}" for key in right_keys]
+
+        for k in left_keys:
+            validate(
+                k in self._columns,
+                f"Join key '{k}' not found in left table {self.__table__}.",
+                logger,
+                KeyError,
+            )
+
+        for k in right_keys:
+            validate(
+                k in other._columns,
+                f"Join key '{k}' not found in right table {other.__table__}.",
+                logger,
+                KeyError,
+            )
+
+        # Perform Join
+        joined_df = pd.merge(left_df, right_df, left_on=left_on, right_on=right_on, how=how)
 
         # Get Columns
         columns = {}
