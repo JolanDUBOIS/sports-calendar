@@ -1,8 +1,6 @@
 from datetime import datetime
 
-from ..base import Table, Column, Relationship
-from .competitions import FootballCompetitionsTable
-from .teams import FootballTeamsTable
+from ..base import Table, Column
 
 
 class FootballMatchesTable(Table):
@@ -19,8 +17,3 @@ class FootballMatchesTable(Table):
     leg = Column(source="leg", dtype=int, nullable=True)
     leg_display = Column(source="leg_display", dtype=str, nullable=True)
     venue = Column(source="venue", dtype=str, nullable=True)
-    __relationships__ = [
-        Relationship(FootballTeamsTable, local_key="home_team_id", alias="home_team"),
-        Relationship(FootballTeamsTable, local_key="away_team_id", alias="away_team"),
-        Relationship(FootballCompetitionsTable, local_key="competition_id", alias="competition"),
-    ]

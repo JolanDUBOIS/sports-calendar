@@ -1,6 +1,4 @@
-from ..base import Table, Column, Relationship
-from .competitions import FootballCompetitionsTable
-from .teams import FootballTeamsTable
+from ..base import Table, Column
 
 
 class FootballStandingsTable(Table):
@@ -18,8 +16,3 @@ class FootballStandingsTable(Table):
     goals_for = Column(source="goals_for", dtype=int)
     goals_against = Column(source="goals_against", dtype=int)
     deductions = Column(source="deductions", dtype=int)
-
-    __relationships__ = [
-        Relationship(FootballTeamsTable, local_key="team_id", alias="team"),
-        Relationship(FootballCompetitionsTable, local_key="competition_id", alias="competition"),
-    ]

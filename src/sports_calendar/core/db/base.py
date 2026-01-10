@@ -1,25 +1,27 @@
 from __future__ import annotations
 from pathlib import Path
-from dataclasses import dataclass
 from datetime import datetime
+from dataclasses import dataclass
+from abc import ABC, abstractmethod
 
 import pandas as pd
 
 from . import logger
 from .filters import Filter, CombinedFilter
+from ..utils import validate
 from sports_calendar.core.file_io import FileHandlerFactory, CSVHandler
 
 
 @dataclass(frozen=True)
 class Column:
-    source: str | None = None
+    source: str
     dtype: type = str
     nullable: bool = False
     format: str | None = None  # only used when dtype is datetime
 
 
 class TableMeta(type):
-    _registry: list[Table] = []  # store all Table subclasses
+    _registry: list[type[Table]] = []  # store all Table subclasses
 
     def __new__(cls, name, bases, namespace):
         columns = {
@@ -33,19 +35,38 @@ class TableMeta(type):
         return new_cls
 
 
-class Table(metaclass=TableMeta):
-    __file__: str = None
-    __sport__: str = None
+class AbstractTable(ABC):
+    __table__: str
+    _columns: dict[str, Column]
+
+    @abstractmethod
+    def get_df(cls) -> pd.DataFrame: ...
+
+    @abstractmethod
+    def join(
+        cls,
+        other: AbstractTable | type[AbstractTable],
+        left_on: str,
+        right_on: str,
+        how: str = "left",
+        prefix: str | None = None
+    ) -> JoinedTable: ...
+
+    @abstractmethod
+    def query(cls, *filters: Filter | CombinedFilter) -> pd.DataFrame: ...
+
+
+class Table(AbstractTable, metaclass=TableMeta):
+    __table__: str # name of the table
+    __file__: str | None = None
+    __sport__: str | None = None
     _path: Path | None = None # set via set_repo_path
     _columns: dict[str, Column] # populated by TableMeta
-    __relationships__: list[Relationship] = []
 
     @classmethod
     def path(cls) -> Path:
-        if cls._path is None:
-            logger.error(f"Path for table {cls.__name__} is not set. Please run set_repo_path().")
-            raise RuntimeError(f"Path for table {cls.__name__} is not set. Please run set_repo_path().")
-        logger.debug(f"Reading path for table {cls.__name__}: {cls._path}")
+        validate(bool(cls._path), f"Path for table {cls.__table__} is not set. Please run set_repo_path().", logger, RuntimeError)
+        logger.debug(f"Reading path for table {cls.__table__}: {cls._path}")
         return cls._path
 
     @classmethod
@@ -56,15 +77,15 @@ class Table(metaclass=TableMeta):
 
     @classmethod
     def get_df(cls) -> pd.DataFrame:
-        # TODO - Add caching mechanism later
+        if hasattr(cls, "_cached_df") and cls._cached_df is not None:
+            return cls._cached_df.copy()
+
         df = cls.file_handler().read()
 
         for col_name, col in cls._columns.items():
-            src = col.source or col_name
+            src = col.source
 
-            if src not in df.columns:
-                logger.error(f"Source column {src} not found in table {cls.__name__}.")
-                raise KeyError(f"Source column {src} not found in table {cls.__name__}.")
+            validate(src in df.columns, f"Source column {src} not found in table {cls.__table__}.", logger, KeyError)
 
             series = cls._astype(df, col, src)
 
@@ -72,11 +93,30 @@ class Table(metaclass=TableMeta):
             if src != col_name:
                 del df[src]
 
-            if not col.nullable and df[col_name].isnull().any():
-                logger.error(f"Column {col_name} in table {cls.__name__} contains null values but is marked as non-nullable.")
-                raise ValueError(f"Column {col_name} in table {cls.__name__} contains null values but is marked as non-nullable.")
+            validate(
+                col.nullable or not df[col_name].isnull().any(),
+                f"Column {col_name} in table {cls.__table__} contains null values but is marked as non-nullable.",
+                logger
+            )
+
+        cls._cached_df = df
+        return df.copy()
+
+    @classmethod
+    def join(cls, other: AbstractTable, left_on: str, right_on: str, how: str = "left") -> JoinedTable:
+        logger.debug(f"Joining table {cls.__str__()} with {other.__str__()} on {left_on} = {right_on} using {how} join.")
+        left_df = cls.get_df().add_prefix(f"{cls.__table__}.")
+        if isinstance(other, type) and issubclass(other, Table):
+            right_df = other.get_df().add_prefix(f"{other.__table__}.")
+        elif isinstance(other, JoinedTable):
+            right_df = other.get_df().add_prefix(f"{other.__table__}.")
+        else:
+            logger.error(f"Invalid type for 'other' in join: {type(other)}")
+            raise TypeError(f"Invalid type for 'other' in join: {type(other)}")
         
-        return df
+        joined_df = pd.merge(left_df, right_df, left_on=left_on, right_on=right_on, how=how)
+        tables = (cls, other)
+        return JoinedTable(joined_df, tables=tables)
 
     @classmethod
     def query(cls, *filters: Filter | CombinedFilter) -> pd.DataFrame:
@@ -87,26 +127,10 @@ class Table(metaclass=TableMeta):
         """
         df = cls.get_df()
 
-        if hasattr(cls, "__relationships__"):
-            for rel in cls.__relationships__:
-                logger.debug(f"Joining table {cls.__name__} with {rel.table.__name__} on {rel.local_key} = {rel.remote_key}")
-                alias = rel.alias
-                rel_df = rel.table.get_df()
-                # add alias prefix to columns
-                rel_df = rel_df.add_prefix(f"{alias}.")
-                df = df.merge(
-                    rel_df,
-                    how="left",
-                    left_on=rel.local_key,
-                    right_on=f"{alias}.{rel.remote_key}"
-                )
-
         if filters:
             mask = pd.Series([True] * len(df))
             for f in filters:
-                if f.col not in df.columns:
-                    logger.error(f"Column {f.col} not found in table {cls.__name__}.")
-                    raise KeyError(f"Column {f.col} not found in table {cls.__name__}.")
+                validate(f.col in df.columns, f"Column {f.col} not found in table {cls.__table__}.", logger, KeyError)
                 mask &= f.apply(df)
         return df[mask].copy()
 
@@ -116,31 +140,78 @@ class Table(metaclass=TableMeta):
             df[src] = pd.to_datetime(
                 df[src],
                 format=col.format,
-                utc=True,
                 errors="raise"
             )
         else:
             df[src] = df[src].astype(col.dtype, errors="raise")
         return df[src]
 
+    def __str__(cls):
+        return f"<Table({cls.__table__})>"
 
-class Relationship:
-    def __init__(self, table: type[Table], local_key: str, remote_key: str = "id", alias: str | None = None):
-        """
-        table: Table class to join with
-        local_key: column in THIS table
-        remote_key: column in foreign table (default 'id')
-        alias: optional prefix for joined table columns
-        """
-        self.table = table
-        self.local_key = local_key
-        self.remote_key = remote_key
-        self.alias = alias or table.__name__.lower()
+    def __repr__(cls):
+        return f"<Table({cls.__table__}), Columns({list(cls._columns.keys())})>"
 
 
-def set_repo_path(repo_path: Path, stage: str = "staging"):
-    logger.debug(f"Setting repository path to: {repo_path}, stage: {stage}")
-    for table_cls in TableMeta._registry:
-        if table_cls.__sport__ is None or table_cls.__file__ is None:
-            continue
-        table_cls._path = repo_path / stage / table_cls.__sport__ / table_cls.__file__
+class JoinedTable(AbstractTable):
+    def __init__(self, df: pd.DataFrame, name: str, tables: tuple[AbstractTable, AbstractTable]):
+        self._df = df
+        self.__table__ = name
+
+        validate(
+            all(isinstance(t, (type, JoinedTable)) and issubclass(t, Table) if isinstance(t, type) else isinstance(t, JoinedTable) for t in tables),
+            "All elements in tables must be Table subclasses or JoinedTable instances.",
+            logger,
+            TypeError
+        )
+        self._tables = tables
+        self.init_cols()
+
+    def init_cols(self):
+        self._columns = {}
+        for table in self._tables:
+            for col, column in table._columns.items():
+                self._columns[f"{table.__table__}.{col}"] = Column(
+                    source=f"{table.__table__}.{col}",
+                    dtype=column.dtype,
+                    nullable=column.nullable,
+                    format=column.format
+                )
+
+    def get_df(self) -> pd.DataFrame:
+        for _, col in self._columns.items():
+            src = col.source
+            validate(src in self._df.columns, f"Source column {src} not found in table {self.__table__}.", logger, KeyError)
+        return self._df.copy()
+
+    def join(self, other: AbstractTable, left_on: str, right_on: str, how: str = "left") -> JoinedTable:
+        logger.debug(f"Joining JoinedTable with {other.__str__()} on {left_on} = {right_on} using {how} join.")
+        left_df = self.get_df().add_prefix(f"{self.__table__}.")
+        if isinstance(other, type) and issubclass(other, Table):
+            right_df = other.get_df().add_prefix(f"{other.__table__}.")
+        elif isinstance(other, JoinedTable):
+            right_df = other.get_df().add_prefix(f"{other.__table__}.")
+        else:
+            logger.error(f"Invalid type for 'other' in join: {type(other)}")
+            raise TypeError(f"Invalid type for 'other' in join: {type(other)}")
+        
+        joined_df = pd.merge(left_df, right_df, left_on=left_on, right_on=right_on, how=how)
+        tables = (self, other)
+        return JoinedTable(joined_df, tables=tables)
+
+    def query(self, *filters: Filter | CombinedFilter) -> pd.DataFrame:
+        if not filters:
+            return self._df.copy()
+        mask = pd.Series([True] * len(self._df))
+        for f in filters:
+            validate(f.col in self._df.columns, f"Column {f.col} not found in joined table.", logger, KeyError)
+            mask &= f.apply(self._df)
+        return self._df[mask].copy()
+
+    def __str__(self):
+        tables_str = " | ".join(table.__table__ for table in self._tables)
+        return f"<JoinedTable({tables_str})>"
+
+    def __repr__(self):
+        tables_str = " | ".join(table.__table__ for table in self._tables)
+        return f"<JoinedTable({tables_str}), Columns({list(self._df.columns)})>"
