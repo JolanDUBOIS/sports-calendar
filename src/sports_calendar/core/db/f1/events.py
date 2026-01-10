@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from ..base import Table, Column
 
 
@@ -15,5 +17,5 @@ class F1EventsTable(Table):
     circuit_city = Column(source="circuit_city", dtype=str)
     circuit_country = Column(source="circuit_country", dtype=str)
     session_id = Column(source="session_id", dtype=int)
-    session_date = Column(source="session_date", dtype=str) # TODO - Change type to datetime (format: "%Y-%m-%dT%H:%M:%S+00:00")
+    session_date = Column(source="session_date", dtype=datetime, format="%Y-%m-%dT%H:%M:%S+00:00")
     session_type = Column(source="session_type", dtype=str)

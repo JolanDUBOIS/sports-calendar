@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from ..base import Table, Column, Relationship
 from .competitions import FootballCompetitionsTable
 from .teams import FootballTeamsTable
@@ -7,17 +9,16 @@ class FootballMatchesTable(Table):
     """ Table for storing football match data. """
     __file__ = "matches.csv"
     __sport__ = "football"
-    id = Column(source="id", dtype="int")
-    date = Column(source="date", dtype="str") # TODO - Change type to datetime (format: "%Y-%m-%dT%H:%M:%S+00:00")
-    competition_id = Column(source="competition_id", dtype="int")
-    home_team_id = Column(source="home_team_id", dtype="int")
-    away_team_id = Column(source="away_team_id", dtype="int")
-    season_year = Column(source="season_year", dtype="int")
-    stage = Column(source="stage", dtype="str", nullable=True)
-    leg = Column(source="leg", dtype="int", nullable=True)
-    leg_display = Column(source="leg_display", dtype="str", nullable=True)
-    venue = Column(source="venue", dtype="str", nullable=True)
-
+    id = Column(source="id", dtype=int)
+    date = Column(source="date", dtype=datetime, format="%Y-%m-%dT%H:%M:%S+00:00")
+    competition_id = Column(source="competition_id", dtype=int)
+    home_team_id = Column(source="home_team_id", dtype=int)
+    away_team_id = Column(source="away_team_id", dtype=int)
+    season_year = Column(source="season_year", dtype=int)
+    stage = Column(source="stage", dtype=str, nullable=True)
+    leg = Column(source="leg", dtype=int, nullable=True)
+    leg_display = Column(source="leg_display", dtype=str, nullable=True)
+    venue = Column(source="venue", dtype=str, nullable=True)
     __relationships__ = [
         Relationship(FootballTeamsTable, local_key="home_team_id", alias="home_team"),
         Relationship(FootballTeamsTable, local_key="away_team_id", alias="away_team"),

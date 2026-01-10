@@ -1,5 +1,7 @@
 from __future__ import annotations
 from pathlib import Path
+from dataclasses import dataclass
+from datetime import datetime
 
 import pandas as pd
 
@@ -8,11 +10,12 @@ from .filters import Filter, CombinedFilter
 from sports_calendar.core.file_io import FileHandlerFactory, CSVHandler
 
 
+@dataclass(frozen=True)
 class Column:
-    def __init__(self, source: str | None = None, dtype: type = str, nullable: bool = False):
-        self.source = source
-        self.dtype = dtype
-        self.nullable = nullable
+    source: str | None = None
+    dtype: type = str
+    nullable: bool = False
+    format: str | None = None  # only used when dtype is datetime
 
 
 class TableMeta(type):
@@ -55,11 +58,24 @@ class Table(metaclass=TableMeta):
     def get_df(cls) -> pd.DataFrame:
         # TODO - Add caching mechanism later
         df = cls.file_handler().read()
+
         for col_name, col in cls._columns.items():
-            if col_name not in df.columns:
-                logger.error(f"Column {col_name} not found in table {cls.__name__}.")
-                raise KeyError(f"Column {col_name} not found in table {cls.__name__}.")
-            df[col_name] = df[col_name].astype(col.dtype, errors="raise")
+            src = col.source or col_name
+
+            if src not in df.columns:
+                logger.error(f"Source column {src} not found in table {cls.__name__}.")
+                raise KeyError(f"Source column {src} not found in table {cls.__name__}.")
+
+            series = cls._astype(df, col, src)
+
+            df[col_name] = series
+            if src != col_name:
+                del df[src]
+
+            if not col.nullable and df[col_name].isnull().any():
+                logger.error(f"Column {col_name} in table {cls.__name__} contains null values but is marked as non-nullable.")
+                raise ValueError(f"Column {col_name} in table {cls.__name__} contains null values but is marked as non-nullable.")
+        
         return df
 
     @classmethod
@@ -88,8 +104,24 @@ class Table(metaclass=TableMeta):
         if filters:
             mask = pd.Series([True] * len(df))
             for f in filters:
+                if f.col not in df.columns:
+                    logger.error(f"Column {f.col} not found in table {cls.__name__}.")
+                    raise KeyError(f"Column {f.col} not found in table {cls.__name__}.")
                 mask &= f.apply(df)
         return df[mask].copy()
+
+    @staticmethod
+    def _astype(df: pd.DataFrame, col: Column, src: str) -> pd.Series:
+        if col.dtype is datetime:
+            df[src] = pd.to_datetime(
+                df[src],
+                format=col.format,
+                utc=True,
+                errors="raise"
+            )
+        else:
+            df[src] = df[src].astype(col.dtype, errors="raise")
+        return df[src]
 
 
 class Relationship:
