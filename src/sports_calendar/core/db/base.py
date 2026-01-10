@@ -70,7 +70,7 @@ class BaseTable(ABC, metaclass=TableMeta):
         return cls._file_handler
 
     @classmethod
-    def _view(cls) -> TableView:
+    def view(cls) -> TableView:
         return TableView(cls.get(), cls._columns, cls.__table__)
 
     @classmethod
@@ -104,11 +104,11 @@ class BaseTable(ABC, metaclass=TableMeta):
 
     @classmethod
     def select(cls, *columns: str) -> TableView:
-        return cls._view().select(*columns)
+        return cls.view().select(*columns)
 
     @classmethod
     def values(cls, column: str) -> pd.Series:
-        return cls._view().values(column)
+        return cls.view().values(column)
 
     @staticmethod
     def _astype(df: pd.DataFrame, col: Column, src: str) -> pd.Series:
@@ -126,7 +126,7 @@ class BaseTable(ABC, metaclass=TableMeta):
 
     @classmethod
     def query(cls, *filters: Filter | CombinedFilter) -> TableView:
-        return cls._view().query(*filters)
+        return cls.view().query(*filters)
 
     @classmethod
     def join(
@@ -138,7 +138,7 @@ class BaseTable(ABC, metaclass=TableMeta):
         left_alias: str | None = None,
         right_alias: str | None = None
     ) -> TableView:
-        return cls._view().join(other, left_on, right_on, how, left_alias, right_alias)
+        return cls.view().join(other, left_on, right_on, how, left_alias, right_alias)
 
     def __str__(self) -> str:
         return f"<Table({self.__table__}), Columns({list(self._columns.keys())})>"

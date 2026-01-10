@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import IntEnum
 
-from . import logger
+from .selection import logger
 
 
 class CompetitionStage(IntEnum):

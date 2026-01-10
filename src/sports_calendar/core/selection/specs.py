@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import Iterable
 
 from . import logger
-from .competition_stages import CompetitionStage
+from ..competition_stages import CompetitionStage
 from ..utils import validate
 
 
@@ -33,9 +32,6 @@ class SelectionSpec:
                 TypeError
             )
 
-    def __iter__(self) -> Iterable[SelectionItemSpec]:
-        return iter(self.items)
-
     def add_item(self, item: SelectionItemSpec):
         validate(
             isinstance(item, SelectionItemSpec),
@@ -54,28 +50,13 @@ class SelectionSpec:
 
 class SelectionItemSpec:
     sport: str
-    entity: str | None = None          # "team" | "competition" | None
-    entity_id: int | None = None
     filters: list[SelectionFilterSpec] = field(default_factory=list)
 
     def __post_init__(self):
-        valid_entities = {"team", "competition"}
-
         validate(
             bool(self.sport),
             "SelectionItemSpec.sport cannot be empty",
             logger
-        )
-        validate(
-            self.entity is None or self.entity in valid_entities,
-            f"Invalid entity '{self.entity}'. Must be one of {sorted(valid_entities)}",
-            logger
-        )
-        validate(
-            self.entity_id is None or isinstance(self.entity_id, int),
-            "entity_id must be an int or None",
-            logger,
-            TypeError
         )
         validate(
             isinstance(self.filters, list),
@@ -90,9 +71,6 @@ class SelectionItemSpec:
                 TypeError
             )
 
-    def __iter__(self) -> Iterable[SelectionFilterSpec]:
-        return iter(self.filters)
-
     def add_filter(self, filter: SelectionFilterSpec):
         validate(
             isinstance(filter, SelectionFilterSpec),
@@ -105,8 +83,6 @@ class SelectionItemSpec:
     def to_dict(self) -> dict:
         return {
             "sport": self.sport,
-            "entity": self.entity,
-            "entity_id": self.entity_id,
             "filters": [f.to_dict() for f in self.filters]
         }
 

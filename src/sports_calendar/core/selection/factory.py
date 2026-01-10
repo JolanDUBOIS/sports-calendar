@@ -58,8 +58,6 @@ class SelectionSpecFactory:
             items.append(
                 SelectionItemSpec(
                     sport=item_data["sport"],
-                    entity=item_data.get("entity"),
-                    entity_id=item_data.get("entity_id"),
                     filters=filters
                 )
             )
