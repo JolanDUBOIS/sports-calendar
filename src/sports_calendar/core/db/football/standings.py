@@ -1,9 +1,11 @@
-from ..base import Table, Column
+from ..base import BaseTable, Column
 
 
-class FootballStandingsTable(Table):
+class FootballStandingsTable(BaseTable):
+    __table__ = "football_standings"
     __file__ = "standings.csv"
     __sport__ = "football"
+
     competition_id = Column(source="competition_id", dtype=int)
     team_id = Column(source="team_id", dtype=int)
     position = Column(source="position", dtype=int)

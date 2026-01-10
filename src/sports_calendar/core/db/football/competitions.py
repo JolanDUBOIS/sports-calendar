@@ -1,10 +1,12 @@
-from ..base import Table, Column
+from ..base import BaseTable, Column
 
 
-class FootballCompetitionsTable(Table):
+class FootballCompetitionsTable(BaseTable):
     """ Table for storing football competition data. """
+    __table__ = "football_competitions"
     __file__ = "competitions.csv"
     __sport__ = "football"
+
     id = Column(source="id", dtype=int)
     name = Column(source="name", dtype=str)
     abbreviation = Column(source="abbreviation", dtype=str)

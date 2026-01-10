@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from ..base import Table, Column
+from ..base import BaseTable, Column
 
 
-class F1EventsTable(Table):
+class F1EventsTable(BaseTable):
     """ Table for storing F1 event data. """
+    __table__ = "f1_events"
     __file__ = "events.csv"
     __sport__ = "f1"
 

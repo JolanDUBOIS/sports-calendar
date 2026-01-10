@@ -1,10 +1,12 @@
-from ..base import Table, Column
+from ..base import BaseTable, Column
 
 
-class FootballTeamsTable(Table):
+class FootballTeamsTable(BaseTable):
     """ Table for storing football team data. """
+    __table__ = "football_teams"
     __file__ = "teams.csv"
     __sport__ = "football"
+
     id = Column(source="id", dtype=int)
     name = Column(source="name", dtype=str)
     abbreviation = Column(source="abbreviation", dtype=str)
