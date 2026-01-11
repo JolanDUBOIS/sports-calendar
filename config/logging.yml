@@ -27,29 +27,39 @@ loggers:
     level: DEBUG
 
   # Core loggers
-  sports_calendar.sc_core:
+  sports_calendar.core:
     level: DEBUG
 
-  sports_calendar.sc_core.file_io:
+  sports_calendar.core.db:
     level: DEBUG
 
-  sports_calendar.sc_core.setup:
+  sports_calendar.core.file_io:
     level: DEBUG
+
+  sports_calendar.core.selection:
+    level: DEBUG
+
+  sports_calendar.core.setup:
+    level: DEBUG
+
+  sports_calendar.core.utils:
+    level: DEBUG
+
+  # Selection UI loggers
+  sports_calendar.selection_ui:
+    level: DEBUG 
 
   # Sync Calendar loggers
   sports_calendar.sync_calendar:
     level: DEBUG
 
-  sports_calendar.sync_calendar.calendar:
-    level: DEBUG
-
   sports_calendar.sync_calendar.config:
     level: DEBUG
 
-  sports_calendar.sync_calendar.models:
+  sports_calendar.sync_calendar.events:
     level: DEBUG
 
-  sports_calendar.sync_calendar.selection:
+  sports_calendar.sync_calendar.google_calendar:
     level: DEBUG
 
   # Sync DB loggers

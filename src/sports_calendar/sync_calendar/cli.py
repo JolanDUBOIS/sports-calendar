@@ -1,6 +1,7 @@
 import typer 
 
-from .main import run_selection, clear_calendar
+from .run_selection import run_selection
+from .clear_calendar import clear_calendar
 
 
 sync_calendar = typer.Typer(help="Commands to run and manage the calendar selection and utils.")

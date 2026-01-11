@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ..processors import ProcessorFactory
-from sports_calendar.sc_core import IOContent
+from sports_calendar.core import IOContent
 
 if TYPE_CHECKING:
     from sports_calendar.sync_db.definitions.specs import ProcessingStepSpec

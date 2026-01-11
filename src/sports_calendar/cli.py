@@ -6,7 +6,7 @@ from .initialize import init
 from .sync_db import sync_db
 from .sync_calendar import sync_calendar, clear_cal
 from .validate_db import validate_db
-from .sc_core.setup import Paths, setup_logging
+from .core.setup import Paths, setup_logging
 
 
 app = typer.Typer(help="Sports Calendar CLI Application — manage DB, calendar, validation.")

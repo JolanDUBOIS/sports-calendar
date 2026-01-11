@@ -6,7 +6,7 @@ from . import logger
 from .column_manager import ColumnManager
 from .validation_result import SchemaValidationResult, ModelValidationResult, ValidationError, ValidationIssue
 from .definitions.specs import LayerSchemaSpec, ModelSchemaSpec
-from sports_calendar.sc_core.file_io import FileHandlerFactory
+from sports_calendar.core.file_io import FileHandlerFactory
 
 
 class ModelSchemaManager:

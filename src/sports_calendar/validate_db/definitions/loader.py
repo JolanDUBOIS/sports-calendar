@@ -2,7 +2,7 @@ from pathlib import Path
 
 from . import logger
 from .specs import SchemaSpec, LayerSchemaSpec
-from sports_calendar.sc_core import load_yml
+from sports_calendar.core import load_yml
 
 
 def load_schema(strict: bool = True) -> SchemaSpec:

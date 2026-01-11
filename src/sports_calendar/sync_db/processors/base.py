@@ -4,10 +4,10 @@ from pathlib import Path
 from abc import ABC, abstractmethod
 
 from . import logger
-from sports_calendar.sc_core import load_yml
+from sports_calendar.core import load_yml
 
 if TYPE_CHECKING:
-    from sports_calendar.sc_core import IOContent
+    from sports_calendar.core import IOContent
     from sports_calendar.sync_db.definitions.specs import ProcessingStepSpec, ProcessingIOInfo
 
 

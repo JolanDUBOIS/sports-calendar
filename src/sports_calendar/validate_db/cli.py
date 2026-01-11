@@ -1,8 +1,8 @@
 import typer
 
 from .main import run_validation
-from sports_calendar.sc_core import DataStage
-from sports_calendar.sc_core.cli_helpers import (
+from sports_calendar.core import DataStage
+from sports_calendar.core.cli_helpers import (
     parse_stage,
     require_stage_if_model,
 )

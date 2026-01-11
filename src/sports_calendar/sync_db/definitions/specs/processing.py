@@ -1,6 +1,6 @@
 from typing import Any
 from dataclasses import dataclass, field
-from sports_calendar.sc_core import SpecModel
+from sports_calendar.core import SpecModel
 
 
 @dataclass
