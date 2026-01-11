@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from ..base import BaseTable, Column
 
 
@@ -18,3 +20,7 @@ class FootballStandingsTable(BaseTable):
     goals_for = Column(source="goals_for", dtype=int)
     goals_against = Column(source="goals_against", dtype=int)
     deductions = Column(source="deductions", dtype=int)
+
+    # Dev fields
+    staging_at = Column(source="staging_at", dtype=datetime, nullable=True)
+    _ctime = Column(source="_ctime", dtype=datetime, nullable=True)

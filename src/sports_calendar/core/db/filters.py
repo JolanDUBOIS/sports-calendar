@@ -4,8 +4,10 @@ from typing import Any
 import pandas as pd
 
 from . import logger
+from sports_calendar.core.utils import validate
 
 
+# TODO - Filters should use Column objects instead of strings...
 class Filter:
     """ Represents a single column filter. """
     def __init__(self, col: str, op: str, value: Any):
@@ -14,9 +16,8 @@ class Filter:
         self.value = value
 
     def apply(self, df: pd.DataFrame) -> pd.Series:
-        logger.debug(f"Applying filter on column {self.col} with operation {self.op} and value {self.value}")
-        if self.col not in df.columns:
-            return pd.Series([True] * len(df))  # ignore missing columns
+        logger.debug(f"Applying filter on column '{self.col}' with operation '{self.op}' and value '{self.value}'")
+        validate(self.col in df.columns, f"Column '{self.col}' does not exist in DataFrame", logger)
         series = df[self.col]
         if self.op == "==":
             return series == self.value

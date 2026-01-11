@@ -11,7 +11,7 @@ class FootballMatchesTable(BaseTable):
     __sport__ = "football"
 
     id = Column(source="id", dtype=int)
-    date = Column(source="date", dtype=datetime, format="%Y-%m-%dT%H:%M:%S+00:00")
+    date = Column(source="date", dtype=datetime) # format="%Y-%m-%dT%H:%M:%S+00:00"
     competition_id = Column(source="competition_id", dtype=int)
     home_team_id = Column(source="home_team_id", dtype=int)
     away_team_id = Column(source="away_team_id", dtype=int)
@@ -20,3 +20,7 @@ class FootballMatchesTable(BaseTable):
     leg = Column(source="leg", dtype=int, nullable=True)
     leg_display = Column(source="leg_display", dtype=str, nullable=True)
     venue = Column(source="venue", dtype=str, nullable=True)
+
+    # Dev fields
+    staging_at = Column(source="staging_at", dtype=datetime, nullable=True)
+    _ctime = Column(source="_ctime", dtype=datetime, nullable=True)

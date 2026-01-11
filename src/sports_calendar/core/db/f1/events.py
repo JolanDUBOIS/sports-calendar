@@ -9,8 +9,8 @@ class F1EventsTable(BaseTable):
     __file__ = "events.csv"
     __sport__ = "f1"
 
-    id = Column(source="session_id", dtype=int)
-    name = Column(source="short_name", dtype=str)
+    id = Column(source="id", dtype=int)
+    name = Column(source="name", dtype=str)
     short_name = Column(source="short_name", dtype=str, nullable=True)
     season_year = Column(source="season_year", dtype=int)
     circuit_id = Column(source="circuit_id", dtype=int)
@@ -18,5 +18,9 @@ class F1EventsTable(BaseTable):
     circuit_city = Column(source="circuit_city", dtype=str)
     circuit_country = Column(source="circuit_country", dtype=str)
     session_id = Column(source="session_id", dtype=int)
-    session_date = Column(source="session_date", dtype=datetime, format="%Y-%m-%dT%H:%M:%S+00:00")
+    session_date = Column(source="session_date", dtype=datetime) # format="%Y-%m-%dT%H:%M:%S+00:00"
     session_type = Column(source="session_type", dtype=str)
+
+    # Dev fields
+    staging_at = Column(source="staging_at", dtype=datetime, nullable=True)
+    _ctime = Column(source="_ctime", dtype=datetime, nullable=True)

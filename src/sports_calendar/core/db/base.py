@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from abc import ABC
+from abc import ABC, ABCMeta
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -18,30 +19,39 @@ class Column:
     source: str
     dtype: type = str
     nullable: bool = False
-    format: str | None = None  # only used when dtype is datetime
 
     def __str__(self) -> str:
-        return f"<Column(source={self.source}, dtype={self.dtype.__name__}, nullable={self.nullable}, format={self.format})>"
+        return f"<Column(source={self.source}, dtype={self.dtype.__name__}, nullable={self.nullable})>"
 
     def __repr__(self) -> str:
         return self.__str__()
 
 
-class TableMeta(type):
+class TableMeta(ABCMeta):
     _registry: list[type[BaseTable]] = []  # store all Table subclasses
 
-    def __new__(cls, name, bases, namespace):
+    def __new__(cls, name: str, bases: tuple[type, ...], namespace: dict[str, Any]):
+        # TODO - Enforce that columns source is the same as the key...
         columns = {
             key: value for key, value in namespace.items()
             if isinstance(value, Column)
         }
         namespace["_columns"] = columns
+
         new_cls = super().__new__(cls, name, bases, namespace)
-        if name != "Table":
+
+        if name != "BaseTable":
             cls._registry.append(new_cls)
+
         logger.debug(f"Registered table class: {name} with columns: {list(columns.keys())}")
         logger.debug(f"Current table registry: {[table.__name__ for table in cls._registry]}")
         return new_cls
+
+    def __str__(cls: type[BaseTable]) -> str:
+        return f"<Table({cls.__table__}), Columns({list(cls._columns.keys())})>"
+
+    def __repr__(cls: type[BaseTable]) -> str:
+        return f"<Table({cls.__table__}), Columns({cls._columns}), DataFrame Shape({cls._df.shape if cls._df is not None else 'Not Loaded'})>"
 
 
 class BaseTable(ABC, metaclass=TableMeta):
@@ -60,17 +70,19 @@ class BaseTable(ABC, metaclass=TableMeta):
     @classmethod
     def get_path(cls) -> Path:
         validate(bool(cls._path), f"Path for table {cls.__table__} is not set. Please run set_path().", logger, RuntimeError)
-        logger.debug(f"Reading path for table {cls.__table__}: {cls._path}")
+        logger.debug(f"Getting path for table {cls.__table__}: {cls._path}")
         return cls._path
 
     @classmethod
     def file_handler(cls) -> CSVHandler:
         if not hasattr(cls, "_file_handler") or cls._file_handler is None:
+            logger.debug(f"Creating file handler for table {cls.__table__} at path {cls.get_path()}")
             cls._file_handler = FileHandlerFactory.create_file_handler(cls.get_path())
         return cls._file_handler
 
     @classmethod
     def view(cls) -> TableView:
+        logger.debug(f"Creating TableView for table {cls.__table__}")
         return TableView(cls.get(), cls._columns, cls.__table__)
 
     @classmethod
@@ -78,6 +90,7 @@ class BaseTable(ABC, metaclass=TableMeta):
         if cls._df is not None:
             return cls._df.copy()
         df = cls.file_handler().read()
+        logger.debug(f"Loaded data for table {cls.__table__} with shape {df.shape} and columns {list(df.columns)}")
 
         for col_name, col in cls._columns.items():
             src = col.source
@@ -110,19 +123,32 @@ class BaseTable(ABC, metaclass=TableMeta):
     def values(cls, column: str) -> pd.Series:
         return cls.view().values(column)
 
+    @classmethod
+    def columns(cls) -> list[str]:
+        return list(cls._columns.keys())
+
     @staticmethod
     def _astype(df: pd.DataFrame, col: Column, src: str) -> pd.Series:
+        s = df[src]
+        null_mask = s.isna()
+
+        s_non_null = s[~null_mask]
+
         if col.dtype is datetime:
-            df[src] = pd.to_datetime(
-                df[src],
-                format=col.format,
+            s_non_null = pd.to_datetime(
+                s_non_null,
                 errors="raise"
             )
         elif col.dtype is CompetitionStage:
-            df[src] = df[src].apply(lambda s: CompetitionStage.from_str(s))
+            s_non_null = s_non_null.map(CompetitionStage.from_str)
+        elif col.dtype is int or col.dtype is float:
+            s_non_null = pd.to_numeric(s_non_null, errors="raise").astype(col.dtype)
         else:
-            df[src] = df[src].astype(col.dtype, errors="raise")
-        return df[src]
+            s_non_null = s_non_null.astype(col.dtype, errors="raise")
+
+        s = s.copy()
+        s.loc[~null_mask] = s_non_null
+        return s
 
     @classmethod
     def query(cls, *filters: Filter | CombinedFilter) -> TableView:
@@ -140,11 +166,6 @@ class BaseTable(ABC, metaclass=TableMeta):
     ) -> TableView:
         return cls.view().join(other, left_on, right_on, how, left_alias, right_alias)
 
-    def __str__(self) -> str:
-        return f"<Table({self.__table__}), Columns({list(self._columns.keys())})>"
-
-    def __repr__(self) -> str:
-        return f"<Table({self.__table__}), Columns({self._columns}), DataFrame Shape({self._df.shape if self._df is not None else 'Not Loaded'})>"
 
 
 class TableView:
@@ -166,14 +187,14 @@ class TableView:
         validate(column in self._columns, f"Column {column} not found in TableView {self.__table__}.", logger, KeyError)
         return self._df[column].copy()
 
-    def query(self, *filters: Filter | CombinedFilter) -> TableView:
+    def columns(self) -> list[str]:
+        return list(self._columns.keys())
+
+    def query(self, filter: Filter | CombinedFilter) -> TableView:
+        logger.debug(f"Querying TableView {self.__table__} with filters: {filter}")
         df = self.get()
 
-        if filters:
-            mask = pd.Series(True, index=df.index)
-            for f in filters:
-                validate(f.col in df.columns, f"Column {f.col} not found in table {self.__table__}.", logger, KeyError)
-                mask &= f.apply(df)
+        mask = filter.apply(df)
         df = df[mask].copy()
 
         return TableView(df, self._columns, f"{self.__table__}_filtered")
@@ -190,7 +211,7 @@ class TableView:
         logger.debug(f"Joining TableView {self.__table__} with {other.__str__()} on {left_on} = {right_on} using {how} join.")
 
         # Prefixes
-        left_prefix = f"{left_alias}." if left_alias is not None else f"{self.__table__}."
+        left_prefix = f"{left_alias}." if left_alias is not None else ""
         right_prefix = f"{right_alias}." if right_alias is not None else f"{other.__table__}."
         validate(left_prefix != right_prefix, "Left and right table aliases must be different to avoid column name collisions.", logger, ValueError)
         left_df = self.get().add_prefix(left_prefix)
@@ -225,9 +246,9 @@ class TableView:
         # Get Columns
         columns = {}
         for col_name, col in self._columns.items():
-            columns[f"{left_prefix}{col_name}"] = Column(source=f"{left_prefix}{col_name}", dtype=col.dtype, nullable=col.nullable, format=col.format)
+            columns[f"{left_prefix}{col_name}"] = Column(source=f"{left_prefix}{col_name}", dtype=col.dtype, nullable=col.nullable)
         for col_name, col in other._columns.items():
-            columns[f"{right_prefix}{col_name}"] = Column(source=f"{right_prefix}{col_name}", dtype=col.dtype, nullable=col.nullable, format=col.format)
+            columns[f"{right_prefix}{col_name}"] = Column(source=f"{right_prefix}{col_name}", dtype=col.dtype, nullable=col.nullable)
 
         # Create TableView
         return TableView(joined_df, columns, f"{self.__table__}_{other.__table__}_joined")
