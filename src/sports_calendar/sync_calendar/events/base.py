@@ -68,6 +68,9 @@ class SportsEventCollection:
         """ Return the number of events in the collection. """
         return len(self.events)
 
+    def __getitem__(self, index: int | slice) -> SportsEvent | list[SportsEvent]:
+        return self.events[index]
+
     def __repr__(self):
         """ Return a string representation of the collection with one event per line. """
         if not self.events:

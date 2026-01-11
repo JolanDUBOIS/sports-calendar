@@ -22,6 +22,7 @@ class GoogleCalendarManager:
         **kwargs
     ) -> None:
         """ Add a calendar to Google Calendar """
+        logger.info("Adding events to Google Calendar.")
         today = datetime.now(timezone.utc).date().isoformat()
         if scope is None or scope == 'all':
             self.api.add_events(events=calendar.events, **kwargs)
@@ -35,6 +36,7 @@ class GoogleCalendarManager:
 
     def clear_calendar(self, scope: str | None = None, date_from: str | None = None, date_to: str | None = None, verbose: bool = False) -> None:
         """ Clear events from the Google Calendar based on the specified scope """
+        logger.info("Clearing events from Google Calendar.")
         today = datetime.now(timezone.utc).date().isoformat()
         if scope is None:
             self.api.delete_events(date_from=date_from, date_to=date_to, verbose=verbose)

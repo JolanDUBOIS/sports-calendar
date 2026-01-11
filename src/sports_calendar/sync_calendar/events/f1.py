@@ -1,8 +1,7 @@
 from __future__ import annotations
 from datetime import datetime, timedelta
 
-import pandas as pd
-
+from . import logger
 from .base import SportsEvent
 
 
@@ -34,6 +33,7 @@ class F1Event(SportsEvent):
     @property
     def start(self) -> datetime:
         """ Start time of the F1 event. """
+        # logger.debug(f"Parsing date_time: {self.date_time}")
         return datetime.fromisoformat(self.date_time)
 
     @property
