@@ -12,6 +12,7 @@ from ..utils import validate
 # Selection specs
 # =========================
 
+@dataclass
 class SelectionSpec:
     name: str
     items: list[SelectionItemSpec] = field(default_factory=list)
@@ -48,6 +49,7 @@ class SelectionSpec:
         }
 
 
+@dataclass
 class SelectionItemSpec:
     sport: str
     filters: list[SelectionFilterSpec] = field(default_factory=list)

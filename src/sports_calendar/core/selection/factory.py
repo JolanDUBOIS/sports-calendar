@@ -19,17 +19,20 @@ class SelectionFilterSpecFactory:
             cls._registry[key] = subclass
 
     @classmethod
-    def create_filter(cls, data: dict) -> SelectionFilterSpec:
+    def create_filter(cls, sport: str, filter_type: str, **kwargs) -> SelectionFilterSpec:
         """
         data: dict with at least "key" and other fields
         """
         cls._build_registry()
-        key = data.get("key")
-        validate(bool(key), "Filter dict must have a 'key' field", logger)
-        filter_cls = cls._registry.get(key)
-        validate(bool(filter_cls), f"Unknown filter key '{key}'", logger)
-        kwargs = {k: v for k, v in data.items() if k != "key"}
-        return filter_cls(**kwargs)
+        filter_cls = cls._registry.get(filter_type)
+        validate(
+            filter_cls is not None,
+            f"Unknown filter type: {filter_type}",
+            logger
+        )
+        logger.debug(f"Creating filter of type {filter_type} for sport {sport} with args {kwargs}")
+        logger.debug(f"Using filter class: {filter_cls.__name__}")
+        return filter_cls(sport=sport, **kwargs)
 
 class SelectionSpecFactory:
 
@@ -52,7 +55,7 @@ class SelectionSpecFactory:
         items = []
         for item_data in data.get("items", []):
             filters = [
-                SelectionFilterSpecFactory.create_filter(f_data)
+                SelectionFilterSpecFactory.create_filter(sport=item_data["sport"], **f_data)
                 for f_data in item_data.get("filters", [])
             ]
             items.append(

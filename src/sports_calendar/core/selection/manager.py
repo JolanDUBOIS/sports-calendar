@@ -5,6 +5,7 @@ from ..utils import validate
 from sports_calendar.core import load_yml, Paths
 
 
+# TODO - Lazy load !!
 class SelectionManager:
     """ Load and provide access to SelectionSpec objects from the selections folder. """
 
