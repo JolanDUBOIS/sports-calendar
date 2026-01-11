@@ -12,6 +12,7 @@ class FileHandlerFactory:
     @staticmethod
     def create_file_handler(file_path: Path | str) -> BaseFileHandler:
         """ Create a file handler based on the file path. """
+        logger.debug(f"Creating file handler for path: {file_path}")
         file_path = Path(file_path).resolve()
         file_suffix = file_path.suffix.lower()
         if file_suffix == ".csv":
