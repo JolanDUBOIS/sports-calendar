@@ -20,9 +20,7 @@ class SelectionFilterSpecFactory:
 
     @classmethod
     def create_filter(cls, sport: str, filter_type: str, **kwargs) -> SelectionFilterSpec:
-        """
-        data: dict with at least "key" and other fields
-        """
+        """ TODO """
         cls._build_registry()
         filter_cls = cls._registry.get(filter_type)
         validate(
@@ -35,36 +33,26 @@ class SelectionFilterSpecFactory:
         return filter_cls(sport=sport, **kwargs)
 
 class SelectionSpecFactory:
+    """ Factory to create SelectionSpec instances from dicts. """
 
     @classmethod
     def from_dict(cls, data: dict) -> SelectionSpec:
-        """
-        data: {
-            "name": "my selection",
-            "items": [
-                {
-                    "sport": "football",
-                    "entity": "team",
-                    "entity_id": 1,
-                    "filters": [ {...}, {...} ]
-                },
-                ...
-            ]
-        }
-        """
+        """ TODO """
         items = []
         for item_data in data.get("items", []):
             filters = [
                 SelectionFilterSpecFactory.create_filter(sport=item_data["sport"], **f_data)
                 for f_data in item_data.get("filters", [])
             ]
+            item_kwargs = {k: v for k, v in item_data.items() if k != "filters"}
             items.append(
                 SelectionItemSpec(
-                    sport=item_data["sport"],
+                    **item_kwargs,
                     filters=filters
                 )
             )
+        data_kwargs = {k: v for k, v in data.items() if k != "items"}
         return SelectionSpec(
-            name=data["name"],
+            **data_kwargs,
             items=items
         )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from uuid import uuid4
 from dataclasses import dataclass, field
 
 from . import logger
@@ -16,6 +17,7 @@ from ..utils import validate
 class SelectionSpec:
     name: str
     items: list[SelectionItemSpec] = field(default_factory=list)
+    uid: str = field(default_factory=lambda: str(uuid4()))
 
     def __post_init__(self):
         validate(bool(self.name), "SelectionSpec.name cannot be empty", logger)
@@ -45,14 +47,29 @@ class SelectionSpec:
     def to_dict(self) -> dict:
         return {
             "name": self.name,
+            "uid": self.uid,
             "items": [item.to_dict() for item in self.items]
         }
+
+    def clone(self, new_name: str) -> SelectionSpec:
+        """ Create a deep copy of this SelectionSpec with new IDs. """
+        cloned_items = [item.clone() for item in self.items]
+        return SelectionSpec(
+            name=new_name,
+            items=cloned_items
+        )
+
+    @classmethod
+    def empty(cls, name: str) -> SelectionSpec:
+        """ Create an empty SelectionSpec with the given name. """
+        return cls(name=name, items=[])
 
 
 @dataclass
 class SelectionItemSpec:
     sport: str
     filters: list[SelectionFilterSpec] = field(default_factory=list)
+    uid: str = field(default_factory=lambda: str(uuid4()))
 
     def __post_init__(self):
         validate(
@@ -85,8 +102,17 @@ class SelectionItemSpec:
     def to_dict(self) -> dict:
         return {
             "sport": self.sport,
+            "uid": self.uid,
             "filters": [f.to_dict() for f in self.filters]
         }
+
+    def clone(self) -> SelectionItemSpec:
+        """ Create a deep copy of this SelectionItemSpec with new IDs. """
+        cloned_filters = [f.clone() for f in self.filters]
+        return SelectionItemSpec(
+            sport=self.sport,
+            filters=cloned_filters
+        )
 
 
 # =========================
@@ -96,6 +122,7 @@ class SelectionItemSpec:
 @dataclass(frozen=True)
 class SelectionFilterSpec(ABC):
     sport: str
+    uid: str = field(default_factory=lambda: str(uuid4()), kw_only=True)
     key: str = field(init=False)
 
     def __post_init__(self):
@@ -103,11 +130,16 @@ class SelectionFilterSpec(ABC):
         validate(isinstance(self.key, str), "SelectionFilterSpec.key must be a string", logger, TypeError)
 
     def to_dict(self) -> dict:
-        data = {"key": self.key, "sport": self.sport}
+        data = {}
         for field_name in self.__dataclass_fields__:
-            if field_name not in {"key", "sport"}:
-                data[field_name] = getattr(self, field_name)
+            data[field_name] = getattr(self, field_name)
         return data
+
+    def clone(self) -> SelectionFilterSpec:
+        """ Create a deep copy of this SelectionFilterSpec with a new ID. """
+        data = self.to_dict()
+        data.pop("uid", None)  # Remove existing ID to generate a new one
+        return type(self)(**data)
 
 
 # -------------------------
