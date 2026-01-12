@@ -10,16 +10,16 @@ from sports_calendar.core.selection import SelectionManager, SelectionApplier
 
 
 def run_selection(
-    key: str = "dev",
+    name: str = "dev",
     dry_run: bool = False,
     **kwargs
 ):
     """ TODO """
-    logger.info(f"Running selection for selection {key}.")
+    logger.info(f"Running selection for selection {name}.")
 
     setup_repo_path(Paths.DB_DIR)
 
-    selection = SelectionManager().get(key)
+    selection = SelectionManager.get_by_name(name)
     views = SelectionApplier.apply(selection)
     events = SportsEventCollection()
     for view in views:
@@ -39,7 +39,7 @@ def run_selection(
 
     add_calendar_google(
         calendar=calendar,
-        gcal_id=Secrets().get_gcal_id(key),
+        gcal_id=Secrets().get_gcal_id(name),
         scope='future',
         verbose=kwargs.get('verbose', False)
     )
