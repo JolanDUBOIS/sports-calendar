@@ -4,11 +4,19 @@ from .routes.selections import bp as selections_bp
 from .routes.items import bp as items_bp
 from .routes.filters import bp as filters_bp
 from .routes.lookups import bp as lookups_bp
+from sports_calendar.core import Paths
+from sports_calendar.core.db import setup_repo_path
+from sports_calendar.core.selection import SelectionRegistry, SelectionStorage
 
 
 def create_app(config: dict | None = None) -> Flask:
     """Create and configure the Flask app."""
     app = Flask(__name__)
+
+    setup_repo_path(Paths.DB_DIR)
+    SelectionRegistry.initialize(
+        SelectionStorage.load_all()
+    )
 
     if config:
         app.config.update(config)

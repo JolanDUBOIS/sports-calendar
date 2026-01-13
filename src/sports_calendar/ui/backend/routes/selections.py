@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint
 
 from . import logger
-from sports_calendar.core.selection import SelectionManager
+from sports_calendar.core.selection import SelectionRegistry, SelectionSpec
 
 
 bp = Blueprint("selections", __name__, url_prefix="/selections")
@@ -10,13 +10,13 @@ bp = Blueprint("selections", __name__, url_prefix="/selections")
 def list_selections():
     """ List all selections. """
     try:
-        selections = SelectionManager.get_all()
+        selections = SelectionRegistry.get_all()
     except Exception as e:
         logger.exception("Error retrieving selections")
         return jsonify({"error": "Internal server error"}), 500
     payload = {
         "selections": [
-            {"name": sel.name, "sid": sel.uid} for sel in selections.values()
+            {"selection": sel.to_dict()} for sel in selections.values()
         ]
     }
     return jsonify(payload), 200
@@ -28,10 +28,11 @@ def create_selection():
     name = data.get("name") if data else None
     if not name:
         return jsonify({"error": "Selection name is required"}), 400
-
+    logger.info(f"Creating selection with name: {name}")
     try:
-        new_selection = SelectionManager.empty(name=name)
-        return jsonify({"name": new_selection.name, "sid": new_selection.uid}), 201
+        new_selection = SelectionSpec.empty(name=name)
+        SelectionRegistry.add(new_selection)
+        return jsonify({"selection": new_selection.to_dict()}), 201
     except Exception as e:
         logger.exception("Error creating selection")
         return jsonify({"error": "Internal server error"}), 500
@@ -40,8 +41,8 @@ def create_selection():
 def get_selection(sid: str):
     """ Get a specific selection by id. """
     try:
-        selection = SelectionManager.get(sid)
-        return jsonify(selection.to_dict()), 200
+        selection = SelectionRegistry.get(sid)
+        return jsonify({"selection": selection.to_dict()}), 200
     except KeyError as e:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
@@ -58,7 +59,7 @@ def update_selection(sid: str):
 def delete_selection(sid: str):
     """ Delete a specific selection by id. """
     try:
-        SelectionManager.remove(sid)
+        SelectionRegistry.remove(sid)
         return "", 204
     except KeyError as e:
         logger.warning(f"Selection not found for deletion: {sid}")
@@ -74,10 +75,11 @@ def clone_selection(sid: str):
     new_name = data.get("name") if data else None
     if not new_name:
         return jsonify({"error": "New selection name is required for cloning"}), 400
-    
     try:
-        cloned_selection = SelectionManager.clone(sid, new_name=new_name)
-        return jsonify({"name": cloned_selection.name, "sid": cloned_selection.uid}), 201
+        selection = SelectionRegistry.get(sid)
+        cloned_selection = selection.clone(new_name=new_name)
+        SelectionRegistry.add(cloned_selection)
+        return jsonify({"selection": cloned_selection.to_dict()}), 201
     except KeyError as e:
         logger.warning(f"Selection not found for cloning: {sid}")
         return jsonify({"error": "Selection not found"}), 404
