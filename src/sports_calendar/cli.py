@@ -6,6 +6,7 @@ from .initialize import init
 from .sync_db import sync_db
 from .sync_calendar import sync_calendar, clear_cal
 from .validate_db import validate_db
+from .ui import launch_ui
 from .core.setup import Paths, setup_logging
 
 
@@ -15,6 +16,7 @@ app.add_typer(sync_db, name="sync-db", help="Commands to manage the data synchro
 app.add_typer(sync_calendar, name="sync-calendar", help="Commands to manage calendar selection.")
 app.add_typer(clear_cal, name="clear-calendar", help="Commands to clear events from the Google Calendar.")
 app.add_typer(validate_db, name="validate-db", help="Commands to validate the database.")
+app.add_typer(launch_ui, name="launch-ui", help="Launch the Sports Calendar UI application.")
 
 app.command(name="init")(init)
 

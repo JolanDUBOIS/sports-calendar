@@ -11,6 +11,6 @@ from .specs import (
     CompetitionsFilterSpec,
     SessionFilterSpec
 )
-from .manager import SelectionManager
-from .factory import SelectionSpecFactory
 from .engine import SelectionApplier
+from .registry import SelectionRegistry
+from .storage import SelectionStorage
