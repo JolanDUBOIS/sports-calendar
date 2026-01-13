@@ -11,7 +11,7 @@ def list_selections():
     """ List all selections. """
     try:
         selections = SelectionRegistry.get_all()
-    except Exception as e:
+    except Exception:
         logger.exception("Error retrieving selections")
         return jsonify({"error": "Internal server error"}), 500
     payload = {
@@ -33,7 +33,7 @@ def create_selection():
         new_selection = SelectionSpec.empty(name=name)
         SelectionRegistry.add(new_selection)
         return jsonify({"selection": new_selection.to_dict()}), 201
-    except Exception as e:
+    except Exception:
         logger.exception("Error creating selection")
         return jsonify({"error": "Internal server error"}), 500
 
@@ -43,10 +43,10 @@ def get_selection(sid: str):
     try:
         selection = SelectionRegistry.get(sid)
         return jsonify({"selection": selection.to_dict()}), 200
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error retrieving selection: {sid}")
         return jsonify({"error": "Internal server error"}), 500  
 
@@ -61,10 +61,10 @@ def delete_selection(sid: str):
     try:
         SelectionRegistry.remove(sid)
         return "", 204
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Selection not found for deletion: {sid}")
         return jsonify({"error": "Selection not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error deleting selection: {sid}")
         return jsonify({"error": "Internal server error"}), 500
 
@@ -80,9 +80,9 @@ def clone_selection(sid: str):
         cloned_selection = selection.clone(new_name=new_name)
         SelectionRegistry.add(cloned_selection)
         return jsonify({"selection": cloned_selection.to_dict()}), 201
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Selection not found for cloning: {sid}")
         return jsonify({"error": "Selection not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error cloning selection: {sid}")
         return jsonify({"error": "Internal server error"}), 500

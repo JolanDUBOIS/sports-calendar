@@ -12,10 +12,10 @@ def list_items(sid: str):
     try:
         selection = SelectionRegistry.get(sid)
         return jsonify({"items": [item.to_dict() for item in selection.items]}), 200
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error retrieving items for selection: {sid}")
         return jsonify({"error": "Internal server error"}), 500
 
@@ -31,10 +31,10 @@ def create_item(sid: str):
         new_item = SelectionItemSpec.empty(sport=sport)
         selection.add_item(new_item)
         return jsonify({"item": new_item.to_dict()}), 201
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error creating item in selection: {sid}")
         return jsonify({"error": "Internal server error"}), 500
 
@@ -45,10 +45,10 @@ def get_item(sid: str, iid: str):
         selection = SelectionRegistry.get(sid)
         item = selection.get_item(iid)
         return jsonify({"item": item.to_dict()}), 200
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Item not found: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error retrieving item: {iid} in selection {sid}")
         return jsonify({"error": "Internal server error"}), 500
 
@@ -64,10 +64,10 @@ def delete_item(sid: str, iid: str):
         selection = SelectionRegistry.get(sid)
         selection.remove_item(iid)
         return jsonify({"message": "Item deleted"}), 200
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Item not found for deletion: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error deleting item: {iid} in selection {sid}")
         return jsonify({"error": "Internal server error"}), 500
 
@@ -80,9 +80,9 @@ def clone_item(sid: str, iid: str):
         cloned_item = item.clone()
         selection.add_item(cloned_item)
         return jsonify({"selection": selection.to_dict()}), 201
-    except KeyError as e:
+    except KeyError:
         logger.warning(f"Item not found for cloning: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
-    except Exception as e:
+    except Exception:
         logger.exception(f"Error cloning item: {iid} in selection {sid}")
         return jsonify({"error": "Internal server error"}), 500
