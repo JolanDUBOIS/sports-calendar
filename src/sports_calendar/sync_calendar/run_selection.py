@@ -6,7 +6,7 @@ from .transformer import EventTransformer
 from .google_calendar import GoogleCalendarManager
 from sports_calendar.core import Paths
 from sports_calendar.core.db import setup_repo_path
-from sports_calendar.core.selection import SelectionManager, SelectionApplier
+from sports_calendar.core.selection import SelectionRegistry, SelectionStorage, SelectionApplier
 
 
 def run_selection(
@@ -18,8 +18,11 @@ def run_selection(
     logger.info(f"Running selection for selection {name}.")
 
     setup_repo_path(Paths.DB_DIR)
+    SelectionRegistry.initialize(
+        SelectionStorage.load_all()
+    )
 
-    selection = SelectionManager.get_by_name(name)
+    selection = SelectionRegistry.get_by_name(name)
     views = SelectionApplier.apply(selection)
     events = SportsEventCollection()
     for view in views:
