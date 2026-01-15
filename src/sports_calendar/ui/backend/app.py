@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import Flask
 
 from .routes.selections import bp as selections_bp
@@ -9,10 +11,16 @@ from sports_calendar.core.db import setup_repo_path
 from sports_calendar.core.selection import SelectionRegistry, SelectionStorage
 
 
+FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+
 def create_app(config: dict | None = None) -> Flask:
     """Create and configure the Flask app."""
-    app = Flask(__name__)
-
+    app = Flask(
+        __name__,
+        template_folder=FRONTEND_DIR / "templates",
+        static_folder=FRONTEND_DIR / "static",
+        static_url_path="/static",
+    )
     setup_repo_path(Paths.DB_DIR)
     SelectionRegistry.initialize(
         SelectionStorage.load_all()

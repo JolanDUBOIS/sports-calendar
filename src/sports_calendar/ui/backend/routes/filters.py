@@ -3,6 +3,7 @@ from flask import request, jsonify, Blueprint
 from . import logger
 from sports_calendar.core.selection import SelectionRegistry, SelectionFilterSpec
 
+
 bp = Blueprint("filters", __name__, url_prefix="/selections/<sid>/items/<iid>/filters")
 
 @bp.route("/", methods=["GET"])

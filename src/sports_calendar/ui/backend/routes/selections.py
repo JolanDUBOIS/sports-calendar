@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, render_template
 
 from . import logger
 from sports_calendar.core.selection import SelectionRegistry, SelectionSpec
@@ -19,7 +19,7 @@ def list_selections():
             {"selection": sel.to_dict()} for sel in selections.values()
         ]
     }
-    return jsonify(payload), 200
+    return render_template("selections.html", **payload), 200
 
 @bp.route("/", methods=["POST"])
 def create_selection():
@@ -37,12 +37,25 @@ def create_selection():
         logger.exception("Error creating selection")
         return jsonify({"error": "Internal server error"}), 500
 
+@bp.route("/validate-name", methods=["POST"])
+def validate_selection_name():
+    """ Validate if a selection name is valid (i.e., not duplicate, not empty). """
+    data = request.get_json(silent=True)
+    name = data.get("name") if data else None
+    if not name:
+        return jsonify({"valid": False, "error": "Name cannot be empty."}), 200
+    exists = SelectionRegistry.exists(name)
+    if exists:
+        return jsonify({"valid": False, "error": "Name already exists."}), 200
+    return jsonify({"valid": True}), 200
+
 @bp.route("/<sid>", methods=["GET"])
 def get_selection(sid: str):
     """ Get a specific selection by id. """
     try:
         selection = SelectionRegistry.get(sid)
-        return jsonify({"selection": selection.to_dict()}), 200
+        payload = {"selection": selection.to_dict()}
+        return render_template("selection/view.html", **payload), 200
     except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404

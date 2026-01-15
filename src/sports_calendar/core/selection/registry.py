@@ -37,6 +37,13 @@ class SelectionRegistry:
         return cls._selections.copy()
 
     @classmethod
+    def exists(cls, name: str) -> bool:
+        for sel in cls._selections.values():
+            if sel.name == name:
+                return True
+        return False
+
+    @classmethod
     def add(cls, selection: SelectionSpec):
         validate(selection.uid not in cls._selections, "Duplicate uid", logger)
         cls._assert_unique_name(selection.name)
