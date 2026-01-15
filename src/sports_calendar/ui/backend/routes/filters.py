@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 
 from . import logger
+from ..presenters import FilterPresenter
 from sports_calendar.core.selection import SelectionRegistry, SelectionFilterSpec
 
 
@@ -12,7 +13,7 @@ def list_filters(sid: str, iid: str):
     try:
         selection = SelectionRegistry.get(sid)
         item = selection.get_item(iid)
-        return jsonify({"filters": [filt.to_dict() for filt in item.filters]}), 200
+        return jsonify({"filters": [FilterPresenter.summary(filt) for filt in item.filters]}), 200
     except KeyError:
         logger.warning(f"Item not found: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
@@ -32,7 +33,7 @@ def create_filter(sid: str, iid: str):
         item = selection.get_item(iid)
         new_filter = SelectionFilterSpec.empty(sport=item.sport, filter_type=filter_type)
         item.add_filter(new_filter)
-        return jsonify({"filter": new_filter.to_dict()}), 201
+        return jsonify({"filter": FilterPresenter.summary(new_filter)}), 201
     except KeyError:
         logger.warning(f"Item not found: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
@@ -47,7 +48,7 @@ def get_filter(sid: str, iid: str, filter_id: str):
         selection = SelectionRegistry.get(sid)
         item = selection.get_item(iid)
         filt = item.get_filter(filter_id)
-        return jsonify({"filter": filt.to_dict()}), 200
+        return jsonify({"filter": FilterPresenter.detailed(filt)}), 200
     except KeyError:
         logger.warning(f"Filter not found: {filter_id} in item {iid} of selection {sid}")
         return jsonify({"error": "Filter not found"}), 404

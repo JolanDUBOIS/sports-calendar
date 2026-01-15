@@ -35,6 +35,10 @@ class SelectionSpec:
                 TypeError
             )
 
+    @property
+    def sports(self) -> set[str]:
+        return {item.sport for item in self.items}
+
     def get_item(self, item_uid: str) -> SelectionItemSpec:
         for item in self.items:
             if item.uid == item_uid:
@@ -265,6 +269,11 @@ class StageFilterSpec(SelectionFilterSpec):
             logger,
             TypeError
         )
+
+    def to_dict(self) -> dict:
+        data = super().to_dict()
+        data["stage"] = {"name": self.stage.name, "value": self.stage.value}
+        return data
 
 
 @dataclass(frozen=True)

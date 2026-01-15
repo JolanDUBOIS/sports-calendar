@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint, render_template
 
 from . import logger
+from ..presenters import SelectionPresenter
 from sports_calendar.core.selection import SelectionRegistry, SelectionSpec
 
 
@@ -16,7 +17,7 @@ def list_selections():
         return jsonify({"error": "Internal server error"}), 500
     payload = {
         "selections": [
-            {"selection": sel.to_dict()} for sel in selections.values()
+            {"selection": SelectionPresenter.summary(sel)} for sel in selections.values()
         ]
     }
     return render_template("selections.html", **payload), 200
@@ -32,7 +33,7 @@ def create_selection():
     try:
         new_selection = SelectionSpec.empty(name=name)
         SelectionRegistry.add(new_selection)
-        return jsonify({"selection": new_selection.to_dict()}), 201
+        return jsonify({"selection": SelectionPresenter.summary(new_selection)}), 201
     except Exception:
         logger.exception("Error creating selection")
         return jsonify({"error": "Internal server error"}), 500
@@ -54,7 +55,7 @@ def get_selection(sid: str):
     """ Get a specific selection by id. """
     try:
         selection = SelectionRegistry.get(sid)
-        payload = {"selection": selection.to_dict()}
+        payload = {"selection": SelectionPresenter.detailed(selection)}
         return render_template("selection/view.html", **payload), 200
     except KeyError:
         logger.warning(f"Selection not found: {sid}")
@@ -92,7 +93,7 @@ def clone_selection(sid: str):
         selection = SelectionRegistry.get(sid)
         cloned_selection = selection.clone(new_name=new_name)
         SelectionRegistry.add(cloned_selection)
-        return jsonify({"selection": cloned_selection.to_dict()}), 201
+        return jsonify({"selection": SelectionPresenter.summary(cloned_selection)}), 201
     except KeyError:
         logger.warning(f"Selection not found for cloning: {sid}")
         return jsonify({"error": "Selection not found"}), 404

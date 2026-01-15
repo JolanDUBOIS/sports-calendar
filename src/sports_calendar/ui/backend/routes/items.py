@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 
 from . import logger
+from ..presenters import SelectionItemPresenter
 from sports_calendar.core.selection import SelectionRegistry, SelectionItemSpec
 
 
@@ -11,7 +12,7 @@ def list_items(sid: str):
     """ List all items in a selection. """
     try:
         selection = SelectionRegistry.get(sid)
-        return jsonify({"items": [item.to_dict() for item in selection.items]}), 200
+        return jsonify({"items": [SelectionItemPresenter.summary(item) for item in selection.items]}), 200
     except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
@@ -30,7 +31,7 @@ def create_item(sid: str):
         selection = SelectionRegistry.get(sid)
         new_item = SelectionItemSpec.empty(sport=sport)
         selection.add_item(new_item)
-        return jsonify({"item": new_item.to_dict()}), 201
+        return jsonify({"item": SelectionItemPresenter.summary(new_item)}), 201
     except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
@@ -44,7 +45,7 @@ def get_item(sid: str, iid: str):
     try:
         selection = SelectionRegistry.get(sid)
         item = selection.get_item(iid)
-        return jsonify({"item": item.to_dict()}), 200
+        return jsonify({"item": SelectionItemPresenter.detailed(item)}), 200
     except KeyError:
         logger.warning(f"Item not found: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
@@ -79,7 +80,7 @@ def clone_item(sid: str, iid: str):
         item = selection.get_item(iid)
         cloned_item = item.clone()
         selection.add_item(cloned_item)
-        return jsonify({"selection": selection.to_dict()}), 201
+        return jsonify({"item": SelectionItemPresenter.summary(cloned_item)}), 201
     except KeyError:
         logger.warning(f"Item not found for cloning: {iid} in selection {sid}")
         return jsonify({"error": "Item not found"}), 404
