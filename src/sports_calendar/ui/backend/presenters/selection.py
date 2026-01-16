@@ -20,6 +20,8 @@ class SelectionPresenter:
         logger.debug(f"Presenting detailed view for selection: {sel.uid}")
         return {
             **sel.to_dict(),
+            "sports": sel.sports,
+            "n_items": len(sel.items),
             "items": [
                 SelectionItemPresenter.detailed(item) for item in sel.items
             ]

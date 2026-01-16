@@ -56,7 +56,7 @@ def get_selection(sid: str):
     try:
         selection = SelectionRegistry.get(sid)
         payload = {"selection": SelectionPresenter.detailed(selection)}
-        return render_template("selection/view.html", **payload), 200
+        return render_template("selection_detail.html", **payload), 200
     except KeyError:
         logger.warning(f"Selection not found: {sid}")
         return jsonify({"error": "Selection not found"}), 404
