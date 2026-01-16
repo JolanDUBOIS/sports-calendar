@@ -1,0 +1,74 @@
+{% macro filter_type_min_ranking(filter) %}
+<div class="filter-block border-top pt-2 mt-2">
+  <div class="fw-bold">{{ filter["name"] }}</div>
+  <div class="text-muted">
+    Minimum Ranking: {{ filter["ranking"] }}<br>
+
+    Competitions:
+    {{
+      filter["competitions"]
+      | map(attribute="short_name")
+      | join(", ")
+      if filter["competitions"] else "none"
+    }}
+    <br>
+
+    {% if filter["reference_team"] %}
+      Reference Team: {{ filter["reference_team"]["short_display_name"] }}
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro filter_type_stage(filter) %}
+<div class="filter-block border-top pt-2 mt-2">
+  <div class="fw-bold">{{ filter["name"] }}</div>
+  <div class="text-muted">
+    Minimum stage: {{ filter["stage"]["name"] }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro filter_type_teams(filter) %}
+<div class="filter-block border-top pt-2 mt-2">
+  <div class="fw-bold">{{ filter["name"] }}</div>
+  <div class="text-muted">
+    Teams:
+    {{
+      filter["teams"]
+      | map(attribute="short_display_name")
+      | join(", ")
+      if filter["teams"] else "none"
+    }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro filter_type_competitions(filter) %}
+<div class="filter-block border-top pt-2 mt-2">
+  <div class="fw-bold">{{ filter["name"] }}</div>
+  <div class="text-muted">
+    Competitions:
+    {{
+      filter["competitions"]
+      | map(attribute="short_name")
+      | join(", ")
+      if filter["competitions"] else "none"
+    }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro filter_type_session(filter) %}
+<div class="filter-block border-top pt-2 mt-2">
+  <div class="fw-bold">{{ filter["name"] }}</div>
+  <div class="text-muted">
+    Sessions:
+    {{
+      filter["sessions"]
+      | join(", ")
+      if filter["sessions"] else "none"
+    }}
+  </div>
+</div>
+{% endmacro %}

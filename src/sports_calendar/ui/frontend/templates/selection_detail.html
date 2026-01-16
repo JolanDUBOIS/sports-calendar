@@ -1,0 +1,90 @@
+{% import "_filter_macros.html" as filters %}
+
+<!-- Macro -->
+{% macro item_card(item) %}
+<div class="card mb-3 shadow-sm" data-item-id="{{ item['uid'] }}">
+  <div class="card-body">
+
+    <div class="d-flex justify-content-between align-items-start">
+
+      <!-- Left: expand button -->
+      <div class="me-2">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          type="button"
+          data-action="toggle-item">
+          +
+        </button>
+      </div>
+
+      <!-- Middle: item summary -->
+      <div class="flex-grow-1">
+        <div class="fw-bold">
+          Item for {{ item["sport"] }}
+        </div>
+        <div class="text-muted">
+          Filters:
+          {% for filter in item["filters"] %}
+            {{ filter["name"] }}{% if not loop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: delete button -->
+      <div>
+        <button
+          class="btn btn-outline-danger btn-sm"
+          type="button"
+          data-action="delete-item">
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Expandable details (collapsed by default) -->
+    <div class="d-none item-details mt-3">
+      {% for filter in item["filters"] %}
+        {% if filter["filter_type"] == "min_ranking" %}
+          {{ filters.filter_type_min_ranking(filter) }}
+
+        {% elif filter["filter_type"] == "stage" %}
+          {{ filters.filter_type_stage(filter) }}
+
+        {% elif filter["filter_type"] == "teams" %}
+          {{ filters.filter_type_teams(filter) }}
+
+        {% elif filter["filter_type"] == "competitions" %}
+          {{ filters.filter_type_competitions(filter) }}
+
+        {% elif filter["filter_type"] == "session" %}
+          {{ filters.filter_type_session(filter) }}
+
+        {% else %}
+          <div class="text-danger">
+            Unknown filter type: {{ filter["filter_type"] }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+
+<!-- Selection Detail page -->
+{% extends "base.html" %}
+
+{% block title %}Selection {{ selection["name"] }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <h1 class="text-center my-4">Selection "{{ selection["name"] }}"</h1>
+
+  <!-- <h5>Items</h5> -->
+  <div id="items-list">
+    {% for item in selection["items"] %}
+      {{ item_card(item) }}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
