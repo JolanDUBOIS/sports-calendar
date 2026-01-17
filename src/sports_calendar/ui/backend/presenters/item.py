@@ -1,12 +1,12 @@
 from . import logger
 from .assets import SPORT_ICON_URLS
 from .filter import FilterPresenter
-from sports_calendar.core.selection import SelectionItemSpec
+from sports_calendar.core.selection import SelectionItem
 
 
 class SelectionItemPresenter:
     @staticmethod
-    def summary(item: SelectionItemSpec) -> dict:
+    def summary(item: SelectionItem) -> dict:
         """ Minimal info for list views. """
         logger.debug(f"Presenting summary for item: {item.uid}")
         return {
@@ -18,7 +18,7 @@ class SelectionItemPresenter:
         }
 
     @staticmethod
-    def detailed(item: SelectionItemSpec) -> dict:
+    def detailed(item: SelectionItem) -> dict:
         """ Full info for detailed views. """
         logger.debug(f"Presenting detailed view for item: {item.uid}")
         return {

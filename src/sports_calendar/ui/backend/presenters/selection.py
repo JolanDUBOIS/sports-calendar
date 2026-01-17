@@ -1,11 +1,11 @@
 from . import logger
 from .item import SelectionItemPresenter
-from sports_calendar.core.selection import SelectionSpec
+from sports_calendar.core.selection import Selection
 
 
 class SelectionPresenter:
     @staticmethod
-    def summary(sel: SelectionSpec) -> dict:
+    def summary(sel: Selection) -> dict:
         """ Minimal info for list views. """
         logger.debug(f"Presenting summary for selection: {sel.uid}")
         return {
@@ -15,7 +15,7 @@ class SelectionPresenter:
         }
 
     @staticmethod
-    def detailed(sel: SelectionSpec) -> dict:
+    def detailed(sel: Selection) -> dict:
         """ Full ino for detailed views. """
         logger.debug(f"Presenting detailed view for selection: {sel.uid}")
         return {

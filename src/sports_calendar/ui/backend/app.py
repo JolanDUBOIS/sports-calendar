@@ -8,7 +8,7 @@ from .routes.filters import bp as filters_bp
 from .routes.lookups import bp as lookups_bp
 from sports_calendar.core import Paths
 from sports_calendar.core.db import setup_repo_path
-from sports_calendar.core.selection import SelectionRegistry, SelectionStorage
+from sports_calendar.core.selection import SelectionService
 
 
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
@@ -22,9 +22,7 @@ def create_app(config: dict | None = None) -> Flask:
         static_url_path="/static",
     )
     setup_repo_path(Paths.DB_DIR)
-    SelectionRegistry.initialize(
-        SelectionStorage.load_all()
-    )
+    SelectionService.initialize_registry()
 
     if config:
         app.config.update(config)
