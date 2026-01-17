@@ -14,6 +14,9 @@ window.openModifyFilterModal = function(filterId, onConfirm) {
 
     modalBody.appendChild(clone);
 
+    // Initialize lookup fields for this form
+    initLookupFields(modalBody);
+
     // Remove previous listeners
     const modalEl = document.getElementById("modifyFilterModal");
     const confirmBtn = modalEl.querySelector("#modify-filter-confirm-btn");
@@ -24,15 +27,22 @@ window.openModifyFilterModal = function(filterId, onConfirm) {
     newConfirmBtn.addEventListener("click", () => {
         const form = modalBody.querySelector("form");
         if (!form) return;
-        const formData = new FormData(form);
+
         const data = {};
-        for (const [key, value] of formData.entries()) {
+        for (const [key, value] of new FormData(form).entries()) {
             data[key] = value;
         }
+
+        // Lookup fields
+        modalBody.querySelectorAll(".lookup-input").forEach(input => {
+            if (input.dataset.value) {
+                data[input.name] = input.dataset.value; // override with actual ID
+            }
+        });
+
         onConfirm(data);
         bootstrap.Modal.getInstance(modalEl).hide();
     });
 
-    // show modal
     new bootstrap.Modal(modalEl).show();
 }

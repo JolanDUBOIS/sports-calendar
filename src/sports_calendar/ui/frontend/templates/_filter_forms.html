@@ -1,3 +1,5 @@
+{% import "_lookup_field.html" as lookup %}
+
 {% macro render_field(field) %}
   <div class="mb-3" data-path="{{ field.path }}" data-input-type="{{ field.input_type }}">
     <label class="form-label">{{ field.label }}</label>
@@ -19,8 +21,17 @@
       </select>
 
     {% elif field.input_type in ["lookup", "multilookup"] %}
-      <!-- For now, just render a simple input, JS will handle dynamic search later -->
+      {% if field.input_type == "lookup" %}
+        {{ lookup.lookup_field(
+            label=field.label,
+            path=field.path,
+            value=field.current_display[0] if field.current_display else "",
+            lookup_endpoint=field.lookup_endpoint
+        ) }}
+      {% else %}
+      <!-- Placeholder... -->
       <input name="{{ field.path }}" type="text" class="form-control" value="{{ field.current_display | join(', ') }}">
+      {% endif %}
     {% endif %}
   </div>
 {% endmacro %}

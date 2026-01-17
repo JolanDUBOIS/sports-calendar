@@ -23,7 +23,13 @@
 <div class="filter-block border-top pt-2 mt-2">
   <div class="fw-bold">{{ filter["name"] }}</div>
   <div class="text-muted">
-    Minimum stage: {{ filter["fields"]["stage"]["current_display"][0] }}
+    Minimum stage: {{ filter["fields"]["stage"]["current_display"][0] }}<br>
+    Competitions:
+    {{
+      filter["fields"]["competitions"]["current_display"]
+      | join(", ")
+      if filter["fields"]["competitions"]["current_display"] else "none"
+    }}
   </div>
 </div>
 {% endmacro %}

@@ -1,0 +1,7 @@
+{% macro lookup_field(label, path, value='', lookup_endpoint='') %}
+<div class="mb-3 lookup-field" data-endpoint="{{ lookup_endpoint }}">
+    <label class="form-label">{{ label }}</label>
+    <input type="text" class="form-control lookup-input" name="{{ path }}" value="{{ value }}">
+    <ul class="list-group lookup-suggestions d-none"></ul>
+</div>
+{% endmacro %}
