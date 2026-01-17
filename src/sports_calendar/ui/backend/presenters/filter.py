@@ -1,7 +1,6 @@
-from dataclasses import dataclass
-
 from . import logger
-from sports_calendar.core.utils import validate
+from .utils import FieldDescriptor, SelectorOption
+from sports_calendar.core.utils import deep_asdict
 from sports_calendar.core.db import SPORT_SCHEMAS, Filter
 from sports_calendar.core.competition_stages import CompetitionStage
 from sports_calendar.core.selection import (
@@ -13,29 +12,6 @@ from sports_calendar.core.selection import (
     SessionFilter
 )
 
-
-@dataclass
-class SelectorOption:
-    value: str
-    display: str
-
-@dataclass
-class FieldDescriptor:
-    label: str
-    path: str
-    current_value: list
-    input_type: str
-    current_display: list = None
-    lookup_endpoint: str = None
-    select_options: list[SelectorOption] = None
-
-    def __post_init__(self):
-        if self.current_display is None:
-            self.current_display = self.current_value
-        validate(self.input_type in self.get_valid_input_types(), f"Invalid input_type '{self.input_type}'", logger)
-
-    def get_valid_input_types(self) -> list[str]:
-        return ["text", "number", "select", "lookup", "multiselect", "multilookup"]
 
 class FilterPresenter:
     DETAILED_DISPATCH = {
@@ -80,7 +56,7 @@ class FilterPresenter:
                 Filter(col="id", op="==", value=flt.reference_team)
             ).select("id", "short_display_name").get()
 
-        return {
+        result = {
             "name": "Min Ranking Filter",
             "sport": flt.sport,
             "uid": flt.uid,
@@ -107,7 +83,7 @@ class FilterPresenter:
                     current_value=[cid for cid in flt.competition_ids],
                     current_display=[comp["short_name"] for comp in comp_df.to_dict(orient="records")],
                     input_type="multilookup",
-                    lookup_endpoint="/lookups/{sport}/competitions"
+                    lookup_endpoint=f"/lookups/{flt.sport}/competitions"
                 ),
                 "reference_team": FieldDescriptor(
                     label="Reference Team",
@@ -115,10 +91,12 @@ class FilterPresenter:
                     current_value=[flt.reference_team] if flt.reference_team is not None else [],
                     current_display=[team_df.to_dict(orient="records")[0]["short_display_name"]] if flt.reference_team is not None else [],
                     input_type="lookup",
-                    lookup_endpoint="/lookups/{sport}/teams"
+                    lookup_endpoint=f"/lookups/{flt.sport}/teams"
                 ),
             }
         }
+
+        return deep_asdict(result)
 
     @staticmethod
     def _stage_detailed(flt: StageFilter) -> dict:
@@ -126,7 +104,7 @@ class FilterPresenter:
             Filter(col="id", op="in", value=flt.competition_ids)
         ).select("id", "short_name").get()
 
-        return {
+        result = {
             "name": "Stage Filter",
             "sport": flt.sport,
             "uid": flt.uid,
@@ -146,10 +124,12 @@ class FilterPresenter:
                     current_value=[cid for cid in flt.competition_ids],
                     current_display=[comp["short_name"] for comp in comp_df.to_dict(orient="records")],
                     input_type="multilookup",
-                    lookup_endpoint="/lookups/{sport}/competitions"
+                    lookup_endpoint=f"/lookups/{flt.sport}/competitions"
                 )
             }
         }
+
+        return deep_asdict(result)
 
     @staticmethod
     def _teams_detailed(flt: TeamsFilter) -> dict:
@@ -157,7 +137,7 @@ class FilterPresenter:
             Filter(col="id", op="in", value=flt.team_ids)
         ).select("id", "short_display_name").get()
 
-        return {
+        result = {
             "name": "Teams Filter",
             "sport": flt.sport,
             "uid": flt.uid,
@@ -177,10 +157,12 @@ class FilterPresenter:
                     current_value=[tid for tid in flt.team_ids],
                     current_display=[team["short_display_name"] for team in team_df.to_dict(orient="records")],
                     input_type="multilookup",
-                    lookup_endpoint="/lookups/{sport}/teams"
+                    lookup_endpoint=f"/lookups/{flt.sport}/teams"
                 )
             }
         }
+
+        return deep_asdict(result)
 
     @staticmethod
     def _competitions_detailed(flt: CompetitionsFilter) -> dict:
@@ -188,7 +170,7 @@ class FilterPresenter:
             Filter(col="id", op="in", value=flt.competition_ids)
         ).select("id", "short_name").get()
 
-        return {
+        result = {
             "name": "Competitions Filter",
             "sport": flt.sport,
             "uid": flt.uid,
@@ -200,14 +182,16 @@ class FilterPresenter:
                     current_value=[cid for cid in flt.competition_ids],
                     current_display=[comp["short_name"] for comp in comp_df.to_dict(orient="records")],
                     input_type="multilookup",
-                    lookup_endpoint="/lookups/{sport}/competitions"
+                    lookup_endpoint=f"/lookups/{flt.sport}/competitions"
                 )
             }
         }
 
+        return deep_asdict(result)
+
     @staticmethod
     def _session_detailed(flt: SessionFilter) -> dict:
-        return {
+        result = {
             "name": "Session Filter",
             "sport": flt.sport,
             "uid": flt.uid,
@@ -223,3 +207,5 @@ class FilterPresenter:
                 )
             }
         }
+
+        return deep_asdict(result)
