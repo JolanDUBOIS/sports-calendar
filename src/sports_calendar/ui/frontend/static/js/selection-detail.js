@@ -56,5 +56,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .catch(err => console.error("Error deleting:", type, selectionId, id, err));
         })
-    }
+    };
+
+    // ---------------------------
+    // Modify filter button click
+    // ---------------------------
+    container.addEventListener("click", (event) => {
+        console.log("Modify filter button clicked");
+        const btn = event.target.closest("button[data-action='modify-filter']");
+        if (!btn) return;
+
+        const divEl = btn.closest(".filter-div");
+        if (!divEl) return;
+
+        const filterId = divEl.dataset.filterId;
+
+        openModifyFilterForm(filterId);
+    });
+
 });

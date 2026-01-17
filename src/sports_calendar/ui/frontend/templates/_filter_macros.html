@@ -2,19 +2,18 @@
 <div class="filter-block border-top pt-2 mt-2">
   <div class="fw-bold">{{ filter["name"] }}</div>
   <div class="text-muted">
-    Minimum Ranking: {{ filter["ranking"] }}<br>
+    Minimum Ranking: {{ filter["fields"]["ranking"]["current_display"][0] }}<br>
 
     Competitions:
     {{
-      filter["competitions"]
-      | map(attribute="short_name")
+      filter["fields"]["competitions"]["current_display"]
       | join(", ")
-      if filter["competitions"] else "none"
+      if filter["fields"]["competitions"]["current_display"] else "none"
     }}
     <br>
 
-    {% if filter["reference_team"] %}
-      Reference Team: {{ filter["reference_team"]["short_display_name"] }}
+    {% if filter["fields"]["reference_team"]["current_display"] %}
+      Reference Team: {{ filter["fields"]["reference_team"]["current_display"][0] }}
     {% endif %}
   </div>
 </div>
@@ -24,7 +23,7 @@
 <div class="filter-block border-top pt-2 mt-2">
   <div class="fw-bold">{{ filter["name"] }}</div>
   <div class="text-muted">
-    Minimum stage: {{ filter["stage"]["name"] }}
+    Minimum stage: {{ filter["fields"]["stage"]["current_display"][0] }}
   </div>
 </div>
 {% endmacro %}
@@ -35,10 +34,9 @@
   <div class="text-muted">
     Teams:
     {{
-      filter["teams"]
-      | map(attribute="short_display_name")
+      filter["fields"]["teams"]["current_display"]
       | join(", ")
-      if filter["teams"] else "none"
+      if filter["fields"]["teams"]["current_display"] else "none"
     }}
   </div>
 </div>
@@ -50,10 +48,9 @@
   <div class="text-muted">
     Competitions:
     {{
-      filter["competitions"]
-      | map(attribute="short_name")
+      filter["fields"]["competitions"]["current_display"]
       | join(", ")
-      if filter["competitions"] else "none"
+      if filter["fields"]["competitions"]["current_display"] else "none"
     }}
   </div>
 </div>
@@ -65,9 +62,9 @@
   <div class="text-muted">
     Sessions:
     {{
-      filter["sessions"]
+      filter["fields"]["sessions"]["current_display"]
       | join(", ")
-      if filter["sessions"] else "none"
+      if filter["fields"]["sessions"]["current_display"] else "none"
     }}
   </div>
 </div>

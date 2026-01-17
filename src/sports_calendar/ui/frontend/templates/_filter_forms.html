@@ -1,0 +1,26 @@
+{% macro render_field(field) %}
+  <div class="mb-3" data-path="{{ field.path }}" data-input-type="{{ field.input_type }}">
+    <label class="form-label">{{ field.label }}</label>
+
+    {% if field.input_type in ["text", "number"] %}
+      <input type="{{ field.input_type }}" class="form-control" value="{{ field.current_display[0] }}">
+
+    {% elif field.input_type in ["select", "multiselect"] %}
+      {% if field.input_type == "multiselect" %}
+        <select class="form-select" multiple>
+      {% else %}
+        <select class="form-select">
+      {% endif %}
+      {% for opt in field.select_options %}
+        <option value="{{ opt.value }}" {% if opt.value in field.current_value %}selected{% endif %}>
+          {{ opt.display }}
+        </option>
+      {% endfor %}
+      </select>
+
+    {% elif field.input_type in ["lookup", "multilookup"] %}
+      <!-- For now, just render a simple input, JS will handle dynamic search later -->
+      <input type="text" class="form-control" value="{{ field.current_display | join(', ') }}">
+    {% endif %}
+  </div>
+{% endmacro %}

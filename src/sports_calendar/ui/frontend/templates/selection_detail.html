@@ -1,75 +1,5 @@
 {% import "_filter_macros.html" as filters %}
-
-<!-- Macro -->
-{% macro item_card(item, selection_id) %}
-<div class="card mb-3 shadow-sm" data-type="selection-item" data-selection-id="{{ selection_id }}" data-item-id="{{ item['uid'] }}">
-  <div class="card-body">
-
-    <div class="d-flex justify-content-between align-items-start">
-
-      <!-- Left: expand button -->
-      <div class="me-2">
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          type="button"
-          data-action="toggle-item">
-          +
-        </button>
-      </div>
-
-      <!-- Middle: item summary -->
-      <div class="flex-grow-1">
-        <div class="fw-bold">
-          Item for {{ item["sport"] }}
-        </div>
-        <div class="text-muted">
-          Filters:
-          {% for filter in item["filters"] %}
-            {{ filter["name"] }}{% if not loop.last %}, {% endif %}
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Right: delete button -->
-      <div>
-        <button
-          class="btn btn-outline-danger btn-sm"
-          type="button"
-          data-action="delete-item">
-          Delete
-        </button>
-      </div>
-    </div>
-
-    <!-- Expandable details (collapsed by default) -->
-    <div class="d-none item-details mt-3">
-      {% for filter in item["filters"] %}
-        {% if filter["filter_type"] == "min_ranking" %}
-          {{ filters.filter_type_min_ranking(filter) }}
-
-        {% elif filter["filter_type"] == "stage" %}
-          {{ filters.filter_type_stage(filter) }}
-
-        {% elif filter["filter_type"] == "teams" %}
-          {{ filters.filter_type_teams(filter) }}
-
-        {% elif filter["filter_type"] == "competitions" %}
-          {{ filters.filter_type_competitions(filter) }}
-
-        {% elif filter["filter_type"] == "session" %}
-          {{ filters.filter_type_session(filter) }}
-
-        {% else %}
-          <div class="text-danger">
-            Unknown filter type: {{ filter["filter_type"] }}
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
-</div>
-{% endmacro %}
-
+{% import "_filter_forms.html" as forms %}
 
 <!-- Selection Detail page -->
 {% extends "base.html" %}
@@ -83,8 +13,124 @@
   <!-- <h5>Items</h5> -->
   <div id="items-list">
     {% for item in selection["items"] %}
-      {{ item_card(item, selection["uid"]) }}
+      <div class="card mb-3 shadow-sm"
+        data-type="selection-item"
+        data-selection-id="{{ selection_id }}"
+        data-item-id="{{ item['uid'] }}">
+
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-start">
+            <!-- Left: expand button -->
+            <div class="me-2">
+              <button
+                class="btn btn-outline-secondary btn-sm"
+                type="button"
+                data-action="toggle-item">
+                +
+              </button>
+            </div>
+
+            <!-- Middle: item summary -->
+            <div class="flex-grow-1">
+              <div class="fw-bold">
+                Item for {{ item["sport"] }}
+              </div>
+              <div class="text-muted">
+                Filters:
+                {% for filter in item["filters"] %}
+                  {{ filter["name"] }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Right: delete button -->
+            <div>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                type="button"
+                data-action="delete-item">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Expandable details (collapsed by default) -->
+          <div class="d-none item-details mt-3">
+            {% for filter in item["filters"] %}
+              <div class="d-flex align-items-center mb-2 filter-div" data-filter-id="{{ filter.uid }}">
+
+                <div class="flex-grow-1">
+                  {% if filter["filter_type"] == "min_ranking" %}
+                    {{ filters.filter_type_min_ranking(filter) }}
+                  {% elif filter["filter_type"] == "stage" %}
+                    {{ filters.filter_type_stage(filter) }}
+                  {% elif filter["filter_type"] == "teams" %}
+                    {{ filters.filter_type_teams(filter) }}
+                  {% elif filter["filter_type"] == "competitions" %}
+                    {{ filters.filter_type_competitions(filter) }}
+                  {% elif filter["filter_type"] == "session" %}
+                    {{ filters.filter_type_session(filter) }}
+                  {% else %}
+                    <div class="text-danger">
+                      Unknown filter type: {{ filter["filter_type"] }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="ms-2">
+                  <button
+                    class="btn btn-outline-primary btn-sm"
+                    type="button"
+                    title="Modify filter"
+                    data-action="modify-filter">
+                    <i class="bi bi-pencil"></i> Modify
+                  </button>
+                </div>
+
+              </div>
+            {% endfor %}
+          </div>
+
+        </div>
+
+      </div>
     {% endfor %}
+  </div>
+
+</div>
+
+<!-- Hidden filter form templates -->
+<div id="filter-forms-templates" class="d-none">
+  {% for item in selection["items"] %}
+    {% for filter in item["filters"] %}
+      <div id="filter-form-{{ filter.uid }}">
+        <form>
+          {% for field in filter.fields.values() %}
+            {{ forms.render_field(field) }}
+          {% endfor %}
+        </form>
+      </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+
+<!-- Modify Filter Form -->
+<div class="modal fade" id="modifyFilterModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modify Filter</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modify-filter-body">
+        <!-- Form content will be injected here by JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modify-filter-confirm-btn">Apply</button>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
