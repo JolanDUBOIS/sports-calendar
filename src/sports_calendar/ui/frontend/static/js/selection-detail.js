@@ -69,9 +69,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const divEl = btn.closest(".filter-div");
         if (!divEl) return;
 
+        const selectionName = divEl.dataset.selectionName;
+        const itemId = divEl.dataset.itemId;
         const filterId = divEl.dataset.filterId;
 
-        openModifyFilterForm(filterId);
+        window.openModifyFilterModal(filterId, function(data) {
+            // Log the JSON we're sending
+            console.log("Sending filter update:", JSON.stringify(data));
+            fetch(`/selections/${selectionName}/items/${itemId}/filters/${filterId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (res.ok) {
+                    console.log("Filter updated successfully");
+                } else {
+                    console.error("Failed to update filter");
+                }
+            })
+            .catch(err => console.error("Error updating filter", err));
+        });
     });
 
 });

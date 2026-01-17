@@ -58,7 +58,7 @@
           <!-- Expandable details (collapsed by default) -->
           <div class="d-none item-details mt-3">
             {% for filter in item["filters"] %}
-              <div class="d-flex align-items-center mb-2 filter-div" data-filter-id="{{ filter.uid }}">
+              <div class="d-flex align-items-center mb-2 filter-div" data-selection-name="{{ selection['name'] }}" data-item-id="{{ item['uid'] }}" data-filter-id="{{ filter['uid'] }}">
 
                 <div class="flex-grow-1">
                   {% if filter["filter_type"] == "min_ranking" %}
@@ -104,7 +104,7 @@
 <div id="filter-forms-templates" class="d-none">
   {% for item in selection["items"] %}
     {% for filter in item["filters"] %}
-      <div id="filter-form-{{ filter.uid }}">
+      <div id="filter-form-{{ filter['uid'] }}">
         <form>
           {% for field in filter.fields.values() %}
             {{ forms.render_field(field) }}
