@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from . import logger
-from sports_calendar.sc_core import Paths, load_yml
+from sports_calendar.core import Paths, load_yml
 
 
 class Secrets:

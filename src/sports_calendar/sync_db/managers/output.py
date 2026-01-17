@@ -5,12 +5,12 @@ from . import logger
 from .enforcers import ConstraintEnforcerFactory
 from ..versioning import read_versions
 from sports_calendar.sync_db.utils import concat_io_content
-from sports_calendar.sc_core.file_io import FileHandlerFactory
+from sports_calendar.core.file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
     from .enforcers import ConstraintEnforcer
     from ..versioning import SourceVersions
-    from sports_calendar.sc_core import IOContent
+    from sports_calendar.core import IOContent
     from sports_calendar.sync_db.definitions.specs import OutputSpec
 
 

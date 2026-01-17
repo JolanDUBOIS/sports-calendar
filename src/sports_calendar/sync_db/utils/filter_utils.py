@@ -3,7 +3,7 @@ from typing import Any
 import pandas as pd
 
 from . import logger
-from sports_calendar.sc_core import IOContent
+from sports_calendar.core import IOContent
 
 
 def filter_file_content(data: IOContent, field: str, op: str, value: Any | None = None) -> IOContent:

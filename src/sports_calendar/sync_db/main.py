@@ -1,7 +1,7 @@
 from . import logger
 from .definitions import load_workflow
 from .build_layer import LayerBuilder, ModelManager
-from sports_calendar.sc_core import DataStage, Paths
+from sports_calendar.core import DataStage, Paths
 
 
 def run_pipeline(

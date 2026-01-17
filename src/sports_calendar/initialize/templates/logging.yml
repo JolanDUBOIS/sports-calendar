@@ -36,6 +36,10 @@ loggers:
   sports_calendar.sc_core.setup:
     level: DEBUG
 
+  # Selection UI loggers
+  sports_calendar.selection_ui:
+    level: DEBUG 
+
   # Sync Calendar loggers
   sports_calendar.sync_calendar:
     level: DEBUG

@@ -3,7 +3,7 @@ from typing import Union, Literal
 from dataclasses import dataclass, field
 
 from . import logger
-from sports_calendar.sc_core import SpecModel
+from sports_calendar.core import SpecModel
 
 
 # ---- Constraint Specs ----

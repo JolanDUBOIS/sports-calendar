@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from . import logger
 from .model import ModelSchemaSpec
-from sports_calendar.sc_core import SpecModel, DataStage
+from sports_calendar.core import SpecModel, DataStage
 
 
 @dataclass

@@ -29,12 +29,16 @@ setup:
 	$(POETRY) install
 
 .PHONY: sync-db
-sync-db: setup
+sync-db:
 	$(POETRY) run sports-calendar sync-db
 
 .PHONY: sync-calendar
-sync-calendar: setup
+sync-calendar:
 	$(POETRY) run sports-calendar sync-calendar dev
+
+.PHONY: clear-calendar
+clear-calendar:
+	$(POETRY) run sports-calendar clear-calendar dev
 
 # ------------------
 # Docker targets

@@ -6,8 +6,8 @@ from sports_calendar.sync_db.utils import filter_file_content
 
 if TYPE_CHECKING:
     from . import SourceVersioningStrategy
-    from sports_calendar.sc_core import IOContent
-    from sports_calendar.sc_core.file_io import MetadataEntry
+    from sports_calendar.core import IOContent
+    from sports_calendar.core.file_io import MetadataEntry
 
 
 def read_versions(metadata_entry: MetadataEntry) -> SourceVersions:

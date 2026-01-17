@@ -2,7 +2,7 @@ from pathlib import Path
 
 from . import logger
 from .specs import WorkflowSpec, LayerSpec
-from sports_calendar.sc_core import load_yml
+from sports_calendar.core import load_yml
 
 
 def load_workflow(strict: bool = True) -> WorkflowSpec:

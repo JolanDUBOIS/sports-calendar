@@ -4,7 +4,7 @@ Sport Calendar is a command-line tool designed for sports fans who want to keep 
 
 ## Scope & Limitations
 
-Sport Calendar is a personal project written in Python that automates the creation of a customized sports events calendar. It retrieves and processes data from the unofficial ESPN API (#TODO - Link to the "documentations"). The focus is on upcoming matches and events across various sports, leagues, and competitions, with data carefully parsed, normalized, and cleaned to ensure accuracy.
+Sport Calendar is a personal project written in Python that automates the creation of a customized sports events calendar. It retrieves and processes data from the [unofficial ESPN API](https://github.com/pseudo-r/Public-ESPN-API). The focus is on upcoming matches and events across various sports, leagues, and competitions, with data carefully parsed, normalized, and cleaned to ensure accuracy.
 
 Users define their sports preferences in a simple YAML file, specifying which teams, players, competitions, or match conditions they want to follow. Based on this selection, the project automatically generates and syncs a personalized calendar with Google Calendar, making it easy for fans to never miss a game or event.
 

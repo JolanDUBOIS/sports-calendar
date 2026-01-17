@@ -2,7 +2,7 @@ from . import logger
 from .definitions import load_schema
 from .schema_manager import LayerSchemaManager, ModelSchemaManager
 from .validation_result import SchemaValidationResult
-from sports_calendar.sc_core import DataStage, Paths
+from sports_calendar.core import DataStage, Paths
 
 
 def run_validation(

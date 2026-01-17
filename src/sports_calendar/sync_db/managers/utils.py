@@ -6,7 +6,7 @@ import pandas as pd
 from . import logger
 
 if TYPE_CHECKING:
-    from sports_calendar.sc_core import IOContent
+    from sports_calendar.core import IOContent
 
 
 def inject_static_fields(data: IOContent, static_fields: list[dict] | None = None) -> IOContent:

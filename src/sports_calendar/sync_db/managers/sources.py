@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 from ..versioning import SourceVersions, SourceVersion, version_filter
 from sports_calendar.sync_db.utils import get_max_field_value
-from sports_calendar.sc_core.file_io import FileHandlerFactory
+from sports_calendar.core.file_io import FileHandlerFactory
 
 if TYPE_CHECKING:
-    from sports_calendar.sc_core import IOContent
+    from sports_calendar.core import IOContent
     from sports_calendar.sync_db.definitions.specs import SourceSpec
 
 
