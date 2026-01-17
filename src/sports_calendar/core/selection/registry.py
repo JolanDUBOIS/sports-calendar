@@ -1,78 +1,77 @@
 from typing import Iterable
+from copy import deepcopy
 
 from . import logger
-from .specs import SelectionSpec
+from .model import Selection
 from .storage import SelectionStorage
 from ..utils import validate
 
 
 class SelectionRegistry:
-    _selections: dict[str, SelectionSpec] = {}
+    _selections: list[Selection] = []
     _initialized: bool = False
 
     @classmethod
-    def initialize(cls, selections: Iterable[SelectionSpec]):
+    def initialize(cls, selections: Iterable[Selection]):
         validate(not cls._initialized, "SelectionRegistry already initialized", logger)
-        cls._selections = {}
+        cls._selections = []
         for sel in selections:
-            validate(sel.uid not in cls._selections, f"Duplicate uid {sel.uid}", logger)
-            cls._assert_unique_name(sel.name)
-            cls._selections[sel.uid] = sel
+            validate(not cls.exists(sel.name), f"Duplicate name {sel.name}", logger, KeyError)
+            cls._selections.append(sel)
         cls._initialized = True
 
     @classmethod
-    def get(cls, uid: str) -> SelectionSpec:
-        validate(uid in cls._selections, f"Selection '{uid}' not found", logger, KeyError)
-        return cls._selections[uid]
-
-    @classmethod
-    def get_by_name(cls, name: str) -> SelectionSpec:
-        for sel in cls._selections.values():
+    def get(cls, name: str) -> Selection:
+        for sel in cls._selections:
             if sel.name == name:
-                return sel
+                return deepcopy(sel)
+        logger.error(f"Selection '{name}' not found")
         raise KeyError(f"Selection '{name}' not found")
 
     @classmethod
-    def get_all(cls) -> dict[str, SelectionSpec]:
-        return cls._selections.copy()
+    def get_all(cls) -> list[Selection]:
+        return deepcopy(cls._selections)
 
     @classmethod
     def exists(cls, name: str) -> bool:
-        for sel in cls._selections.values():
+        for sel in cls._selections:
             if sel.name == name:
                 return True
         return False
 
     @classmethod
-    def add(cls, selection: SelectionSpec):
-        validate(selection.uid not in cls._selections, "Duplicate uid", logger)
-        cls._assert_unique_name(selection.name)
-
+    def add(cls, selection: Selection):
+        validate(not cls.exists(selection.name), "Duplicate name", logger, KeyError)
         SelectionStorage.save(selection, mode="new")
-        cls._selections[selection.uid] = selection
+        cls._selections.append(deepcopy(selection))
 
     @classmethod
-    def replace(cls, selection: SelectionSpec):
-        validate(selection.uid in cls._selections, "Selection not found", logger)
-        cls._assert_unique_name(selection.name, ignore_uid=selection.uid)
+    def add_empty(cls, name: str) -> Selection:
+        validate(not cls.exists(name), "Duplicate name", logger, KeyError)
+        selection = Selection.empty(name)
+        SelectionStorage.save(selection, mode="new")
+        cls._selections.append(deepcopy(selection))
+        return selection
 
+    @classmethod
+    def replace(cls, selection: Selection):
+        validate(cls.exists(selection.name), "Selection not found", logger, KeyError)
         SelectionStorage.save(selection, mode="existing")
-        cls._selections[selection.uid] = selection
+        cls._selections = [sel for sel in cls._selections if sel.name != selection.name]
+        cls._selections.append(deepcopy(selection))
 
     @classmethod
-    def remove(cls, uid: str):
-        validate(uid in cls._selections, "Selection not found", logger)
-
-        selection = cls._selections[uid]
-
-        SelectionStorage.delete(selection)
-        del cls._selections[uid]
+    def remove(cls, name: str):
+        validate(cls.exists(name), "Selection not found", logger, KeyError)
+        selection = cls.get(name)
+        SelectionStorage.delete(selection.name)
+        cls._selections = [sel for sel in cls._selections if sel.name != name]
 
     @classmethod
-    def _assert_unique_name(cls, name: str, *, ignore_uid: str | None = None):
-        for uid, sel in cls._selections.items():
-            validate(
-                sel.name != name or uid == ignore_uid,
-                f"Duplicate selection name '{name}'",
-                logger
-            )
+    def clone(cls, name: str, new_name: str) -> Selection:
+        validate(cls.exists(name), "Selection not found", logger, KeyError)
+        validate(not cls.exists(new_name), "Duplicate name", logger, KeyError)
+        original = cls.get(name)
+        cloned = original.clone(new_name)
+        cls.add(cloned)
+        return cloned

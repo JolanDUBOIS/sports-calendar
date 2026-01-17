@@ -1,7 +1,7 @@
 import yaml
 
 from . import logger
-from .specs import SelectionSpec
+from .model import Selection
 from ..utils import validate
 from sports_calendar.core import load_yml, Paths
 
@@ -9,15 +9,15 @@ from sports_calendar.core import load_yml, Paths
 class SelectionStorage:
 
     @staticmethod
-    def load_all() -> list[SelectionSpec]:
+    def load_all() -> list[Selection]:
         selections = []
         for file in Paths.SELECTIONS_FOLDER.glob("*.yml"):
             data = load_yml(file)
-            selections.append(SelectionSpec.from_dict(data))
+            selections.append(Selection.from_dict(data))
         return selections
 
     @staticmethod
-    def save(selection: SelectionSpec, mode: str = "any"):
+    def save(selection: Selection, mode: str = "any"):
         """ Save selection to disk. 
         mode: 
             'any' - save regardless of existing file
@@ -36,13 +36,9 @@ class SelectionStorage:
             yaml.safe_dump(selection.to_dict(), f)
 
     @staticmethod
-    def delete(selection: SelectionSpec):
+    def delete(name: str):
         """ Delete selection file from disk. """
-        path = Paths.SELECTIONS_FOLDER / f"{selection.name}.yml"
+        path = Paths.SELECTIONS_FOLDER / f"{name}.yml"
         validate(path.exists(), f"Selection file does not exist: {path}", logger, FileNotFoundError)
         if path.exists():
             path.unlink()
-
-# Issues:
-# - Can't have a file name different than selection name
-# - When using this in the backend, can't change the files manually without breaking everything (this issue is linked to the registry as well)

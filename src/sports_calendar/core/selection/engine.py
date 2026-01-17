@@ -4,15 +4,14 @@ from typing import Callable, Type
 import pandas as pd
 
 from . import logger
-from .specs import (
-    SelectionSpec,
-    SelectionItemSpec,
-    SelectionFilterSpec,
-    MinRankingFilterSpec,
-    StageFilterSpec,
-    TeamsFilterSpec,
-    CompetitionsFilterSpec,
-    SessionFilterSpec
+from .model import Selection, SelectionItem
+from .filters import (
+    SelectionFilter,
+    MinRankingFilter,
+    StageFilter,
+    TeamsFilter,
+    CompetitionsFilter,
+    SessionFilter
 )
 from sports_calendar.core.db import (
     TableView,
@@ -28,12 +27,12 @@ from sports_calendar.core.utils import validate
 class SelectionItemApplier:
     """ Base class for applying selection filters to retrieve sports data. """
     _DISPATCH: dict[
-        Type[SelectionFilterSpec],
+        Type[SelectionFilter],
         Callable[..., TableView]
     ] = {}
 
     @classmethod
-    def apply(cls, item: SelectionItemSpec) -> EventTableView:
+    def apply(cls, item: SelectionItem) -> EventTableView:
         """ TODO """
         logger.debug(f"Applying selection for sport: {item.sport} with items: {item}")
         validate(item.sport in SPORT_SCHEMAS, f"Unsupported sport: {item.sport}", logger)
@@ -58,8 +57,8 @@ class SelectionItemApplier:
     # Min Ranking Filter
 
     @classmethod
-    def _apply_min_ranking_filter(cls, filter_spec: MinRankingFilterSpec, table: TableView, schema: SportSchema, **kwargs) -> TableView:
-        logger.debug(f"Applying MinRankingFilterSpec: {filter_spec} on table: {table}")
+    def _apply_min_ranking_filter(cls, filter_spec: MinRankingFilter, table: TableView, schema: SportSchema, **kwargs) -> TableView:
+        logger.debug(f"Applying MinRankingFilter: {filter_spec} on table: {table}")
         validate(schema.standings is not None, f"Standings table not defined for sport {schema.sport}", logger)
         # TODO - Maybe use the table competitions to check if the competition has standings (field has_standings)
         standings_table = schema.standings.view()
@@ -70,24 +69,24 @@ class SelectionItemApplier:
         return getattr(cls, f'_apply_min_ranking_{filter_spec.rule}')(filter_spec, table, valid_teams)
 
     @staticmethod
-    def _apply_min_ranking_both(filter_spec: MinRankingFilterSpec, table: TableView, valid_teams: pd.Series) -> TableView:
-        logger.debug(f"Applying MinRankingFilterSpec BOTH with valid teams: {valid_teams.tolist()}")
+    def _apply_min_ranking_both(filter_spec: MinRankingFilter, table: TableView, valid_teams: pd.Series) -> TableView:
+        logger.debug(f"Applying MinRankingFilter BOTH with valid teams: {valid_teams.tolist()}")
         return table.query(
             (Filter(col="home_team_id", op="in", value=valid_teams.tolist()) &
              Filter(col="away_team_id", op="in", value=valid_teams.tolist()))
         )
 
     @staticmethod
-    def _apply_min_ranking_any(filter_spec: MinRankingFilterSpec, table: TableView, valid_teams: pd.Series) -> TableView:
-        logger.debug(f"Applying MinRankingFilterSpec ANY with valid teams: {valid_teams.tolist()}")
+    def _apply_min_ranking_any(filter_spec: MinRankingFilter, table: TableView, valid_teams: pd.Series) -> TableView:
+        logger.debug(f"Applying MinRankingFilter ANY with valid teams: {valid_teams.tolist()}")
         return table.query(
             (Filter(col="home_team_id", op="in", value=valid_teams.tolist()) |
              Filter(col="away_team_id", op="in", value=valid_teams.tolist()))
         )
 
     @staticmethod
-    def _apply_min_ranking_opponent(filter_spec: MinRankingFilterSpec, table: TableView, valid_teams: pd.Series) -> TableView:
-        logger.debug(f"Applying MinRankingFilterSpec OPPONENT with valid teams: {valid_teams.tolist()}")
+    def _apply_min_ranking_opponent(filter_spec: MinRankingFilter, table: TableView, valid_teams: pd.Series) -> TableView:
+        logger.debug(f"Applying MinRankingFilter OPPONENT with valid teams: {valid_teams.tolist()}")
         return table.query(
             ((Filter(col="home_team_id", op="==", value=filter_spec.reference_team) &
               Filter(col="away_team_id", op="in", value=valid_teams.tolist())) |
@@ -98,30 +97,31 @@ class SelectionItemApplier:
     # Stage Filter
 
     @staticmethod
-    def _apply_stage_filter(filter_spec: StageFilterSpec, table: TableView, **kwargs) -> TableView:
-        logger.debug(f"Applying StageFilterSpec: {filter_spec} on table: {table}")
+    def _apply_stage_filter(filter_spec: StageFilter, table: TableView, **kwargs) -> TableView:
+        logger.debug(f"Applying StageFilter: {filter_spec} on table: {table}")
         return table.query(
-            Filter(col="stage", op=">=", value=filter_spec.stage)
+            (Filter(col="competition_id", op="in", value=filter_spec.competition_ids) &
+            Filter(col="stage", op=">=", value=filter_spec.stage))
         )
 
     # Teams Filter
 
     @classmethod
-    def _apply_teams_filter(cls, filter_spec: TeamsFilterSpec, table: TableView, **kwargs) -> TableView:
-        logger.debug(f"Applying TeamsFilterSpec: {filter_spec} on table: {table}")
+    def _apply_teams_filter(cls, filter_spec: TeamsFilter, table: TableView, **kwargs) -> TableView:
+        logger.debug(f"Applying TeamsFilter: {filter_spec} on table: {table}")
         return getattr(cls, f'_apply_teams_{filter_spec.rule}')(filter_spec, table)
 
     @staticmethod
-    def _apply_teams_both(filter_spec: TeamsFilterSpec, table: TableView) -> TableView:
-        logger.debug(f"Applying TeamsFilterSpec BOTH with team IDs: {filter_spec.team_ids}")
+    def _apply_teams_both(filter_spec: TeamsFilter, table: TableView) -> TableView:
+        logger.debug(f"Applying TeamsFilter BOTH with team IDs: {filter_spec.team_ids}")
         return table.query(
             (Filter(col="home_team_id", op="in", value=filter_spec.team_ids) &
              Filter(col="away_team_id", op="in", value=filter_spec.team_ids))
         )
 
     @staticmethod
-    def _apply_teams_any(filter_spec: TeamsFilterSpec, table: TableView) -> TableView:
-        logger.debug(f"Applying TeamsFilterSpec ANY with team IDs: {filter_spec.team_ids}")
+    def _apply_teams_any(filter_spec: TeamsFilter, table: TableView) -> TableView:
+        logger.debug(f"Applying TeamsFilter ANY with team IDs: {filter_spec.team_ids}")
         return table.query(
             (Filter(col="home_team_id", op="in", value=filter_spec.team_ids) |
              Filter(col="away_team_id", op="in", value=filter_spec.team_ids))
@@ -130,8 +130,8 @@ class SelectionItemApplier:
     # Competitions Filter
 
     @staticmethod
-    def _apply_competitions_filter(filter_spec: CompetitionsFilterSpec, table: TableView, **kwargs) -> TableView:
-        logger.debug(f"Applying CompetitionsFilterSpec: {filter_spec} on table: {table}")
+    def _apply_competitions_filter(filter_spec: CompetitionsFilter, table: TableView, **kwargs) -> TableView:
+        logger.debug(f"Applying CompetitionsFilter: {filter_spec} on table: {table}")
         return table.query(
             Filter(col="competition_id", op="in", value=filter_spec.competition_ids)
         )
@@ -139,19 +139,19 @@ class SelectionItemApplier:
     # Session Filter
 
     @staticmethod
-    def _apply_session_filter(filter_spec: SessionFilterSpec, table: TableView, **kwargs) -> TableView:
-        logger.debug(f"Applying SessionFilterSpec: {filter_spec} on table: {table}")
+    def _apply_session_filter(filter_spec: SessionFilter, table: TableView, **kwargs) -> TableView:
+        logger.debug(f"Applying SessionFilter: {filter_spec} on table: {table}")
         return table.query(
             Filter(col="session_id", op="in", value=filter_spec.sessions)
         )
 
 
 SelectionItemApplier._DISPATCH = {
-    MinRankingFilterSpec: SelectionItemApplier._apply_min_ranking_filter,
-    StageFilterSpec: SelectionItemApplier._apply_stage_filter,
-    TeamsFilterSpec: SelectionItemApplier._apply_teams_filter,
-    CompetitionsFilterSpec: SelectionItemApplier._apply_competitions_filter,
-    SessionFilterSpec: SelectionItemApplier._apply_session_filter,
+    MinRankingFilter: SelectionItemApplier._apply_min_ranking_filter,
+    StageFilter: SelectionItemApplier._apply_stage_filter,
+    TeamsFilter: SelectionItemApplier._apply_teams_filter,
+    CompetitionsFilter: SelectionItemApplier._apply_competitions_filter,
+    SessionFilter: SelectionItemApplier._apply_session_filter,
 }
 
 
@@ -159,7 +159,7 @@ class SelectionApplier:
     """ Class to apply selection specifications to retrieve sports data. """
 
     @classmethod
-    def apply(cls, spec: SelectionSpec) -> list[TableView]:
+    def apply(cls, spec: Selection) -> list[TableView]:
         """ Apply the selection specification and return the resulting data tables. """
         logger.info(f"Applying selection spec with {len(spec.items)} items.")
         result: list[TableView] = []
