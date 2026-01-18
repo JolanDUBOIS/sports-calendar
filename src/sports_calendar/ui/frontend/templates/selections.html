@@ -30,9 +30,36 @@
       {% for sel in selections %}
         {{ selection_card(sel.selection) }}
       {% endfor %}
+      <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-primary" type="button">Create</button>
+      </div>
     </div>
   {% else %}
     <p class="text-muted text-center">No selections yet.</p>
   {% endif %}
+</div>
+
+<!-- Create Selection Modal (Bootstrap themed, matching others) -->
+<div class="modal fade" id="createSelectionModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Selection</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="create-selection-body">
+        <form>
+          <div class="mb-3">
+            <label for="create-selection-name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="create-selection-name" name="name" autocomplete="off" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="create-selection-confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -65,4 +65,65 @@ document.addEventListener("DOMContentLoaded", () => {
                 .catch(err => console.error("Delete error:", err));
         });
     }
+
+    // --------------------
+    // Create button click
+    // --------------------
+    const createBtn = container.querySelector("button.btn-primary");
+    if (createBtn) {
+        createBtn.addEventListener("click", () => {
+            openCreateModal((name) => {
+                if (!name) return;
+                fetch('/selections/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                })
+                .then(res => {
+                    if (res.ok) {
+                        // Optionally reload or update the list
+                        window.location.reload();
+                    } else {
+                        console.error("Create failed:", res.status);
+                    }
+                })
+                .catch(err => console.error("Create error:", err));
+            });
+        });
+    }
+
+    // --------------------
+    // Create Modal function (to be implemented)
+    // --------------------
+    function openCreateModal(onConfirm) {
+        const modalEl = document.getElementById("createSelectionModal");
+        const inputEl = modalEl.querySelector("#create-selection-name");
+        const confirmBtn = modalEl.querySelector("#create-selection-confirm-btn");
+
+        // Clear previous value
+        inputEl.value = "";
+
+        // Remove previous listeners
+        confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+        const newConfirmBtn = modalEl.querySelector("#create-selection-confirm-btn");
+
+        // Attach new listener
+        newConfirmBtn.addEventListener("click", () => {
+            const name = inputEl.value.trim();
+            if (!name) return;
+            onConfirm(name);
+            bootstrap.Modal.getInstance(modalEl).hide();
+        });
+
+        // Show modal
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+        // Focus input when modal is shown
+        modalEl.addEventListener('shown.bs.modal', function handler() {
+            inputEl.focus();
+            modalEl.removeEventListener('shown.bs.modal', handler);
+        });
+    }
 });

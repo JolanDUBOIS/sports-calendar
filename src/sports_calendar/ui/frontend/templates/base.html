@@ -13,8 +13,11 @@
   <link href="{{ url_for('static', filename='css/cards.css') }}" rel="stylesheet">
   {% block head %}{% endblock %}
 </head>
-<body>
-  {% block body %}{% endblock %}
+<body class="d-flex flex-column min-vh-100">
+  <!-- Main content -->
+  <div class="flex-grow-1 container py-4">
+    {% block body %}{% endblock %}
+  </div>
 
   <!-- Load your custom JS -->
   <script src="{{ url_for('static', filename='js/delete-modal.js') }}"></script>
@@ -45,5 +48,7 @@
       </div>
     </div>
   </div>
+
+  <footer class="mt-3"></footer>
 </body>
 </html>

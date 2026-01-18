@@ -10,6 +10,7 @@
 <div class="container mt-4">
   <h1 class="text-center my-4">Selection "{{ selection["name"] }}"</h1>
 
+  {% if selection["items"] %}
   <!-- <h5>Items</h5> -->
   <div id="items-list">
     {% for item in selection["items"] %}
@@ -97,6 +98,9 @@
       </div>
     {% endfor %}
   </div>
+  {% else %}
+    <p class="text-muted text-center">No items in this selection.</p>
+  {% endif %}
 
 </div>
 
