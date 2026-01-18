@@ -14,6 +14,13 @@ window.openModifyFilterModal = function(filterId, onConfirm) {
 
     modalBody.appendChild(clone);
 
+    // Initialize lookup inputs with their existing IDs from the template
+    clone.querySelectorAll(".lookup-input").forEach(input => {
+        if (input.dataset.initialValue !== undefined) {
+            input.dataset.value = input.dataset.initialValue;
+        }
+    });
+
     // Initialize lookup fields for this form
     initLookupFields(modalBody);
 
@@ -29,15 +36,16 @@ window.openModifyFilterModal = function(filterId, onConfirm) {
         if (!form) return;
 
         const data = {};
-        for (const [key, value] of new FormData(form).entries()) {
-            data[key] = value;
-        }
 
-        // Lookup fields
-        modalBody.querySelectorAll(".lookup-input").forEach(input => {
-            if (input.dataset.value) {
-                data[input.name] = input.dataset.value; // override with actual ID
+        form.querySelectorAll("input, select").forEach(el => {
+            if (!el.name) return;
+
+            if (el.classList.contains("lookup-input")) {
+                data[el.name] = el.dataset.value ?? null;
+                return;
             }
+
+            data[el.name] = el.value;
         });
 
         onConfirm(data);

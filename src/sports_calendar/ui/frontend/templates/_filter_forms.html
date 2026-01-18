@@ -25,7 +25,8 @@
         {{ lookup.lookup_field(
             label=field.label,
             path=field.path,
-            value=field.current_display[0] if field.current_display else "",
+            value=field.current_value[0] if field.current_value else "",
+            display=field.current_display[0] if field.current_display else "",
             lookup_endpoint=field.lookup_endpoint
         ) }}
       {% else %}
