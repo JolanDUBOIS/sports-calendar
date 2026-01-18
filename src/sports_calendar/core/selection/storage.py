@@ -14,6 +14,7 @@ class SelectionStorage:
         for file in Paths.SELECTIONS_FOLDER.glob("*.yml"):
             data = load_yml(file)
             selections.append(Selection.from_dict(data))
+            logger.debug(f"Loaded selection:\n{selections[-1]}")
         return selections
 
     @staticmethod

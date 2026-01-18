@@ -1,6 +1,6 @@
 from . import logger
 from .assets import SPORT_ICON_URLS
-from .filter import FilterPresenter
+from .filters import FilterPresenter
 from sports_calendar.core.selection import SelectionItem
 
 

@@ -1,6 +1,7 @@
 from flask import request, jsonify, Blueprint
 
 from . import logger
+from ..readers import FilterReader
 from ..presenters import FilterPresenter
 from sports_calendar.core.selection import SelectionService
 
@@ -53,7 +54,22 @@ def get_filter(sname: str, iid: str, fid: str):
 @bp.route("/<fid>", methods=["PUT"])
 def update_filter(sname: str, iid: str, fid: str):
     """ Update a specific filter by id in an item. """
-    return jsonify({"message": "Not implemented"}), 501
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "Invalid JSON payload"}), 400
+    
+    logger.debug(f"Update filter called with data: {data}")
+    try:
+        original_filter = SelectionService.get_filter(selection_name=sname, item_uid=iid, filter_uid=fid)
+        updated_filter = FilterReader.from_payload(data, original_filter)
+        SelectionService.replace_filter(selection_name=sname, item_uid=iid, filter=updated_filter)
+        return jsonify({"filter": FilterPresenter.detailed(updated_filter)}), 200
+    except KeyError:
+        logger.warning(f"Filter not found for update: {fid} in item {iid} of selection {sname}")
+        return jsonify({"error": "Filter not found"}), 404
+    except Exception:
+        logger.exception(f"Error updating filter: {fid} in item {iid} of selection {sname}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @bp.route("/<fid>", methods=["DELETE"])
 def delete_filter(sname: str, iid: str, fid: str):

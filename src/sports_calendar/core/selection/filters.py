@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from uuid import uuid4
+from typing import ClassVar
 from dataclasses import dataclass, field
 
 from . import logger
@@ -15,7 +16,7 @@ from ..utils import validate
 class SelectionFilter(ABC):
     sport: str
     uid: str = field(default_factory=lambda: str(uuid4())[:8], kw_only=True)
-    filter_type: str = field(init=False)
+    filter_type: ClassVar[str]
 
     def __post_init__(self):
         validate(bool(self.sport), "SelectionFilter.sport cannot be empty", logger)
@@ -63,7 +64,7 @@ class MinRankingFilter(SelectionFilter):
     competition_ids: list[int] = field(default_factory=list)
     reference_team: str | None = None
 
-    filter_type: str = field(init=False, default="min_ranking", repr=False)
+    filter_type: ClassVar[str] = "min_ranking"
 
     def __post_init__(self):
         super().__post_init__()
@@ -97,7 +98,7 @@ class StageFilter(SelectionFilter):
     stage: CompetitionStage
     competition_ids: list[int] = field(default_factory=list)
 
-    filter_type: str = field(init=False, default="stage", repr=False)
+    filter_type: ClassVar[str] = "stage"
 
     def __post_init__(self):
         if isinstance(self.stage, str):
@@ -121,7 +122,7 @@ class TeamsFilter(SelectionFilter):
     team_ids: list[int]
     rule: str                     # "both" | "any"
 
-    filter_type: str = field(init=False, default="teams", repr=False)
+    filter_type: ClassVar[str] = "teams"
 
     def __post_init__(self):
         super().__post_init__()
@@ -144,7 +145,7 @@ class TeamsFilter(SelectionFilter):
 @dataclass(frozen=True)
 class CompetitionsFilter(SelectionFilter):
     competition_ids: list[int]
-    filter_type: str = field(init=False, default="competitions", repr=False)
+    filter_type: ClassVar[str] = "competitions"
 
     def __post_init__(self):
         super().__post_init__()
@@ -158,7 +159,7 @@ class CompetitionsFilter(SelectionFilter):
 @dataclass(frozen=True)
 class SessionFilter(SelectionFilter):
     sessions: list[str]
-    filter_type: str = field(init=False, default="session", repr=False)
+    filter_type: ClassVar[str] = "session"
 
     def __post_init__(self):
         super().__post_init__()

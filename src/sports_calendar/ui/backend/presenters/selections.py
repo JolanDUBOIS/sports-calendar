@@ -1,5 +1,5 @@
 from . import logger
-from .item import SelectionItemPresenter
+from .items import SelectionItemPresenter
 from sports_calendar.core.selection import Selection
 
 
