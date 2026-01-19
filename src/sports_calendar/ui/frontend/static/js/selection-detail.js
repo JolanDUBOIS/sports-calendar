@@ -1,6 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+
     const container = document.getElementById("items-list");
+    const mainContainer = document.getElementById("selection-container"); // <- new main container
+    console.log("Main container:", mainContainer);
+    const selectionName = mainContainer ? mainContainer.dataset.selectionName : null;
+    console.log("Fetched selectionName:", selectionName);
+
+    // Always set up Create button handler, even if container is missing
+    const createBtn = document.querySelector("[data-action='create-item']");
+    if (createBtn) {
+        createBtn.addEventListener("click", () => {
+            if (!selectionName) {
+                console.error("No selection id found for item creation");
+                return;
+            }
+
+            openCreateItemModal((sport) => {
+                if (!sport) return;
+                fetch(`/selections/${selectionName}/items/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sport })
+                })
+                .then(res => {
+                    if (res.ok) window.location.reload();
+                    else console.error("Create item failed:", res.status);
+                })
+                .catch(err => console.error("Create item error:", err));
+            });
+        });
+    }
+
     if (!container) return;
 
     // ----------------------------
@@ -34,27 +65,26 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!card) return;
 
         const type = card.dataset.type;
-        const selectionId = card.dataset.selectionId;
         const itemId = card.dataset.itemId;
 
-        handleDeleteClick(type, selectionId, itemId, card);
+        handleDeleteClick(type, selectionName, itemId, card);
     });
 
-    function handleDeleteClick(type, selectionId, id, cardEl) {
-        console.log("Delete clicked:", type, selectionId, id);
+    function handleDeleteClick(type, selectionName, id, cardEl) {
+        console.log("Delete clicked:", type, selectionName, id);
         const message = `Are you sure you want to delete this selection item?`;
         
         openDeleteModal(message, () => {
-            fetch(`/selections/${selectionId}/items/${id}`, { method: 'DELETE' })
+            fetch(`/selections/${selectionName}/items/${id}`, { method: 'DELETE' })
                 .then(res => {
                     if (res.ok) {
                         cardEl.remove();
-                        console.log("Deleted:", type, selectionId, id);
+                        console.log("Deleted:", type, selectionName, id);
                     } else {
-                        console.error("Failed to delete:", type, selectionId, id);
+                        console.error("Failed to delete:", type, selectionName, id);
                     }
                 })
-                .catch(err => console.error("Error deleting:", type, selectionId, id, err));
+                .catch(err => console.error("Error deleting:", type, selectionName, id, err));
         })
     };
 
@@ -62,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Modify filter button click
     // ---------------------------
     container.addEventListener("click", (event) => {
-        console.log("Modify filter button clicked");
         const btn = event.target.closest("button[data-action='modify-filter']");
         if (!btn) return;
 
@@ -74,8 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const filterId = divEl.dataset.filterId;
 
         window.openModifyFilterModal(filterId, function(data) {
-            // Log the JSON we're sending
-            console.log("Sending filter update:", JSON.stringify(data));
             fetch(`/selections/${selectionName}/items/${itemId}/filters/${filterId}`, {
                 method: 'PUT',
                 headers: {
@@ -94,4 +121,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // ---------------------
+    // Create Modal function
+    // ---------------------
+    function openCreateItemModal(onConfirm) {
+        const modalEl = document.getElementById("createItemModal");
+        const sportInput = modalEl.querySelector("#create-item-sport");
+        const confirmBtn = modalEl.querySelector("#create-item-confirm-btn");
+
+        sportInput.value = "";
+
+        confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+        const newConfirmBtn = modalEl.querySelector("#create-item-confirm-btn");
+
+        newConfirmBtn.addEventListener("click", () => {
+            const sport = sportInput.value.trim();
+            onConfirm(sport);
+            bootstrap.Modal.getInstance(modalEl).hide();
+        });
+
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+
+        modalEl.addEventListener('shown.bs.modal', function handler() {
+            sportInput.focus();
+            modalEl.removeEventListener('shown.bs.modal', handler);
+        });
+    }
 });

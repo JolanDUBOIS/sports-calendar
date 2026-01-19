@@ -69,10 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // --------------------
     // Create button click
     // --------------------
-    const createBtn = container.querySelector("button.btn-primary");
+    const createBtn = container.querySelector("[data-action='create-selection']");
     if (createBtn) {
         createBtn.addEventListener("click", () => {
-            openCreateModal((name) => {
+            console.log("Create selection button clicked");
+            openCreateSelectionModal((name) => {
                 if (!name) return;
                 fetch('/selections/', {
                     method: 'POST',
@@ -81,23 +82,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
                     body: JSON.stringify({ name })
                 })
-                .then(res => {
-                    if (res.ok) {
-                        // Optionally reload or update the list
-                        window.location.reload();
-                    } else {
-                        console.error("Create failed:", res.status);
-                    }
-                })
-                .catch(err => console.error("Create error:", err));
+                    .then(res => {
+                        if (res.ok) {
+                            // Optionally reload or update the list
+                            window.location.reload();
+                        } else {
+                            console.error("Create failed:", res.status);
+                        }
+                    })
+                    .catch(err => console.error("Create error:", err));
             });
         });
     }
 
-    // --------------------
-    // Create Modal function (to be implemented)
-    // --------------------
-    function openCreateModal(onConfirm) {
+    // ---------------------
+    // Create Modal function
+    // ---------------------
+    function openCreateSelectionModal(onConfirm) {
         const modalEl = document.getElementById("createSelectionModal");
         const inputEl = modalEl.querySelector("#create-selection-name");
         const confirmBtn = modalEl.querySelector("#create-selection-confirm-btn");
@@ -120,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Show modal
         const bsModal = new bootstrap.Modal(modalEl);
         bsModal.show();
+
         // Focus input when modal is shown
         modalEl.addEventListener('shown.bs.modal', function handler() {
             inputEl.focus();

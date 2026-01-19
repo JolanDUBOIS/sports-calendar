@@ -31,7 +31,7 @@
         {{ selection_card(sel.selection) }}
       {% endfor %}
       <div class="d-flex justify-content-center mt-4">
-        <button class="btn btn-primary" type="button">Create</button>
+        <button class="btn btn-primary" type="button" data-action="create-selection">Create New Selection</button>
       </div>
     </div>
   {% else %}
@@ -39,7 +39,7 @@
   {% endif %}
 </div>
 
-<!-- Create Selection Modal (Bootstrap themed, matching others) -->
+<!-- Create Selection Modal -->
 <div class="modal fade" id="createSelectionModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
