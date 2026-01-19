@@ -1,7 +1,8 @@
 from flask import request, jsonify, Blueprint
 
 from . import logger
-from ..readers import FilterReader
+from ..dtos import FilterDTOFactory
+from ..mappers import FilterMapper
 from ..presenters import FilterPresenter
 from sports_calendar.core.selection import SelectionService
 
@@ -57,13 +58,19 @@ def update_filter(sname: str, iid: str, fid: str):
     data = request.get_json(silent=True)
     if data is None:
         return jsonify({"error": "Invalid JSON payload"}), 400
-    
+
     logger.debug(f"Update filter called with data: {data}")
     try:
         original_filter = SelectionService.get_filter(selection_name=sname, item_uid=iid, filter_uid=fid)
-        updated_filter = FilterReader.from_payload(data, original_filter)
-        SelectionService.replace_filter(selection_name=sname, item_uid=iid, filter=updated_filter)
-        return jsonify({"filter": FilterPresenter.detailed(updated_filter)}), 200
+        logger.debug(f"Original filter retrieved: {original_filter}")
+        dto = FilterDTOFactory.from_payload(original_filter.filter_type, data)
+        logger.debug(f"Mapped DTO: {dto}")
+        new_filter = FilterMapper.from_dto(dto, original_filter)
+        logger.debug(f"Mapped new filter: {new_filter}")
+        SelectionService.replace_filter(selection_name=sname, item_uid=iid, filter=new_filter)
+        return jsonify({"filter": FilterPresenter.detailed(new_filter)}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except KeyError:
         logger.warning(f"Filter not found for update: {fid} in item {iid} of selection {sname}")
         return jsonify({"error": "Filter not found"}), 404
