@@ -65,7 +65,6 @@ class MinRankingFilter(SelectionFilter):
     ranking: int
     competition_ids: list[int] = field(default_factory=list)
     reference_team: str | None = None
-
     filter_type: ClassVar[str] = "min_ranking"
 
     def __post_init__(self):
@@ -106,7 +105,6 @@ class MinRankingFilter(SelectionFilter):
 class StageFilter(SelectionFilter):
     stage: CompetitionStage
     competition_ids: list[int] = field(default_factory=list)
-
     filter_type: ClassVar[str] = "stage"
 
     def __post_init__(self):
@@ -136,7 +134,6 @@ class StageFilter(SelectionFilter):
 class TeamsFilter(SelectionFilter):
     team_ids: list[int]
     rule: str                     # "both" | "any"
-
     filter_type: ClassVar[str] = "teams"
 
     def __post_init__(self):
