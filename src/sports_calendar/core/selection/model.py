@@ -72,6 +72,8 @@ class Selection:
 
     @classmethod
     def from_dict(cls, data: dict) -> Selection:
+        logger.debug(f"Deserializing Selection with name '{data.get('name')}'")
+        validate(isinstance(data, dict), "Selection data must be a dictionary", logger, TypeError)
         data = dict(data)
         items_data = data.pop("items", [])
         items = [SelectionItem.from_dict(item_data) for item_data in items_data]
@@ -145,6 +147,8 @@ class SelectionItem:
 
     @classmethod
     def from_dict(cls, data: dict) -> SelectionItem:
+        logger.debug(f"Deserializing SelectionItem with sport '{data.get('sport')}'")
+        validate(isinstance(data, dict), "SelectionItem data must be a dictionary", logger, TypeError)
         data = dict(data)
         filters_data = data.pop("filters", [])
         filters = [SelectionFilter.from_dict(sport=data.get("sport"), data=filter_data) for filter_data in filters_data]
