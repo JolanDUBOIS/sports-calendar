@@ -37,15 +37,25 @@
                 Item for {{ item["sport"] }}
               </div>
               <div class="text-muted">
+                {% if item["filters"]|length == 0 %}
+                  No filters
+                {% else %}
                 Filters:
                 {% for filter in item["filters"] %}
                   {{ filter["name"] }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
+                {% endif %}
               </div>
             </div>
 
-            <!-- Right: delete button -->
+            <!-- Right: add & delete buttons -->
             <div>
+              <button
+                class="btn btn-outline-primary btn-sm"
+                type="button"
+                data-action="add-filter">
+                Add Filter
+              </button>
               <button
                 class="btn btn-outline-danger btn-sm"
                 type="button"

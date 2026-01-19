@@ -5,7 +5,16 @@
     <div>
       <div class="fw-bold">Selection "{{ selection.name }}"</div>
       <div class="text-muted">
-        Sports: {{ selection.sports | join(', ') if selection.sports else 'none' }}
+        {% if selection["n_items"] == 0 %}
+          No items
+        {% else %}
+          {% if selection["n_items"] == 1 %}
+            1 Item
+          {% else %}
+            {{ selection["n_items"] }} Items
+          {% endif %}
+          ({{ selection.sports | join(', ') if selection.sports else 'none' }})
+        {% endif %}
       </div>
     </div>
     <div>
