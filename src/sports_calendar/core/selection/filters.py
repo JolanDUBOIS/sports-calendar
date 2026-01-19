@@ -39,9 +39,11 @@ class SelectionFilter(ABC):
         data = dict(data) 
         filter_type = data.pop("filter_type", None)
         validate(filter_type is not None, "filter_type is required to create SelectionFilter", logger, KeyError)
+        
         for subclass in cls.__subclasses__():
             if getattr(subclass, "filter_type", None) == filter_type:
-                return subclass(sport=sport, **data)
+                return subclass.from_dict(sport=sport, data=data)
+
         logger.error(f"Unknown filter type: {filter_type}")
         raise KeyError(f"Unknown filter type: {filter_type}")
 
@@ -92,6 +94,13 @@ class MinRankingFilter(SelectionFilter):
     def valid_rules(self) -> set[str]:
         return {"both", "any", "opponent"}
 
+    @classmethod
+    def from_dict(cls, sport: str, data: dict) -> MinRankingFilter:
+        return cls(
+            sport=sport,
+            **data
+        )
+
 
 @dataclass(frozen=True)
 class StageFilter(SelectionFilter):
@@ -101,20 +110,26 @@ class StageFilter(SelectionFilter):
     filter_type: ClassVar[str] = "stage"
 
     def __post_init__(self):
-        if isinstance(self.stage, str):
-            object.__setattr__(self, "stage", CompetitionStage.from_str(self.stage))
-
         super().__post_init__()
 
-        validate(
-            isinstance(self.stage, CompetitionStage),
-            "stage must be a CompetitionStage instance",
-            logger,
-            TypeError
-        )
+        validate(isinstance(self.stage, CompetitionStage), "stage must be a CompetitionStage instance", logger, TypeError)
         validate(isinstance(self.competition_ids, list), "competition_ids must be a list", logger, TypeError)
         for cid in self.competition_ids:
             validate(isinstance(cid, int), "competition_ids must contain only integers", logger, TypeError)
+
+    def to_dict(self) -> dict:
+        data = super().to_dict()
+        data["stage"] = self.stage.value
+        return data
+
+    @classmethod
+    def from_dict(cls, sport: str, data: dict) -> StageFilter:
+        stage_value = data.pop("stage")
+        return cls(
+            sport=sport,
+            stage=CompetitionStage(stage_value),
+            **data
+        )
 
 
 @dataclass(frozen=True)
@@ -141,6 +156,13 @@ class TeamsFilter(SelectionFilter):
     def valid_rules(self) -> set[str]:
         return {"both", "any"}
 
+    @classmethod
+    def from_dict(cls, sport: str, data: dict) -> TeamsFilter:
+        return cls(
+            sport=sport,
+            **data
+        )
+
 
 @dataclass(frozen=True)
 class CompetitionsFilter(SelectionFilter):
@@ -154,6 +176,13 @@ class CompetitionsFilter(SelectionFilter):
         validate(isinstance(self.competition_ids, list), "competition_ids must be a list", logger, TypeError)
         for cid in self.competition_ids:
             validate(isinstance(cid, int), "competition_ids must contain only integers", logger, TypeError)
+
+    @classmethod
+    def from_dict(cls, sport: str, data: dict) -> CompetitionsFilter:
+        return cls(
+            sport=sport,
+            **data
+        )
 
 
 @dataclass(frozen=True)
@@ -173,3 +202,10 @@ class SessionFilter(SelectionFilter):
                 logger,
                 TypeError
             )
+
+    @classmethod
+    def from_dict(cls, sport: str, data: dict) -> SessionFilter:
+        return cls(
+            sport=sport,
+            **data
+        )
