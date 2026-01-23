@@ -40,21 +40,29 @@ class SelectionFilter(ABC):
         filter_type = data.pop("filter_type", None)
         validate(filter_type is not None, "filter_type is required to create SelectionFilter", logger, KeyError)
         
-        for subclass in cls.__subclasses__():
-            if getattr(subclass, "filter_type", None) == filter_type:
-                return subclass.from_dict(sport=sport, data=data)
+        filter_class = FILTER_TYPE_MAP.get(filter_type)
+        if filter_class:
+            return filter_class.from_dict(sport, data)
 
         logger.error(f"Unknown filter type: {filter_type}")
         raise KeyError(f"Unknown filter type: {filter_type}")
 
     @classmethod
-    def empty(cls, sport: str, filter_type: str) -> SelectionFilter:
-        """ Create an empty SelectionFilter for the given sport and filter type. """
-        for subclass in cls.__subclasses__():
-            if getattr(subclass, "filter_type", None) == filter_type:
-                return subclass(sport=sport)
-        logger.error(f"Unknown filter type: {filter_type}")
-        raise KeyError(f"Unknown filter type: {filter_type}")
+    def empty(cls, sport: str) -> SelectionFilter:
+        """ Create an EmptyFilter for the given sport and filter type. """
+        logger.debug(f"Creating EmptyFilter for sport: {sport}")
+        return EmptyFilter(sport=sport)
+
+
+# Empty filter
+
+@dataclass(frozen=True)
+class EmptyFilter(SelectionFilter):
+    filter_type: ClassVar[str] = "empty"
+
+    @classmethod
+    def from_dict(cls, sport: str, data: dict) -> EmptyFilter:
+        return cls(sport=sport)
 
 
 # Specific filter implementations
@@ -90,7 +98,8 @@ class MinRankingFilter(SelectionFilter):
         for cid in self.competition_ids:
             validate(isinstance(cid, int), "competition_ids must contain only integers", logger, TypeError)
 
-    def valid_rules(self) -> set[str]:
+    @staticmethod
+    def valid_rules() -> set[str]:
         return {"both", "any", "opponent"}
 
     @classmethod
@@ -150,7 +159,8 @@ class TeamsFilter(SelectionFilter):
         for tid in self.team_ids:
             validate(isinstance(tid, int), "team_ids must contain only integers", logger, TypeError)
 
-    def valid_rules(self) -> set[str]:
+    @staticmethod
+    def valid_rules() -> set[str]:
         return {"both", "any"}
 
     @classmethod
@@ -206,3 +216,15 @@ class SessionFilter(SelectionFilter):
             sport=sport,
             **data
         )
+
+
+# Global filter type class map
+
+FILTER_TYPE_MAP: dict[str, type[SelectionFilter]] = {
+    "empty": EmptyFilter,
+    "min_ranking": MinRankingFilter,
+    "stage": StageFilter,
+    "teams": TeamsFilter,
+    "competitions": CompetitionsFilter,
+    "session": SessionFilter,
+}

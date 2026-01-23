@@ -176,10 +176,10 @@ class SelectionService:
         SelectionRegistry.replace(selection)
 
     @staticmethod
-    def add_empty_filter(selection_name: str, item_uid: str, filter_type: str) -> SelectionFilter:
+    def add_empty_filter(selection_name: str, item_uid: str) -> SelectionFilter:
         selection = SelectionRegistry.get(selection_name)
         item = selection.get_item(item_uid)
-        filter = SelectionFilter.empty(item.sport, filter_type)
+        filter = SelectionFilter.empty(item.sport)
         item.add_filter(filter)
         SelectionRegistry.replace(selection)
         return filter

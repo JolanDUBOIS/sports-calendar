@@ -7,6 +7,7 @@ from . import logger
 from .model import Selection, SelectionItem
 from .filters import (
     SelectionFilter,
+    EmptyFilter,
     MinRankingFilter,
     StageFilter,
     TeamsFilter,
@@ -53,6 +54,13 @@ class SelectionItemApplier:
             schema=schema,
             view=table_view
         )
+
+    # Empty Filter
+
+    @staticmethod
+    def _apply_empty_filter(filter_spec: EmptyFilter, table: TableView, **kwargs) -> TableView:
+        logger.debug(f"Applying EmptyFilter: {filter_spec} on table: {table}")
+        return table
 
     # Min Ranking Filter
 
@@ -147,6 +155,7 @@ class SelectionItemApplier:
 
 
 SelectionItemApplier._DISPATCH = {
+    EmptyFilter: SelectionItemApplier._apply_empty_filter,
     MinRankingFilter: SelectionItemApplier._apply_min_ranking_filter,
     StageFilter: SelectionItemApplier._apply_stage_filter,
     TeamsFilter: SelectionItemApplier._apply_teams_filter,
