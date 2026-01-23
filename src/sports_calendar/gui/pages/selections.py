@@ -2,7 +2,9 @@ from nicegui import ui
 
 from . import logger
 from ..components.modals import Modal
+from ..components.fields import ValidatedTextField
 from ..components.selection_list import selection_list
+from sports_calendar.core.utils import validate
 from sports_calendar.core.selection import SelectionService
 
 
@@ -18,6 +20,16 @@ def register():
 
         def on_create_click():
             logger.debug("Create New Selection clicked")
+
+            def validate_name(input_value: str) -> bool | str:
+                logger.debug(f"Validating selection name: {input_value}")
+                validate(isinstance(input_value, str), "Input value must be a string.", logger, TypeError)
+                if not input_value.strip():
+                    return "Name cannot be empty."
+                if SelectionService.selection_exists(input_value.strip()):
+                    return "A selection with this name already exists."
+                return True
+
             Modal(
                 title='Create New Selection',
                 message='Enter the name of your new selection',
@@ -26,7 +38,7 @@ def register():
                 reload_on_confirm=True
             ).open(
                 on_confirm=SelectionService.add_empty_selection,
-                fields=[{'key': 'name', 'label': 'Name', 'type': 'text'}]
+                fields=[ValidatedTextField(key='name', label='Name', validator=validate_name)]
             )
 
         ui.button('Create', on_click=on_create_click).classes('mt-6 mx-auto block')
