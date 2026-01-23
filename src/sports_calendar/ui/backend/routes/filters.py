@@ -25,12 +25,8 @@ def list_filters(sname: str, iid: str):
 @bp.route("/", methods=["POST"])
 def create_filter(sname: str, iid: str):
     """ Create a new filter in an item. """
-    data = request.get_json(silent=True)
-    filter_type = data.get("filter_type") if data else None
-    if not filter_type:
-        return jsonify({"error": "Filter type is required"}), 400
     try:
-        new_filter = SelectionService.add_empty_filter(selection_name=sname, item_uid=iid, filter_type=filter_type)
+        new_filter = SelectionService.add_empty_filter(selection_name=sname, item_uid=iid)
         return jsonify({"filter": FilterPresenter.summary(new_filter)}), 201
     except KeyError:
         logger.warning(f"Item not found: {iid} in selection {sname}")

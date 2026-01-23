@@ -68,10 +68,17 @@
           <!-- Expandable details (collapsed by default) -->
           <div class="d-none item-details mt-3">
             {% for filter in item["filters"] %}
-              <div class="d-flex align-items-center mb-2 filter-div" data-selection-name="{{ selection['name'] }}" data-item-id="{{ item['uid'] }}" data-filter-id="{{ filter['uid'] }}">
+              <div
+                class="d-flex align-items-center mb-2 filter-div"
+                data-selection-name="{{ selection['name'] }}" data-i
+                em-id="{{ item['uid'] }}"
+                data-filter-id="{{ filter['uid'] }}"
+              >
 
                 <div class="flex-grow-1">
-                  {% if filter["filter_type"] == "min_ranking" %}
+                  {% if filter["filter_type"] == "empty" %}
+                    {{ filters.filter_type_empty(filter) }}
+                  {% elif filter["filter_type"] == "min_ranking" %}
                     {{ filters.filter_type_min_ranking(filter) }}
                   {% elif filter["filter_type"] == "stage" %}
                     {{ filters.filter_type_stage(filter) }}

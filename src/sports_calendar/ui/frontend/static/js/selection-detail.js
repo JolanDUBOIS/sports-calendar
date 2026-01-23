@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         details.classList.toggle("d-none");
 
         // Optional: change button symbol
-        btn.textContent = details.classList.contains("d-none") ? "+" : "−";
+        btn.textContent = details.classList.contains("d-none") ? "+" : "-";
     });
 
     // --------------------
@@ -64,14 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = btn.closest(".card");
         if (!card) return;
 
-        const type = card.dataset.type;
         const itemId = card.dataset.itemId;
 
-        handleDeleteClick(type, selectionName, itemId, card);
+        handleDeleteClick(selectionName, itemId, card);
     });
 
-    function handleDeleteClick(type, selectionName, id, cardEl) {
-        console.log("Delete clicked:", type, selectionName, id);
+    function handleDeleteClick(selectionName, id, cardEl) {
+        console.log("Delete clicked:", selectionName, id);
         const message = `Are you sure you want to delete this selection item?`;
         
         openDeleteModal(message, () => {
@@ -79,12 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(res => {
                     if (res.ok) {
                         cardEl.remove();
-                        console.log("Deleted:", type, selectionName, id);
+                        console.log("Deleted:", selectionName, id);
                     } else {
-                        console.error("Failed to delete:", type, selectionName, id);
+                        console.error("Failed to delete:", selectionName, id);
                     }
                 })
-                .catch(err => console.error("Error deleting:", type, selectionName, id, err));
+                .catch(err => console.error("Error deleting:", selectionName, id, err));
         })
     };
 
@@ -147,5 +146,55 @@ document.addEventListener("DOMContentLoaded", () => {
             sportInput.focus();
             modalEl.removeEventListener('shown.bs.modal', handler);
         });
+    }
+
+    // -----------------------
+    // Add Filter button click
+    // -----------------------
+    container.addEventListener("click", (event) => {
+        const btn = event.target.closest("button[data-action='add-filter']");
+        if (!btn) return;
+
+        const card = btn.closest(".card");
+        if (!card) return;
+
+        const itemId = card.dataset.itemId;
+
+        handleAddFilterClick(selectionName, itemId);
+    });
+
+    function handleAddFilterClick(selectionName, itemId) {
+        console.log("Add Filter clicked:", selectionName, itemId);
+        // First call 
+
+        fetch(`/selections/${selectionName}/items/${itemId}/filters/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+        .then(res => res.json())
+        .then(data => {
+            const newFilterId = data.uid;
+            console.log("New filter created with ID:", newFilterId);
+
+            // Open modify filter modal for the new filter
+            window.openModifyFilterModal(newFilterId, function(modifyData) {
+                fetch(`/selections/${selectionName}/items/${itemId}/filters/${newFilterId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(modifyData)
+                })
+                .then(res => {
+                    if (res.ok) {
+                        console.log("New filter modified successfully");
+                        window.location.reload();
+                    } else {
+                        console.error("Failed to modify new filter");
+                    }
+                })
+                .catch(err => console.error("Error modifying new filter", err));
+            });
+        })
+        .catch(err => console.error("Error creating new filter", err));
     }
 });

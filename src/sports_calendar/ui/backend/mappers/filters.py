@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from ..dtos import FilterDTO, MinRankingFilterDTO, StageFilterDTO, TeamsFilterDTO, CompetitionsFilterDTO, SessionFilterDTO
+from ..dtos import FilterDTO, EmptyFilterDTO, MinRankingFilterDTO, StageFilterDTO, TeamsFilterDTO, CompetitionsFilterDTO, SessionFilterDTO
 from sports_calendar.core.competition_stages import CompetitionStage
-from sports_calendar.core.selection import SelectionFilter, MinRankingFilter, StageFilter, TeamsFilter, CompetitionsFilter, SessionFilter
+from sports_calendar.core.selection import SelectionFilter, EmptyFilter, MinRankingFilter, StageFilter, TeamsFilter, CompetitionsFilter, SessionFilter
 
 
 class FilterMapper(ABC):
@@ -11,6 +11,13 @@ class FilterMapper(ABC):
     def from_dto(cls, dto: FilterDTO, original: SelectionFilter) -> SelectionFilter:
         """ Maps an original SelectionFilter to a new SelectionFilter based on the modifications provided in the FilterDTO. """
         raise NotImplementedError
+
+class EmptyFilterMapper(FilterMapper):
+    @classmethod
+    def from_dto(cls, dto: EmptyFilterDTO, original: EmptyFilter) -> EmptyFilter:
+        return EmptyFilter(
+            sport=original.sport
+        )
 
 class MinRankingFilterMapper(FilterMapper):
     @classmethod

@@ -1,0 +1,5 @@
+<form>
+  {% for field in filter.fields.values() %}
+    {{ forms.render_field(field) }}
+  {% endfor %}
+</form>

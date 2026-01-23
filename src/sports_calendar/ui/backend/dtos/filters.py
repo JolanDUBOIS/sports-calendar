@@ -5,7 +5,12 @@ from dataclasses import dataclass, field
 from . import logger
 
 
-# DTOs for selection filters, only containing fields that can be modified in the UI.
+@dataclass
+class EmptyFilterDTO:
+    @classmethod
+    def from_payload(self, payload: dict) -> EmptyFilterDTO:
+        return EmptyFilterDTO()
+
 
 @dataclass
 class MinRankingFilterDTO:
@@ -72,6 +77,7 @@ class SessionFilterDTO:
         )
 
 FilterDTO = Union[
+    EmptyFilterDTO,
     MinRankingFilterDTO,
     StageFilterDTO,
     TeamsFilterDTO,
@@ -81,6 +87,7 @@ FilterDTO = Union[
 
 class FilterDTOFactory:
     mapping = {
+        "empty": EmptyFilterDTO,
         "min_ranking": MinRankingFilterDTO,
         "stage": StageFilterDTO,
         "teams": TeamsFilterDTO,
