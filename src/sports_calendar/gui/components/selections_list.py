@@ -5,12 +5,20 @@ from .modals import Modal
 from sports_calendar.core.selection import SelectionService, Selection
 
 
+def selections_list():
+    selections = SelectionService.get_all_selections()
+    logger.debug(f"Loaded {len(selections)} selections for selection list.")
+
+    with ui.column().classes('w-full p-4 gap-4'):
+        for selection in selections:
+            selection_card(selection)
+
 def selection_card(selection: Selection):
     logger.debug(f"Creating selection card for selection {selection.name}")
     sname = selection.name
+
     def go_to_selection():
         ui.navigate.to(f'/selections/{sname}')
-
 
     def on_delete_click():
         logger.debug(f"Delete clicked for selection {selection.name}")

@@ -3,7 +3,7 @@ from nicegui import ui
 from . import logger
 from ..components.modals import Modal
 from ..components.fields import ValidatedTextField
-from ..components.selection_list import selection_list
+from ..components.selections_list import selections_list
 from sports_calendar.core.utils import validate
 from sports_calendar.core.selection import SelectionService
 
@@ -14,10 +14,15 @@ def register():
     @ui.page('/selections')
     def selections_page():
         logger.debug("Loading selections page...")
+
+        # Title
         with ui.row().classes('justify-center items-center w-full'):
             ui.label('Your Selections').classes('text-h4 font-bold mx-auto')
-        selection_list()
+        
+        # Selection list
+        selections_list()
 
+        # Create button
         def on_create_click():
             logger.debug("Create New Selection clicked")
 
