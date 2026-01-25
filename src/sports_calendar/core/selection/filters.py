@@ -33,6 +33,17 @@ class SelectionFilter(ABC):
         """ Create a deep copy of this SelectionFilter with a new ID. """
         return type(self)(**{f: getattr(self, f) for f in self.__dataclass_fields__ if f not in ("uid", "filter_type")})
 
+    def with_updates(self, **updates) -> SelectionFilter:
+        """ Create a copy of this SelectionFilter and updates the fields (even filter_type can be changed, leading to a different subclass). """
+        new_filter_type = updates.get("filter_type", self.filter_type)
+
+        if new_filter_type == self.filter_type:
+            data = {f: getattr(self, f) for f in self.to_dict()}
+            return SelectionFilter.from_dict(sport=self.sport, data={**data, **updates})
+        else:
+            data = {"uid": self.uid}
+            return SelectionFilter.from_dict(sport=self.sport, data={**data, **updates})
+
     @classmethod
     def from_dict(cls, sport: str, data: dict) -> SelectionFilter:
         """ Create a SelectionFilter from a dictionary. """

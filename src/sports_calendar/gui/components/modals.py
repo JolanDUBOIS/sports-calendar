@@ -1,10 +1,12 @@
-from typing import Callable, List, Dict, Any
+from __future__ import annotations
+from typing import Callable, List, Dict, TYPE_CHECKING
 
 from attrs import field
 from nicegui import ui
 
 from . import logger
-from .fields import BaseField
+if TYPE_CHECKING:
+    from .filters.fields import BaseField
 
 
 class Modal:
@@ -30,7 +32,10 @@ class Modal:
         self.cancel_label = cancel_label
         self.reload_on_confirm = reload_on_confirm
 
-        self.fields: Dict[str, BaseField] = {}  # store field instances
+        self.fields: Dict[str, BaseField] = {}
+        self._fields_container = None  # NEW: dedicated container for fields only
+        self._card_container = None
+        self._dialog = None
 
     def build_content(self, container, fields: list[BaseField]):
         """Render all fields inside the given container."""
@@ -38,34 +43,52 @@ class Modal:
             f.render(container)
             self.fields[f.key] = f
 
+    def update_fields(self, new_fields: list[BaseField]):
+        """Replace existing fields dynamically (reactive forms)."""
+        if not self._fields_container:
+            return
+
+        self._fields_container.clear()
+        self.fields = {}
+        self.build_content(self._fields_container, new_fields)
+
     def open(self, on_confirm: Callable, fields: List[BaseField] = None):
         """Open the modal and handle confirm/cancel."""
         self.fields = {}
 
         with ui.dialog() as dialog:
+            self._dialog = dialog
             with ui.card().classes('p-4 rounded-lg shadow-lg').style(
                 f'min-width: {self.min_width}; max-width: {self.max_width}; width: fit-content; margin: auto;'
             ) as card:
+                self._card_container = card
+
+                # title and message
                 if self.title:
                     ui.label(self.title).classes('text-h6 mb-4')
                 if self.message:
                     ui.label(self.message).classes('text-base mb-4')
 
-                # render fields inside the card
-                if fields:
-                    self.build_content(container=card, fields=fields)
+                # NEW: Create dedicated container for fields
+                with ui.column().classes('w-full gap-2') as fields_container:
+                    self._fields_container = fields_container
+                    if fields:
+                        self.build_content(fields_container, fields)
 
-                # action buttons
+                # action buttons (these stay below the fields container)
                 with ui.row().classes('justify-end gap-2 mt-4'):
                     ui.button(self.cancel_label, on_click=dialog.close).props('flat')
 
                     def confirm(event=None):
+                        logger.debug("Modal confirmed")
                         try:
-                            # collect current values from all fields
                             values = {k: f.value for k, f in self.fields.items()}
+                            logger.debug(f"Calling modal on_confirm with values: {values}")
                             on_confirm(**values)
-                        except TypeError:
-                            on_confirm()
+                        # except TypeError:
+                        #     logger.exception("Error in modal confirm callback due to argument mismatch, retrying without values:")
+                        #     logger.debug("Calling modal on_confirm without values")
+                        #     on_confirm()
                         except Exception:
                             logger.exception("Error in modal confirm callback:")
                             raise

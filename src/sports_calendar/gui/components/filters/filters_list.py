@@ -1,8 +1,9 @@
 from nicegui import ui
 
 from . import logger
-from .modals import Modal
 from .filters_body import filter_body
+from .filter_modal import open_filter_modal
+from ..modals import Modal
 from sports_calendar.core.selection import SelectionService, SelectionItem, SelectionFilter
 
 
@@ -16,13 +17,29 @@ def filter_block(filter: SelectionFilter, **kwargs):
     def on_modify_click():
         logger.debug("Modify clicked for filter")
 
+        def on_confirm(**filter_updates):
+            logger.debug(f"Filter modified kwargs: {filter_updates}")
+            updated_filter = filter.with_updates(**filter_updates)
+            SelectionService.replace_filter(
+                selection_name=kwargs['selection_name'],
+                item_uid=kwargs['item_uid'],
+                filter=updated_filter
+            )
+        
+        open_filter_modal(
+            filter=filter,
+            title="Modify Filter",
+            on_confirm_callback=on_confirm
+        )
+
+
     def on_delete_click():
         logger.debug("Delete clicked for filter")
         Modal('Are you sure you want to delete this filter?', confirm_color='red', reload_on_confirm=True).open(
             lambda: SelectionService.remove_filter(
                 selection_name=kwargs['selection_name'],
                 item_uid=kwargs['item_uid'],
-                filter=filter
+                filter_uid=filter.uid
             )
         )
 

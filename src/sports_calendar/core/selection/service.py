@@ -67,7 +67,7 @@ class SelectionService:
     - add_filter(selection_name: str, item_uid: str, filter: SelectionFilter)
         Add a SelectionFilter to a SelectionItem and persist changes.
 
-    - add_empty_filter(selection_name: str, item_uid: str, filter_type: str) -> SelectionFilter
+    - add_empty_filter(selection_name: str, item_uid: str) -> SelectionFilter
         Create and add an empty SelectionFilter of a specific type.
 
     - replace_filter(selection_name: str, item_uid: str, filter: SelectionFilter)

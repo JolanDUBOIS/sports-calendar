@@ -2,8 +2,9 @@ from nicegui import ui
 
 from . import logger
 from .modals import Modal
-from .filters_list import filters_list
-from sports_calendar.core.selection import SelectionService, Selection, SelectionItem
+from .filters import filters_list
+from .filters.filter_modal import open_filter_modal
+from sports_calendar.core.selection import SelectionService, Selection, SelectionItem, SelectionFilter
 
 
 def items_list(selection: Selection):
@@ -26,6 +27,25 @@ def item_card(selection_name: str, item: SelectionItem):
             lambda: SelectionService.remove_item(selection_name, item.uid)
         )
 
+    def on_add_filter_click():
+        logger.debug(f"Add Filter clicked for item {item.uid} in selection {selection_name}")
+        new_filter = SelectionService.add_empty_filter(selection_name, item.uid)
+
+        def on_confirm(**filter_updates):
+            logger.debug(f"New filter updates: {filter_updates}")
+            updated_filter = new_filter.with_updates(**filter_updates)
+            SelectionService.replace_filter(
+                selection_name=selection_name,
+                item_uid=item.uid,
+                filter=updated_filter
+            )
+
+        open_filter_modal(
+            filter=new_filter,
+            title="Add Filter",
+            on_confirm_callback=on_confirm
+        )
+
     with ui.expansion().classes('w-full bg-white rounded shadow') as exp:
 
         # HEADER
@@ -37,7 +57,9 @@ def item_card(selection_name: str, item: SelectionItem):
 
                 ui.label(item.uid).classes('text-sm italic text-gray-500')
 
-                ui.button('Delete').props('color=red flat dense').classes('ml-auto').on('click.stop', on_delete_click)
+                with ui.row().classes('gap-2 ml-auto'):
+                    ui.button('+ Filter').props('flat dense small').on('click.stop', on_add_filter_click)
+                    ui.button('Delete').props('color=red flat dense small').on('click.stop', on_delete_click)
 
         # BODY
         filters_list(selection_name, item)

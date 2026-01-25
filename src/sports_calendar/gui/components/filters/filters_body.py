@@ -13,6 +13,8 @@ from sports_calendar.core.selection import (
 )
 
 
+# Main function
+
 def filter_body(filter: SelectionFilter):
     """ Render the appropriate UI for the specific filter. """
     render_function = DISPATCH_FILTER_BODY.get(filter.filter_type)
@@ -26,6 +28,9 @@ def filter_body(filter: SelectionFilter):
     else:
         with ui.column():
             ui.label('Unknown filter type')
+
+
+# Specific filter renderers
 
 def _empty_filter_body(filter: EmptyFilter):
     with ui.column():
@@ -108,6 +113,7 @@ def _session_filter_body(filter: SessionFilter):
         # Line 1 - Session Filter with Sessions: {session1}, {session2}, ... # Max 5 sessions, then "and X more"
         ui.label(f'Session Filter with Sessions: {_format_list_with_limit(filter.sessions)}')
 
+
 # Helpers
 
 def _format_list_with_limit(items: list[str], limit: int = 5) -> str:
@@ -117,6 +123,7 @@ def _format_list_with_limit(items: list[str], limit: int = 5) -> str:
         return f'{", ".join(displayed_items)} and {remaining} more'
     else:
         return ', '.join(items)
+
 
 # Dispatch dictionary
 
