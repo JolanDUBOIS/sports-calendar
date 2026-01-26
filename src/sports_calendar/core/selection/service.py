@@ -133,9 +133,9 @@ class SelectionService:
         SelectionRegistry.replace(selection)
 
     @staticmethod
-    def add_empty_item(selection_name: str, sport: str) -> SelectionItem:
+    def add_empty_item(selection_name: str, sport: str, name: str = '') -> SelectionItem:
         selection = SelectionRegistry.get(selection_name)
-        item = SelectionItem.empty(sport)
+        item = SelectionItem.empty(sport, name)
         selection.add_item(item)
         SelectionRegistry.replace(selection)
         return item
@@ -144,6 +144,13 @@ class SelectionService:
     def replace_item(selection_name: str, item: SelectionItem):
         selection = SelectionRegistry.get(selection_name)
         selection.replace_item(item)
+        SelectionRegistry.replace(selection)
+
+    @staticmethod
+    def rename_item(selection_name: str, item_uid: str, new_name: str):
+        selection = SelectionRegistry.get(selection_name)
+        item = selection.get_item(item_uid)
+        item.name = new_name
         SelectionRegistry.replace(selection)
 
     @staticmethod
@@ -177,10 +184,10 @@ class SelectionService:
         SelectionRegistry.replace(selection)
 
     @staticmethod
-    def add_empty_filter(selection_name: str, item_uid: str) -> SelectionFilter:
+    def add_empty_filter(selection_name: str, item_uid: str, name: str = "") -> SelectionFilter:
         selection = SelectionRegistry.get(selection_name)
         item = selection.get_item(item_uid)
-        filter = SelectionFilter.empty(item.sport)
+        filter = SelectionFilter.empty(item.sport, name)
         item.add_filter(filter)
         SelectionRegistry.replace(selection)
         return filter
@@ -190,6 +197,14 @@ class SelectionService:
         selection = SelectionRegistry.get(selection_name)
         item = selection.get_item(item_uid)
         item.replace_filter(filter)
+        SelectionRegistry.replace(selection)
+
+    @staticmethod
+    def rename_filter(selection_name: str, item_uid: str, filter_uid: str, new_name: str):
+        selection = SelectionRegistry.get(selection_name)
+        item = selection.get_item(item_uid)
+        filter = item.get_filter(filter_uid)
+        filter.name = new_name
         SelectionRegistry.replace(selection)
 
     @staticmethod

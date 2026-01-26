@@ -128,5 +128,5 @@ class SelectionFilter:
         })
 
     @classmethod
-    def empty(cls, sport: str) -> SelectionFilter:
-        return cls(sport=sport, filter_type=FilterType.EMPTY)
+    def empty(cls, sport: str, name: str = "") -> SelectionFilter:
+        return cls(sport=sport, filter_type=FilterType.EMPTY, name=name)

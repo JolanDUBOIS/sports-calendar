@@ -3,7 +3,7 @@ from nicegui import ui
 from . import logger
 from ..components.modals import Modal
 from ..components.items_list import items_list
-from ..components.filters.fields import SelectField, Choice
+from ..components.filters.fields import SelectField, TextField, Choice
 from sports_calendar.core.db import SPORT_SCHEMAS
 from sports_calendar.core.selection import SelectionService
 
@@ -34,11 +34,12 @@ def register():
                 max_width='800px',
                 reload_on_confirm=True
             ).open(
-                on_confirm=lambda sport: SelectionService.add_empty_item(sname, sport),
+                on_confirm=lambda sport, name: SelectionService.add_empty_item(sname, sport, name),
                 fields=[
                     SelectField(key='sport', label='Sport', options=[
                         Choice(value=sport_key, label=sport_key.capitalize()) for sport_key in SPORT_SCHEMAS.keys()
-                    ])
+                    ]),
+                    TextField(key='name', label='Name')
                 ]
             )
 
