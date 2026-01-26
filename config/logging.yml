@@ -47,23 +47,14 @@ loggers:
   sports_calendar.core.utils:
     level: DEBUG
 
-  # Selection UI loggers
-  sports_calendar.ui:
+  # Selection GUI loggers
+  sports_calendar.gui:
     level: DEBUG
 
-  sports_calendar.ui.backend:
+  sports_calendar.gui.components:
     level: DEBUG
 
-  sports_calendar.ui.backend.presenters:
-    level: DEBUG
-
-  sports_calendar.ui.backend.routes:
-    level: DEBUG
-
-  sports_calendar.ui.backend.dtos:
-    level: DEBUG
-
-  sports_calendar.ui.backend.mappers:
+  sports_calendar.gui.pages:
     level: DEBUG
 
   # Sync Calendar loggers
