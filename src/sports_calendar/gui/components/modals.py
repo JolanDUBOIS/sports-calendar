@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Callable, List, Dict, TYPE_CHECKING
 
-from attrs import field
 from nicegui import ui
 
 from . import logger
@@ -58,6 +57,7 @@ class Modal:
 
         with ui.dialog() as dialog:
             self._dialog = dialog
+
             with ui.card().classes('p-4 rounded-lg shadow-lg').style(
                 f'min-width: {self.min_width}; max-width: {self.max_width}; width: fit-content; margin: auto;'
             ) as card:
@@ -85,10 +85,6 @@ class Modal:
                             values = {k: f.value for k, f in self.fields.items()}
                             logger.debug(f"Calling modal on_confirm with values: {values}")
                             on_confirm(**values)
-                        # except TypeError:
-                        #     logger.exception("Error in modal confirm callback due to argument mismatch, retrying without values:")
-                        #     logger.debug("Calling modal on_confirm without values")
-                        #     on_confirm()
                         except Exception:
                             logger.exception("Error in modal confirm callback:")
                             raise
@@ -98,5 +94,9 @@ class Modal:
                         dialog.close()
 
                     ui.button(self.confirm_label, on_click=confirm).props(f'color={self.confirm_color}')
+
+            ui.keyboard(
+                on_key=lambda e: confirm() if e.action.keydown and e.key.enter else None
+            )
 
         dialog.open()
