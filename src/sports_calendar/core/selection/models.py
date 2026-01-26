@@ -92,6 +92,7 @@ class SelectionItem:
     sport: str
     uid: str = field(default_factory=lambda: str(uuid4())[:8], kw_only=True)
     filters: list[SelectionFilter] = field(default_factory=list)
+    name: str = ""
 
     def __post_init__(self):
         validate(bool(self.sport), "SelectionItem sport must be a non-empty string", logger)
@@ -132,9 +133,11 @@ class SelectionItem:
         logger.debug(f"Removed filter {filter_uid} from selection item {self.uid}")
     
     def clone(self) -> SelectionItem:
+        """ Create a deep copy of this SelectionItem with a new ID. """
         cloned_filters = [f.clone() for f in self.filters]
         return SelectionItem(
             sport=self.sport,
+            name=self.name,
             filters=cloned_filters
         )
 
@@ -142,6 +145,7 @@ class SelectionItem:
         return {
             "sport": self.sport,
             "uid": self.uid,
+            "name": self.name,
             "filters": [f.to_dict() for f in self.filters]
         }
 
@@ -151,7 +155,7 @@ class SelectionItem:
         validate(isinstance(data, dict), "SelectionItem data must be a dictionary", logger, TypeError)
         data = dict(data)
         filters_data = data.pop("filters", [])
-        filters = [SelectionFilter.from_dict(sport=data.get("sport"), data=filter_data) for filter_data in filters_data]
+        filters = [SelectionFilter.from_dict(data=filter_data) for filter_data in filters_data]
         return cls(
             filters=filters,
             **data

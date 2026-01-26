@@ -4,6 +4,7 @@ from . import logger
 from ..components.modals import Modal
 from ..components.items_list import items_list
 from ..components.filters.fields import SelectField, Choice
+from sports_calendar.core.db import SPORT_SCHEMAS
 from sports_calendar.core.selection import SelectionService
 
 
@@ -34,7 +35,11 @@ def register():
                 reload_on_confirm=True
             ).open(
                 on_confirm=lambda sport: SelectionService.add_empty_item(sname, sport),
-                fields=[SelectField(key='sport', label='Sport', options=[Choice(value="football", label="Football"), Choice(value="f1", label="F1")])] # TODO - Improve that ofc
+                fields=[
+                    SelectField(key='sport', label='Sport', options=[
+                        Choice(value=sport_key, label=sport_key.capitalize()) for sport_key in SPORT_SCHEMAS.keys()
+                    ])
+                ]
             )
 
         ui.button('+', on_click=on_create_item_click).props('small round').classes('mt-6 mx-auto block')

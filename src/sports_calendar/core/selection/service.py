@@ -1,7 +1,8 @@
 from copy import deepcopy
 
 from . import logger
-from .model import Selection, SelectionItem, SelectionFilter
+from .models import Selection, SelectionItem
+from .filters import SelectionFilter
 from .storage import SelectionStorage
 from .registry import SelectionRegistry
 

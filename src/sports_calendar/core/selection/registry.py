@@ -2,7 +2,7 @@ from typing import Iterable
 from copy import deepcopy
 
 from . import logger
-from .model import Selection
+from .models import Selection
 from .storage import SelectionStorage
 from ..utils import validate
 

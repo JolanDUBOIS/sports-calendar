@@ -2,15 +2,7 @@ from nicegui import ui
 
 from . import logger
 from sports_calendar.core.db import SPORT_SCHEMAS, Filter
-from sports_calendar.core.selection import (
-    SelectionFilter,
-    EmptyFilter,
-    MinRankingFilter,
-    StageFilter,
-    TeamsFilter,
-    CompetitionsFilter,
-    SessionFilter,
-)
+from sports_calendar.core.selection import SelectionFilter, FilterType
 
 
 # Main function
@@ -32,11 +24,11 @@ def filter_body(filter: SelectionFilter):
 
 # Specific filter renderers
 
-def _empty_filter_body(filter: EmptyFilter):
+def _empty_filter_body(filter: SelectionFilter):
     with ui.column():
         ui.label('Empty Filter')
 
-def _min_ranking_filter_body(filter: MinRankingFilter):
+def _min_ranking_filter_body(filter: SelectionFilter):
     comp_df = SPORT_SCHEMAS[filter.sport].competitions.query(
         Filter(col="id", op="in", value=filter.competition_ids)
     ).select("id", "short_name").get()
@@ -60,7 +52,7 @@ def _min_ranking_filter_body(filter: MinRankingFilter):
         if filter.reference_team is not None and team_name is not None:
             ui.label(f'Reference Team: {team_name}')
 
-def _stage_filter_body(filter: StageFilter):
+def _stage_filter_body(filter: SelectionFilter):
     comp_df = SPORT_SCHEMAS[filter.sport].competitions.query(
         Filter(col="id", op="in", value=filter.competition_ids)
     ).select("id", "short_name").get()
@@ -76,7 +68,7 @@ def _stage_filter_body(filter: StageFilter):
         else:
             ui.label('Competitions: None')
 
-def _teams_filter_body(filter: TeamsFilter):
+def _teams_filter_body(filter: SelectionFilter):
     team_df = SPORT_SCHEMAS[filter.sport].teams.query(
         Filter(col="id", op="in", value=filter.team_ids)
     ).select("id", "short_display_name").get()
@@ -92,7 +84,7 @@ def _teams_filter_body(filter: TeamsFilter):
         else:
             ui.label('Teams: None')
 
-def _competitions_filter_body(filter: CompetitionsFilter):
+def _competitions_filter_body(filter: SelectionFilter):
     comp_df = SPORT_SCHEMAS[filter.sport].competitions.query(
         Filter(col="id", op="in", value=filter.competition_ids)
     ).select("id", "short_name").get()
@@ -108,7 +100,7 @@ def _competitions_filter_body(filter: CompetitionsFilter):
         else:
             ui.label('Competitions: None')
 
-def _session_filter_body(filter: SessionFilter):
+def _session_filter_body(filter: SelectionFilter):
     with ui.column():
         # Line 1 - Session Filter with Sessions: {session1}, {session2}, ... # Max 5 sessions, then "and X more"
         ui.label(f'Session Filter with Sessions: {_format_list_with_limit(filter.sessions)}')
@@ -128,10 +120,10 @@ def _format_list_with_limit(items: list[str], limit: int = 5) -> str:
 # Dispatch dictionary
 
 DISPATCH_FILTER_BODY = {
-    "empty": _empty_filter_body,
-    "min_ranking": _min_ranking_filter_body,
-    "stage": _stage_filter_body,
-    "teams": _teams_filter_body,
-    "competitions": _competitions_filter_body,
-    "session": _session_filter_body,
+    FilterType.EMPTY: _empty_filter_body,
+    FilterType.MIN_RANKING: _min_ranking_filter_body,
+    FilterType.STAGE: _stage_filter_body,
+    FilterType.TEAMS: _teams_filter_body,
+    FilterType.COMPETITIONS: _competitions_filter_body,
+    FilterType.SESSION: _session_filter_body,
 }

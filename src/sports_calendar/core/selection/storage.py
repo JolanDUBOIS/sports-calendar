@@ -1,7 +1,7 @@
 import yaml
 
 from . import logger
-from .model import Selection
+from .models import Selection
 from ..utils import validate
 from sports_calendar.core import load_yml, Paths
 

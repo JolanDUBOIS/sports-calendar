@@ -44,6 +44,10 @@ clear-calendar:
 validate-selections:
 	$(POETRY) run sports-calendar devtools validate-selections
 
+.PHONY: launch-gui
+launch-gui:
+	$(POETRY) run sports-calendar launch-gui
+
 # ------------------
 # Docker targets
 # ------------------

@@ -12,15 +12,7 @@ from .fields import (
 )
 from sports_calendar.core.db import SPORT_SCHEMAS
 from sports_calendar.core.competition_stages import CompetitionStage
-from sports_calendar.core.selection import (
-    SelectionFilter,
-    EmptyFilter,
-    MinRankingFilter,
-    StageFilter,
-    TeamsFilter,
-    CompetitionsFilter,
-    SessionFilter
-)
+from sports_calendar.core.selection import SelectionFilter, FilterType
 
 
 # Main function
@@ -38,7 +30,7 @@ def get_fields_for_filter(filter: SelectionFilter | None, filter_meta: dict | No
         current_type = filter.filter_type
         sport = filter.sport
     elif filter_meta:
-        current_type = filter_meta.get("filter_type", "empty")
+        current_type = FilterType(filter_meta["filter_type"]) if "filter_type" in filter_meta else FilterType.EMPTY
         sport = filter_meta["sport"]
     else:
         raise ValueError("Either filter or filter_meta must be provided")
@@ -48,14 +40,14 @@ def get_fields_for_filter(filter: SelectionFilter | None, filter_meta: dict | No
         key="filter_type",
         label="Filter Type",
         options=[
-            Choice(label="Empty", value="empty"),
-            Choice(label="Minimum Ranking", value="min_ranking"),
-            Choice(label="Stage", value="stage"),
-            Choice(label="Teams", value="teams"),
-            Choice(label="Competitions", value="competitions"),
-            Choice(label="Session", value="session"),
+            Choice(label="Empty", value=FilterType.EMPTY.value),
+            Choice(label="Minimum Ranking", value=FilterType.MIN_RANKING.value),
+            Choice(label="Stage", value=FilterType.STAGE.value),
+            Choice(label="Teams", value=FilterType.TEAMS.value),
+            Choice(label="Competitions", value=FilterType.COMPETITIONS.value),
+            Choice(label="Session", value=FilterType.SESSION.value),
         ],
-        default=current_type
+        default=current_type.value
     )
     
     # Get the specific fields for the current filter type
@@ -69,10 +61,10 @@ def get_fields_for_filter(filter: SelectionFilter | None, filter_meta: dict | No
 
 # Specific filter field getters
 
-def _get_fields_empty_filter(filter: EmptyFilter | SimpleNamespace) -> list[BaseField]:
+def _get_fields_empty_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     return []
 
-def _get_fields_min_ranking_filter(filter: MinRankingFilter | SimpleNamespace) -> list[BaseField]:
+def _get_fields_min_ranking_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
         filter.rule = "both"
         filter.ranking = 20
@@ -88,7 +80,7 @@ def _get_fields_min_ranking_filter(filter: MinRankingFilter | SimpleNamespace) -
             label="Rule",
             options=[
                 Choice(label=r, value=r)
-                for r in sorted(MinRankingFilter.valid_rules())
+                for r in sorted(FilterType.MIN_RANKING.valid_values("rule") or [])
             ],
             default=filter.rule
         ),
@@ -117,7 +109,8 @@ def _get_fields_min_ranking_filter(filter: MinRankingFilter | SimpleNamespace) -
         )
     ]
 
-def _get_fields_stage_filter(filter: StageFilter | SimpleNamespace) -> list[BaseField]:
+
+def _get_fields_stage_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
         filter.stage = CompetitionStage.NULL
         filter.competition_ids = []
@@ -145,7 +138,7 @@ def _get_fields_stage_filter(filter: StageFilter | SimpleNamespace) -> list[Base
         )
     ]
 
-def _get_fields_teams_filter(filter: TeamsFilter | SimpleNamespace) -> list[BaseField]:
+def _get_fields_teams_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
         filter.rule = "any"
         filter.team_ids = []
@@ -158,7 +151,7 @@ def _get_fields_teams_filter(filter: TeamsFilter | SimpleNamespace) -> list[Base
             label="Rule",
             options=[
                 Choice(label=r, value=r)
-                for r in TeamsFilter.valid_rules()
+                for r in FilterType.TEAMS.valid_values("rule") or []
             ],
             default=filter.rule
         ),
@@ -173,7 +166,7 @@ def _get_fields_teams_filter(filter: TeamsFilter | SimpleNamespace) -> list[Base
         )
     ]
 
-def _get_fields_competitions_filter(filter: CompetitionsFilter | SimpleNamespace) -> list[BaseField]:
+def _get_fields_competitions_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
         filter.competition_ids = []
 
@@ -191,7 +184,7 @@ def _get_fields_competitions_filter(filter: CompetitionsFilter | SimpleNamespace
         )
     ]
 
-def _get_fields_session_filter(filter: SessionFilter | SimpleNamespace) -> list[BaseField]:
+def _get_fields_session_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
         filter.sessions = []
 
@@ -213,10 +206,10 @@ def _get_fields_session_filter(filter: SessionFilter | SimpleNamespace) -> list[
 # Dispatch dictionary
 
 DISPATCH_FILTER_FIELDS = {
-    "empty": _get_fields_empty_filter,
-    "min_ranking": _get_fields_min_ranking_filter,
-    "stage": _get_fields_stage_filter,
-    "teams": _get_fields_teams_filter,
-    "competitions": _get_fields_competitions_filter,
-    "session": _get_fields_session_filter,
+    FilterType.EMPTY: _get_fields_empty_filter,
+    FilterType.MIN_RANKING: _get_fields_min_ranking_filter,
+    FilterType.STAGE: _get_fields_stage_filter,
+    FilterType.TEAMS: _get_fields_teams_filter,
+    FilterType.COMPETITIONS: _get_fields_competitions_filter,
+    FilterType.SESSION: _get_fields_session_filter,
 }
