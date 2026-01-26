@@ -40,6 +40,10 @@ sync-calendar:
 clear-calendar:
 	$(POETRY) run sports-calendar clear-calendar dev
 
+.PHONY: validate-selections
+validate-selections:
+	$(POETRY) run sports-calendar devtools validate-selections
+
 # ------------------
 # Docker targets
 # ------------------

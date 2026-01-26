@@ -1,8 +1,6 @@
 from __future__ import annotations
 from enum import IntEnum
 
-from . import logger
-
 
 class CompetitionStage(IntEnum):
     NULL = 0

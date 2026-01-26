@@ -25,6 +25,8 @@ handlers:
 loggers:
   sports_calendar:
     level: DEBUG
+  sports_calendar.devtools:
+    level: DEBUG
 
   # Core loggers
   sports_calendar.core:
@@ -45,9 +47,15 @@ loggers:
   sports_calendar.core.utils:
     level: DEBUG
 
-  # Selection UI loggers
-  sports_calendar.selection_ui:
-    level: DEBUG 
+  # Selection GUI loggers
+  sports_calendar.gui:
+    level: DEBUG
+
+  sports_calendar.gui.components:
+    level: DEBUG
+
+  sports_calendar.gui.pages:
+    level: DEBUG
 
   # Sync Calendar loggers
   sports_calendar.sync_calendar:
