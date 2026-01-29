@@ -20,17 +20,13 @@ DOCKER_RUN := docker run --rm \
 # Local targets
 # ------------------
 
-.PHONY: all
-all: sync-db sync-calendar
+# .PHONY: all
+# all: sync-calendar
 
 .PHONY: setup
 setup:
 	$(POETRY) env use $(PYTHON)
 	$(POETRY) install
-
-.PHONY: sync-db
-sync-db:
-	$(POETRY) run sports-calendar sync-db
 
 .PHONY: sync-calendar
 sync-calendar:
@@ -56,17 +52,6 @@ launch-gui:
 docker-build:
 	docker build -t $(DOCKER_IMAGE) .
 
-.PHONY: docker-sync-db
-docker-sync-db: docker-build
-	$(DOCKER_RUN) $(POETRY) run sports-calendar sync-db
-
 .PHONY: docker-sync-calendar
 docker-sync-calendar: docker-build
 	$(DOCKER_RUN) $(POETRY) run sports-calendar sync-calendar dev
-
-.PHONY: docker-all
-docker-all: docker-build
-	$(DOCKER_RUN) bash -c "\
-		poetry run sports-calendar sync-db && \
-		poetry run sports-calendar sync-calendar dev \
-	"
