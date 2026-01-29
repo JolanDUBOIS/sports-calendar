@@ -162,5 +162,5 @@ class SelectionItem:
         )
 
     @classmethod
-    def empty(cls, sport: str) -> SelectionItem:
-        return cls(sport=sport)
+    def empty(cls, sport: str, name: str = "") -> SelectionItem:
+        return cls(sport=sport, name=name)
