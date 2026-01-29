@@ -16,6 +16,14 @@ class IdentityCodec:
         return value
 
 
+class IntCodec:
+    def to_dict(self, value: int) -> Any:
+        return value
+
+    def from_dict(self, value: Any) -> int:
+        return int(value)
+
+
 class EnumCodec:
     def __init__(self, enum_cls: type[Enum]):
         self.enum_cls = enum_cls

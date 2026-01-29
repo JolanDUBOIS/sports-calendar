@@ -29,7 +29,7 @@ FILTER_SPECS = [
                                  f"Invalid rule '{data['rule']}'. Must be one of {sorted(MIN_RANKING_RULES)}", 
                                  logger),
             lambda data, logger: validate(isinstance(data["ranking"], int) and data["ranking"] > 0,
-                                 "ranking must be positive", logger),
+                                 "ranking must be a positive integer", logger),
             lambda data, logger: validate(data["rule"] != "opponent" or data.get("reference_team"),
                                  "reference_team required for opponent rule", logger),
             lambda data, logger: validate(isinstance(data.get("competition_ids", []), list),

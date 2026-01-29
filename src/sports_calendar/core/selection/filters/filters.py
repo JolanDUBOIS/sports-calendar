@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 from . import logger
 from .specs import FILTER_SPECS
-from .codecs import FieldCodec, IdentityCodec, EnumCodec
+from .codecs import FieldCodec, IdentityCodec, IntCodec, EnumCodec
 from ...utils import validate
 from ...db.schemas import SPORT_SCHEMAS
 from ...competition_stages import CompetitionStage
@@ -53,7 +53,7 @@ FIELD_CODECS: dict[str, FieldCodec[Any]] = {
     "name": IdentityCodec(),
 
     "rule": IdentityCodec(),
-    "ranking": IdentityCodec(),
+    "ranking": IntCodec(),
     "competition_ids": IdentityCodec(),
     "reference_team": IdentityCodec(),
     "stage": EnumCodec(CompetitionStage),
@@ -87,6 +87,7 @@ class SelectionFilter:
         """ Validate based on filter specification. """
         validators = self.filter_type.validators()
         data = {field: getattr(self, field) for field in self.filter_type.specific_fields()}
+        logger.debug(f"Validating SelectionFilter data: {data} for filter type: {self.filter_type.value}")
 
         for validator in validators:
             validator(data, logger)
