@@ -46,7 +46,6 @@ class SelectionFilter:
     filter_type: FilterType = FilterType.EMPTY
     fields: FilterFields = field(default_factory=EmptyFilterFields)
     created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
-    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 
     def __post_init__(self):
         validate(self.sport in SPORT_SCHEMAS, f"Invalid sport: {self.sport}", logger)
@@ -54,7 +53,6 @@ class SelectionFilter:
         validate(isinstance(self.fields, expected_cls),
                  f"fields must be of type {expected_cls.__name__} for filter_type {self.filter_type.value}", logger)
         validate_timestamp(self.created_at, "created_at", logger)
-        validate_timestamp(self.updated_at, "updated_at", logger)
 
     def clone(self) -> SelectionFilter:
         """ Create a deep copy of this SelectionFilter with a new ID. """
@@ -80,7 +78,6 @@ class SelectionFilter:
             "filter_type": self.filter_type.value,
             "fields": self.fields.to_dict() if self.fields else None,
             "created_at": self.created_at,
-            "updated_at": self.updated_at
         }
 
     @classmethod
