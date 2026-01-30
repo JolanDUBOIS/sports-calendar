@@ -94,15 +94,15 @@ class SelectionItemApplier:
               Filter(col="home_team_id", op="in", value=valid_teams.tolist())))
         )
 
-    # Stage Filter
+    # # Stage Filter
 
-    @staticmethod
-    def _apply_stage_filter(filter_spec: SelectionFilter, table: TableView, **kwargs) -> TableView:
-        logger.debug(f"Applying Filter of type stage: {filter_spec} on table: {table}")
-        return table.query(
-            (Filter(col="competition_id", op="in", value=filter_spec.competition_ids) &
-            Filter(col="stage", op=">=", value=filter_spec.stage))
-        )
+    # @staticmethod
+    # def _apply_stage_filter(filter_spec: SelectionFilter, table: TableView, **kwargs) -> TableView:
+    #     logger.debug(f"Applying Filter of type stage: {filter_spec} on table: {table}")
+    #     return table.query(
+    #         (Filter(col="competition_id", op="in", value=filter_spec.competition_ids) &
+    #         Filter(col="stage", op=">=", value=filter_spec.stage))
+    #     )
 
     # Teams Filter
 
@@ -149,7 +149,6 @@ class SelectionItemApplier:
 SelectionItemApplier._DISPATCH = {
     FilterType.EMPTY: SelectionItemApplier._apply_empty_filter,
     FilterType.MIN_RANKING: SelectionItemApplier._apply_min_ranking_filter,
-    FilterType.STAGE: SelectionItemApplier._apply_stage_filter,
     FilterType.TEAMS: SelectionItemApplier._apply_teams_filter,
     FilterType.COMPETITIONS: SelectionItemApplier._apply_competitions_filter,
     FilterType.SESSION: SelectionItemApplier._apply_session_filter,

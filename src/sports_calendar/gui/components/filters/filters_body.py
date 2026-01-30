@@ -52,21 +52,21 @@ def _min_ranking_filter_body(filter: SelectionFilter):
         if filter.reference_team is not None and team_name is not None:
             ui.label(f'Reference Team: {team_name}')
 
-def _stage_filter_body(filter: SelectionFilter):
-    comp_df = SPORT_SCHEMAS[filter.sport].competitions.query(
-        Filter(col="id", op="in", value=filter.competition_ids)
-    ).select("id", "short_name").get()
-    competitions = [comp["short_name"] for comp in comp_df.to_dict(orient="records")]
+# def _stage_filter_body(filter: SelectionFilter):
+#     comp_df = SPORT_SCHEMAS[filter.sport].competitions.query(
+#         Filter(col="id", op="in", value=filter.competition_ids)
+#     ).select("id", "short_name").get()
+#     competitions = [comp["short_name"] for comp in comp_df.to_dict(orient="records")]
 
-    with ui.column():
-        # Line 1 - Stage Filter with Stage: {stage.name}
-        ui.label(f'Stage Filter with Stage: {filter.stage.name}')
+#     with ui.column():
+#         # Line 1 - Stage Filter with Stage: {stage.name}
+#         ui.label(f'Stage Filter with Stage: {filter.stage.name}')
 
-        # Line 2 - Competitions: {comp1}, {comp2}, ... # Max 5 competitions, then "and X more"
-        if competitions:
-            ui.label(f'Competitions: {_format_list_with_limit(competitions)}')
-        else:
-            ui.label('Competitions: None')
+#         # Line 2 - Competitions: {comp1}, {comp2}, ... # Max 5 competitions, then "and X more"
+#         if competitions:
+#             ui.label(f'Competitions: {_format_list_with_limit(competitions)}')
+#         else:
+#             ui.label('Competitions: None')
 
 def _teams_filter_body(filter: SelectionFilter):
     team_df = SPORT_SCHEMAS[filter.sport].teams.query(
@@ -122,7 +122,6 @@ def _format_list_with_limit(items: list[str], limit: int = 5) -> str:
 DISPATCH_FILTER_BODY = {
     FilterType.EMPTY: _empty_filter_body,
     FilterType.MIN_RANKING: _min_ranking_filter_body,
-    FilterType.STAGE: _stage_filter_body,
     FilterType.TEAMS: _teams_filter_body,
     FilterType.COMPETITIONS: _competitions_filter_body,
     FilterType.SESSION: _session_filter_body,

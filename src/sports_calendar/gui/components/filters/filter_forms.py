@@ -42,7 +42,6 @@ def get_fields_for_filter(filter: SelectionFilter | None, filter_meta: dict | No
         options=[
             Choice(label="Empty", value=FilterType.EMPTY.value),
             Choice(label="Minimum Ranking", value=FilterType.MIN_RANKING.value),
-            Choice(label="Stage", value=FilterType.STAGE.value),
             Choice(label="Teams", value=FilterType.TEAMS.value),
             Choice(label="Competitions", value=FilterType.COMPETITIONS.value),
             Choice(label="Session", value=FilterType.SESSION.value),
@@ -110,33 +109,33 @@ def _get_fields_min_ranking_filter(filter: SelectionFilter | SimpleNamespace) ->
     ]
 
 
-def _get_fields_stage_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
-    if isinstance(filter, SimpleNamespace):
-        filter.stage = CompetitionStage.NULL
-        filter.competition_ids = []
+# def _get_fields_stage_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
+#     if isinstance(filter, SimpleNamespace):
+#         filter.stage = CompetitionStage.NULL
+#         filter.competition_ids = []
     
-    competitions_df = SPORT_SCHEMAS[filter.sport].competitions.select("id", "short_name").get().dropna(subset=["short_name"])
+#     competitions_df = SPORT_SCHEMAS[filter.sport].competitions.select("id", "short_name").get().dropna(subset=["short_name"])
 
-    return [
-        SelectField(
-            key="stage",
-            label="Stage",
-            options=[
-                Choice(label=stage.name, value=stage)
-                for stage in CompetitionStage
-            ],
-            default=filter.stage
-        ),
-        SearchableMultipleSelectField(
-            key="competition_ids",
-            label="Competitions",
-            options=[
-                Choice(label=comp["short_name"], value=comp["id"])
-                for comp in competitions_df.to_dict(orient="records")
-            ],
-            default=filter.competition_ids
-        )
-    ]
+#     return [
+#         SelectField(
+#             key="stage",
+#             label="Stage",
+#             options=[
+#                 Choice(label=stage.name, value=stage)
+#                 for stage in CompetitionStage
+#             ],
+#             default=filter.stage
+#         ),
+#         SearchableMultipleSelectField(
+#             key="competition_ids",
+#             label="Competitions",
+#             options=[
+#                 Choice(label=comp["short_name"], value=comp["id"])
+#                 for comp in competitions_df.to_dict(orient="records")
+#             ],
+#             default=filter.competition_ids
+#         )
+#     ]
 
 def _get_fields_teams_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
@@ -208,7 +207,6 @@ def _get_fields_session_filter(filter: SelectionFilter | SimpleNamespace) -> lis
 DISPATCH_FILTER_FIELDS = {
     FilterType.EMPTY: _get_fields_empty_filter,
     FilterType.MIN_RANKING: _get_fields_min_ranking_filter,
-    FilterType.STAGE: _get_fields_stage_filter,
     FilterType.TEAMS: _get_fields_teams_filter,
     FilterType.COMPETITIONS: _get_fields_competitions_filter,
     FilterType.SESSION: _get_fields_session_filter,
