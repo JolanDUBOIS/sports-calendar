@@ -25,14 +25,12 @@ handlers:
 loggers:
   sports_calendar:
     level: DEBUG
+
   sports_calendar.devtools:
     level: DEBUG
 
   # Core loggers
   sports_calendar.core:
-    level: DEBUG
-
-  sports_calendar.core.db:
     level: DEBUG
 
   sports_calendar.core.file_io:
@@ -68,31 +66,6 @@ loggers:
     level: DEBUG
 
   sports_calendar.sync_calendar.google_calendar:
-    level: DEBUG
-
-  # Sync DB loggers
-  sports_calendar.sync_db:
-    level: DEBUG
-
-  sports_calendar.sync_db.clients:
-    level: DEBUG
-
-  sports_calendar.sync_db.definitions:
-    level: DEBUG
-
-  sports_calendar.sync_db.definitions.specs:
-    level: DEBUG
-
-  sports_calendar.sync_db.managers:
-    level: DEBUG
-
-  sports_calendar.sync_db.processors:
-    level: DEBUG
-
-  sports_calendar.sync_db.utils:
-    level: DEBUG
-
-  sports_calendar.sync_db.versioning:
     level: DEBUG
 
   # Validate DB loggers
