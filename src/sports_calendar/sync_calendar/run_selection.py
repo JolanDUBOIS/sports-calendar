@@ -5,7 +5,6 @@ from .events import SportsEventCollection
 from .transformer import EventTransformer
 from .google_calendar import GoogleCalendarManager
 from sports_calendar.core import Paths
-from sports_calendar.core.db import setup_repo_path
 from sports_calendar.core.selection import SelectionService, SelectionApplier
 
 
@@ -17,7 +16,6 @@ def run_selection(
     """ TODO """
     logger.info(f"Running selection for selection {name}.")
 
-    setup_repo_path(Paths.DB_DIR)
     SelectionService.initialize_registry()
 
     selection = SelectionService.get_selection(name)

@@ -11,7 +11,7 @@ from .fields import (
     SearchableMultipleSelectField
 )
 from sports_calendar.core.db import SPORT_SCHEMAS
-from sports_calendar.core.competition_stages import CompetitionStage
+from sports_calendar.core import CompetitionStage
 from sports_calendar.core.selection import SelectionFilter, FilterType
 
 
