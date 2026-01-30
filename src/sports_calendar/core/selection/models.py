@@ -1,22 +1,27 @@
 from __future__ import annotations
 from uuid import uuid4
+from datetime import datetime
 from dataclasses import dataclass, field
 
 from . import logger
 from .filters import SelectionFilter
-from ..utils import validate
+from ..utils import validate, validate_timestamp
 
 
 @dataclass
 class Selection:
     name: str
     items: list[SelectionItem] = field(default_factory=list)
+    created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 
     def __post_init__(self):
         validate(bool(self.name), "Selection name must be a non-empty string", logger)
         validate(isinstance(self.items, list), "Selection items must be a list", logger, TypeError)
         for item in self.items:
             validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
+        validate_timestamp(self.created_at, "created_at", logger)
+        validate_timestamp(self.updated_at, "updated_at", logger)
 
     @property
     def uid(self) -> str:
@@ -41,6 +46,7 @@ class Selection:
         validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
         validate(item.uid not in self._items_uids(), f"Selection item with uid '{item.uid}' already exists in selection '{self.uid}'", logger, ValueError)
         self.items.append(item)
+        self._update_timestamp()
         logger.debug(f"Added item {item.uid} to selection {self.uid}")
 
     def replace_item(self, item: SelectionItem):
@@ -48,6 +54,7 @@ class Selection:
         validate(item.uid in self._items_uids(), f"Selection item with uid '{item.uid}' does not exist in selection '{self.uid}'", logger, KeyError)
         self.items = [i for i in self.items if i.uid != item.uid]
         self.items.append(item)
+        self._update_timestamp()
         logger.debug(f"Replaced item {item.uid} in selection {self.uid}")
 
     def remove_item(self, item_uid: str):
@@ -55,6 +62,7 @@ class Selection:
             logger.error(f"Item {item_uid} not found in selection {self.uid}")
             raise KeyError(f"Item {item_uid} not found in selection {self.uid}")
         self.items = [item for item in self.items if item.uid != item_uid]
+        self._update_timestamp()
         logger.debug(f"Removed item {item_uid} from selection {self.uid}")
     
     def clone(self, new_name: str) -> Selection:
@@ -67,7 +75,9 @@ class Selection:
     def to_dict(self) -> dict:
         return {
             "name": self.name,
-            "items": [item.to_dict() for item in self.items]
+            "items": [item.to_dict() for item in self.items],
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
         }
 
     @classmethod
@@ -86,6 +96,9 @@ class Selection:
     def empty(cls, name: str) -> Selection:
         return cls(name=name)
 
+    def _update_timestamp(self):
+        self.updated_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
 
 @dataclass
 class SelectionItem:
@@ -93,12 +106,16 @@ class SelectionItem:
     uid: str = field(default_factory=lambda: str(uuid4())[:8], kw_only=True)
     filters: list[SelectionFilter] = field(default_factory=list)
     name: str = ""
+    created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 
     def __post_init__(self):
         validate(bool(self.sport), "SelectionItem sport must be a non-empty string", logger)
         validate(isinstance(self.filters, list), "SelectionItem filters must be a list", logger, TypeError)
         for f in self.filters:
             validate(isinstance(f, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
+        validate_timestamp(self.created_at, "created_at", logger)
+        validate_timestamp(self.updated_at, "updated_at", logger)
 
     def _filters_uids(self):
         return [f.uid for f in self.filters]
@@ -115,6 +132,7 @@ class SelectionItem:
         validate(selection_filter.sport == self.sport, "SelectionFilter sport must match SelectionItem sport", logger, ValueError)
         validate(selection_filter.uid not in self._filters_uids(), f"Selection filter with uid '{selection_filter.uid}' already exists in selection item '{self.uid}'", logger, ValueError)
         self.filters.append(selection_filter)
+        self._update_timestamp()
         logger.debug(f"Added filter {selection_filter.uid} to selection item {self.uid}")
 
     def replace_filter(self, selection_filter: SelectionFilter):
@@ -123,6 +141,7 @@ class SelectionItem:
         validate(selection_filter.uid in self._filters_uids(), f"Selection filter with uid '{selection_filter.uid}' does not exist in selection item '{self.uid}'", logger, KeyError)
         self.filters = [f for f in self.filters if f.uid != selection_filter.uid]
         self.filters.append(selection_filter)
+        self._update_timestamp()
         logger.debug(f"Replaced filter {selection_filter.uid} in selection item {self.uid}")
 
     def remove_filter(self, filter_uid: str):
@@ -130,6 +149,7 @@ class SelectionItem:
             logger.error(f"Filter {filter_uid} not found in selection item {self.uid}")
             raise KeyError(f"Filter {filter_uid} not found in selection item {self.uid}")
         self.filters = [f for f in self.filters if f.uid != filter_uid]
+        self._update_timestamp()
         logger.debug(f"Removed filter {filter_uid} from selection item {self.uid}")
     
     def clone(self) -> SelectionItem:
@@ -146,7 +166,9 @@ class SelectionItem:
             "sport": self.sport,
             "uid": self.uid,
             "name": self.name,
-            "filters": [f.to_dict() for f in self.filters]
+            "filters": [f.to_dict() for f in self.filters],
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
         }
 
     @classmethod
@@ -164,3 +186,6 @@ class SelectionItem:
     @classmethod
     def empty(cls, sport: str, name: str = "") -> SelectionItem:
         return cls(sport=sport, name=name)
+
+    def _update_timestamp(self):
+        self.updated_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
