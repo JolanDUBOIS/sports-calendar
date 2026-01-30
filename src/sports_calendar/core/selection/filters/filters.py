@@ -1,6 +1,7 @@
 from __future__ import annotations
 from uuid import uuid4
 from enum import Enum
+from datetime import datetime
 from dataclasses import dataclass, field
 
 from . import logger
@@ -12,7 +13,7 @@ from .fields import (
     TeamsFilterFields,
     SessionFilterFields
 )
-from sports_calendar.core.utils import validate
+from sports_calendar.core.utils import validate, validate_timestamp
 from sports_calendar.core.db import SPORT_SCHEMAS
 
 
@@ -37,19 +38,23 @@ FILTER_TYPE_TO_FIELDS: dict[FilterType, type[FilterFields]] = {
 
 # === Selection Filter Data Class ====
 
-@dataclass
+@dataclass(frozen=True)
 class SelectionFilter:
     sport: str
     name: str = ""
     uid: str = field(default_factory=lambda: str(uuid4())[:8])
     filter_type: FilterType = FilterType.EMPTY
     fields: FilterFields = field(default_factory=EmptyFilterFields)
+    created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 
     def __post_init__(self):
         validate(self.sport in SPORT_SCHEMAS, f"Invalid sport: {self.sport}", logger)
         expected_cls = FILTER_TYPE_TO_FIELDS.get(self.filter_type)
         validate(isinstance(self.fields, expected_cls),
                  f"fields must be of type {expected_cls.__name__} for filter_type {self.filter_type.value}", logger)
+        validate_timestamp(self.created_at, "created_at", logger)
+        validate_timestamp(self.updated_at, "updated_at", logger)
 
     def clone(self) -> SelectionFilter:
         """ Create a deep copy of this SelectionFilter with a new ID. """
@@ -73,22 +78,22 @@ class SelectionFilter:
             "name": self.name,
             "uid": self.uid,
             "filter_type": self.filter_type.value,
-            "fields": self.fields.to_dict() if self.fields else None
+            "fields": self.fields.to_dict() if self.fields else None,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> SelectionFilter:
         """ Create a SelectionFilter from a dictionary. """
-        filter_type = FilterType(data["filter_type"])
+        data = dict(data)
+        filter_type = FilterType(data.pop("filter_type"))
         fields_cls = FILTER_TYPE_TO_FIELDS.get(filter_type, EmptyFilterFields)
-        fields_data = data.get("fields", {})
-        fields = fields_cls.from_dict(fields_data)
+        fields = fields_cls.from_dict(data.pop("fields", {}))
         return cls(
-            sport=data["sport"],
-            name=data.get("name", ""),
-            uid=data.get("uid", str(uuid4())[:8]),
             filter_type=filter_type,
-            fields=fields
+            fields=fields,
+            **data
         )
 
     @classmethod
