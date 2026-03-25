@@ -85,6 +85,19 @@ class SportsEventCollection:
     def __getitem__(self, index: int | slice) -> SportsEvent | list[SportsEvent]:
         return self.events[index]
 
+    def __add__(self, other: SportsEventCollection) -> SportsEventCollection:
+        """ Combine two collections into a new collection. """
+        if not isinstance(other, SportsEventCollection):
+            return NotImplemented
+        return SportsEventCollection(self.events + other.events)
+
+    def __iadd__(self, other: SportsEventCollection) -> SportsEventCollection:
+        """ Extend this collection with another collection. """
+        if not isinstance(other, SportsEventCollection):
+            return NotImplemented
+        self.events.extend(other.events)
+        return self
+
     def __repr__(self):
         """ Return a string representation of the collection with one event per line. """
         if not self.events:
@@ -114,3 +127,11 @@ class SportsEventCollection:
             return self
         else:
             return SportsEventCollection(unique)
+
+    @classmethod
+    def from_sport_index_collection(cls, collection: SportIndexEventCollection, event_cls: type[SportsEvent]) -> SportsEventCollection:
+        """ Factory method to create a SportsEventCollection from a SportIndexEventCollection. """
+        events = [event_cls.from_sport_index_event(event) for event in collection]
+        return cls(events)
+
+    # TODO: Instead of drop_duplicates, implement a & and | operator for intersection and union of collections...

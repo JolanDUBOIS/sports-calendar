@@ -1,11 +1,9 @@
 from . import logger
-from .config import Secrets
-from .calendar import SportsCalendar
-from .events import SportsEventCollection
-from .transformer import EventTransformer
-from .google_calendar import GoogleCalendarManager
-from sports_calendar.core import Paths
-from sports_calendar.core.selection import SelectionService, SelectionApplier
+from ..core.calendar.calendar import SportsCalendar
+from sports_calendar.core.engine import Resolver
+from sports_calendar.core.selection import SelectionService
+from sports_calendar.core.calendar import SportsEventCollection, EVENT_TYPE_MAP
+from sports_calendar.core.google_calendar import GoogleCalendarManager, Secrets
 
 
 def run_selection(
@@ -19,10 +17,15 @@ def run_selection(
     SelectionService.initialize_registry()
 
     selection = SelectionService.get_selection(name)
-    views = SelectionApplier.apply(selection)
+    resolved_collections = Resolver.resolve_selection(selection)
+
     events = SportsEventCollection()
-    for view in views:
-        events.extend(EventTransformer.transform(view))
+    for collection, sport in resolved_collections:
+        event_cls = EVENT_TYPE_MAP.get(sport)
+        if not event_cls:
+            raise ValueError(f"Unsupported sport type {sport} for event transformation.")
+        events += SportsEventCollection.from_sport_index_collection(collection, event_cls)
+
     events.drop_duplicates(inplace=True)
 
     logger.info(f"Total events selected: {len(events)}")

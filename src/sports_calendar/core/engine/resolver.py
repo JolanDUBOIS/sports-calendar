@@ -11,13 +11,13 @@ class Resolver:
     """ TODO """
 
     @classmethod
-    def resolve(cls, selection: Selection, client: SportClient, **kwargs) -> list[EventCollection, SportType]:
-        """ Resolve a Selection into a list of EventCollections with their corresponding SportTypes. """
+    def resolve_selection(cls, selection: Selection, client: SportClient, **kwargs) -> list[tuple[EventCollection, SportType]]:
+        """ Resolve a Selection into a list of tuples containing an EventCollection and its corresponding SportType. """
         logger.debug(f"Resolving selection: {selection.name} with {len(selection.items)} items...")
         validate(isinstance(selection, Selection), "Selection must be an instance of Selection for resolution.", logger)
         validate(isinstance(client, SportClient), "Client must be an instance of SportClient for resolution.", logger)
 
-        resolved_collections: list[EventCollection, SportType] = []
+        resolved_collections: list[tuple[EventCollection, SportType]] = []
 
         for item in selection.items:
             events = cls._resolve_item(item, client, **kwargs)
