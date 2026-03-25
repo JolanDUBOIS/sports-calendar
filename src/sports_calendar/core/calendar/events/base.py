@@ -1,14 +1,21 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-from icalendar import Event
-
 from datetime import datetime
+
+from icalendar import Event as ICalendarEvent
+from sportindex import Event as SportIndexEvent, EventCollection as SportIndexEventCollection
+
+from sports_calendar.core import SportType
 
 
 class SportsEvent(ABC):
     """ Abstract base class for sports events. """
-    sport: str
+    sport: SportType
+
+    def __init__(self, **kwargs):
+        """ Initialize the sports event with common attributes. """
+        self.extra = kwargs
 
     def __repr__(self):
         """ Return a string representation of the event. """
@@ -17,30 +24,31 @@ class SportsEvent(ABC):
     @property
     @abstractmethod
     def summary(self) -> str:
-        """ TODO """
+        raise NotImplementedError("Subclasses must implement summary property for event details.")
 
     @property
     @abstractmethod
     def start(self) -> datetime:
-        """ TODO """
+        raise NotImplementedError("Subclasses must implement start property for event details.")
 
     @property
     @abstractmethod
     def end(self) -> datetime:
-        """ TODO """
+        raise NotImplementedError("Subclasses must implement end property for event details.")
 
     @property
     @abstractmethod
     def location(self) -> str:
-        """ TODO """
+        raise NotImplementedError("Subclasses must implement location property for event details.")
 
     @property
     @abstractmethod
     def description(self) -> str:
-        """ TODO """
+        raise NotImplementedError("Subclasses must implement description property for event details.")
 
-    def get_event(self) -> Event:
-        event = Event()
+    def get_event(self) -> ICalendarEvent:
+        """ Convert this sports event into an iCalendar event. """
+        event = ICalendarEvent()
         event.add("summary", self.summary)
         event.add("dtstart", self.start)
         event.add("dtend", self.end)
@@ -51,7 +59,13 @@ class SportsEvent(ABC):
     @abstractmethod
     def identity_key(self) -> str:
         """ Return a unique string identifying this event for equality/deduplication. """
-        pass
+        raise NotImplementedError("Subclasses must implement identity_key method for event deduplication.")
+
+    @classmethod
+    @abstractmethod
+    def from_sport_index_event(cls, event: SportIndexEvent) -> SportsEvent:
+        """ Factory method to create a SportsEvent from a SportIndexEvent. """
+        raise NotImplementedError("Subclasses must implement from_sport_index_event class method for event creation from SportIndex data.")
 
 
 class SportsEventCollection:

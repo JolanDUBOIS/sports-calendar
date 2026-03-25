@@ -6,7 +6,7 @@ from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 from . import logger
-from sports_calendar.sync_calendar.config import Credentials as AppCredentials
+from .config import Credentials as AppCredentials
 
 class GoogleAuthManager:
     """ TODO """
