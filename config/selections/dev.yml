@@ -3,8 +3,8 @@ items:
 - created_at: '2026-01-30T19:57:02'
   filters:
   - created_at: '2026-01-30T19:57:02'
-    fields: {}
-    filter_type: empty
+    fields:
+      filter_type: empty
     name: item-1-filter-1
     sport: football
     uid: it-001-filt-001
@@ -14,16 +14,17 @@ items:
       - 1
       - 2
       - 3
+      filter_type: min_ranking
       ranking: 5
       selection_rule:
         reference: null
         rule: both
-    filter_type: min_ranking
     name: item-1-filter-2
     sport: football
     uid: it-001-filt-002
   - created_at: '2026-01-30T19:57:02'
     fields:
+      filter_type: teams
       selection_rule:
         reference: 40
         rule: opponent
@@ -31,7 +32,6 @@ items:
       - 10
       - 20
       - 30
-    filter_type: teams
     name: item-1-filter-3
     sport: football
     uid: it-001-filt-003
@@ -43,10 +43,10 @@ items:
   filters:
   - created_at: '2026-01-30T19:57:02'
     fields:
+      filter_type: session
       sessions:
       - Sprint
       - Race
-    filter_type: session
     name: item-2-filter-1
     sport: football
     uid: it-002-filt-001
