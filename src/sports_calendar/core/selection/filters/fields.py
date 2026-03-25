@@ -166,6 +166,7 @@ class SessionsFilterFields:
 
     def to_dict(self) -> dict:
         return {
+            "competition_id": self.competition_id,
             "sessions": self.sessions,
             "filter_type": self.filter_type.value
         }

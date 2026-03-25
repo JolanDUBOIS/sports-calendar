@@ -43,6 +43,7 @@ items:
   filters:
   - created_at: '2026-01-30T19:57:02'
     fields:
+      competition_id: 11
       filter_type: session
       sessions:
       - Sprint
