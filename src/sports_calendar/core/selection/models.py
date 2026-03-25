@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from . import logger
 from .filters import SelectionFilter
 from ..utils import validate, validate_timestamp
+from sports_calendar.core import SportType
 
 
 @dataclass
@@ -102,7 +103,7 @@ class Selection:
 
 @dataclass
 class SelectionItem:
-    sport: str
+    sport: SportType
     uid: str = field(default_factory=lambda: str(uuid4())[:8], kw_only=True)
     filters: list[SelectionFilter] = field(default_factory=list)
     name: str = ""
@@ -163,7 +164,7 @@ class SelectionItem:
 
     def to_dict(self) -> dict:
         return {
-            "sport": self.sport,
+            "sport": self.sport.value,
             "uid": self.uid,
             "name": self.name,
             "filters": [f.to_dict() for f in self.filters],
@@ -176,15 +177,16 @@ class SelectionItem:
         logger.debug(f"Deserializing SelectionItem with sport '{data.get('sport')}'")
         validate(isinstance(data, dict), "SelectionItem data must be a dictionary", logger, TypeError)
         data = dict(data)
-        filters_data = data.pop("filters", [])
-        filters = [SelectionFilter.from_dict(data=filter_data) for filter_data in filters_data]
+        sport=SportType(data.pop("sport"))
+        filters = [SelectionFilter.from_dict(data=filter_data) for filter_data in data.pop("filters", [])]
         return cls(
+            sport=sport,
             filters=filters,
             **data
         )
 
     @classmethod
-    def empty(cls, sport: str, name: str = "") -> SelectionItem:
+    def empty(cls, sport: SportType, name: str = "") -> SelectionItem:
         return cls(sport=sport, name=name)
 
     def _update_timestamp(self):

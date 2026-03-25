@@ -1,20 +1,21 @@
 from __future__ import annotations
 import copy
-from enum import Enum
-from typing import Protocol
+from enum import IntEnum
+from typing import Protocol, Literal
 from dataclasses import dataclass, field
 
 from . import logger
+from .enums import FilterType
 from sports_calendar.core import CompetitionStage
 from sports_calendar.core.utils import validate
 
 
 # ==== Entity Selection Rule ====
 
-class Rule(Enum):
-    BOTH = "both"
-    ANY = "any"
-    OPPONENT = "opponent"
+class Rule(IntEnum):
+    ANY = 1
+    BOTH = 2
+    OPPONENT = 3
 
 @dataclass
 class EntitySelectionRule:
@@ -45,11 +46,15 @@ class EntitySelectionRule:
 
 @dataclass
 class EmptyFilterFields:
+    filter_type: Literal[FilterType.EMPTY] = FilterType.EMPTY
+
     def clone(self) -> EmptyFilterFields:
         return EmptyFilterFields()
 
     def to_dict(self) -> dict:
-        return {}
+        return {
+            "filter_type": self.filter_type.value
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> EmptyFilterFields:
@@ -58,14 +63,15 @@ class EmptyFilterFields:
 @dataclass
 class MinRankingFilterFields:
     ranking: int
-    competition_ids: list[int]
+    competition_ids: list[str]
+    filter_type: Literal[FilterType.MIN_RANKING] = FilterType.MIN_RANKING
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
         validate(isinstance(self.ranking, int) and self.ranking > 0,
                  "ranking must be a positive integer", logger)
-        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, int) for cid in self.competition_ids),
-                 "competition_ids must be a list of integers", logger)
+        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, str) for cid in self.competition_ids),
+                 "competition_ids must be a list of strings", logger)
 
     def clone(self) -> MinRankingFilterFields:
         return copy.deepcopy(self)
@@ -74,6 +80,7 @@ class MinRankingFilterFields:
         return {
             "ranking": self.ranking,
             "competition_ids": self.competition_ids,
+            "filter_type": self.filter_type.value,
             "selection_rule": self.selection_rule.to_dict()
         }
 
@@ -86,27 +93,29 @@ class MinRankingFilterFields:
         )
         
 @dataclass
-class CompetitionFilterFields:
-    competition_ids: list[int]
+class CompetitionsFilterFields:
+    competition_ids: list[str]
+    filter_type: Literal[FilterType.COMPETITIONS] = FilterType.COMPETITIONS
     stage: CompetitionStage = CompetitionStage.NULL
 
     def __post_init__(self):
         validate(isinstance(self.stage, CompetitionStage),
                  "stage must be a CompetitionStage", logger)
-        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, int) for cid in self.competition_ids),
-                 "competition_ids must be a list of integers", logger)
+        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, str) for cid in self.competition_ids),
+                 "competition_ids must be a list of strings", logger)
 
-    def clone(self) -> CompetitionFilterFields:
+    def clone(self) -> CompetitionsFilterFields:
         return copy.deepcopy(self)
 
     def to_dict(self) -> dict:
         return {
             "competition_ids": self.competition_ids,
+            "filter_type": self.filter_type.value,
             "stage": self.stage.value
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> CompetitionFilterFields:
+    def from_dict(cls, data: dict) -> CompetitionsFilterFields:
         return cls(
             competition_ids=data["competition_ids"],
             stage=CompetitionStage(data.get("stage", CompetitionStage.NULL.value))
@@ -114,12 +123,13 @@ class CompetitionFilterFields:
 
 @dataclass
 class TeamsFilterFields:
-    team_ids: list[int]
+    team_ids: list[str]
+    filter_type: Literal[FilterType.TEAMS] = FilterType.TEAMS
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
-        validate(isinstance(self.team_ids, list) and all(isinstance(tid, int) for tid in self.team_ids),
-                 "team_ids must be a list of integers", logger)
+        validate(isinstance(self.team_ids, list) and all(isinstance(tid, str) for tid in self.team_ids),
+                 "team_ids must be a list of strings", logger)
 
     def clone(self) -> TeamsFilterFields:
         return copy.deepcopy(self)
@@ -127,6 +137,7 @@ class TeamsFilterFields:
     def to_dict(self) -> dict:
         return {
             "team_ids": self.team_ids,
+            "filter_type": self.filter_type.value,
             "selection_rule": self.selection_rule.to_dict()
         }
 
@@ -138,24 +149,27 @@ class TeamsFilterFields:
         )
 
 @dataclass
-class SessionFilterFields:
-    sessions: list[str]  # e.g., ["Race", "Sprint", "FP1"]
-    # Note: sessions might evolve when more sports are added, we might need to create enums...
+class SessionsFilterFields:
+    competition_id: str
+    sessions: list[str]  # e.g., ["Grand Prix", "Sprint", "Practice", "Sprint Qualifying", "Qualifying", etc.]
+    filter_type: Literal[FilterType.SESSIONS] = FilterType.SESSIONS
+    # NOTE: sessions might evolve when more sports are added, we might need to create enums...
 
     def __post_init__(self):
         validate(isinstance(self.sessions, list) and all(isinstance(session, str) for session in self.sessions),
                  "sessions must be a list of strings", logger)
 
-    def clone(self) -> SessionFilterFields:
+    def clone(self) -> SessionsFilterFields:
         return copy.deepcopy(self)
 
     def to_dict(self) -> dict:
         return {
-            "sessions": self.sessions
+            "sessions": self.sessions,
+            "filter_type": self.filter_type.value
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> SessionFilterFields:
+    def from_dict(cls, data: dict) -> SessionsFilterFields:
         return cls(
             sessions=data["sessions"]
         )
@@ -164,7 +178,14 @@ class SessionFilterFields:
 # ==== Filter Fields Protocol ====
 
 class FilterFields(Protocol):
+    filter_type: FilterType
     def clone(self) -> FilterFields: ...
     def to_dict(self) -> dict: ...
     @classmethod
     def from_dict(cls, data: dict) -> FilterFields: ...
+
+# NOTE: Teams, Competitions, MinRanking are coded as uniquely designed for opposition sports (football, basketball, tennis, etc.)
+# Sessions is coded as uniquely designed for race sports (motorsports, cycling)
+
+# TODO: Switch from TeamsFilterFields to CompetitorsFilterFields with a competitor type (team or individual) since the client provides a unified interface for both teams and players.
+# TODO: Switch ids from str to int accross the codebase since the client provides int IDs for competitors, competitions, etc.
