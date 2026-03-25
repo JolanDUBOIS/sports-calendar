@@ -1,6 +1,6 @@
 from __future__ import annotations
 import copy
-from enum import IntEnum
+from enum import Enum
 from typing import Protocol, Literal
 from dataclasses import dataclass, field
 
@@ -12,10 +12,11 @@ from sports_calendar.core.utils import validate
 
 # ==== Entity Selection Rule ====
 
-class Rule(IntEnum):
-    ANY = 1
-    BOTH = 2
-    OPPONENT = 3
+class Rule(Enum):
+    ANY = "any"
+    BOTH = "both"
+    OPPONENT = "opponent"
+
 
 @dataclass
 class EntitySelectionRule:
@@ -63,15 +64,15 @@ class EmptyFilterFields:
 @dataclass
 class MinRankingFilterFields:
     ranking: int
-    competition_ids: list[str]
+    competition_ids: list[int]
     filter_type: Literal[FilterType.MIN_RANKING] = FilterType.MIN_RANKING
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
         validate(isinstance(self.ranking, int) and self.ranking > 0,
                  "ranking must be a positive integer", logger)
-        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, str) for cid in self.competition_ids),
-                 "competition_ids must be a list of strings", logger)
+        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, int) for cid in self.competition_ids),
+                 "competition_ids must be a list of integers", logger)
 
     def clone(self) -> MinRankingFilterFields:
         return copy.deepcopy(self)
@@ -94,15 +95,15 @@ class MinRankingFilterFields:
         
 @dataclass
 class CompetitionsFilterFields:
-    competition_ids: list[str]
+    competition_ids: list[int]
     filter_type: Literal[FilterType.COMPETITIONS] = FilterType.COMPETITIONS
     stage: CompetitionStage = CompetitionStage.NULL
 
     def __post_init__(self):
         validate(isinstance(self.stage, CompetitionStage),
                  "stage must be a CompetitionStage", logger)
-        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, str) for cid in self.competition_ids),
-                 "competition_ids must be a list of strings", logger)
+        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, int) for cid in self.competition_ids),
+                 "competition_ids must be a list of integers", logger)
 
     def clone(self) -> CompetitionsFilterFields:
         return copy.deepcopy(self)
@@ -123,13 +124,13 @@ class CompetitionsFilterFields:
 
 @dataclass
 class TeamsFilterFields:
-    team_ids: list[str]
+    team_ids: list[int]
     filter_type: Literal[FilterType.TEAMS] = FilterType.TEAMS
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
-        validate(isinstance(self.team_ids, list) and all(isinstance(tid, str) for tid in self.team_ids),
-                 "team_ids must be a list of strings", logger)
+        validate(isinstance(self.team_ids, list) and all(isinstance(tid, int) for tid in self.team_ids),
+                 "team_ids must be a list of integers", logger)
 
     def clone(self) -> TeamsFilterFields:
         return copy.deepcopy(self)
@@ -150,12 +151,13 @@ class TeamsFilterFields:
 
 @dataclass
 class SessionsFilterFields:
-    competition_id: str
+    competition_id: int
     sessions: list[str]  # e.g., ["Grand Prix", "Sprint", "Practice", "Sprint Qualifying", "Qualifying", etc.]
     filter_type: Literal[FilterType.SESSIONS] = FilterType.SESSIONS
     # NOTE: sessions might evolve when more sports are added, we might need to create enums...
 
     def __post_init__(self):
+        validate(isinstance(self.competition_id, int), "competition_id must be an integer", logger)
         validate(isinstance(self.sessions, list) and all(isinstance(session, str) for session in self.sessions),
                  "sessions must be a list of strings", logger)
 
@@ -171,6 +173,7 @@ class SessionsFilterFields:
     @classmethod
     def from_dict(cls, data: dict) -> SessionsFilterFields:
         return cls(
+            competition_id=data["competition_id"],
             sessions=data["sessions"]
         )
 

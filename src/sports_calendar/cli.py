@@ -4,7 +4,7 @@ from . import logger, __version__
 from .devtools import dev_tools
 from .initialize import init
 from .sync_calendar import sync_calendar, clear_cal
-from .gui import launch_gui
+# from .gui import launch_gui
 from .core.setup import Paths, setup_logging
 
 
@@ -13,7 +13,7 @@ app = typer.Typer(help="Sports Calendar CLI Application — manage DB, calendar,
 app.add_typer(dev_tools, name="devtools", help="Development tools for the sports calendar application.")
 app.add_typer(sync_calendar, name="sync-calendar", help="Commands to manage calendar selection.")
 app.add_typer(clear_cal, name="clear-calendar", help="Commands to clear events from the Google Calendar.")
-app.add_typer(launch_gui, name="launch-gui", help="Launch the Sports Calendar GUI application.")
+# app.add_typer(launch_gui, name="launch-gui", help="Launch the Sports Calendar GUI application.")
 
 app.command(name="init")(init)
 

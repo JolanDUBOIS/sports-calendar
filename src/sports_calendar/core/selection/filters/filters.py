@@ -54,6 +54,8 @@ class SelectionFilter:
         """ Create a SelectionFilter from a dictionary. """
         data = dict(data)
 
+        sport = SportType(data.pop("sport"))
+
         fields_data = data.pop("fields") or {}
 
         raw_filter_type = fields_data.get("filter_type", FilterType.EMPTY.value)
@@ -63,6 +65,7 @@ class SelectionFilter:
         fields = fields_cls.from_dict(fields_data)
 
         return cls(
+            sport=sport,
             fields=fields,
             **data
         )
