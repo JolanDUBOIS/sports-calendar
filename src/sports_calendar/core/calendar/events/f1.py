@@ -69,7 +69,7 @@ class F1Event(SportsEvent):
         """ Factory method to create an F1Event from a SportIndexEvent. """
         return cls(
             start=event.start,
-            name=event.source.stageParent.description, # NOTE - Expecting an update of the SportIndexEvent model to include a 'parent' field in race events
+            name=event.source.parent.description, # NOTE - Expecting an update of the SportIndexEvent model to include a 'parent' field in race events
             session=event.name,
             city=event.venue.city if event.venue else None,
             country=event.venue.country.name if event.venue and event.venue.country else None,

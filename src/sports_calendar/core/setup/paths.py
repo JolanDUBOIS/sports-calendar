@@ -12,7 +12,7 @@ DEV_DEFAULT_LOG_DIR = PROJECT_ROOT / "logs"
 class Paths:
     """ Manage application paths for config, data, and state. """
     
-    DB_DIR: Path
+    DB_DIR: Path # TODO - Not Used anymore, remove
 
     CONFIG_DIR: Path
     LOG_DIR: Path

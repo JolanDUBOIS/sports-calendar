@@ -9,7 +9,7 @@ def init():
 
     # Create the necessary directories if they don't exist
     Paths.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    Paths.DB_DIR.mkdir(parents=True, exist_ok=True)
+    Paths.DB_DIR.mkdir(parents=True, exist_ok=True) # TODO - Not Used anymore, remove
     Paths.LOG_DIR.mkdir(parents=True, exist_ok=True)
     Paths.CREDS_FOLDER.mkdir(parents=True, exist_ok=True)
     Paths.SECRETS_FOLDER.mkdir(parents=True, exist_ok=True)

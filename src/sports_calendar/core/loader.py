@@ -11,7 +11,7 @@ def date_offset_constructor(loader, node):
     days = int(node.value)
     return (datetime.now(timezone.utc) + timedelta(days=days)).isoformat(timespec="seconds")
 
-yaml.add_constructor('!date_offset', date_offset_constructor, Loader=yaml.loader.SafeLoader)
+yaml.add_constructor('!date_offset', date_offset_constructor, Loader=yaml.loader.SafeLoader) # TODO - Remove, not used anymore
 
 def load_yml(path: str | Path) -> dict | list | None:
     """ Load a YAML file and return its content as a dictionary or list. """
