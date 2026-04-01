@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sports_calendar.core.selection.filters.registry import FilterType
+from sports_calendar.core.selection.filters.definitions import FilterType
 
 from .min_ranking import MinRankingExecutor
 from .teams import TeamsExecutor

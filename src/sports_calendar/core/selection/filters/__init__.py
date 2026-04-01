@@ -10,4 +10,4 @@ from .fields import (
     SessionsFilterFields
 )
 from .filters import SelectionFilter
-from .registry import FilterType, FilterTarget, FILTER_DEFINITIONS
+from .definitions import FilterType, FilterTarget, FILTER_DEFINITIONS

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from . import logger
 from .fields import FilterFields, EmptyFilterFields
-from .registry import FilterType, FILTER_DEFINITIONS
+from .definitions import FilterType, FILTER_DEFINITIONS
 from sports_calendar.core import SportType
 from sports_calendar.core.utils import validate, validate_timestamp
 
