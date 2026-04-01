@@ -16,10 +16,10 @@ class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
         return TeamsExecutor.fetch(teams_filter_fields, client)
 
     @classmethod
-    def apply(cls, filter_fields: MinRankingFilterFields, events: EventCollection) -> EventCollection:
+    def apply(cls, filter_fields: MinRankingFilterFields, events: EventCollection, client: SportClient) -> EventCollection:
         """ Apply the minimum ranking filter to the provided events. """
-        teams_filter_fields = cls._transform_to_teams_filter_fields(filter_fields, client=None)
-        return TeamsExecutor.apply(teams_filter_fields, events)
+        teams_filter_fields = cls._transform_to_teams_filter_fields(filter_fields, client=client)
+        return TeamsExecutor.apply(teams_filter_fields, events, client)
 
     @classmethod
     def _transform_to_teams_filter_fields(cls, filter_fields: MinRankingFilterFields, client: SportClient) -> TeamsFilterFields:

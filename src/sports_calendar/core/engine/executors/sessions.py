@@ -24,7 +24,7 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
         return events
 
     @classmethod
-    def apply(cls, filter_fields: SessionsFilterFields, events: EventCollection) -> EventCollection:
+    def apply(cls, filter_fields: SessionsFilterFields, events: EventCollection, client: SportClient) -> EventCollection:
         """ Apply the sessions filter to the provided events. """
         return cls._filter_events_by_sessions(events, filter_fields)
 

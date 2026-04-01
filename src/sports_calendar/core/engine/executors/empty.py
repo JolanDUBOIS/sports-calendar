@@ -13,6 +13,6 @@ class EmptyExecutor(BaseExecutor[EmptyFilterFields]):
         return EventCollection()
 
     @classmethod
-    def apply(cls, filter_fields: EmptyFilterFields, events: EventCollection) -> EventCollection:
+    def apply(cls, filter_fields: EmptyFilterFields, events: EventCollection, client: SportClient) -> EventCollection:
         """ For empty filters, we return the input events unchanged. """
         return events

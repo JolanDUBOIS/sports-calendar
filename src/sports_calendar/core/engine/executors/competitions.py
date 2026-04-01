@@ -21,7 +21,7 @@ class CompetitionsExecutor(BaseExecutor[CompetitionsFilterFields]):
         return events
 
     @classmethod
-    def apply(cls, filter_fields: CompetitionsFilterFields, events: EventCollection) -> EventCollection:
+    def apply(cls, filter_fields: CompetitionsFilterFields, events: EventCollection, client: SportClient) -> EventCollection:
         """ Apply the competitions filter to the provided events. """
         return cls._filter_events_by_competitions(events, filter_fields)
 

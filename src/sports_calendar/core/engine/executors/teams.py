@@ -21,7 +21,7 @@ class TeamsExecutor(BaseExecutor[TeamsFilterFields]):
         return cls._filter_events_by_teams(events, filter_fields)
 
     @classmethod
-    def apply(cls, filter_fields: TeamsFilterFields, events: EventCollection) -> EventCollection:
+    def apply(cls, filter_fields: TeamsFilterFields, events: EventCollection, client: SportClient) -> EventCollection:
         """ Apply the teams filter to the provided events. """
         return cls._filter_events_by_teams(events, filter_fields)
 

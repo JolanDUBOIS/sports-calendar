@@ -13,7 +13,7 @@ class Resolver:
     @classmethod
     def resolve_selection(cls, selection: Selection, client: SportClient, **kwargs) -> list[tuple[EventCollection, SportType]]:
         """ Resolve a Selection into a list of tuples containing an EventCollection and its corresponding SportType. """
-        logger.debug(f"Resolving selection: {selection.name} with {len(selection.items)} items...")
+        logger.info(f"Resolving selection: {selection.name} with {len(selection.items)} items...")
         validate(isinstance(selection, Selection), "Selection must be an instance of Selection for resolution.", logger)
         validate(isinstance(client, SportClient), "Client must be an instance of SportClient for resolution.", logger)
 
@@ -23,13 +23,13 @@ class Resolver:
             events = cls._resolve_item(item, client, **kwargs)
             resolved_collections.append((events, item.sport))
 
-        logger.debug(f"Selection {selection.name} resolved with {len(resolved_collections)} collections.")
+        logger.info(f"Selection {selection.name} resolved with {len(resolved_collections)} collections.")
         return resolved_collections
 
     @classmethod
     def _resolve_item(cls, item: SelectionItem, client: SportClient, **kwargs) -> EventCollection:
         """ Resolve a SelectionFilter into a collection of events. """
-        logger.debug(f"Resolving filter: {item.name}...")
+        logger.info(f"Resolving filter: {item.name}...")
         validate(isinstance(item, SelectionItem), "Item must be an instance of SelectionItem for resolution.", logger)
         validate(isinstance(client, SportClient), "Client must be an instance of SportClient for resolution.", logger)
 
@@ -44,8 +44,8 @@ class Resolver:
             if events is None:
                 events = executor.fetch(filter.fields, client)
             else:
-                events = executor.apply(filter.fields, events)
+                events = executor.apply(filter.fields, events, client)
             logger.debug(f"Filter {filter.name} applied, resulting in {len(events)} events.")
 
-        logger.debug(f"Finished resolving item: {item.name} with {len(events) if events else 0} events.")
+        logger.info(f"Finished resolving item: {item.name} with {len(events) if events else 0} events.")
         return events or EventCollection()

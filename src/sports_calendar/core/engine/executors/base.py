@@ -19,6 +19,6 @@ class BaseExecutor(ABC, Generic[T]):
 
     @classmethod
     @abstractmethod
-    def apply(cls, filter_fields: T, events: EventCollection) -> EventCollection:
+    def apply(cls, filter_fields: T, events: EventCollection, client: SportClient) -> EventCollection:
         """ Apply the given filter fields to the provided events. """
         raise NotImplementedError
