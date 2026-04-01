@@ -1,7 +1,6 @@
 import typer 
 
-from .run_selection import run_selection
-from .clear_calendar import clear_calendar
+from sports_calendar.application.workflows import run_selection, clear_calendar
 
 
 sync_calendar = typer.Typer(help="Commands to run and manage the calendar selection and utils.")

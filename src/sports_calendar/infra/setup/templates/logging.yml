@@ -26,56 +26,65 @@ loggers:
   sports_calendar:
     level: DEBUG
 
-  sports_calendar.devtools:
+  # Application loggers
+  sports_calendar.application:
+    level: DEBUG
+
+  sports_calendar.application.selection:
+    level: DEBUG
+
+  sports_calendar.application.workflows:
     level: DEBUG
 
   # Core loggers
   sports_calendar.core:
     level: DEBUG
 
-  sports_calendar.core.file_io:
+  sports_calendar.core.calendar:
     level: DEBUG
 
   sports_calendar.core.selection:
     level: DEBUG
 
-  sports_calendar.core.setup:
-    level: DEBUG
-
   sports_calendar.core.utils:
     level: DEBUG
 
-  # Selection GUI loggers
-  sports_calendar.gui:
+  # Infrastructure loggers
+  sports_calendar.infra:
     level: DEBUG
 
-  sports_calendar.gui.components:
+  sports_calendar.infra.config:
     level: DEBUG
 
-  sports_calendar.gui.pages:
+  sports_calendar.infra.engine:
     level: DEBUG
 
-  # Sync Calendar loggers
-  sports_calendar.sync_calendar:
+  sports_calendar.infra.engine.executors:
     level: DEBUG
 
-  sports_calendar.sync_calendar.config:
+  sports_calendar.infra.google_calendar:
     level: DEBUG
 
-  sports_calendar.sync_calendar.events:
+  sports_calendar.infra.setup:
     level: DEBUG
 
-  sports_calendar.sync_calendar.google_calendar:
+  sports_calendar.infra.storage:
     level: DEBUG
 
-  # Validate DB loggers
-  sports_calendar.validate_db:
+  # Interfaces loggers
+  sports_calendar.interfaces:
     level: DEBUG
 
-  sports_calendar.validate_db.definitions:
+  sports_calendar.interfaces.cli:
     level: DEBUG
-  
-  sports_calendar.validate_db.definitions.specs:
+
+  sports_calendar.interfaces.gui:
+    level: DEBUG
+
+  sports_calendar.interfaces.gui.components:
+    level: DEBUG
+
+  sports_calendar.interfaces.gui.pages:
     level: DEBUG
 
   # Third party loggers
@@ -88,6 +97,8 @@ loggers:
     level: WARNING
     handlers: []
     propagate: False
+
+  # TODO - Setup sport-index logger
 
 root:
   level: DEBUG

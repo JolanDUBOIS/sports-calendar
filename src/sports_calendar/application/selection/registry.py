@@ -1,10 +1,10 @@
 from typing import Iterable
 from copy import deepcopy
 
-from . import logger
-from .models import Selection
-from .storage import SelectionStorage
-from ..utils import validate
+from ...core.selection import logger
+from ...core.selection.models import Selection
+from ...core.utils import validate
+from sports_calendar.infra.storage import SelectionStorage
 
 
 class SelectionRegistry:

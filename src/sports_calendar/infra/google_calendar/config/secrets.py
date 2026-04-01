@@ -1,7 +1,6 @@
-from pathlib import Path
-
 from . import logger
-from sports_calendar.core import Paths, load_yml
+from sports_calendar.infra.config import Paths
+from sports_calendar.infra.storage import load_yml
 
 
 class Secrets:

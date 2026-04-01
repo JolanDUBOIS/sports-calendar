@@ -1,6 +1,5 @@
 from . import logger
-from .config import Secrets
-from .google_calendar import GoogleCalendarManager
+from sports_calendar.infra.google_calendar import GoogleCalendarManager, Secrets
 
 
 def clear_calendar(

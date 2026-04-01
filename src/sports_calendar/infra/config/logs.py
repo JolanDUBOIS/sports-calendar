@@ -4,7 +4,7 @@ from datetime import datetime
 
 import yaml
 
-from .. import logger
+from . import logger
 
 
 def setup_logging(config_file: Path, log_dir: Path) -> None:

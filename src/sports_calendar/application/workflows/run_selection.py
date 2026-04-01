@@ -1,9 +1,10 @@
+from sportindex import SportClient
+
 from . import logger
-from ..core.calendar.calendar import SportsCalendar
-from sports_calendar.core.engine import Resolver
-from sports_calendar.core.selection import SelectionService
-from sports_calendar.core.calendar import SportsEventCollection, EVENT_TYPE_MAP
-from sports_calendar.core.google_calendar import GoogleCalendarManager, Secrets
+from sports_calendar.core.calendar import SportsCalendar, SportsEventCollection, EVENT_TYPE_MAP
+from sports_calendar.infra.engine import Resolver
+from sports_calendar.infra.google_calendar import GoogleCalendarManager, Secrets
+from sports_calendar.application.selection import SelectionService
 
 
 def run_selection(
@@ -17,7 +18,8 @@ def run_selection(
     SelectionService.initialize_registry()
 
     selection = SelectionService.get_selection(name)
-    resolved_collections = Resolver.resolve_selection(selection)
+    client = SportClient()
+    resolved_collections = Resolver.resolve_selection(selection, client)
 
     events = SportsEventCollection()
     for collection, sport in resolved_collections:

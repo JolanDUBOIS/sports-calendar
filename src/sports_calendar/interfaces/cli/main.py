@@ -1,11 +1,11 @@
 import typer
 
-from . import logger, __version__
-from .devtools import dev_tools
-from .initialize import init
-from .sync_calendar import sync_calendar, clear_cal
+from ... import logger, __version__
+from .dev import dev_tools
+from .sync import sync_calendar, clear_cal
+from sports_calendar.infra.setup import init
 # from .gui import launch_gui
-from .core.setup import Paths, setup_logging
+from ...infra.config import Paths, setup_logging
 
 
 app = typer.Typer(help="Sports Calendar CLI Application — manage DB, calendar, validation.")

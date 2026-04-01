@@ -1,9 +1,10 @@
 import yaml
 
 from . import logger
-from .models import Selection
-from ..utils import validate
-from sports_calendar.core import load_yml, Paths
+from sports_calendar.core.selection.models import Selection
+from sports_calendar.core.utils import validate
+from sports_calendar.infra.config import Paths
+from sports_calendar.infra.storage import load_yml
 
 
 class SelectionStorage:

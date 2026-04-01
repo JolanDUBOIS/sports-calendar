@@ -1,10 +1,10 @@
 from copy import deepcopy
 
-from . import logger
-from .models import Selection, SelectionItem
-from .filters import SelectionFilter
-from .storage import SelectionStorage
+from ...core.selection import logger
+from ...core.selection.models import Selection, SelectionItem
+from ...core.selection.filters import SelectionFilter
 from .registry import SelectionRegistry
+from sports_calendar.infra.storage.selection import SelectionStorage
 
 
 class SelectionService:
