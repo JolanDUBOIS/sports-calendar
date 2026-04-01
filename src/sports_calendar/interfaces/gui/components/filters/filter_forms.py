@@ -10,7 +10,6 @@ from .fields import (
     MultipleSelectField,
     SearchableMultipleSelectField
 )
-from sports_calendar.core.db import SPORT_SCHEMAS
 from sports_calendar.core import CompetitionStage
 from sports_calendar.core.selection import SelectionFilter, FilterType
 
@@ -183,7 +182,7 @@ def _get_fields_competitions_filter(filter: SelectionFilter | SimpleNamespace) -
         )
     ]
 
-def _get_fields_session_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
+def _get_fields_sessions_filter(filter: SelectionFilter | SimpleNamespace) -> list[BaseField]:
     if isinstance(filter, SimpleNamespace):
         filter.sessions = []
 
@@ -209,5 +208,5 @@ DISPATCH_FILTER_FIELDS = {
     FilterType.MIN_RANKING: _get_fields_min_ranking_filter,
     FilterType.TEAMS: _get_fields_teams_filter,
     FilterType.COMPETITIONS: _get_fields_competitions_filter,
-    FilterType.SESSION: _get_fields_session_filter,
+    FilterType.SESSIONS: _get_fields_sessions_filter,
 }

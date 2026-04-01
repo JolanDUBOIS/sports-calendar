@@ -6,7 +6,8 @@ from .modals import Modal
 from .filters import filters_list
 from .filters.fields import TextField
 from .filters.filter_modal import open_filter_modal
-from sports_calendar.core.selection import SelectionService, Selection, SelectionItem
+from sports_calendar.core.selection import Selection, SelectionItem
+from sports_calendar.application.selection import SelectionService
 
 
 def items_list(selection: Selection):

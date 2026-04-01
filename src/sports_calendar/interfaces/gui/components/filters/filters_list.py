@@ -4,7 +4,8 @@ from . import logger
 from .filters_body import filter_body
 from .filter_modal import open_filter_modal
 from ..modals import Modal
-from sports_calendar.core.selection import SelectionService, SelectionItem, SelectionFilter
+from sports_calendar.core.selection import SelectionItem, SelectionFilter
+from sports_calendar.application.selection import SelectionService
 
 
 def filters_list(selection_name: str, selection_item: SelectionItem):

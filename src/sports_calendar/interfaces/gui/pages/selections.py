@@ -5,7 +5,7 @@ from ..components.modals import Modal
 from ..components.selections_list import selections_list
 from ..components.filters.fields import ValidatedTextField
 from sports_calendar.core.utils import validate
-from sports_calendar.core.selection import SelectionService
+from sports_calendar.application.selection import SelectionService
 
 
 def register():
