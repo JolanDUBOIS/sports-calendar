@@ -7,7 +7,7 @@ from .fields import (
     EmptyFilterFields,
     MinRankingFilterFields,
     CompetitionsFilterFields,
-    TeamsFilterFields,
+    CompetitorsFilterFields,
     SessionsFilterFields
 )
 
@@ -27,15 +27,15 @@ FILTER_DEFINITIONS: dict[FilterType, FilterDefinition] = {
     ),
     FilterType.MIN_RANKING: FilterDefinition(
         fields_cls=MinRankingFilterFields,
-        target=FilterTarget.TEAM
+        target=FilterTarget.COMPETITOR
     ),
     FilterType.COMPETITIONS: FilterDefinition(
         fields_cls=CompetitionsFilterFields,
         target=FilterTarget.COMPETITION
     ),
-    FilterType.TEAMS: FilterDefinition(
-        fields_cls=TeamsFilterFields,
-        target=FilterTarget.TEAM
+    FilterType.COMPETITORS: FilterDefinition(
+        fields_cls=CompetitorsFilterFields,
+        target=FilterTarget.COMPETITOR
     ),
     FilterType.SESSIONS: FilterDefinition(
         fields_cls=SessionsFilterFields,
@@ -47,7 +47,7 @@ FILTER_DEFINITIONS: dict[FilterType, FilterDefinition] = {
 # === Mapping from FilterTarget to Basic FilterFields ====
 FILTER_TARGET_TO_BASIC: dict[FilterTarget, type[FilterFields]] = {
     FilterTarget.NONE: EmptyFilterFields,
-    FilterTarget.TEAM: TeamsFilterFields,
+    FilterTarget.COMPETITOR: CompetitorsFilterFields,
     FilterTarget.COMPETITION: CompetitionsFilterFields,
     FilterTarget.SESSION: SessionsFilterFields,
 }

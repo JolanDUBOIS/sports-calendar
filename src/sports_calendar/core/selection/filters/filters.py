@@ -6,13 +6,12 @@ from dataclasses import dataclass, field
 from . import logger
 from .fields import FilterFields, EmptyFilterFields
 from .definitions import FilterType, FILTER_DEFINITIONS
-from sports_calendar.core import SportType
-from sports_calendar.core.utils import validate, validate_timestamp
+from sports_calendar.core.utils import validate_timestamp
 
 
 @dataclass(frozen=True)
 class SelectionFilter:
-    sport: SportType
+    sport_id: int
     name: str = ""
     uid: str = field(default_factory=lambda: str(uuid4())[:8])
     fields: FilterFields = field(default_factory=EmptyFilterFields)
@@ -28,7 +27,7 @@ class SelectionFilter:
     def clone(self) -> SelectionFilter:
         """ Create a deep copy of this SelectionFilter with a new ID. """
         return SelectionFilter(
-            sport=self.sport,
+            sport_id=self.sport_id,
             name=self.name,
             fields=self.fields.clone()
         )
@@ -42,7 +41,7 @@ class SelectionFilter:
     def to_dict(self) -> dict:
         """ Convert this SelectionFilter to a dictionary. """
         return {
-            "sport": self.sport.value,
+            "sport_id": self.sport_id,
             "name": self.name,
             "uid": self.uid,
             "fields": self.fields.to_dict() if self.fields else None,
@@ -53,9 +52,6 @@ class SelectionFilter:
     def from_dict(cls, data: dict) -> SelectionFilter:
         """ Create a SelectionFilter from a dictionary. """
         data = dict(data)
-
-        sport = SportType(data.pop("sport"))
-
         fields_data = data.pop("fields") or {}
 
         raw_filter_type = fields_data.get("filter_type", FilterType.EMPTY.value)
@@ -65,11 +61,10 @@ class SelectionFilter:
         fields = fields_cls.from_dict(fields_data)
 
         return cls(
-            sport=sport,
             fields=fields,
             **data
         )
 
     @classmethod
-    def empty(cls, sport: SportType, name: str = "") -> SelectionFilter:
-        return cls(sport=sport, name=name, fields=EmptyFilterFields())
+    def empty(cls, sport_id: int, name: str = "") -> SelectionFilter:
+        return cls(sport_id=sport_id, name=name, fields=EmptyFilterFields())

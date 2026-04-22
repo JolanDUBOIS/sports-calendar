@@ -5,7 +5,7 @@ from .dev import dev_tools
 from .sync import sync_calendar, clear_cal
 from sports_calendar.infra.setup import init
 # from .gui import launch_gui
-from ...infra.config import Paths, setup_logging
+from sports_calendar.infra import Paths, setup_logging
 
 
 app = typer.Typer(help="Sports Calendar CLI Application — manage DB, calendar, validation.")

@@ -5,6 +5,6 @@ from .base import BaseExecutor
 from .competitions import CompetitionsExecutor
 from .empty import EmptyExecutor
 from .min_ranking import MinRankingExecutor
-from .teams import TeamsExecutor
+from .competitors import CompetitorsExecutor
 from .sessions import SessionsExecutor
 from .mapping import EXECUTOR_MAP

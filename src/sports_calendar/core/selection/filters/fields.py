@@ -123,29 +123,29 @@ class CompetitionsFilterFields:
         )
 
 @dataclass
-class TeamsFilterFields:
-    team_ids: list[int]
-    filter_type: Literal[FilterType.TEAMS] = FilterType.TEAMS
+class CompetitorsFilterFields:
+    competitor_ids: list[int]
+    filter_type: Literal[FilterType.COMPETITORS] = FilterType.COMPETITORS
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
-        validate(isinstance(self.team_ids, list) and all(isinstance(tid, int) for tid in self.team_ids),
-                 "team_ids must be a list of integers", logger)
+        validate(isinstance(self.competitor_ids, list) and all(isinstance(cid, int) for cid in self.competitor_ids),
+                 "competitor_ids must be a list of integers", logger)
 
-    def clone(self) -> TeamsFilterFields:
+    def clone(self) -> CompetitorsFilterFields:
         return copy.deepcopy(self)
 
     def to_dict(self) -> dict:
         return {
-            "team_ids": self.team_ids,
+            "competitor_ids": self.competitor_ids,
             "filter_type": self.filter_type.value,
             "selection_rule": self.selection_rule.to_dict()
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> TeamsFilterFields:
+    def from_dict(cls, data: dict) -> CompetitorsFilterFields:
         return cls(
-            team_ids=data["team_ids"],
+            competitor_ids=data["competitor_ids"],
             selection_rule=EntitySelectionRule.from_dict(data.get("selection_rule", {}))
         )
 

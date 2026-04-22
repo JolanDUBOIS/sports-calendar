@@ -1,4 +1,4 @@
-from sportindex import SportClient, EventCollection
+from sportindex import SportClient, EventCollection, Competition
 
 from . import logger
 from .base import BaseExecutor
@@ -13,7 +13,7 @@ class CompetitionsExecutor(BaseExecutor[CompetitionsFilterFields]):
         """ Fetch events that meet the competitions criteria using the provided SportClient. """
         events = EventCollection()
         for competition_id in filter_fields.competition_ids:
-            competition = client.get_competition(competition_id)
+            competition = client.get(Competition, competition_id)
             if competition is None:
                 logger.warning(f"Competition with ID {competition_id} not found. Skipping.")
                 continue

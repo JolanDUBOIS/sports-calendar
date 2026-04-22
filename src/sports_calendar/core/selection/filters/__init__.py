@@ -6,7 +6,7 @@ from .fields import (
     EmptyFilterFields,
     MinRankingFilterFields,
     CompetitionsFilterFields,
-    TeamsFilterFields,
+    CompetitorsFilterFields,
     SessionsFilterFields
 )
 from .filters import SelectionFilter

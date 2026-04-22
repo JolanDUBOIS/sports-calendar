@@ -22,10 +22,10 @@ def run_selection(
     resolved_collections = Resolver.resolve_selection(selection, client)
 
     events = SportsEventCollection()
-    for collection, sport in resolved_collections:
-        event_cls = EVENT_TYPE_MAP.get(sport)
+    for collection, sport_id in resolved_collections:
+        event_cls = EVENT_TYPE_MAP.get(sport_id)
         if not event_cls:
-            raise ValueError(f"Unsupported sport type {sport} for event transformation.")
+            raise ValueError(f"Unsupported sport id {sport_id} for event transformation.")
         events += SportsEventCollection.from_sport_index_collection(collection, event_cls)
 
     events.drop_duplicates(inplace=True)

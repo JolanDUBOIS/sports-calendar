@@ -1,26 +1,22 @@
 from __future__ import annotations
 from datetime import datetime, timedelta
 
-from sportindex import Event as SportIndexEvent
+import sportindex
 
-from . import logger
 from .base import SportsEvent
-from sports_calendar.core import SportType
 
 
-class FootballEvent(SportsEvent):
-    """ Represents a football match event. """
-    sport = SportType.FOOTBALL
+class MatchEvent(SportsEvent):
+    """ Represents an match event (opposition sport event). """
 
     def __init__(
         self,
         start: datetime | str,
-        home_team_id: str = None,
-        home_team_name: str = "",
-        home_team_abbreviation: str = None,
-        away_team_id: str = None,
-        away_team_name: str = "",
-        away_team_abbreviation: str = None,
+        sport: str = "unknown", 
+        home_competitor_id: str = None,
+        home_competitor_name: str = "",
+        away_competitor_id: str = None,
+        away_competitor_name: str = "",
         competition_id: str = None,
         competition_name: str = None,
         stage: str = None,
@@ -28,16 +24,15 @@ class FootballEvent(SportsEvent):
         venue: str = None,
         **kwargs
     ):
-        """ Initialize the FootballEvent with match details. """
+        """ Initialize the MatchEvent with match details. """
         self._start = start
+        self.sport = sport
 
-        self.home_team_id = home_team_id
-        self.home_team_name = home_team_name
-        self.home_team_abbreviation = home_team_abbreviation
+        self.home_competitor_id = home_competitor_id
+        self.home_competitor_name = home_competitor_name
 
-        self.away_team_id = away_team_id
-        self.away_team_name = away_team_name
-        self.away_team_abbreviation = away_team_abbreviation
+        self.away_competitor_id = away_competitor_id
+        self.away_competitor_name = away_competitor_name
 
         self.competition_id = competition_id
         self.competition_name = competition_name
@@ -51,27 +46,27 @@ class FootballEvent(SportsEvent):
 
     @property
     def summary(self) -> str:
-        """ TODO """
-        return f"{self.home_team_name} - {self.away_team_name} ({self.competition_name})"
+        """ Summary of the Match event. """
+        return f"{self.home_competitor_name} - {self.away_competitor_name} ({self.competition_name})"
 
     @property
     def start(self) -> datetime:
-        """ TODO """
+        """ Start time of the Match event. """
         return self._start if isinstance(self._start, datetime) else datetime.fromisoformat(self._start) 
 
     @property
     def end(self) -> datetime:
-        """ TODO """
+        """ End time of the Match event. """
         return self.start + timedelta(hours=2)
 
     @property
     def location(self) -> str:
-        """ TODO """
+        """ Location of the Match event. """
         return self._venue
 
     @property
     def description(self) -> str:
-        """ TODO """
+        """ Description of the Match event. """
         description_lines = [f"Sport: {self.sport}"]
         if self.competition_name:
             description_lines.append(f"Competition: {self.competition_name}")
@@ -83,19 +78,18 @@ class FootballEvent(SportsEvent):
 
     def identity_key(self) -> str:
         """ Return a unique string identifying this event for equality/deduplication. """
-        return f"{self.sport} | {self.home_team_name} vs {self.away_team_name} | {self.start}"
+        return f"{self.sport} | {self.home_competitor_name} vs {self.away_competitor_name} | {self.start}"
 
     @classmethod
-    def from_sport_index_event(cls, event: SportIndexEvent) -> FootballEvent:
-        """ Factory method to create a FootballEvent from a SportIndexEvent. """
+    def from_sport_index_event(cls, event: sportindex.MatchEvent) -> MatchEvent:
+        """ Factory method to create a MatchEvent from a sportindex.MatchEvent. """
         return cls(
             start=event.start,
-            home_team_id=event.competitors.home.id if event.competitors and event.competitors.home else None,
-            home_team_name=event.competitors.home.name if event.competitors and event.competitors.home else "",
-            home_team_abbreviation=event.competitors.home.name_code if event.competitors and event.competitors.home else None,
-            away_team_id=event.competitors.away.id if event.competitors and event.competitors.away else None,
-            away_team_name=event.competitors.away.name if event.competitors and event.competitors.away else "",
-            away_team_abbreviation=event.competitors.away.name_code if event.competitors and event.competitors.away else None,
+            sport=event.sport.name,
+            home_competitor_id=event.competitors.home.id if event.competitors and event.competitors.home else None,
+            home_competitor_name=event.competitors.home.name if event.competitors and event.competitors.home else "",
+            away_competitor_id=event.competitors.away.id if event.competitors and event.competitors.away else None,
+            away_competitor_name=event.competitors.away.name if event.competitors and event.competitors.away else "",
             competition_id=event.competition.id if event.competition else None,
             competition_name=event.competition.name if event.competition else None,
             stage=event.round.name if event.round else None,

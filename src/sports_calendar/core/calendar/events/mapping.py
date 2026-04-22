@@ -1,9 +1,9 @@
 from .base import SportsEvent
-from .f1 import F1Event
-from .football import FootballEvent
-from sports_calendar.core import SportType
+from .match import MatchEvent
+from .stage import StageEvent
 
-EVENT_TYPE_MAP: dict[SportType, type[SportsEvent]] = {
-    SportType.F1: F1Event,
-    SportType.FOOTBALL: FootballEvent
+
+EVENT_TYPE_MAP: dict[int, type[SportsEvent]] = {
+    1: MatchEvent,
+    11: StageEvent
 }

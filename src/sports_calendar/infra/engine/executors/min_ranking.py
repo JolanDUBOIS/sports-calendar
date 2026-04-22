@@ -2,8 +2,8 @@ from sportindex import SportClient, EventCollection, Competition, Standings
 
 from . import logger
 from .base import BaseExecutor
-from .teams import TeamsExecutor
-from sports_calendar.core.selection import MinRankingFilterFields, TeamsFilterFields
+from .competitors import CompetitorsExecutor
+from sports_calendar.core.selection import MinRankingFilterFields, CompetitorsFilterFields
 
 
 class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
@@ -12,21 +12,21 @@ class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
     @classmethod
     def fetch(cls, filter_fields: MinRankingFilterFields, client: SportClient) -> EventCollection:
         """ Fetch events that meet the minimum ranking criteria using the provided SportClient. """
-        teams_filter_fields = cls._transform_to_teams_filter_fields(filter_fields, client)
-        return TeamsExecutor.fetch(teams_filter_fields, client)
+        competitors_filter_fields = cls._transform_to_competitors_filter_fields(filter_fields, client)
+        return CompetitorsExecutor.fetch(competitors_filter_fields, client)
 
     @classmethod
     def apply(cls, filter_fields: MinRankingFilterFields, events: EventCollection, client: SportClient) -> EventCollection:
         """ Apply the minimum ranking filter to the provided events. """
-        teams_filter_fields = cls._transform_to_teams_filter_fields(filter_fields, client=client)
-        return TeamsExecutor.apply(teams_filter_fields, events, client)
+        competitors_filter_fields = cls._transform_to_competitors_filter_fields(filter_fields, client=client)
+        return CompetitorsExecutor.apply(competitors_filter_fields, events, client)
 
     @classmethod
-    def _transform_to_teams_filter_fields(cls, filter_fields: MinRankingFilterFields, client: SportClient) -> TeamsFilterFields:
-        """ Transform MinRankingFilterFields into TeamsFilterFields by fetching the relevant teams based on the specified ranking and competitions. """
-        team_ids: set[str] = set()
+    def _transform_to_competitors_filter_fields(cls, filter_fields: MinRankingFilterFields, client: SportClient) -> CompetitorsFilterFields:
+        """ Transform MinRankingFilterFields into CompetitorsFilterFields by fetching the relevant competitors based on the specified ranking and competitions. """
+        competitor_ids: set[str] = set()
         for comp_id in filter_fields.competition_ids:
-            competition = client.get_competition(comp_id)
+            competition = client.get(Competition, comp_id)
             total_standings, reason = cls._extract_total_standings(competition)
 
             if total_standings is None:
@@ -35,9 +35,9 @@ class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
 
             for entry in total_standings.entries:
                 if entry.position <= filter_fields.ranking:
-                    team_ids.add(entry.competitor.id)
+                    competitor_ids.add(entry.competitor.id)
 
-        return TeamsFilterFields(team_ids=sorted(team_ids), selection_rule=filter_fields.selection_rule)
+        return CompetitorsFilterFields(competitor_ids=sorted(competitor_ids), selection_rule=filter_fields.selection_rule)
 
     @staticmethod
     def _extract_total_standings(competition: Competition | None) -> tuple[Standings | None, str | None]:
@@ -52,7 +52,7 @@ class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
         if standings is None:
             return None, "no standings"
 
-        total = standings.get(kind="total")
+        total = next((s for s in standings if s.kind == "total"), None)
         if total is None:
             return None, "no total standings"
 

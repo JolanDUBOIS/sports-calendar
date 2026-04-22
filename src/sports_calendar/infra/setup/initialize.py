@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-from sports_calendar.core import Paths
+from sports_calendar.infra import Paths
 
 
 def init():

@@ -3,15 +3,12 @@ from abc import ABC, abstractmethod
 
 from datetime import datetime
 
+import sportindex
 from icalendar import Event as ICalendarEvent
-from sportindex import Event as SportIndexEvent, EventCollection as SportIndexEventCollection
-
-from sports_calendar.core import SportType
 
 
 class SportsEvent(ABC):
     """ Abstract base class for sports events. """
-    sport: SportType
 
     def __init__(self, **kwargs):
         """ Initialize the sports event with common attributes. """
@@ -19,7 +16,7 @@ class SportsEvent(ABC):
 
     def __repr__(self):
         """ Return a string representation of the event. """
-        return f"{self.__class__.__name__}(sport={self.sport}, summary={self.summary}, start={self.start}, end={self.end})"
+        return f"{self.__class__.__name__}(summary={self.summary}, start={self.start}, end={self.end})"
 
     @property
     @abstractmethod
@@ -63,8 +60,8 @@ class SportsEvent(ABC):
 
     @classmethod
     @abstractmethod
-    def from_sport_index_event(cls, event: SportIndexEvent) -> SportsEvent:
-        """ Factory method to create a SportsEvent from a SportIndexEvent. """
+    def from_sport_index_event(cls, event: sportindex.Event) -> SportsEvent:
+        """ Factory method to create a SportsEvent from a sportindex.Event. """
         raise NotImplementedError("Subclasses must implement from_sport_index_event class method for event creation from SportIndex data.")
 
 
@@ -129,8 +126,8 @@ class SportsEventCollection:
             return SportsEventCollection(unique)
 
     @classmethod
-    def from_sport_index_collection(cls, collection: SportIndexEventCollection, event_cls: type[SportsEvent]) -> SportsEventCollection:
-        """ Factory method to create a SportsEventCollection from a SportIndexEventCollection. """
+    def from_sport_index_collection(cls, collection: sportindex.EventCollection, event_cls: type[SportsEvent]) -> SportsEventCollection:
+        """ Factory method to create a SportsEventCollection from a sportindex.EventCollection. """
         events = [event_cls.from_sport_index_event(event) for event in collection]
         return cls(events)
 

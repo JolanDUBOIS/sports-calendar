@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from . import logger
-from sports_calendar.core import Paths
+from sports_calendar.infra import Paths
 
 
 class Credentials:

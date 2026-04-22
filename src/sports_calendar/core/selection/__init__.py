@@ -5,6 +5,6 @@ from .models import Selection, SelectionItem
 from .filters import (
     SelectionFilter, FilterType, Rule, EntitySelectionRule,
     FilterFields, EmptyFilterFields, MinRankingFilterFields,
-    CompetitionsFilterFields, TeamsFilterFields, SessionsFilterFields,
+    CompetitionsFilterFields, CompetitorsFilterFields, SessionsFilterFields,
     FilterTarget, FILTER_DEFINITIONS
 )

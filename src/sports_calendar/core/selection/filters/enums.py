@@ -7,13 +7,13 @@ class FilterType(Enum):
     EMPTY = "empty"
     MIN_RANKING = "min_ranking"
     COMPETITIONS = "competitions"
-    TEAMS = "teams"
-    SESSIONS = "session"
+    COMPETITORS = "competitors"
+    SESSIONS = "sessions"
 
 
 # === Filter Target Enum ====
 class FilterTarget(Enum):
-    TEAM = "team"
+    COMPETITOR = "competitor"
     COMPETITION = "competition"
     SESSION = "session"
     NONE = "none"
