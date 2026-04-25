@@ -1,4 +1,4 @@
-from sportindex import SportClient, EventCollection, Competition
+from sportindex import SportClient, EventCollection, Competition, StageEvent
 
 from . import logger
 from .base import BaseExecutor
@@ -34,6 +34,8 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
         """ Filter events based on the sessions criteria defined in the filter fields. """
         filtered_events = EventCollection()
         for event in events:
-            if event.competition and event.competition.id == filter_fields.competition_id and event.name in filter_fields.sessions:
+            if not isinstance(event, StageEvent):
+                continue
+            if event.competition and event.competition.id == filter_fields.competition_id and event.tier in filter_fields.sessions:
                     filtered_events.add(event)
         return filtered_events

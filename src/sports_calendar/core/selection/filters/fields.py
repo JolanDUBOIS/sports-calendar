@@ -4,6 +4,8 @@ from enum import Enum
 from typing import Protocol, Literal
 from dataclasses import dataclass, field
 
+from sportindex import StageTier
+
 from . import logger
 from .enums import FilterType
 from sports_calendar.core import CompetitionStage
@@ -152,9 +154,8 @@ class CompetitorsFilterFields:
 @dataclass
 class SessionsFilterFields:
     competition_id: int
-    sessions: list[str]  # e.g., ["Grand Prix", "Sprint", "Practice", "Sprint Qualifying", "Qualifying", etc.]
+    sessions: list[StageTier]
     filter_type: Literal[FilterType.SESSIONS] = FilterType.SESSIONS
-    # NOTE: sessions might evolve when more sports are added, we might need to create enums...
 
     def __post_init__(self):
         validate(isinstance(self.competition_id, int), "competition_id must be an integer", logger)
@@ -167,7 +168,7 @@ class SessionsFilterFields:
     def to_dict(self) -> dict:
         return {
             "competition_id": self.competition_id,
-            "sessions": self.sessions,
+            "sessions": [session.value for session in self.sessions],
             "filter_type": self.filter_type.value
         }
 
@@ -175,7 +176,7 @@ class SessionsFilterFields:
     def from_dict(cls, data: dict) -> SessionsFilterFields:
         return cls(
             competition_id=data["competition_id"],
-            sessions=data["sessions"]
+            sessions=[StageTier(value) for value in data["sessions"]]
         )
 
 
