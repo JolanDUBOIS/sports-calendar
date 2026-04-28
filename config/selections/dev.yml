@@ -3,55 +3,56 @@ items:
 - created_at: '2026-01-30T19:57:02'
   filters:
   - created_at: '2026-01-30T19:57:02'
-    fields: {}
-    filter_type: empty
+    fields:
+      filter_type: empty
     name: item-1-filter-1
-    sport: football
+    sport_id: 1
     uid: it-001-filt-001
   - created_at: '2026-01-30T19:57:02'
     fields:
       competition_ids:
-      - 1
-      - 2
-      - 3
+      - 14
+      - 1358
+      - 68
+      filter_type: min_ranking
       ranking: 5
       selection_rule:
         reference: null
         rule: both
-    filter_type: min_ranking
     name: item-1-filter-2
-    sport: football
+    sport_id: 1
     uid: it-001-filt-002
   - created_at: '2026-01-30T19:57:02'
     fields:
+      competitor_ids:
+      - 3288
+      - 3296
+      - 3280
+      filter_type: competitors
       selection_rule:
-        reference: 40
+        reference: 80
         rule: opponent
-      team_ids:
-      - 10
-      - 20
-      - 30
-    filter_type: teams
     name: item-1-filter-3
-    sport: football
+    sport_id: 1
     uid: it-001-filt-003
   name: item-1
-  sport: football
+  sport_id: 1
   uid: it-001
   updated_at: '2026-01-30T19:57:02'
 - created_at: '2026-01-30T19:57:02'
   filters:
   - created_at: '2026-01-30T19:57:02'
     fields:
+      competition_id: 81
+      filter_type: sessions
       sessions:
       - Sprint
       - Race
-    filter_type: session
     name: item-2-filter-1
-    sport: football
+    sport_id: 11
     uid: it-002-filt-001
   name: item-2
-  sport: f1
+  sport_id: 11
   uid: it-002
   updated_at: '2026-01-30T19:57:02'
 name: dev

@@ -1,4 +1,4 @@
-from typing import get_origin, get_args, Any, List, Dict, Tuple, Union
+from typing import Any, Union, get_args, get_origin
 
 
 def coerce(value: any, to_type: type) -> any:
@@ -14,7 +14,7 @@ def coerce(value: any, to_type: type) -> any:
         return coerce(value, actual_type)
 
     # Lists
-    if origin is list or origin is List:
+    if origin is list or origin is list:
         if not isinstance(value, list):
             # Try to wrap a single value into a list
             value = [value]
@@ -22,7 +22,7 @@ def coerce(value: any, to_type: type) -> any:
         return [coerce(v, item_type) for v in value]
 
     # Tuples
-    if origin is tuple or origin is Tuple:
+    if origin is tuple or origin is tuple:
         if not isinstance(value, (tuple, list)):
             raise TypeError(f"Cannot coerce {value!r} to tuple")
         if len(args) == 2 and args[1] is ...:
@@ -30,10 +30,10 @@ def coerce(value: any, to_type: type) -> any:
             return tuple(coerce(v, args[0]) for v in value)
         if len(args) != len(value):
             raise TypeError(f"Tuple length mismatch: expected {len(args)}, got {len(value)}")
-        return tuple(coerce(v, t) for v, t in zip(value, args))
+        return tuple(coerce(v, t) for v, t in zip(value, args, strict=False))
 
     # Dicts
-    if origin is dict or origin is Dict:
+    if origin is dict or origin is dict:
         if not isinstance(value, dict):
             raise TypeError(f"Cannot coerce {value!r} to dict")
         key_type, val_type = args if args else (Any, Any)

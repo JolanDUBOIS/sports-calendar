@@ -31,3 +31,6 @@ config/selections/*
 
 # Distribution / build files
 dist/
+
+# Tests data
+tests/mock_data/

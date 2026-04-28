@@ -29,8 +29,8 @@ class Selection:
         return self.name
 
     @property
-    def sports(self) -> list[str]:
-        return list({item.sport for item in self.items})
+    def sport_ids(self) -> list[int]:
+        return list({item.sport_id for item in self.items})
 
     def _items_uids(self):
         return [item.uid for item in self.items]
@@ -102,7 +102,7 @@ class Selection:
 
 @dataclass
 class SelectionItem:
-    sport: str
+    sport_id: int
     uid: str = field(default_factory=lambda: str(uuid4())[:8], kw_only=True)
     filters: list[SelectionFilter] = field(default_factory=list)
     name: str = ""
@@ -110,7 +110,7 @@ class SelectionItem:
     updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
 
     def __post_init__(self):
-        validate(bool(self.sport), "SelectionItem sport must be a non-empty string", logger)
+        validate(bool(self.sport_id), "SelectionItem sport_id must be a non-empty int", logger)
         validate(isinstance(self.filters, list), "SelectionItem filters must be a list", logger, TypeError)
         for f in self.filters:
             validate(isinstance(f, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
@@ -129,7 +129,7 @@ class SelectionItem:
 
     def add_filter(self, selection_filter: SelectionFilter):
         validate(isinstance(selection_filter, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
-        validate(selection_filter.sport == self.sport, "SelectionFilter sport must match SelectionItem sport", logger, ValueError)
+        validate(selection_filter.sport_id == self.sport_id, "SelectionFilter sport_id must match SelectionItem sport_id", logger, ValueError)
         validate(selection_filter.uid not in self._filters_uids(), f"Selection filter with uid '{selection_filter.uid}' already exists in selection item '{self.uid}'", logger, ValueError)
         self.filters.append(selection_filter)
         self._update_timestamp()
@@ -137,7 +137,7 @@ class SelectionItem:
 
     def replace_filter(self, selection_filter: SelectionFilter):
         validate(isinstance(selection_filter, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
-        validate(selection_filter.sport == self.sport, "SelectionFilter sport must match SelectionItem sport", logger, ValueError)
+        validate(selection_filter.sport_id == self.sport_id, "SelectionFilter sport_id must match SelectionItem sport_id", logger, ValueError)
         validate(selection_filter.uid in self._filters_uids(), f"Selection filter with uid '{selection_filter.uid}' does not exist in selection item '{self.uid}'", logger, KeyError)
         self.filters = [f for f in self.filters if f.uid != selection_filter.uid]
         self.filters.append(selection_filter)
@@ -156,14 +156,14 @@ class SelectionItem:
         """ Create a deep copy of this SelectionItem with a new ID. """
         cloned_filters = [f.clone() for f in self.filters]
         return SelectionItem(
-            sport=self.sport,
+            sport_id=self.sport_id,
             name=self.name,
             filters=cloned_filters
         )
 
     def to_dict(self) -> dict:
         return {
-            "sport": self.sport,
+            "sport_id": self.sport_id,
             "uid": self.uid,
             "name": self.name,
             "filters": [f.to_dict() for f in self.filters],
@@ -173,19 +173,18 @@ class SelectionItem:
 
     @classmethod
     def from_dict(cls, data: dict) -> SelectionItem:
-        logger.debug(f"Deserializing SelectionItem with sport '{data.get('sport')}'")
+        logger.debug(f"Deserializing SelectionItem with sport_id '{data.get('sport_id')}'")
         validate(isinstance(data, dict), "SelectionItem data must be a dictionary", logger, TypeError)
         data = dict(data)
-        filters_data = data.pop("filters", [])
-        filters = [SelectionFilter.from_dict(data=filter_data) for filter_data in filters_data]
+        filters = [SelectionFilter.from_dict(data=filter_data) for filter_data in data.pop("filters", [])]
         return cls(
             filters=filters,
             **data
         )
 
     @classmethod
-    def empty(cls, sport: str, name: str = "") -> SelectionItem:
-        return cls(sport=sport, name=name)
+    def empty(cls, sport_id: int, name: str = "") -> SelectionItem:
+        return cls(sport_id=sport_id, name=name)
 
     def _update_timestamp(self):
         self.updated_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
