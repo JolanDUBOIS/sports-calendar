@@ -1,9 +1,16 @@
-from sportindex import SportClient, EventCollection, Competition, Standings
+import logging
 
-from . import logger
+from sportindex import Competition, EventCollection, SportClient, Standings
+
+from sports_calendar.core.selection import (
+    CompetitorsFilterFields,
+    MinRankingFilterFields,
+)
+
 from .base import BaseExecutor
 from .competitors import CompetitorsExecutor
-from sports_calendar.core.selection import MinRankingFilterFields, CompetitorsFilterFields
+
+logger = logging.getLogger(__name__)
 
 
 class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):

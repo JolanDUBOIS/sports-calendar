@@ -1,13 +1,12 @@
-from .. import logger
+from .definitions import FILTER_DEFINITIONS, FilterTarget, FilterType
 from .fields import (
-    Rule,
-    EntitySelectionRule,
-    FilterFields,
-    EmptyFilterFields,
-    MinRankingFilterFields,
     CompetitionsFilterFields,
     CompetitorsFilterFields,
-    SessionsFilterFields
+    EmptyFilterFields,
+    EntitySelectionRule,
+    FilterFields,
+    MinRankingFilterFields,
+    Rule,
+    SessionsFilterFields,
 )
 from .filters import SelectionFilter
-from .definitions import FilterType, FilterTarget, FILTER_DEFINITIONS

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from sports_calendar.core.selection.filters.definitions import FilterType
 
-from .min_ranking import MinRankingExecutor
-from .competitors import CompetitorsExecutor
-from .sessions import SessionsExecutor
 from .competitions import CompetitionsExecutor
+from .competitors import CompetitorsExecutor
 from .empty import EmptyExecutor
-from .base import BaseExecutor
+from .min_ranking import MinRankingExecutor
+from .sessions import SessionsExecutor
+
+if TYPE_CHECKING:
+    from .base import BaseExecutor
 
 
 EXECUTOR_MAP: dict[FilterType, type[BaseExecutor]] = {

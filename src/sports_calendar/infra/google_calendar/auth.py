@@ -1,12 +1,15 @@
+import logging
 from pathlib import Path
 
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
 from google.auth.exceptions import RefreshError
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from . import logger
 from .config import Credentials as AppCredentials
+
+logger = logging.getLogger(__name__)
+
 
 class GoogleAuthManager:
     """ TODO """
@@ -22,7 +25,7 @@ class GoogleAuthManager:
     def credentials(self) -> Credentials:
         """ TODO """
         creds = None
-        
+
         def write_token(token_path: Path, creds: Credentials):
             with token_path.open(mode='w') as token:
                 token.write(creds.to_json())

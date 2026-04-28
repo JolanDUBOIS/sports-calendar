@@ -1,4 +1,2 @@
-import logging
-logger = logging.getLogger(__name__)
-
 from .competition_stages import CompetitionStage
+from .selection import Selection, SelectionFilter, SelectionItem

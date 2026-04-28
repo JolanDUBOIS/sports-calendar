@@ -1,7 +1,8 @@
-from sportindex import SportClient, EventCollection
+from sportindex import EventCollection, SportClient
+
+from sports_calendar.core.selection import EmptyFilterFields
 
 from .base import BaseExecutor
-from sports_calendar.core.selection import EmptyFilterFields
 
 
 class EmptyExecutor(BaseExecutor[EmptyFilterFields]):

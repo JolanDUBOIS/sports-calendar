@@ -1,21 +1,20 @@
-from typing import Type
 from dataclasses import dataclass
 
-from .enums import FilterType, FilterTarget
+from .enums import FilterTarget, FilterType
 from .fields import (
-    FilterFields,
-    EmptyFilterFields,
-    MinRankingFilterFields,
     CompetitionsFilterFields,
     CompetitorsFilterFields,
-    SessionsFilterFields
+    EmptyFilterFields,
+    FilterFields,
+    MinRankingFilterFields,
+    SessionsFilterFields,
 )
 
 
 # === Filter Definition Data Class ====
 @dataclass(frozen=True)
 class FilterDefinition:
-    fields_cls: Type[FilterFields]
+    fields_cls: type[FilterFields]
     target: FilterTarget
 
 

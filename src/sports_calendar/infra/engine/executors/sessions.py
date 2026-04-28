@@ -1,8 +1,12 @@
-from sportindex import SportClient, EventCollection, Competition, StageEvent
+import logging
 
-from . import logger
-from .base import BaseExecutor
+from sportindex import Competition, EventCollection, SportClient, StageEvent
+
 from sports_calendar.core.selection import SessionsFilterFields
+
+from .base import BaseExecutor
+
+logger = logging.getLogger(__name__)
 
 
 class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
@@ -18,6 +22,9 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
             return events
         main_events = competition.seasons[0].get_fixtures()
         for event in main_events:
+            if not isinstance(event, StageEvent):
+                logger.warning() # TODO - Write the warning
+                continue
             for substage in event.substages:
                 # TODO - Use stage type when released on SportIndex instead of the name !!!!
                 if substage.name in filter_fields.sessions: # TODO - Not just "in" but also "in" any of the sessions (e.g. "Qualifying" is fine for "Qualifying 1", "Qualifying 2", etc.)
@@ -35,6 +42,7 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
         filtered_events = EventCollection()
         for event in events:
             if not isinstance(event, StageEvent):
+                logger.warning() # TODO - Write the warning
                 continue
             if event.competition and event.competition.id == filter_fields.competition_id and event.tier in filter_fields.sessions:
                     filtered_events.add(event)

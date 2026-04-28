@@ -1,11 +1,16 @@
 from __future__ import annotations
-from datetime import datetime, timezone
 
-from icalendar import Calendar
+import logging
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
-from . import logger
-from .auth import GoogleAuthManager
 from .api_client import GoogleCalendarAPI
+from .auth import GoogleAuthManager
+
+if TYPE_CHECKING:
+    from icalendar import Calendar
+
+logger = logging.getLogger(__name__)
 
 
 class GoogleCalendarManager:
@@ -23,7 +28,7 @@ class GoogleCalendarManager:
     ) -> None:
         """ Add a calendar to Google Calendar """
         logger.info("Adding events to Google Calendar.")
-        today = datetime.now(timezone.utc).date().isoformat()
+        today = datetime.now(UTC).date().isoformat()
         if scope is None or scope == 'all':
             self.api.add_events(events=calendar.events, **kwargs)
         elif scope == 'future':
@@ -37,7 +42,7 @@ class GoogleCalendarManager:
     def clear_calendar(self, scope: str | None = None, date_from: str | None = None, date_to: str | None = None, verbose: bool = False) -> None:
         """ Clear events from the Google Calendar based on the specified scope """
         logger.info("Clearing events from Google Calendar.")
-        today = datetime.now(timezone.utc).date().isoformat()
+        today = datetime.now(UTC).date().isoformat()
         if scope is None:
             self.api.delete_events(date_from=date_from, date_to=date_to, verbose=verbose)
         elif scope == 'all':

@@ -1,10 +1,17 @@
+import logging
+
 from sportindex import SportClient
 
-from . import logger
-from sports_calendar.core.calendar import SportsCalendar, SportsEventCollection, EVENT_TYPE_MAP
+from sports_calendar.application.selection import SelectionService
+from sports_calendar.core.calendar import (
+    EVENT_TYPE_MAP,
+    SportsCalendar,
+    SportsEventCollection,
+)
 from sports_calendar.infra.engine import Resolver
 from sports_calendar.infra.google_calendar import GoogleCalendarManager, Secrets
-from sports_calendar.application.selection import SelectionService
+
+logger = logging.getLogger(__name__)
 
 
 def run_selection(

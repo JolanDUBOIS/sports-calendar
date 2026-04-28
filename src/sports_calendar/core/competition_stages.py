@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from enum import IntEnum
 
 
@@ -6,7 +7,7 @@ class CompetitionStage(IntEnum):
     NULL = 0
 
     QUALIFYING_PLAY_IN = 1
-    
+
     GROUP_STAGE = 2
     LEAGUE_STAGE = 2
 

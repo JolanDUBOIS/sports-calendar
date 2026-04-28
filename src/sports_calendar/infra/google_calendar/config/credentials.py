@@ -1,7 +1,12 @@
-from pathlib import Path
+import logging
+from typing import TYPE_CHECKING
 
-from . import logger
 from sports_calendar.infra import Paths
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 class Credentials:

@@ -1,12 +1,11 @@
-import typer 
+import typer
 
-from sports_calendar.application.workflows import run_selection, clear_calendar
-
+from sports_calendar.application.workflows import clear_calendar, run_selection
 
 sync_calendar = typer.Typer(help="Commands to run and manage the calendar selection and utils.")
 
 @sync_calendar.callback(invoke_without_command=True)
-def main(
+def main_run(
     name: str = typer.Argument("dev"),
     dry_run: bool = typer.Option(False, "--dry-run")
 ):
@@ -20,7 +19,7 @@ def main(
 clear_cal = typer.Typer(help="Commands to clear events from the Google Calendar.")
 
 @clear_cal.callback(invoke_without_command=True)
-def main(
+def main_clear(
     name: str = typer.Argument("dev"),
     scope: str | None = typer.Option(None, "--scope", help="Specify which events to clear: 'all', 'future', or 'past'."),
     date_from: str | None = typer.Option(None, "--date-from", help="Clear events from this date onwards (YYYY-MM-DD). Not needed if --scope is specified."),
@@ -30,7 +29,7 @@ def main(
     if scope is not None and scope not in ["all", "future", "past"]:
         typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
         raise typer.Exit(code=1)
-    
+
     clear_calendar(
         name=name,
         scope=scope,

@@ -1,8 +1,12 @@
-from sportindex import SportClient, EventCollection, Event, Competitor
+import logging
 
-from . import logger
-from .base import BaseExecutor
+from sportindex import Competitor, Event, EventCollection, SportClient
+
 from sports_calendar.core.selection import CompetitorsFilterFields, Rule
+
+from .base import BaseExecutor
+
+logger = logging.getLogger(__name__)
 
 
 class CompetitorsExecutor(BaseExecutor[CompetitorsFilterFields]):
@@ -42,9 +46,9 @@ class CompetitorsExecutor(BaseExecutor[CompetitorsFilterFields]):
             event_competitors = {event.competitors.home, event.competitors.away}
         if filter_fields.selection_rule.rule == Rule.ANY:
             return any(competitor_id in filter_fields.competitor_ids for competitor_id in [competitor.id for competitor in event_competitors])
-        elif filter_fields.selection_rule.rule == Rule.BOTH:
+        if filter_fields.selection_rule.rule == Rule.BOTH:
             return all(competitor_id in filter_fields.competitor_ids for competitor_id in [competitor.id for competitor in event_competitors])
-        elif filter_fields.selection_rule.rule == Rule.OPPONENT:
+        if filter_fields.selection_rule.rule == Rule.OPPONENT:
             reference_id = filter_fields.selection_rule.reference
             if reference_id in [competitor.id for competitor in event_competitors]:
                 other_competitor_id = next(competitor.id for competitor in event_competitors if competitor.id != reference_id)

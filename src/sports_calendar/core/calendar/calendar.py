@@ -1,9 +1,11 @@
+import logging
 from pathlib import Path
 
 from icalendar import Calendar
 
-from . import logger
-from .events import SportsEventCollection, SportsEvent
+from .events import SportsEvent, SportsEventCollection
+
+logger = logging.getLogger(__name__)
 
 
 class SportsCalendar:
@@ -28,7 +30,7 @@ class SportsCalendar:
         if path_suffix != '.ics':
             logger.error(f"Invalid file extension: {path_suffix}. Expected .ics")
             raise ValueError(f"Invalid file extension: {path_suffix}. Expected .ics")
-        with open(path, 'wb') as f:
+        with path.open('wb') as f:
             f.write(self.calendar.to_ical())
         logger.info(f"Calendar saved to {path}")
 

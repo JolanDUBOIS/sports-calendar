@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 # === Filter Type Enum ====
 
 class FilterType(Enum):

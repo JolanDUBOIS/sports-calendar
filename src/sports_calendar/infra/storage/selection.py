@@ -1,10 +1,13 @@
+import logging
+
 import yaml
 
-from . import logger
 from sports_calendar.core.selection.models import Selection
 from sports_calendar.core.utils import validate
 from sports_calendar.infra.config import Paths
 from sports_calendar.infra.storage import load_yml
+
+logger = logging.getLogger(__name__)
 
 
 class SelectionStorage:
@@ -20,8 +23,8 @@ class SelectionStorage:
 
     @staticmethod
     def save(selection: Selection, mode: str = "any"):
-        """ Save selection to disk. 
-        mode: 
+        """ Save selection to disk.
+        mode:
             'any' - save regardless of existing file
             'new' - only save if file does not exist else raise error
             'existing' - only save if file exists else raise error
@@ -34,7 +37,7 @@ class SelectionStorage:
         elif mode != "any":
             logger.error(f"Invalid save mode: {mode}")
             raise ValueError(f"Invalid save mode: {mode}")
-        with open(path, "w") as f:
+        with path.open("w") as f:
             yaml.safe_dump(selection.to_dict(), f)
 
     @staticmethod

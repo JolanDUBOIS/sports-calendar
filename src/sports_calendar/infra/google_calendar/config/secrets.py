@@ -1,6 +1,9 @@
-from . import logger
+import logging
+
 from sports_calendar.infra.config import Paths
 from sports_calendar.infra.storage import load_yml
+
+logger = logging.getLogger(__name__)
 
 
 class Secrets:

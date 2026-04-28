@@ -1,12 +1,15 @@
+import logging
 import time
 from datetime import datetime
-from icalendar import Event
+
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from icalendar import Event
 
-from . import logger
 from .auth import GoogleAuthManager
 from .console import TemporaryConsolePrinter
+
+logger = logging.getLogger(__name__)
 
 
 printer = TemporaryConsolePrinter()
@@ -62,7 +65,7 @@ class GoogleCalendarAPI:
 
             return all_events
         except Exception:
-            logger.exception(f"Unexpected error fetching events.")
+            logger.exception("Unexpected error fetching events.")
             raise
 
     # Add events
@@ -78,11 +81,11 @@ class GoogleCalendarAPI:
         date_from = datetime.fromisoformat(date_from).date() if date_from else None
         date_to = datetime.fromisoformat(date_to).date() if date_to else None
 
-        N_events = len(events)
+        n_events = len(events)
         for i, event in enumerate(events):
-            logger.debug(f"Adding event {i + 1}/{N_events}: {event.get('summary')}")
+            logger.debug(f"Adding event {i + 1}/{n_events}: {event.get('summary')}")
             if verbose:
-                printer.print(f"Adding event {i + 1}/{N_events}: {event.get('summary')}")
+                printer.print(f"Adding event {i + 1}/{n_events}: {event.get('summary')}")
             if date_from and event.get('dtstart').dt.date() < date_from:
                 continue
             if date_to and event.get('dtend').dt.date() > date_to:
@@ -90,7 +93,7 @@ class GoogleCalendarAPI:
             self.add_event(event)
         if verbose:
             printer.clear()
-        logger.info(f"Added {N_events} events to Google Calendar.")
+        logger.info(f"Added {n_events} events to Google Calendar.")
 
     def add_event(self, event: Event) -> None:
         """ Add an event to Google Calendar """
@@ -124,9 +127,8 @@ class GoogleCalendarAPI:
                         time.sleep(backoff)
                         backoff *= 2
                         continue
-                    else:
-                        logger.error("Max attempts reached. Could not add event due to rate limit.")
-                        raise e
+                    logger.error("Max attempts reached. Could not add event due to rate limit.")
+                    raise e
             except Exception:
                 logger.exception("Unexpected error adding event.")
                 raise
@@ -141,15 +143,15 @@ class GoogleCalendarAPI:
     ) -> None:
         """ Delete events from Google Calendar within a date range """
         events = self.fetch_events(date_from, date_to)
-        N_events = len(events)
+        n_events = len(events)
         for i, event in enumerate(events):
-            logger.debug(f"Deleting event {i + 1}/{N_events}: {event.get('summary')}")
+            logger.debug(f"Deleting event {i + 1}/{n_events}: {event.get('summary')}")
             if verbose:
-                printer.print(f"Deleting event {i + 1}/{N_events}")
+                printer.print(f"Deleting event {i + 1}/{n_events}")
             self.delete_event(event['id'])
         if verbose:
             printer.clear()
-        logger.info(f"Deleted {N_events} events from Google Calendar.")
+        logger.info(f"Deleted {n_events} events from Google Calendar.")
 
     def delete_event(self, event_id: str) -> None:
         """ Delete a specific event from Google Calendar """
@@ -169,9 +171,8 @@ class GoogleCalendarAPI:
                         time.sleep(backoff)
                         backoff *= 2
                         continue
-                    else:
-                        logger.error("Max attempts reached. Could not delete event due to rate limit.")
-                        raise e
+                    logger.error("Max attempts reached. Could not delete event due to rate limit.")
+                    raise e
             except Exception:
                 logger.exception("Unexpected error deleting event.")
                 raise

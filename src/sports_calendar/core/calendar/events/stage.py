@@ -1,9 +1,12 @@
 from __future__ import annotations
-from datetime import datetime, timedelta
 
-import sportindex
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from .base import SportsEvent
+
+if TYPE_CHECKING:
+    import sportindex
 
 
 class StageEvent(SportsEvent):

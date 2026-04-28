@@ -1,9 +1,12 @@
 from __future__ import annotations
-from datetime import datetime, timedelta
 
-import sportindex
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from .base import SportsEvent
+
+if TYPE_CHECKING:
+    import sportindex
 
 
 class MatchEvent(SportsEvent):
@@ -12,7 +15,7 @@ class MatchEvent(SportsEvent):
     def __init__(
         self,
         start: datetime | str,
-        sport: str = "unknown", 
+        sport: str = "unknown",
         home_competitor_id: str = None,
         home_competitor_name: str = "",
         away_competitor_id: str = None,
@@ -52,7 +55,7 @@ class MatchEvent(SportsEvent):
     @property
     def start(self) -> datetime:
         """ Start time of the Match event. """
-        return self._start if isinstance(self._start, datetime) else datetime.fromisoformat(self._start) 
+        return self._start if isinstance(self._start, datetime) else datetime.fromisoformat(self._start)
 
     @property
     def end(self) -> datetime:

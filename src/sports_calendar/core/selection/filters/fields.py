@@ -1,15 +1,19 @@
 from __future__ import annotations
+
 import copy
-from enum import Enum
-from typing import Protocol, Literal
+import logging
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Literal, Protocol
 
 from sportindex import StageTier
 
-from . import logger
-from .enums import FilterType
 from sports_calendar.core import CompetitionStage
 from sports_calendar.core.utils import validate
+
+from .enums import FilterType
+
+logger = logging.getLogger(__name__)
 
 
 # ==== Entity Selection Rule ====
@@ -27,10 +31,10 @@ class EntitySelectionRule:
 
     def __post_init__(self):
         validate(isinstance(self.rule, Rule),
-                 f"rule must be an instance of Rule Enum", logger)
+                 "rule must be an instance of Rule Enum", logger)
         if self.rule == Rule.OPPONENT:
             validate(self.reference is not None,
-                     "reference is required when rule is OPPONENT", logger)
+                 "reference is required when rule is OPPONENT", logger)
 
     def to_dict(self) -> dict:
         return {
@@ -94,7 +98,7 @@ class MinRankingFilterFields:
             competition_ids=data["competition_ids"],
             selection_rule=EntitySelectionRule.from_dict(data.get("selection_rule", {}))
         )
-        
+
 @dataclass
 class CompetitionsFilterFields:
     competition_ids: list[int]
@@ -159,8 +163,8 @@ class SessionsFilterFields:
 
     def __post_init__(self):
         validate(isinstance(self.competition_id, int), "competition_id must be an integer", logger)
-        validate(isinstance(self.sessions, list) and all(isinstance(session, str) for session in self.sessions),
-                 "sessions must be a list of strings", logger)
+        validate(isinstance(self.sessions, list) and all(isinstance(session, StageTier) for session in self.sessions),
+                 "sessions must be a list of StageTier", logger)
 
     def clone(self) -> SessionsFilterFields:
         return copy.deepcopy(self)

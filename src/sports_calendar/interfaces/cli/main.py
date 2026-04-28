@@ -1,12 +1,10 @@
 import typer
 
-from ... import logger, __version__
-from .dev import dev_tools
-from .sync import sync_calendar, clear_cal
-from sports_calendar.infra.setup import init
-# from .gui import launch_gui
-from sports_calendar.infra import Paths, setup_logging
+from sports_calendar.infra.setup import init_environment
 
+from ... import __version__
+from .dev import dev_tools
+from .sync import clear_cal, sync_calendar
 
 app = typer.Typer(help="Sports Calendar CLI Application — manage DB, calendar, validation.")
 
@@ -15,13 +13,13 @@ app.add_typer(sync_calendar, name="sync-calendar", help="Commands to manage cale
 app.add_typer(clear_cal, name="clear-calendar", help="Commands to clear events from the Google Calendar.")
 # app.add_typer(launch_gui, name="launch-gui", help="Launch the Sports Calendar GUI application.")
 
-app.command(name="init")(init)
+app.command(name="init")(init_environment)
 
 
 def version_callback(value: bool):
     if value:
         typer.echo(f"sports-calendar {__version__}")
-        raise typer.Exit()
+        raise typer.Exit
 
 @app.callback()
 def main(
@@ -34,6 +32,4 @@ def main(
     if ctx.invoked_subcommand == "init":
         return
 
-    Paths.initialize(app_name="sports-calendar")
-    setup_logging(config_file=Paths.LOG_CONFIG_FILE, log_dir=Paths.LOG_DIR)
-    Paths.log_paths(logger=logger)
+    init_environment()

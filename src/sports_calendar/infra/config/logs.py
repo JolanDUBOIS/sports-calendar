@@ -1,10 +1,11 @@
+import logging
 import logging.config
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 import yaml
 
-from . import logger
+logger = logging.getLogger(__name__)
 
 
 def setup_logging(config_file: Path, log_dir: Path) -> None:
@@ -16,12 +17,12 @@ def setup_logging(config_file: Path, log_dir: Path) -> None:
 
     log_file.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(config_file, 'r') as f:
+    with config_file.open('r') as f:
         config = yaml.safe_load(f.read())
-    
+
     if "handlers" in config and "file_debug_handler" in config["handlers"]:
         config["handlers"]["file_debug_handler"]["filename"] = str(log_file)
-    
+
     logging.config.dictConfig(config)
 
     now = datetime.now().strftime("%H:%M:%S")

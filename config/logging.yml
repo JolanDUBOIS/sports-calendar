@@ -26,68 +26,6 @@ loggers:
   sports_calendar:
     level: DEBUG
 
-  # Application loggers
-  sports_calendar.application:
-    level: DEBUG
-
-  sports_calendar.application.selection:
-    level: DEBUG
-
-  sports_calendar.application.workflows:
-    level: DEBUG
-
-  # Core loggers
-  sports_calendar.core:
-    level: DEBUG
-
-  sports_calendar.core.calendar:
-    level: DEBUG
-
-  sports_calendar.core.selection:
-    level: DEBUG
-
-  sports_calendar.core.utils:
-    level: DEBUG
-
-  # Infrastructure loggers
-  sports_calendar.infra:
-    level: DEBUG
-
-  sports_calendar.infra.config:
-    level: DEBUG
-
-  sports_calendar.infra.engine:
-    level: DEBUG
-
-  sports_calendar.infra.engine.executors:
-    level: DEBUG
-
-  sports_calendar.infra.google_calendar:
-    level: DEBUG
-
-  sports_calendar.infra.setup:
-    level: DEBUG
-
-  sports_calendar.infra.storage:
-    level: DEBUG
-
-  # Interfaces loggers
-  sports_calendar.interfaces:
-    level: DEBUG
-
-  sports_calendar.interfaces.cli:
-    level: DEBUG
-
-  sports_calendar.interfaces.gui:
-    level: DEBUG
-
-  sports_calendar.interfaces.gui.components:
-    level: DEBUG
-
-  sports_calendar.interfaces.gui.pages:
-    level: DEBUG
-
-  # Third party loggers
   googleapiclient.discovery_cache:
     level: DEBUG
     handlers: [file_debug_handler]
@@ -98,9 +36,11 @@ loggers:
     handlers: []
     propagate: False
 
-  # TODO - Setup sport-index logger
+  watchfiles:
+    level: WARNING
+    handlers: []
+    propagate: False
 
 root:
   level: DEBUG
   handlers: [console_handler, file_debug_handler]
-  propagate: False

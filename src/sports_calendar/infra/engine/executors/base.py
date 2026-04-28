@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
-from sportindex import SportClient, EventCollection
+from sportindex import EventCollection, SportClient
 
 from sports_calendar.core.selection import FilterFields
-
 
 T = TypeVar('T', bound=FilterFields)
 

@@ -1,8 +1,12 @@
-from sportindex import SportClient, EventCollection, Competition
+import logging
 
-from . import logger
-from .base import BaseExecutor
+from sportindex import Competition, EventCollection, SportClient
+
 from sports_calendar.core.selection import CompetitionsFilterFields
+
+from .base import BaseExecutor
+
+logger = logging.getLogger(__name__)
 
 
 class CompetitionsExecutor(BaseExecutor[CompetitionsFilterFields]):

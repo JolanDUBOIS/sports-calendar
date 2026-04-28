@@ -1,9 +1,13 @@
-from sportindex import SportClient, EventCollection
+import logging
 
-from . import logger
-from .executors import EXECUTOR_MAP
-from sports_calendar.core.utils import validate
+from sportindex import EventCollection, SportClient
+
 from sports_calendar.core.selection import Selection, SelectionItem
+from sports_calendar.core.utils import validate
+
+from .executors import EXECUTOR_MAP
+
+logger = logging.getLogger(__name__)
 
 
 class Resolver:

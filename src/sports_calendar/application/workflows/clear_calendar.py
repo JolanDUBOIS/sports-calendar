@@ -1,5 +1,8 @@
-from . import logger
+import logging
+
 from sports_calendar.infra.google_calendar import GoogleCalendarManager, Secrets
+
+logger = logging.getLogger(__name__)
 
 
 def clear_calendar(
@@ -16,4 +19,4 @@ def clear_calendar(
     google_cal_manager = GoogleCalendarManager.from_defaults(gcal_id)
     google_cal_manager.clear_calendar(scope=scope, date_from=date_from, date_to=date_to, verbose=True)
 
-    logger.info(f"Calendar events cleared successfully.")
+    logger.info("Calendar events cleared successfully.")

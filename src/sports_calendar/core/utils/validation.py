@@ -13,4 +13,4 @@ def validate_timestamp(ts: str, name: str, logger: logging.Logger) -> None:
         datetime.fromisoformat(ts)
     except ValueError:
         logger.error(f"{name} must be a valid ISO timestamp, got: {ts}", stacklevel=2)
-        raise ValueError(f"{name} must be a valid ISO timestamp, got: {ts}")
+        raise ValueError(f"{name} must be a valid ISO timestamp, got: {ts}") from None

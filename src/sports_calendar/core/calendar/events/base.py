@@ -1,10 +1,14 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from datetime import datetime
-
-import sportindex
 from icalendar import Event as ICalendarEvent
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    import sportindex
 
 
 class SportsEvent(ABC):
@@ -122,8 +126,7 @@ class SportsEventCollection:
         if inplace:
             self.events = unique
             return self
-        else:
-            return SportsEventCollection(unique)
+        return SportsEventCollection(unique)
 
     @classmethod
     def from_sport_index_collection(cls, collection: sportindex.EventCollection, event_cls: type[SportsEvent]) -> SportsEventCollection:

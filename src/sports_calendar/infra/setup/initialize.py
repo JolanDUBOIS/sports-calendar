@@ -1,22 +1,19 @@
-import shutil
 from pathlib import Path
 
-from sports_calendar.infra import Paths
+from sports_calendar import logger
+from sports_calendar.infra import Paths, setup_logging
 
 
-def init():
-    Paths.initialize()
+def init_environment():
+    """ Initialize the application environment by setting up paths and logging configuration. """
+    # Initialize paths
+    Paths.setup(app_name="sports-calendar")
 
-    # Create the necessary directories if they don't exist
-    Paths.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    Paths.DB_DIR.mkdir(parents=True, exist_ok=True) # TODO - Not Used anymore, remove
-    Paths.LOG_DIR.mkdir(parents=True, exist_ok=True)
-    Paths.CREDS_FOLDER.mkdir(parents=True, exist_ok=True)
-    Paths.SECRETS_FOLDER.mkdir(parents=True, exist_ok=True)
-    Paths.SELECTIONS_FOLDER.mkdir(parents=True, exist_ok=True)
+    # Seed logging configuration if it doesn't exist
+    Paths.seed_logging(Path(__file__).parent / "templates" / "logging.yml")
 
-    # Copy logging configuration template if it doesn't exist
-    logging_config_template = Path(__file__).parent / "templates" / "logging.yml"
-    logging_config_target = Paths.CONFIG_DIR / "logging.yml"
-    if not logging_config_target.exists():
-        shutil.copy(logging_config_template, logging_config_target)
+    # Setup logging
+    setup_logging(config_file=Paths.LOG_CONFIG_FILE, log_dir=Paths.LOG_DIR)
+
+    # Log the initialized paths for debugging
+    Paths.log_paths(logger=logger)

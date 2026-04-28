@@ -1,7 +1,10 @@
+import logging
+
 import typer
 
-from . import logger
 from sports_calendar.application.selection import SelectionService
+
+logger = logging.getLogger(__name__)
 
 
 dev_tools = typer.Typer(help="Development tools for the sports calendar application.")

@@ -1,12 +1,16 @@
 from __future__ import annotations
-from uuid import uuid4
-from datetime import datetime
-from dataclasses import dataclass, field
 
-from . import logger
-from .fields import FilterFields, EmptyFilterFields
-from .definitions import FilterType, FILTER_DEFINITIONS
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime
+from uuid import uuid4
+
 from sports_calendar.core.utils import validate_timestamp
+
+from .definitions import FILTER_DEFINITIONS, FilterType
+from .fields import EmptyFilterFields, FilterFields
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
