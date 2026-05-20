@@ -26,17 +26,45 @@ dependencies = [
     "networkx (>=3.6.1,<4.0.0)",
     "cattrs (>=25.3.0,<26.0.0)",
     "python-json-logger (>=4.0.0,<5.0.0)",
-    "platformdirs (>=4.5.1,<5.0.0)"
+    "platformdirs (>=4.5.1,<5.0.0)",
+    "itsdangerous (>=2.2.0,<3.0.0)",
+    "jinja2 (>=3.1.6,<4.0.0)",
+    "sport-index",
+    "nicegui>=3.10.0",
+    "num2words>=0.5.14",
 ]
 
-scripts = { "sports-calendar" = "sports_calendar.__main__:app" }
+[project.scripts]
+sports-calendar = "sports_calendar.__main__:app"
 
-[tool.poetry]
-packages = [{ include = "sports_calendar", from = "src" }]
+[tool.hatch.build.targets.wheel]
+packages = ["src/sports_calendar"]
 
-[project.optional-dependencies]
-dev = ["pytest>=9.0.2,<10.0.0"]
+[tool.uv.sources]
+sport-index = { path = "../../sport-index", editable = true }
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2,<10.0.0",
+    "ipykernel (>=7.1.0,<8.0.0)",
+    "pytest-recording (>=0.13.4,<0.14.0)",
+    "ruff>=0.15.12",
+]
+
+[tool.ruff]
+line-length = 88 
+
+[tool.ruff.lint]
+select = [
+    "F", "E", "W", "B", "UP", "I", "FA", "C4", "SIM", 
+    "RET", "RSE", "PIE", "N", "PTH", "TC", "S", "BLE"
+]
+
+ignore = ["D", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]

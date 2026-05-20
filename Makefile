@@ -1,7 +1,7 @@
 # Makefile – sports-calendar (dev)
 
 PYTHON ?= python3.11
-POETRY ?= poetry
+UV ?= uv
 
 DATA_DIR := $(abspath data)
 CONFIG_DIR := $(abspath config)
@@ -20,21 +20,29 @@ DOCKER_RUN := docker run --rm \
 # Local targets
 # ------------------
 
-.PHONY: all
-all: sync-db sync-calendar
+# .PHONY: all
+# all: sync-calendar
 
 .PHONY: setup
 setup:
-	$(POETRY) env use $(PYTHON)
-	$(POETRY) install
-
-.PHONY: sync-db
-sync-db: setup
-	$(POETRY) run sports-calendar sync-db
+	$(UV) env use $(PYTHON)
+	$(UV) install
 
 .PHONY: sync-calendar
-sync-calendar: setup
-	$(POETRY) run sports-calendar sync-calendar dev
+sync-calendar:
+	$(UV) run sports-calendar sync-calendar dev
+
+.PHONY: clear-calendar
+clear-calendar:
+	$(UV) run sports-calendar clear-calendar dev
+
+.PHONY: validate-selections
+validate-selections:
+	$(UV) run sports-calendar devtools validate-selections
+
+.PHONY: launch-gui
+launch-gui:
+	$(UV) run sports-calendar launch-gui
 
 # ------------------
 # Docker targets
@@ -44,17 +52,6 @@ sync-calendar: setup
 docker-build:
 	docker build -t $(DOCKER_IMAGE) .
 
-.PHONY: docker-sync-db
-docker-sync-db: docker-build
-	$(DOCKER_RUN) $(POETRY) run sports-calendar sync-db
-
 .PHONY: docker-sync-calendar
 docker-sync-calendar: docker-build
-	$(DOCKER_RUN) $(POETRY) run sports-calendar sync-calendar dev
-
-.PHONY: docker-all
-docker-all: docker-build
-	$(DOCKER_RUN) bash -c "\
-		poetry run sports-calendar sync-db && \
-		poetry run sports-calendar sync-calendar dev \
-	"
+	$(DOCKER_RUN) $(UV) run sports-calendar sync-calendar dev

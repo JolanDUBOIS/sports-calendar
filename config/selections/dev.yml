@@ -1,260 +1,59 @@
-name: dev
-
+created_at: '2026-01-30T19:57:02'
 items:
-  ### Football Items
-  ## CLUBS
-  - sport: football
-    entity: team
-    id: 160 # PSG
-
-  # UEFA Competitions
-  - sport: football
-    entity: competition
-    id: 775 # UEFA Champions League
-    filters:
-      - filter_type: stage
-        stage: league-stage
-
-  - sport: football
-    entity: competition
-    id: 776 # UEFA Europa League
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 20296 # UEFA Europa Conference League
-    filters:
-      - filter_type: stage
-        stage: Final
-
-  - sport: football
-    entity: competition
-    id: 5462 # UEFA Super Cup
-
-  # French Competitions
-  - sport: football
-    entity: competition
-    id: 710 # Ligue 1
-    filters:
-      - filter_type: min_ranking
-        competition_ids: [710]
+- created_at: '2026-01-30T19:57:02'
+  filters:
+  - created_at: '2026-01-30T19:57:02'
+    fields:
+      filter_type: empty
+    name: item-1-filter-1
+    sport_id: 1
+    uid: it-001-filt-001
+  - created_at: '2026-01-30T19:57:02'
+    fields:
+      competition_ids:
+      - 14
+      - 1358
+      - 68
+      filter_type: min_ranking
+      ranking: 5
+      selection_rule:
+        reference: null
         rule: both
-        ranking: 5
-
-  - sport: football
-    entity: competition
-    id: 3952 # Coupe de France
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 8357 # Trophée des Champions
-
-  # English Competitions
-  - sport: football
-    entity: competition
-    id: 700 # Premier League
-    filters:
-      - filter_type: min_ranking
-        competition_ids: [700]
-        rule: both
-        ranking: 5
-
-  - sport: football
-    entity: competition
-    id: 700 # Premier League
-    filters:
-      - filter_type: teams
-        team_ids: [382, 360, 359, 363, 364, 367] # Manchester City, Manchester United, Arsenal, Chelsea, Liverpool, Tottenham Hotspur
-        rule: both
-
-  - sport: football
-    entity: competition
-    id: 3918 # FA Cup
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 3920 # Carabao Cup
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 5329 # FA Community Shield
-
-  # Spanish Competitions
-  - sport: football
-    entity: competition
-    id: 740 # La Liga
-    filters:
-      - filter_type: min_ranking
-        competition_ids: [740]
-        rule: both
-        ranking: 5
-
-  - sport: football
-    entity: competition
-    id: 740 # La Liga
-    filters:
-      - filter_type: teams
-        team_ids: [86, 83, 1068] # Real Madrid, FC Barcelona, Atlético Madrid
-        rule: both
-
-  - sport: football
-    entity: competition
-    id: 3951 # Copa del Rey
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 3951 # Copa del Rey
-    filters:
-      - filter_type: teams
-        team_ids: [86, 83, 1068] # Real Madrid, FC Barcelona, Atlético Madrid
-        rule: both
-
-  - sport: football
-    entity: competition
-    id: 8102 # Supercopa de España
-
-  # Italian Competitions
-  - sport: football
-    entity: competition
-    id: 730 # Serie A
-    filters:
-      - filter_type: min_ranking
-        competition_ids: [730]
-        rule: both
-        ranking: 3
-
-  - sport: football
-    entity: competition
-    id: 3956 # Coppa Italia
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 8103 # Supercoppa Italiana
-
-  # German Competitions
-  - sport: football
-    entity: competition
-    id: 720 # Bundesliga
-    filters:
-      - filter_type: min_ranking
-        competition_ids: [720]
-        rule: both
-        ranking: 3
-
-  - sport: football
-    entity: competition
-    id: 3954 # DFB-Pokal
-    filters:
-      - filter_type: stage
-        stage: Final
-
-  - sport: football
-    entity: competition
-    id: 8101 # DFL-Supercup
-
-  # FIFA Competitions
-  - sport: football
-    entity: competition
-    id: 5501 # FIFA Club World Cup
-
-  - sport: football
-    entity: competition
-    id: 22902 # FIFA Intercontinental Cup
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  ## NATIONAL SELECTIONS
-  - sport: football
-    entity: team
-    id: 2755
-
-  - sport: football
-    entity: competition
-    id: 606 # FIFA World Cup
-
-  - sport: football
-    entity: competition
-    id: 786 # FIFA WC Qualifying (UEFA)
-    filters:
-      - filter_type: teams
-        team_ids: [2755, 482, 164, 481, 449, 17641, 477] # France, Portugal, Spain, Germany, Netherlands, Switzerland, Croatia # TODO - Add england, italy, belgium
-        rule: both
-
-  - sport: football
-    entity: competition
-    id: 780 # Copa América
-    filters:
-      - filter_type: teams
-        team_ids: [205, 202] # Brazil, Argentina
-        rule: any
-
-  - sport: football
-    entity: competition
-    id: 2395 # UEFA Nations League
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-
-  - sport: football
-    entity: competition
-    id: 2395 # UEFA Nations League
-    filters:
-      - filter_type: teams
-        team_ids: [2755, 482, 164, 481, 449, 17641, 477] # France, Portugal, Spain, Germany, Netherlands, Switzerland, Croatia # TODO - Add england, italy, belgium
-        rule: both
-
-  - sport: football
-    entity: competition
-    id: 781 # UEFA Euro
-
-  - sport: football
-    entity: competition
-    id: 5693 # UEFA Euro U-21
-    filters:
-      - filter_type: stage
-        stage: Semifinals
-      - filter_type: teams
-        team_ids: [11676] # France U-21
-        rule: any
-
-  ## WOMEN'S
-  - sport: football
-    entity: competition
-    id: 795 # Women's World Cup
-    filters:
-      - filter_type: teams
-        team_ids: [2755] # France
-        rule: any
-
-  - sport: football
-    entity: competition
-    id: 19483 # Women's UEFA Champions League
-    filters:
-      - filter_type: stage
-        stage: Final
-
-  ### F1
-  - sport: f1
-    # entity: null
-    # id: null
-    filters:
-      - filter_type: session
-        sessions: [Race, Sprint]
+    name: item-1-filter-2
+    sport_id: 1
+    uid: it-001-filt-002
+  - created_at: '2026-01-30T19:57:02'
+    fields:
+      competitor_ids:
+      - 3288
+      - 3296
+      - 3280
+      filter_type: competitors
+      selection_rule:
+        reference: 80
+        rule: opponent
+    name: item-1-filter-3
+    sport_id: 1
+    uid: it-001-filt-003
+  name: item-1
+  sport_id: 1
+  uid: it-001
+  updated_at: '2026-01-30T19:57:02'
+- created_at: '2026-01-30T19:57:02'
+  filters:
+  - created_at: '2026-01-30T19:57:02'
+    fields:
+      competition_id: 81
+      filter_type: sessions
+      sessions:
+      - Sprint
+      - Race
+    name: item-2-filter-1
+    sport_id: 11
+    uid: it-002-filt-001
+  name: item-2
+  sport_id: 11
+  uid: it-002
+  updated_at: '2026-01-30T19:57:02'
+name: dev
+updated_at: '2026-01-30T19:57:02'

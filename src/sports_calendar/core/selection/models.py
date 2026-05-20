@@ -1,0 +1,190 @@
+from __future__ import annotations
+from uuid import uuid4
+from datetime import datetime
+from dataclasses import dataclass, field
+
+from . import logger
+from .filters import SelectionFilter
+from ..utils import validate, validate_timestamp
+
+
+@dataclass
+class Selection:
+    name: str
+    items: list[SelectionItem] = field(default_factory=list)
+    created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+
+    def __post_init__(self):
+        validate(bool(self.name), "Selection name must be a non-empty string", logger)
+        validate(isinstance(self.items, list), "Selection items must be a list", logger, TypeError)
+        for item in self.items:
+            validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
+        validate_timestamp(self.created_at, "created_at", logger)
+        validate_timestamp(self.updated_at, "updated_at", logger)
+
+    @property
+    def uid(self) -> str:
+        # Compatibility alias. Do not use in new code. Identity is now based on name.
+        return self.name
+
+    @property
+    def sport_ids(self) -> list[int]:
+        return list({item.sport_id for item in self.items})
+
+    def _items_uids(self):
+        return [item.uid for item in self.items]
+
+    def get_item(self, item_uid: str) -> SelectionItem:
+        for item in self.items:
+            if item.uid == item_uid:
+                return item
+        logger.error(f"Selection item with uid '{item_uid}' not found in selection '{self.uid}'.")
+        raise KeyError(f"Selection item with uid '{item_uid}' not found in selection '{self.uid}'.")
+
+    def add_item(self, item: SelectionItem):
+        validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
+        validate(item.uid not in self._items_uids(), f"Selection item with uid '{item.uid}' already exists in selection '{self.uid}'", logger, ValueError)
+        self.items.append(item)
+        self._update_timestamp()
+        logger.debug(f"Added item {item.uid} to selection {self.uid}")
+
+    def replace_item(self, item: SelectionItem):
+        validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
+        validate(item.uid in self._items_uids(), f"Selection item with uid '{item.uid}' does not exist in selection '{self.uid}'", logger, KeyError)
+        self.items = [i for i in self.items if i.uid != item.uid]
+        self.items.append(item)
+        self._update_timestamp()
+        logger.debug(f"Replaced item {item.uid} in selection {self.uid}")
+
+    def remove_item(self, item_uid: str):
+        if not item_uid in self._items_uids():
+            logger.error(f"Item {item_uid} not found in selection {self.uid}")
+            raise KeyError(f"Item {item_uid} not found in selection {self.uid}")
+        self.items = [item for item in self.items if item.uid != item_uid]
+        self._update_timestamp()
+        logger.debug(f"Removed item {item_uid} from selection {self.uid}")
+    
+    def clone(self, new_name: str) -> Selection:
+        cloned_items = [item.clone() for item in self.items]
+        return Selection(
+            name=new_name,
+            items=cloned_items
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "items": [item.to_dict() for item in self.items],
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Selection:
+        logger.debug(f"Deserializing Selection with name '{data.get('name')}'")
+        validate(isinstance(data, dict), "Selection data must be a dictionary", logger, TypeError)
+        data = dict(data)
+        items_data = data.pop("items", [])
+        items = [SelectionItem.from_dict(item_data) for item_data in items_data]
+        return cls(
+            items=items,
+            **data
+        )
+
+    @classmethod
+    def empty(cls, name: str) -> Selection:
+        return cls(name=name)
+
+    def _update_timestamp(self):
+        self.updated_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
+
+@dataclass
+class SelectionItem:
+    sport_id: int
+    uid: str = field(default_factory=lambda: str(uuid4())[:8], kw_only=True)
+    filters: list[SelectionFilter] = field(default_factory=list)
+    name: str = ""
+    created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+
+    def __post_init__(self):
+        validate(bool(self.sport_id), "SelectionItem sport_id must be a non-empty int", logger)
+        validate(isinstance(self.filters, list), "SelectionItem filters must be a list", logger, TypeError)
+        for f in self.filters:
+            validate(isinstance(f, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
+        validate_timestamp(self.created_at, "created_at", logger)
+        validate_timestamp(self.updated_at, "updated_at", logger)
+
+    def _filters_uids(self):
+        return [f.uid for f in self.filters]
+
+    def get_filter(self, filter_uid: str) -> SelectionFilter:
+        for f in self.filters:
+            if f.uid == filter_uid:
+                return f
+        logger.error(f"Selection filter with uid '{filter_uid}' not found in selection item '{self.uid}'.")
+        raise KeyError(f"Selection filter with uid '{filter_uid}' not found in selection item '{self.uid}'.")
+
+    def add_filter(self, selection_filter: SelectionFilter):
+        validate(isinstance(selection_filter, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
+        validate(selection_filter.sport_id == self.sport_id, "SelectionFilter sport_id must match SelectionItem sport_id", logger, ValueError)
+        validate(selection_filter.uid not in self._filters_uids(), f"Selection filter with uid '{selection_filter.uid}' already exists in selection item '{self.uid}'", logger, ValueError)
+        self.filters.append(selection_filter)
+        self._update_timestamp()
+        logger.debug(f"Added filter {selection_filter.uid} to selection item {self.uid}")
+
+    def replace_filter(self, selection_filter: SelectionFilter):
+        validate(isinstance(selection_filter, SelectionFilter), "SelectionItem filters must be of type SelectionFilter", logger, TypeError)
+        validate(selection_filter.sport_id == self.sport_id, "SelectionFilter sport_id must match SelectionItem sport_id", logger, ValueError)
+        validate(selection_filter.uid in self._filters_uids(), f"Selection filter with uid '{selection_filter.uid}' does not exist in selection item '{self.uid}'", logger, KeyError)
+        self.filters = [f for f in self.filters if f.uid != selection_filter.uid]
+        self.filters.append(selection_filter)
+        self._update_timestamp()
+        logger.debug(f"Replaced filter {selection_filter.uid} in selection item {self.uid}")
+
+    def remove_filter(self, filter_uid: str):
+        if not filter_uid in self._filters_uids():
+            logger.error(f"Filter {filter_uid} not found in selection item {self.uid}")
+            raise KeyError(f"Filter {filter_uid} not found in selection item {self.uid}")
+        self.filters = [f for f in self.filters if f.uid != filter_uid]
+        self._update_timestamp()
+        logger.debug(f"Removed filter {filter_uid} from selection item {self.uid}")
+    
+    def clone(self) -> SelectionItem:
+        """ Create a deep copy of this SelectionItem with a new ID. """
+        cloned_filters = [f.clone() for f in self.filters]
+        return SelectionItem(
+            sport_id=self.sport_id,
+            name=self.name,
+            filters=cloned_filters
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "sport_id": self.sport_id,
+            "uid": self.uid,
+            "name": self.name,
+            "filters": [f.to_dict() for f in self.filters],
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> SelectionItem:
+        logger.debug(f"Deserializing SelectionItem with sport_id '{data.get('sport_id')}'")
+        validate(isinstance(data, dict), "SelectionItem data must be a dictionary", logger, TypeError)
+        data = dict(data)
+        filters = [SelectionFilter.from_dict(data=filter_data) for filter_data in data.pop("filters", [])]
+        return cls(
+            filters=filters,
+            **data
+        )
+
+    @classmethod
+    def empty(cls, sport_id: int, name: str = "") -> SelectionItem:
+        return cls(sport_id=sport_id, name=name)
+
+    def _update_timestamp(self):
+        self.updated_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
