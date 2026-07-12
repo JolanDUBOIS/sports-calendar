@@ -17,7 +17,7 @@ class CompetitionsExecutor(BaseExecutor[CompetitionsFilterFields]):
         """ Fetch events that meet the competitions criteria using the provided SportClient. """
         events = EventCollection()
         for competition_id in filter_fields.competition_ids:
-            competition = client.get(Competition, competition_id)
+            competition = client.get(competition_id, Competition)
             if competition is None:
                 logger.warning(f"Competition with ID {competition_id} not found. Skipping.")
                 continue
@@ -35,5 +35,5 @@ class CompetitionsExecutor(BaseExecutor[CompetitionsFilterFields]):
         filtered_events = EventCollection()
         for event in events:
             if event.competition and event.competition.id in filter_fields.competition_ids:
-                filtered_events.append(event)
+                filtered_events.add(event)
         return filtered_events

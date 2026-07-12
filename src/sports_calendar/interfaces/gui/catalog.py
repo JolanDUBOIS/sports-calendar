@@ -33,7 +33,7 @@ def format_entity_label(entity: object, fallback: int) -> str:
 # ==== Direct Lookup Helpers ====
 
 def get_sport_name(client: SportClient, sport_id: str) -> str:
-    sport = client.get(Sport, sport_id)
+    sport = client.get(Sport.encode_id(sport_id), Sport)
     return sport.name.capitalize()
 
 def get_valid_sport_ids(client: SportClient) -> list[int]:
