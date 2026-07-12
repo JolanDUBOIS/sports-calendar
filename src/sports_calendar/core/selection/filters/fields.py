@@ -8,7 +8,7 @@ from typing import Literal, TypeAlias
 
 from sportindex import StageTier
 
-from sports_calendar.core import CompetitionStage
+from sports_calendar.core import CompetitionStage, EntityId
 from sports_calendar.core.utils import validate
 
 from .enums import FilterType
@@ -27,7 +27,7 @@ class Rule(Enum):
 @dataclass
 class EntitySelectionRule:
     rule: Rule = Rule.ANY
-    reference: str | None = None  # only for OPPONENT
+    reference: EntityId | None = None  # only for OPPONENT
 
     def __post_init__(self):
         validate(isinstance(self.rule, Rule),
@@ -72,15 +72,15 @@ class EmptyFilterFields:
 @dataclass
 class MinRankingFilterFields:
     ranking: int
-    competition_ids: list[int]
+    competition_ids: list[EntityId]
     filter_type: Literal[FilterType.MIN_RANKING] = FilterType.MIN_RANKING
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
         validate(isinstance(self.ranking, int) and self.ranking > 0,
                  "ranking must be a positive integer", logger)
-        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, int) for cid in self.competition_ids),
-                 "competition_ids must be a list of integers", logger)
+        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, EntityId) for cid in self.competition_ids),
+                 "competition_ids must be a list of EntityId", logger)
 
     def clone(self) -> MinRankingFilterFields:
         return copy.deepcopy(self)
@@ -105,15 +105,15 @@ class MinRankingFilterFields:
 
 @dataclass
 class CompetitionsFilterFields:
-    competition_ids: list[int]
+    competition_ids: list[EntityId]
     filter_type: Literal[FilterType.COMPETITIONS] = FilterType.COMPETITIONS
     stage: CompetitionStage = CompetitionStage.NULL
 
     def __post_init__(self):
         validate(isinstance(self.stage, CompetitionStage),
                  "stage must be a CompetitionStage", logger)
-        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, int) for cid in self.competition_ids),
-                 "competition_ids must be a list of integers", logger)
+        validate(isinstance(self.competition_ids, list) and all(isinstance(cid, EntityId) for cid in self.competition_ids),
+                 "competition_ids must be a list of EntityId", logger)
 
     def clone(self) -> CompetitionsFilterFields:
         return copy.deepcopy(self)
@@ -136,13 +136,13 @@ class CompetitionsFilterFields:
 
 @dataclass
 class CompetitorsFilterFields:
-    competitor_ids: list[int]
+    competitor_ids: list[EntityId]
     filter_type: Literal[FilterType.COMPETITORS] = FilterType.COMPETITORS
     selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
-        validate(isinstance(self.competitor_ids, list) and all(isinstance(cid, int) for cid in self.competitor_ids),
-                 "competitor_ids must be a list of integers", logger)
+        validate(isinstance(self.competitor_ids, list) and all(isinstance(cid, EntityId) for cid in self.competitor_ids),
+                 "competitor_ids must be a list of EntityId", logger)
 
     def clone(self) -> CompetitorsFilterFields:
         return copy.deepcopy(self)
@@ -165,12 +165,12 @@ class CompetitorsFilterFields:
 
 @dataclass
 class SessionsFilterFields:
-    competition_id: int
+    competition_id: EntityId
     sessions: list[StageTier]
     filter_type: Literal[FilterType.SESSIONS] = FilterType.SESSIONS
 
     def __post_init__(self):
-        validate(isinstance(self.competition_id, int), "competition_id must be an integer", logger)
+        validate(isinstance(self.competition_id, EntityId), "competition_id must be an EntityId", logger)
         validate(isinstance(self.sessions, list) and all(isinstance(session, StageTier) for session in self.sessions),
                  "sessions must be a list of StageTier", logger)
 
@@ -208,4 +208,3 @@ FilterFields: TypeAlias = (
 # Sessions is coded as uniquely designed for race sports (motorsports, cycling)
 
 # TODO: Switch from TeamsFilterFields to CompetitorsFilterFields with a competitor type (team or individual) since the client provides a unified interface for both teams and players.
-# TODO: Switch ids from str to int accross the codebase since the client provides int IDs for competitors, competitions, etc.

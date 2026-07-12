@@ -1586,7 +1586,7 @@ wheels = [
 [[package]]
 name = "sport-index"
 version = "0.7.0"
-source = { editable = "../../sport-index" }
+source = { editable = "../sport-index" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "cloudscraper" },
@@ -1678,7 +1678,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3,<7.0.0" },
     { name = "rapidfuzz", specifier = ">=3.14.3,<4.0.0" },
     { name = "requests", specifier = ">=2.32.5,<3.0.0" },
-    { name = "sport-index", editable = "../../sport-index" },
+    { name = "sport-index", editable = "../sport-index" },
     { name = "sqlalchemy", specifier = ">=2.0.45,<3.0.0" },
     { name = "typer", specifier = ">=0.20.0,<0.21.0" },
 ]

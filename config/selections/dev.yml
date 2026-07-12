@@ -11,9 +11,9 @@ items:
   - created_at: '2026-01-30T19:57:02'
     fields:
       competition_ids:
-      - 14
-      - 1358
-      - 68
+      - trnc:14
+      - trnc:1358
+      - trnc:68
       filter_type: min_ranking
       ranking: 5
       selection_rule:
@@ -25,12 +25,12 @@ items:
   - created_at: '2026-01-30T19:57:02'
     fields:
       competitor_ids:
-      - 3288
-      - 3296
-      - 3280
+      - t-cpt:3288
+      - t-cpt:3296
+      - t-cpt:3280
       filter_type: competitors
       selection_rule:
-        reference: 80
+        reference: t-cpt:80
         rule: opponent
     name: item-1-filter-3
     sport_id: 1
@@ -43,7 +43,7 @@ items:
   filters:
   - created_at: '2026-01-30T19:57:02'
     fields:
-      competition_id: 81
+      competition_id: stgc:81
       filter_type: sessions
       sessions:
       - 6

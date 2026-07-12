@@ -31,7 +31,7 @@ def test_selection_serialization(raw_selection_data, football_competition_ids, f
     assert isinstance(competitors_filter.fields, CompetitorsFilterFields)
     assert len(competitors_filter.fields.competitor_ids) == len(football_team_ids)
     assert competitors_filter.fields.selection_rule.rule == Rule.OPPONENT
-    assert competitors_filter.fields.selection_rule.reference == 40
+    assert competitors_filter.fields.selection_rule.reference == "t-cpt:40"
 
     # F1 item
     f1_item = selection.get_item("it-002")
@@ -39,7 +39,7 @@ def test_selection_serialization(raw_selection_data, football_competition_ids, f
 
     sessions_filter = f1_item.get_filter("it-002-filt-001")
     assert isinstance(sessions_filter.fields, SessionsFilterFields)
-    assert sessions_filter.fields.competition_id == 20000000040
+    assert sessions_filter.fields.competition_id == "stgc:40"
     assert len(sessions_filter.fields.sessions) == 2
 
 

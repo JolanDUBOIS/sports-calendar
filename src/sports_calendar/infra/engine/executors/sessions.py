@@ -16,18 +16,17 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
     def fetch(cls, filter_fields: SessionsFilterFields, client: SportClient) -> EventCollection:
         """ Fetch events that meet the sessions criteria using the provided SportClient. """
         events = EventCollection()
-        competition = client.get(Competition, filter_fields.competition_id)
+        competition = client.get(filter_fields.competition_id, Competition)
         if competition is None:
             logger.warning(f"Competition with ID {filter_fields.competition_id} not found. Returning empty event collection.")
             return events
         main_events = competition.seasons[0].get_fixtures()
         for event in main_events:
             if not isinstance(event, StageEvent):
-                logger.warning() # TODO - Write the warning
+                logger.warning(f"Skipping non-stage event {event!r} while fetching sessions events.")
                 continue
             for substage in event.substages:
-                # TODO - Use stage type when released on SportIndex instead of the name !!!!
-                if substage.name in filter_fields.sessions: # TODO - Not just "in" but also "in" any of the sessions (e.g. "Qualifying" is fine for "Qualifying 1", "Qualifying 2", etc.)
+                if substage.tier in filter_fields.sessions:
                     events.add(substage)
         return events
 
@@ -42,8 +41,8 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
         filtered_events = EventCollection()
         for event in events:
             if not isinstance(event, StageEvent):
-                logger.warning() # TODO - Write the warning
+                logger.warning(f"Skipping non-stage event {event!r} while filtering sessions events.")
                 continue
             if event.competition and event.competition.id == filter_fields.competition_id and event.tier in filter_fields.sessions:
-                    filtered_events.add(event)
+                filtered_events.add(event)
         return filtered_events
