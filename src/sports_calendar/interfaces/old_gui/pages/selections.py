@@ -1,11 +1,12 @@
 from nicegui import ui
 
-from . import logger
+from sports_calendar.application.selection import SelectionService
+from sports_calendar.core.utils import validate
+
+from ..components.filters.fields import ValidatedTextField
 from ..components.modals import Modal
 from ..components.selections_list import selections_list
-from ..components.filters.fields import ValidatedTextField
-from sports_calendar.core.utils import validate
-from sports_calendar.application.selection import SelectionService
+from . import logger
 
 
 def register():
@@ -18,7 +19,7 @@ def register():
         # Title
         with ui.row().classes('justify-center items-center w-full'):
             ui.label('Your Selections').classes('text-h4 font-bold mx-auto')
-        
+
         # Selection list
         selections_list()
 

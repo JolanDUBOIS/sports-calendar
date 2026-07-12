@@ -1,9 +1,10 @@
 from nicegui import ui
 
+from sports_calendar.core.selection import SelectionFilter
+
+from ..modals import Modal
 from . import logger
 from .filter_forms import get_fields_for_filter
-from ..modals import Modal
-from sports_calendar.core.selection import SelectionFilter
 
 
 def open_filter_modal(filter: SelectionFilter | None = None, title: str = "", on_confirm_callback: callable = None):

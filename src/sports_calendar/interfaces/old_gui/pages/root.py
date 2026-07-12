@@ -5,7 +5,7 @@ from . import logger
 
 def register():
     logger.info("Registering root page...")
-    
+
     @ui.page('/')
     def index():
         ui.label('Redirecting...')

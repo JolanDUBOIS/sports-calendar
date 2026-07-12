@@ -4,7 +4,7 @@ import copy
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Literal, Protocol
+from typing import Literal, TypeAlias
 
 from sportindex import StageTier
 
@@ -26,7 +26,7 @@ class Rule(Enum):
 
 @dataclass
 class EntitySelectionRule:
-    rule: Rule = Rule.BOTH
+    rule: Rule = Rule.ANY
     reference: str | None = None  # only for OPPONENT
 
     def __post_init__(self):
@@ -45,7 +45,7 @@ class EntitySelectionRule:
     @classmethod
     def from_dict(cls, data: dict) -> EntitySelectionRule:
         return cls(
-            rule=Rule(data.get("rule", Rule.BOTH.value)),
+            rule=Rule(data.get("rule", Rule.ANY.value)),
             reference=data.get("reference")
         )
 
@@ -65,6 +65,8 @@ class EmptyFilterFields:
 
     @classmethod
     def from_dict(cls, data: dict) -> EmptyFilterFields:
+        if not data.get("filter_type") == FilterType.EMPTY.value:
+            raise ValueError(f"Invalid filter_type for EmptyFilterFields: {data.get('filter_type')}")
         return cls()
 
 @dataclass
@@ -93,6 +95,8 @@ class MinRankingFilterFields:
 
     @classmethod
     def from_dict(cls, data: dict) -> MinRankingFilterFields:
+        if not data.get("filter_type") == FilterType.MIN_RANKING.value:
+            raise ValueError(f"Invalid filter_type for MinRankingFilterFields: {data.get('filter_type')}")
         return cls(
             ranking=data["ranking"],
             competition_ids=data["competition_ids"],
@@ -123,6 +127,8 @@ class CompetitionsFilterFields:
 
     @classmethod
     def from_dict(cls, data: dict) -> CompetitionsFilterFields:
+        if not data.get("filter_type") == FilterType.COMPETITIONS.value:
+            raise ValueError(f"Invalid filter_type for CompetitionsFilterFields: {data.get('filter_type')}")
         return cls(
             competition_ids=data["competition_ids"],
             stage=CompetitionStage(data.get("stage", CompetitionStage.NULL.value))
@@ -150,6 +156,8 @@ class CompetitorsFilterFields:
 
     @classmethod
     def from_dict(cls, data: dict) -> CompetitorsFilterFields:
+        if not data.get("filter_type") == FilterType.COMPETITORS.value:
+            raise ValueError(f"Invalid filter_type for CompetitorsFilterFields: {data.get('filter_type')}")
         return cls(
             competitor_ids=data["competitor_ids"],
             selection_rule=EntitySelectionRule.from_dict(data.get("selection_rule", {}))
@@ -178,6 +186,8 @@ class SessionsFilterFields:
 
     @classmethod
     def from_dict(cls, data: dict) -> SessionsFilterFields:
+        if not data.get("filter_type") == FilterType.SESSIONS.value:
+            raise ValueError(f"Invalid filter_type for SessionsFilterFields: {data.get('filter_type')}")
         return cls(
             competition_id=data["competition_id"],
             sessions=[StageTier(value) for value in data["sessions"]]
@@ -186,12 +196,13 @@ class SessionsFilterFields:
 
 # ==== Filter Fields Protocol ====
 
-class FilterFields(Protocol):
-    filter_type: FilterType
-    def clone(self) -> FilterFields: ...
-    def to_dict(self) -> dict: ...
-    @classmethod
-    def from_dict(cls, data: dict) -> FilterFields: ...
+FilterFields: TypeAlias = (
+    EmptyFilterFields
+    | MinRankingFilterFields
+    | CompetitionsFilterFields
+    | CompetitorsFilterFields
+    | SessionsFilterFields
+)
 
 # NOTE: Teams, Competitions, MinRanking are coded as uniquely designed for opposition sports (football, basketball, tennis, etc.)
 # Sessions is coded as uniquely designed for race sports (motorsports, cycling)

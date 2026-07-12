@@ -2,19 +2,24 @@ import logging
 from unittest.mock import Mock
 
 import pytest
-from sportindex import SportClient, EventCollection, Event
+from sportindex import Event, EventCollection, SportClient
 
 from sports_calendar.core.selection import (
-    CompetitionsFilterFields, EmptyFilterFields,
-    MinRankingFilterFields, CompetitorsFilterFields,
-    SessionsFilterFields, EntitySelectionRule, Rule
+    CompetitionsFilterFields,
+    CompetitorsFilterFields,
+    EmptyFilterFields,
+    EntitySelectionRule,
+    MinRankingFilterFields,
+    Rule,
+    SessionsFilterFields,
 )
 from sports_calendar.infra.engine.executors import (
-    CompetitionsExecutor, EmptyExecutor,
-    MinRankingExecutor, CompetitorsExecutor,
-    SessionsExecutor
+    CompetitionsExecutor,
+    CompetitorsExecutor,
+    EmptyExecutor,
+    MinRankingExecutor,
+    SessionsExecutor,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +211,7 @@ def test_min_ranking_executor_apply(football_competition_ids, sport_client):
 
     if len(all_events) == 0:
         logger.warning("No events available to apply minimum ranking filter.")
-    
+
     new_filter_fields_anyy = MinRankingFilterFields(ranking=10, competition_ids=football_competition_ids[1:3], selection_rule=ANY_SELECTION_RULE)
     new_filter_fields_both = MinRankingFilterFields(ranking=10, competition_ids=football_competition_ids[1:3], selection_rule=BOTH_SELECTION_RULE)
     new_filter_fields_opponent = MinRankingFilterFields(ranking=10, competition_ids=football_competition_ids[1:3], selection_rule=OPPONENT_SELECTION_RULE)

@@ -13,7 +13,7 @@
 #     @ui.page('/selections/{sname}')
 #     def selection_details_page(sname: str):
 #         logger.debug(f"Loading details page for selection: {sname}")
-        
+
 #         # Title
 #         with ui.row().classes('justify-center items-center w-full'):
 #             ui.label(f'Selection - "{sname}"').classes('text-h4 font-bold mx-auto')

@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Callable, List, Dict, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Callable, Dict, List
 
 from nicegui import ui
 
 from . import logger
+
 if TYPE_CHECKING:
     from .filters.fields import BaseField
 

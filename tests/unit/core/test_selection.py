@@ -1,8 +1,10 @@
-from sports_calendar.core import SportType
 from sports_calendar.core.selection import (
-    Selection, EmptyFilterFields,
-    MinRankingFilterFields, CompetitorsFilterFields,
-    SessionsFilterFields, Rule
+    CompetitorsFilterFields,
+    EmptyFilterFields,
+    MinRankingFilterFields,
+    Rule,
+    Selection,
+    SessionsFilterFields,
 )
 
 
@@ -14,7 +16,7 @@ def test_selection_serialization(raw_selection_data, football_competition_ids, f
 
     # Football item
     football_item = selection.get_item("it-001")
-    assert football_item.sport == SportType.FOOTBALL
+    assert football_item.sport_id == 1
 
     empty_filter = football_item.get_filter("it-001-filt-001")
     assert isinstance(empty_filter.fields, EmptyFilterFields)
@@ -33,7 +35,7 @@ def test_selection_serialization(raw_selection_data, football_competition_ids, f
 
     # F1 item
     f1_item = selection.get_item("it-002")
-    assert f1_item.sport == SportType.F1
+    assert f1_item.sport_id == 11
 
     sessions_filter = f1_item.get_filter("it-002-filt-001")
     assert isinstance(sessions_filter.fields, SessionsFilterFields)

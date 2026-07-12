@@ -1,18 +1,18 @@
 from types import SimpleNamespace
 
-from .fields import (
-    Choice,
-    BaseField,
-    SelectField,
-    NumberField,
-    TextField,
-    SearchableSelectField,
-    MultipleSelectField,
-    SearchableMultipleSelectField
-)
 from sports_calendar.core import CompetitionStage
-from sports_calendar.core.selection import SelectionFilter, FilterType
+from sports_calendar.core.selection import FilterType, SelectionFilter
 
+from .fields import (
+    BaseField,
+    Choice,
+    MultipleSelectField,
+    NumberField,
+    SearchableMultipleSelectField,
+    SearchableSelectField,
+    SelectField,
+    TextField,
+)
 
 # Main function
 
@@ -47,14 +47,14 @@ def get_fields_for_filter(filter: SelectionFilter | None, filter_meta: dict | No
         ],
         default=current_type.value
     )
-    
+
     # Get the specific fields for the current filter type
     if filter is None or filter.filter_type != current_type:
         filter = SimpleNamespace(sport=sport, filter_type=current_type)
-    
+
     render_function = DISPATCH_FILTER_FIELDS.get(current_type)
     specific_fields = render_function(filter)
-    
+
     return [filter_type_field] + specific_fields
 
 # Specific filter field getters
@@ -112,7 +112,7 @@ def _get_fields_min_ranking_filter(filter: SelectionFilter | SimpleNamespace) ->
 #     if isinstance(filter, SimpleNamespace):
 #         filter.stage = CompetitionStage.NULL
 #         filter.competition_ids = []
-    
+
 #     competitions_df = SPORT_SCHEMAS[filter.sport].competitions.select("id", "short_name").get().dropna(subset=["short_name"])
 
 #     return [

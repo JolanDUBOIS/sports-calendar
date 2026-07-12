@@ -1,9 +1,10 @@
 from nicegui import ui
 
+from sports_calendar.application.selection import SelectionService
+from sports_calendar.core.selection import Selection
+
 from . import logger
 from .modals import Modal
-from sports_calendar.core.selection import Selection
-from sports_calendar.application.selection import SelectionService
 
 
 def selections_list():
