@@ -55,11 +55,5 @@ items:
   sport_id: 11
   uid: it-002
   updated_at: '2026-01-30T19:57:02'
-- created_at: '2026-04-27T11:01:50'
-  filters: []
-  name: item-3
-  sport_id: 1
-  uid: 996d9d69
-  updated_at: '2026-04-27T11:01:50'
 name: dev
-updated_at: '2026-04-27T11:01:50'
+updated_at: '2026-07-13T12:57:02'

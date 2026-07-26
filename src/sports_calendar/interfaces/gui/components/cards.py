@@ -25,7 +25,7 @@ class BaseCard:
         """Builds the shared title and button layout."""
         with ui.row().classes('w-full items-center justify-between p-4'):
             with ui.column().classes('gap-0'):
-                ui.label(self.title).classes('text-lg font-bold')
+                self.title_label = ui.label(self.title).classes('text-lg font-bold')
                 if self.subtitle:
                     ui.label(self.subtitle).classes('text-sm text-gray-500 italic')
 

@@ -40,6 +40,7 @@ class SelectionFilterPresenter:
         logger.debug(f"Updating filter '{self.uid}' with payload: {payload}")
         new_filter = SelectionFilter.from_dict(payload)
         SelectionService.replace_filter(new_filter)
+        self.filter = new_filter
 
     def clone(self) -> ...:
         raise NotImplementedError

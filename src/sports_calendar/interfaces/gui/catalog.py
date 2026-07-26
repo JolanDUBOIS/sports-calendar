@@ -47,19 +47,21 @@ class SportIndexFilterSearchProvider:
         self._client = client
 
     def search_competition(self, query: str, sport_id: int) -> dict[int, str]:
+        target_sport_id = Sport.encode_id(sport_id)
         competitions = self._client.search(Competition, query=query, max_results=50)
         return {
             competition.id: format_entity_label(competition, competition.id)
             for competition in competitions
-            if getattr(getattr(competition, "sport", None), "id", sport_id) == sport_id
+            if getattr(getattr(competition, "sport", None), "id", target_sport_id) == target_sport_id
         }
 
     def search_competitor(self, query: str, sport_id: int) -> dict[int, str]:
+        target_sport_id = Sport.encode_id(sport_id)
         competitors = self._client.search(Competitor, query=query, max_results=50)
         return {
             competitor.id: format_entity_label(competitor, competitor.id)
             for competitor in competitors
-            if getattr(getattr(competitor, "sport", None), "id", sport_id) == sport_id
+            if getattr(getattr(competitor, "sport", None), "id", target_sport_id) == target_sport_id
         }
 
     def get_competition_option(self, competition_id: int) -> str:

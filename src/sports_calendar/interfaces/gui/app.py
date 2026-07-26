@@ -22,7 +22,11 @@ ASSETS_DIR = Path(__file__).resolve().parent / 'assets'
 def home_route():
     return RedirectResponse('/selections')
 
+def run() -> None:
+    """ Boot the app context and start the NiceGUI server. Assumes the environment has already been initialized. """
+    app_context.boot()
+    ui.run(title='Sports Calendar', favicon=ASSETS_DIR / 'app-icon.svg', reload=False, show=False)
+
 if __name__ in {"__main__", "__mp_main__"}:
     init_environment()
-    app_context.boot()
-    ui.run(title='Sports Calendar', favicon=ASSETS_DIR / 'app-icon.svg')
+    run()

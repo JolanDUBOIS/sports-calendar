@@ -13,13 +13,13 @@ from .item_card import render_item_card
 logger = logging.getLogger(__name__)
 
 
-def _handle_create_item(presenter: SelectionPresenter, sport_value: int | str | None, item_name: str | None) -> bool:
+def _handle_create_item(presenter: SelectionPresenter, sport_value: int | None, item_name: str | None) -> bool:
     if sport_value in (None, ""):
         ui.notify('Please select a sport.', type='warning')
         return False
 
     try:
-        created_item = presenter.create_item(int(sport_value), name=item_name or '')
+        created_item = presenter.create_item(sport_value, name=item_name or '')
     except ValueError as exc:
         ui.notify(str(exc), type='negative')
         return False
@@ -31,7 +31,7 @@ def _handle_create_item(presenter: SelectionPresenter, sport_value: int | str | 
 
 def _open_create_item_modal(presenter: SelectionPresenter) -> None:
     sports = sorted(app_context.client.list(Sport), key=lambda sport: sport.name.lower())
-    sport_options = {sport.id: sport.name.capitalize() for sport in sports}
+    sport_options = {Sport.decode_id(sport.id)[2]: sport.name.capitalize() for sport in sports}
 
     modal = FormModal(
         title='Add Item',
