@@ -41,7 +41,7 @@ sports-calendar = "sports_calendar.__main__:app"
 packages = ["src/sports_calendar"]
 
 [tool.uv.sources]
-sport-index = { path = "../sport-index", editable = true }
+sport-index = { git = "https://github.com/JolanDUBOIS/sport-index.git", tag = "v1.0.0" }
 
 [build-system]
 requires = ["hatchling"]
