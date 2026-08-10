@@ -52,6 +52,7 @@ dev = [
     "pytest-recording (>=0.13.4,<0.14.0)",
     "ruff>=0.15.12",
     "import-linter>=2.0",
+    "pytest-asyncio>=1.4.0",
 ]
 
 # Enforces the backend/UI split statically. Run with `make lint-imports`.
@@ -117,8 +118,11 @@ forbidden_modules = [
     "sports_calendar.interfaces.gui",
 ]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
 [tool.ruff]
-line-length = 88 
+line-length = 88
 
 [tool.ruff.lint]
 select = [

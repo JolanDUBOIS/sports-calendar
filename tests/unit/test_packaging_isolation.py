@@ -58,8 +58,20 @@ def _purge(blocked: list[str]) -> None:
 
 @contextmanager
 def partial_install(blocked: list[str]):
-    """ Run the block with `blocked` packages appearing to be uninstalled. """
+    """ Run the block with `blocked` packages appearing to be uninstalled.
+
+    The original modules are snapshotted and restored afterwards. Without that,
+    re-importing under the block replaces every `sports_calendar` class object,
+    and any later test holding a reference to one (a fixture patching a
+    singleton, say) would silently be patching a class the app no longer uses.
+    """
     finder = _BlockedImportFinder(blocked)
+    saved = {
+        name: module for name, module in sys.modules.items()
+        if name.startswith("sports_calendar") or any(
+            name == b or name.startswith(b + ".") for b in blocked
+        )
+    }
     _purge(blocked)
     sys.meta_path.insert(0, finder)
     try:
@@ -67,6 +79,7 @@ def partial_install(blocked: list[str]):
     finally:
         sys.meta_path.remove(finder)
         _purge(blocked)
+        sys.modules.update(saved)
 
 
 # --- the blocker itself must work, or every test below is a false green ---
