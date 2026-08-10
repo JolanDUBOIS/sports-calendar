@@ -1,6 +1,6 @@
 import typer
 
-from sports_calendar.application.workflows import clear_calendar, run_selection
+from .extras import missing_extra
 
 sync_calendar = typer.Typer(help="Commands to run and manage the calendar selection and utils.")
 
@@ -10,6 +10,11 @@ def main_run(
     dry_run: bool = typer.Option(False, "--dry-run")
 ):
     """ Run the data selection. """
+    try:
+        from sports_calendar.application.workflows.run_selection import run_selection
+    except ImportError as exc:
+        raise missing_extra("backend", exc) from exc
+
     run_selection(
         name=name,
         dry_run=dry_run
@@ -29,6 +34,11 @@ def main_clear(
     if scope is not None and scope not in ["all", "future", "past"]:
         typer.echo("Error: Invalid value for --scope. Valid options are 'all', 'future', or 'past'.", err=True)
         raise typer.Exit(code=1)
+
+    try:
+        from sports_calendar.application.workflows.clear_calendar import clear_calendar
+    except ImportError as exc:
+        raise missing_extra("backend", exc) from exc
 
     clear_calendar(
         name=name,

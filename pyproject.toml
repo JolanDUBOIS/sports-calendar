@@ -8,16 +8,26 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 
+# Shared base: the selection domain, resolver, storage and CLI shell. Usable on
+# its own; neither the Google Calendar sync nor the GUI is pulled in here.
 dependencies = [
     "pyyaml (>=6.0.3,<7.0.0)",
     "icalendar (>=6.3.2,<7.0.0)",
-    "google-api-python-client (>=2.187.0,<3.0.0)",
-    "google-auth-httplib2 (>=0.3.0,<0.4.0)",
-    "google-auth-oauthlib (>=1.2.3,<2.0.0)",
     "typer (>=0.20.0,<0.21.0)",
     "python-json-logger (>=4.0.0,<5.0.0)",
     "platformdirs (>=4.5.1,<5.0.0)",
     "sport-index",
+]
+
+[project.optional-dependencies]
+# Backend: resolves selections and pushes them to Google Calendar.
+backend = [
+    "google-api-python-client (>=2.187.0,<3.0.0)",
+    "google-auth-httplib2 (>=0.3.0,<0.4.0)",
+    "google-auth-oauthlib (>=1.2.3,<2.0.0)",
+]
+# UI: the NiceGUI selection editor shipped to end users.
+ui = [
     "nicegui>=3.10.0",
     "num2words>=0.5.14",
 ]
@@ -41,6 +51,70 @@ dev = [
     "ipykernel (>=7.1.0,<8.0.0)",
     "pytest-recording (>=0.13.4,<0.14.0)",
     "ruff>=0.15.12",
+    "import-linter>=2.0",
+]
+
+# Enforces the backend/UI split statically. Run with `make lint-imports`.
+# The runtime counterpart lives in tests/unit/test_packaging_isolation.py.
+[tool.importlinter]
+root_package = "sports_calendar"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Architecture layers"
+type = "layers"
+layers = [
+    "sports_calendar.interfaces",
+    "sports_calendar.application",
+    "sports_calendar.infra",
+    "sports_calendar.core",
+]
+
+[[tool.importlinter.contracts]]
+name = "Shared code depends on neither extra"
+type = "forbidden"
+source_modules = [
+    "sports_calendar.core",
+    "sports_calendar.application.selection",
+    "sports_calendar.application.workflows.build_calendar",
+    "sports_calendar.infra.config",
+    "sports_calendar.infra.engine",
+    "sports_calendar.infra.setup",
+    "sports_calendar.infra.storage",
+]
+forbidden_modules = [
+    "googleapiclient",
+    "google_auth_oauthlib",
+    "nicegui",
+    "num2words",
+    "sports_calendar.infra.google_calendar",
+    "sports_calendar.interfaces",
+]
+
+[[tool.importlinter.contracts]]
+name = "UI does not reach the Google Calendar side"
+type = "forbidden"
+source_modules = ["sports_calendar.interfaces.gui"]
+forbidden_modules = [
+    "googleapiclient",
+    "google_auth_oauthlib",
+    "sports_calendar.infra.google_calendar",
+    "sports_calendar.application.workflows.run_selection",
+    "sports_calendar.application.workflows.clear_calendar",
+]
+
+[[tool.importlinter.contracts]]
+name = "Backend does not reach the UI"
+type = "forbidden"
+source_modules = [
+    "sports_calendar.infra.google_calendar",
+    "sports_calendar.application.workflows.run_selection",
+    "sports_calendar.application.workflows.clear_calendar",
+]
+forbidden_modules = [
+    "nicegui",
+    "num2words",
+    "sports_calendar.interfaces.gui",
 ]
 
 [tool.ruff]

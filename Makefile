@@ -26,7 +26,20 @@ DOCKER_RUN := docker run --rm \
 .PHONY: setup
 setup:
 	$(UV) env use $(PYTHON)
-	$(UV) install
+	$(UV) sync --all-extras
+
+# Install just one side, as it will be shipped.
+.PHONY: setup-backend
+setup-backend:
+	$(UV) sync --extra backend
+
+.PHONY: setup-ui
+setup-ui:
+	$(UV) sync --extra ui
+
+.PHONY: lint-imports
+lint-imports:
+	$(UV) run lint-imports
 
 .PHONY: sync-calendar
 sync-calendar:
