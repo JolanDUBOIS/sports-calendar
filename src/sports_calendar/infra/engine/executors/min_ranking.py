@@ -1,6 +1,7 @@
 import logging
 
 from sportindex import Competition, EventCollection, SportClient, Standings
+from sportindex.exceptions import ProviderNotFoundError
 
 from sports_calendar.core.selection import (
     CompetitorsFilterFields,
@@ -33,7 +34,7 @@ class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
         """ Transform MinRankingFilterFields into CompetitorsFilterFields by fetching the relevant competitors based on the specified ranking and competitions. """
         competitor_ids: set[str] = set()
         for comp_id in filter_fields.competition_ids:
-            competition = client.get(Competition, comp_id)
+            competition = client.get(comp_id, Competition)
             total_standings, reason = cls._extract_total_standings(competition)
 
             if total_standings is None:
@@ -55,7 +56,10 @@ class MinRankingExecutor(BaseExecutor[MinRankingFilterFields]):
         if not competition.seasons:
             return None, "no seasons"
 
-        standings = competition.seasons[0].standings
+        try:
+            standings = competition.seasons[0].standings
+        except ProviderNotFoundError:
+            return None, "standings not found"
         if standings is None:
             return None, "no standings"
 

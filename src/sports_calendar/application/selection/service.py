@@ -1,10 +1,10 @@
-from copy import deepcopy
+from typing import Literal
 
-from ...core.selection import logger
-from ...core.selection.models import Selection, SelectionItem
-from ...core.selection.filters import SelectionFilter
-from .registry import SelectionRegistry
+from sports_calendar.core.selection.filters import SelectionFilter
+from sports_calendar.core.selection.models import Selection, SelectionItem
 from sports_calendar.infra.storage.selection import SelectionStorage
+
+from .registry import SelectionRegistry
 
 
 class SelectionService:
@@ -89,11 +89,14 @@ class SelectionService:
 
     @staticmethod
     def get_selection(name: str) -> Selection:
-        return SelectionRegistry.get(name)
+        return SelectionRegistry.get_selection(name)
 
     @staticmethod
-    def get_all_selections() -> list[Selection]:
-        return SelectionRegistry.get_all()
+    def get_all_selections(
+        sort_by: Literal["name", "created_at", "updated_at"] | None = None,
+        order: Literal["asc", "desc"] = "asc",
+    ) -> list[Selection]:
+        return SelectionRegistry.get_all(sort_by=sort_by, order=order)
 
     @staticmethod
     def selection_exists(name: str) -> bool:
@@ -122,104 +125,96 @@ class SelectionService:
     # Item operations
 
     @staticmethod
-    def get_item(selection_name: str, item_uid: str) -> SelectionItem:
-        selection = SelectionRegistry.get(selection_name)
-        return selection.get_item(item_uid)
+    def get_item(item_uid: str) -> SelectionItem:
+        return SelectionRegistry.get_item(item_uid)
 
     @staticmethod
     def add_item(selection_name: str, item: SelectionItem):
-        selection = SelectionRegistry.get(selection_name)
+        selection = SelectionRegistry.get_selection(selection_name)
         selection.add_item(item)
         SelectionRegistry.replace(selection)
 
     @staticmethod
     def add_empty_item(selection_name: str, sport: str, name: str = '') -> SelectionItem:
-        selection = SelectionRegistry.get(selection_name)
+        selection = SelectionRegistry.get_selection(selection_name)
         item = SelectionItem.empty(sport, name)
         selection.add_item(item)
         SelectionRegistry.replace(selection)
         return item
 
     @staticmethod
-    def replace_item(selection_name: str, item: SelectionItem):
-        selection = SelectionRegistry.get(selection_name)
-        selection.replace_item(item)
-        SelectionRegistry.replace(selection)
+    def replace_item(item: SelectionItem):
+        item_context = SelectionRegistry.get_item_context(item.uid)
+        item_context.selection.replace_item(item)
+        SelectionRegistry.replace(item_context.selection)
 
     @staticmethod
-    def rename_item(selection_name: str, item_uid: str, new_name: str):
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        item.name = new_name
-        SelectionRegistry.replace(selection)
+    def rename_item(item_uid: str, new_name: str):
+        item_context = SelectionRegistry.get_item_context(item_uid)
+        item_context.item.name = new_name
+        item_context.selection.replace_item(item_context.item)
+        SelectionRegistry.replace(item_context.selection)
 
     @staticmethod
-    def remove_item(selection_name: str, item_uid: str):
-        selection = SelectionRegistry.get(selection_name)
-        selection.remove_item(item_uid)
-        SelectionRegistry.replace(selection)
+    def remove_item(item_uid: str):
+        item_context = SelectionRegistry.get_item_context(item_uid)
+        item_context.selection.remove_item(item_uid)
+        SelectionRegistry.replace(item_context.selection)
 
     @staticmethod
-    def clone_item(selection_name: str, item_uid: str) -> SelectionItem:
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        cloned_item = item.clone()
-        selection.add_item(cloned_item)
-        SelectionRegistry.replace(selection)
+    def clone_item(item_uid: str) -> SelectionItem:
+        item_context = SelectionRegistry.get_item_context(item_uid)
+        cloned_item = item_context.item.clone()
+        item_context.selection.add_item(cloned_item)
+        SelectionRegistry.replace(item_context.selection)
         return cloned_item
 
     # Filter operations
 
     @staticmethod
-    def get_filter(selection_name: str, item_uid: str, filter_uid: str) -> SelectionFilter:
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        return item.get_filter(filter_uid)
+    def get_filter(filter_uid: str) -> SelectionFilter:
+        return SelectionRegistry.get_filter(filter_uid)
 
     @staticmethod
-    def add_filter(selection_name: str, item_uid: str, filter: SelectionFilter):
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        item.add_filter(filter)
-        SelectionRegistry.replace(selection)
+    def add_filter(item_uid: str, filter: SelectionFilter):
+        item_context = SelectionRegistry.get_item_context(item_uid)
+        item_context.item.add_filter(filter)
+        item_context.selection.replace_item(item_context.item)
+        SelectionRegistry.replace(item_context.selection)
 
     @staticmethod
-    def add_empty_filter(selection_name: str, item_uid: str, name: str = "") -> SelectionFilter:
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        filter = SelectionFilter.empty(item.sport, name)
-        item.add_filter(filter)
-        SelectionRegistry.replace(selection)
+    def add_empty_filter(item_uid: str, name: str = "") -> SelectionFilter:
+        item_context = SelectionRegistry.get_item_context(item_uid)
+        filter = SelectionFilter.empty(item_context.item.sport_id, name)
+        item_context.item.add_filter(filter)
+        item_context.selection.replace_item(item_context.item)
+        SelectionRegistry.replace(item_context.selection)
         return filter
 
     @staticmethod
-    def replace_filter(selection_name: str, item_uid: str, filter: SelectionFilter):
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        item.replace_filter(filter)
-        SelectionRegistry.replace(selection)
+    def replace_filter(filter: SelectionFilter):
+        filter_context = SelectionRegistry.get_filter_context(filter.uid)
+        filter_context.item.replace_filter(filter)
+        filter_context.selection.replace_item(filter_context.item)
+        SelectionRegistry.replace(filter_context.selection)
 
     @staticmethod
-    def rename_filter(selection_name: str, item_uid: str, filter_uid: str, new_name: str):
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        filter = item.get_filter(filter_uid)
-        filter.name = new_name
-        SelectionRegistry.replace(selection)
+    def rename_filter(filter_uid: str, new_name: str):
+        filter_context = SelectionRegistry.get_filter_context(filter_uid)
+        filter_context.filter.name = new_name
+        filter_context.selection.replace_filter(filter_context.filter)
+        SelectionRegistry.replace(filter_context.selection)
 
     @staticmethod
-    def remove_filter(selection_name: str, item_uid: str, filter_uid: str):
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        item.remove_filter(filter_uid)
-        SelectionRegistry.replace(selection)
+    def remove_filter(filter_uid: str):
+        filter_context = SelectionRegistry.get_filter_context(filter_uid)
+        filter_context.selection.remove_filter(filter_uid)
+        SelectionRegistry.replace(filter_context.selection)
 
     @staticmethod
-    def clone_filter(selection_name: str, item_uid: str, filter_uid: str) -> SelectionFilter:
-        selection = SelectionRegistry.get(selection_name)
-        item = selection.get_item(item_uid)
-        filter = item.get_filter(filter_uid)
-        cloned_filter = filter.clone()
-        item.add_filter(cloned_filter)
-        SelectionRegistry.replace(selection)
+    def clone_filter(filter_uid: str) -> SelectionFilter:
+        filter_context = SelectionRegistry.get_filter_context(filter_uid)
+        cloned_filter = filter_context.filter.clone()
+        filter_context.selection.add_filter(cloned_filter)
+        SelectionRegistry.replace(filter_context.selection)
         return cloned_filter

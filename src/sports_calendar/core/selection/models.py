@@ -1,11 +1,15 @@
 from __future__ import annotations
-from uuid import uuid4
-from datetime import datetime
-from dataclasses import dataclass, field
 
-from . import logger
-from .filters import SelectionFilter
+import contextlib
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime
+from uuid import uuid4
+
 from ..utils import validate, validate_timestamp
+from .filters import SelectionFilter
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -39,32 +43,64 @@ class Selection:
         for item in self.items:
             if item.uid == item_uid:
                 return item
-        logger.error(f"Selection item with uid '{item_uid}' not found in selection '{self.uid}'.")
-        raise KeyError(f"Selection item with uid '{item_uid}' not found in selection '{self.uid}'.")
+        logger.error(f"Selection item with uid '{item_uid}' not found in selection '{self.name}'.")
+        raise KeyError(f"Selection item with uid '{item_uid}' not found in selection '{self.name}'.")
+
+    def get_filter(self, filter_uid: str) -> SelectionFilter:
+        for item in self.items:
+            with contextlib.suppress(KeyError):
+                return item.get_filter(filter_uid)
+        logger.error(f"Selection filter with uid '{filter_uid}' not found in selection '{self.name}'.")
+        raise KeyError(f"Selection filter with uid '{filter_uid}' not found in selection '{self.name}'.")
 
     def add_item(self, item: SelectionItem):
         validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
-        validate(item.uid not in self._items_uids(), f"Selection item with uid '{item.uid}' already exists in selection '{self.uid}'", logger, ValueError)
+        validate(item.uid not in self._items_uids(), f"Selection item with uid '{item.uid}' already exists in selection '{self.name}'", logger, ValueError)
         self.items.append(item)
         self._update_timestamp()
-        logger.debug(f"Added item {item.uid} to selection {self.uid}")
+        logger.debug(f"Added item {item.uid} to selection {self.name}")
+
+    def add_filter(self, item_uid: str, selection_filter: SelectionFilter):
+        item = self.get_item(item_uid)
+        item.add_filter(selection_filter)
+        self._update_timestamp()
+        logger.debug(f"Routed add_filter for {selection_filter.uid} to item {item_uid} in selection {self.name}")
 
     def replace_item(self, item: SelectionItem):
         validate(isinstance(item, SelectionItem), "Selection items must be of type SelectionItem", logger, TypeError)
-        validate(item.uid in self._items_uids(), f"Selection item with uid '{item.uid}' does not exist in selection '{self.uid}'", logger, KeyError)
+        validate(item.uid in self._items_uids(), f"Selection item with uid '{item.uid}' does not exist in selection '{self.name}'", logger, KeyError)
         self.items = [i for i in self.items if i.uid != item.uid]
         self.items.append(item)
         self._update_timestamp()
-        logger.debug(f"Replaced item {item.uid} in selection {self.uid}")
+        logger.debug(f"Replaced item {item.uid} in selection {self.name}")
+
+    def replace_filter(self, selection_filter: SelectionFilter):
+        for item in self.items:
+            if selection_filter.uid in item._filters_uids():
+                item.replace_filter(selection_filter)
+                self._update_timestamp()
+                return
+        logger.error(f"Selection filter with uid '{selection_filter.uid}' does not exist in selection '{self.name}'.")
+        raise KeyError(f"Selection filter with uid '{selection_filter.uid}' does not exist in selection '{self.name}'.")
 
     def remove_item(self, item_uid: str):
-        if not item_uid in self._items_uids():
-            logger.error(f"Item {item_uid} not found in selection {self.uid}")
-            raise KeyError(f"Item {item_uid} not found in selection {self.uid}")
+        if item_uid not in self._items_uids():
+            logger.error(f"Item {item_uid} not found in selection {self.name}")
+            raise KeyError(f"Item {item_uid} not found in selection {self.name}")
         self.items = [item for item in self.items if item.uid != item_uid]
         self._update_timestamp()
-        logger.debug(f"Removed item {item_uid} from selection {self.uid}")
-    
+        logger.debug(f"Removed item {item_uid} from selection {self.name}")
+
+    def remove_filter(self, filter_uid: str):
+        for item in self.items:
+            if filter_uid in item._filters_uids():
+                item.remove_filter(filter_uid)
+                self._update_timestamp()
+                return
+
+        logger.error(f"Selection filter with uid '{filter_uid}' not found in selection '{self.name}'.")
+        raise KeyError(f"Selection filter with uid '{filter_uid}' not found in selection '{self.name}'.")
+
     def clone(self, new_name: str) -> Selection:
         cloned_items = [item.clone() for item in self.items]
         return Selection(
@@ -145,13 +181,13 @@ class SelectionItem:
         logger.debug(f"Replaced filter {selection_filter.uid} in selection item {self.uid}")
 
     def remove_filter(self, filter_uid: str):
-        if not filter_uid in self._filters_uids():
+        if filter_uid not in self._filters_uids():
             logger.error(f"Filter {filter_uid} not found in selection item {self.uid}")
             raise KeyError(f"Filter {filter_uid} not found in selection item {self.uid}")
         self.filters = [f for f in self.filters if f.uid != filter_uid]
         self._update_timestamp()
         logger.debug(f"Removed filter {filter_uid} from selection item {self.uid}")
-    
+
     def clone(self) -> SelectionItem:
         """ Create a deep copy of this SelectionItem with a new ID. """
         cloned_filters = [f.clone() for f in self.filters]

@@ -1,7 +1,9 @@
+import logging
 from pathlib import Path
 
-from sports_calendar import logger
 from sports_calendar.infra import Paths, setup_logging
+
+logger = logging.getLogger(__name__)
 
 
 def init_environment():

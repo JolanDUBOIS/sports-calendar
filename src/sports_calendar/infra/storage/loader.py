@@ -1,9 +1,10 @@
+import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import yaml
 
-from ...core import logger
+logger = logging.getLogger(__name__)
 
 
 def date_offset_constructor(loader, node):

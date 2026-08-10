@@ -10,9 +10,9 @@ def setup_test_environment():
     """Automatically set environment variables for all tests."""
     os.environ["SPORTINDEX_RECORD_MODE"] = os.environ.get("SPORTINDEX_RECORD_MODE") or "auto"
     os.environ["SPORTINDEX_FIXTURES_DIR"] = "tests/mock_data"
-    
+
     yield
-    
+
     os.environ.pop("SPORTINDEX_RECORD_MODE", None)
     os.environ.pop("SPORTINDEX_FIXTURES_DIR", None)
 
@@ -20,27 +20,27 @@ def setup_test_environment():
 @pytest.fixture
 def football_competition_ids():
     return [
-        10000000007, # Champions League
-        10000000017, # Premier League
-        10000000034, # Ligue 1
-        10000000679, # Europa League
-        10000000008, # La Liga
-        10000000023  # Serie A
+        "trnc:7",   # Champions League
+        "trnc:17",  # Premier League
+        "trnc:34",  # Ligue 1
+        "trnc:679", # Europa League
+        "trnc:8",   # La Liga
+        "trnc:23"   # Serie A
     ]
 
 @pytest.fixture
 def football_team_ids():
     return [
-        10000001644, # PSG
-        10000001653, # Monaco
-        10000001649, # Olympique Lyonnais
-        10000000042, # Arsenal
-        10000000017, # Manchester City
-        10000000044, # Liverpool
-        10000002829, # Real Madrid
-        10000002817, # Barcelona
-        10000002836, # Atletico Madrid
-        10000002672, # Bayern Munich
+        "t-cpt:1644", # PSG
+        "t-cpt:1653", # Monaco
+        "t-cpt:1649", # Olympique Lyonnais
+        "t-cpt:42",   # Arsenal
+        "t-cpt:17",   # Manchester City
+        "t-cpt:44",   # Liverpool
+        "t-cpt:2829", # Real Madrid
+        "t-cpt:2817", # Barcelona
+        "t-cpt:2836", # Atletico Madrid
+        "t-cpt:2672", # Bayern Munich
     ]
 
 @pytest.fixture
@@ -50,18 +50,18 @@ def raw_selection_data(football_competition_ids, football_team_ids):
         "items": [
             {
                 "name": "item-1",
-                "sport": "football",
+                "sport_id": 1,
                 "uid": "it-001",
                 "filters": [
                     {
                         "name": "item-1-filter-1",
-                        "sport": "football",
+                        "sport_id": 1,
                         "uid": "it-001-filt-001",
                         "fields": {"filter_type": "empty"}
                     },
                     {
                         "name": "item-1-filter-2",
-                        "sport": "football",
+                        "sport_id": 1,
                         "uid": "it-001-filt-002",
                         "fields": {
                             "filter_type": "min_ranking",
@@ -72,30 +72,30 @@ def raw_selection_data(football_competition_ids, football_team_ids):
                     },
                     {
                         "name": "item-1-filter-3",
-                        "sport": "football",
+                        "sport_id": 1,
                         "uid": "it-001-filt-003",
                         "fields": {
                             "filter_type": "competitors",
                             "competitor_ids": football_team_ids,
-                            "selection_rule": {"reference": 40, "rule": "opponent"}
+                            "selection_rule": {"reference": "t-cpt:40", "rule": "opponent"}
                         }
                     }
                 ]
             },
             {
                 "name": "item-2",
-                "sport": "f1",
+                "sport_id": 11,
                 "uid": "it-002",
                 "filters": [
                     {
                         "name": "item-2-filter-1",
-                        "sport": "f1",
+                        "sport_id": 11,
                         "uid": "it-002-filt-001",
                         "created_at": "2026-01-30T19:57:02",
                         "fields": {
                             "filter_type": "sessions",
-                            "competition_id": 20000000040,
-                            "sessions": ["Sprint", "Race"]
+                            "competition_id": "stgc:40",
+                            "sessions": [10, 6]  # SPRINT_RACE, RACE
                         }
                     }
                 ]

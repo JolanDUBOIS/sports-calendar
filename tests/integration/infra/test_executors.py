@@ -2,26 +2,31 @@ import logging
 from unittest.mock import Mock
 
 import pytest
-from sportindex import SportClient, EventCollection, Event
+from sportindex import Event, EventCollection, SportClient, StageTier
 
 from sports_calendar.core.selection import (
-    CompetitionsFilterFields, EmptyFilterFields,
-    MinRankingFilterFields, CompetitorsFilterFields,
-    SessionsFilterFields, EntitySelectionRule, Rule
+    CompetitionsFilterFields,
+    CompetitorsFilterFields,
+    EmptyFilterFields,
+    EntitySelectionRule,
+    MinRankingFilterFields,
+    Rule,
+    SessionsFilterFields,
 )
 from sports_calendar.infra.engine.executors import (
-    CompetitionsExecutor, EmptyExecutor,
-    MinRankingExecutor, CompetitorsExecutor,
-    SessionsExecutor
+    CompetitionsExecutor,
+    CompetitorsExecutor,
+    EmptyExecutor,
+    MinRankingExecutor,
+    SessionsExecutor,
 )
-
 
 logger = logging.getLogger(__name__)
 
 
 # ==== Constants ====
 
-PSG_ID = 10000001644
+PSG_ID = "t-cpt:1644"
 ANY_SELECTION_RULE = EntitySelectionRule(rule=Rule.ANY)
 BOTH_SELECTION_RULE = EntitySelectionRule(rule=Rule.BOTH)
 OPPONENT_SELECTION_RULE = EntitySelectionRule(rule=Rule.OPPONENT, reference=PSG_ID)
@@ -48,7 +53,7 @@ def mock_event_collection():
 
 # ==== Helper Functions ====
 
-def is_competitor_in_teams(event: Event, teams: list[int], side: str = "home") -> bool:
+def is_competitor_in_teams(event: Event, teams: list[str], side: str = "home") -> bool:
     if side == "home":
         return event.competitors.home.id in teams
     elif side == "away":
@@ -194,7 +199,8 @@ def test_min_ranking_executor_fetch(football_competition_ids, sport_client):
 
     for event in result_any:
         if event.competition.id in football_competition_ids:
-            competition_standings = event.competition.seasons[0].standings.get(kind="total").entries
+            total_standings = next((s for s in event.competition.seasons[0].standings if s.kind == "total"), None)
+            competition_standings = total_standings.entries
             top_10_team_ids = {entry.competitor.id for entry in competition_standings if entry.position <= 10}
             assert is_competitor_in_teams(event, top_10_team_ids, side="any"), f"Event {event.id} with competitors {event.competitors.home.id} vs {event.competitors.away.id} does not meet minimum ranking criteria for ANY selection rule: {top_10_team_ids}"
 
@@ -206,7 +212,7 @@ def test_min_ranking_executor_apply(football_competition_ids, sport_client):
 
     if len(all_events) == 0:
         logger.warning("No events available to apply minimum ranking filter.")
-    
+
     new_filter_fields_anyy = MinRankingFilterFields(ranking=10, competition_ids=football_competition_ids[1:3], selection_rule=ANY_SELECTION_RULE)
     new_filter_fields_both = MinRankingFilterFields(ranking=10, competition_ids=football_competition_ids[1:3], selection_rule=BOTH_SELECTION_RULE)
     new_filter_fields_opponent = MinRankingFilterFields(ranking=10, competition_ids=football_competition_ids[1:3], selection_rule=OPPONENT_SELECTION_RULE)
@@ -232,31 +238,31 @@ def test_min_ranking_executor_apply(football_competition_ids, sport_client):
 
 
 def test_sessions_executor_fetch(sport_client):
-    filter_fields = SessionsFilterFields(competition_id=20000000040, sessions=["Qualifying", "Sprint", "Race"])
+    filter_fields = SessionsFilterFields(competition_id="stgc:40", sessions=[StageTier.QUALIFYING, StageTier.SPRINT_RACE, StageTier.RACE])
     result = SessionsExecutor.fetch(filter_fields, sport_client)
 
     if len(result) == 0:
         logger.warning("No events fetched for sessions filter.") # Might happen if the test is realized in the off-season for instance...
 
     assert isinstance(result, EventCollection)
-    assert all(event.competition.id == 20000000040 for event in result)
-    # TODO - Add more specific assertions
+    assert all(event.competition.id == "stgc:40" for event in result)
+    assert all(event.tier in filter_fields.sessions for event in result)
 
 
 def test_sessions_executor_apply(sport_client):
-    filter_fields = SessionsFilterFields(competition_id=20000000040, sessions=["Qualifying", "Sprint", "Race"])
+    filter_fields = SessionsFilterFields(competition_id="stgc:40", sessions=[StageTier.QUALIFYING, StageTier.SPRINT_RACE, StageTier.RACE])
     all_events = SessionsExecutor.fetch(filter_fields, sport_client)
 
     if len(all_events) == 0:
         logger.warning("No events available to apply sessions filter.")
 
-    new_filter_fields = SessionsFilterFields(competition_id=20000000040, sessions=["Race"])
+    new_filter_fields = SessionsFilterFields(competition_id="stgc:40", sessions=[StageTier.RACE])
     result = SessionsExecutor.apply(new_filter_fields, all_events, sport_client)
 
     if len(result) == 0:
         logger.warning("No events after applying sessions filter with reduced session list.")
 
     assert isinstance(result, EventCollection)
-    assert all(event.competition.id == 20000000040 for event in result)
+    assert all(event.competition.id == "stgc:40" for event in result)
+    assert all(event.tier == StageTier.RACE for event in result)
     assert len(result) <= len(all_events)
-    # TODO - Add more specific assertions

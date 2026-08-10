@@ -10,25 +10,13 @@ requires-python = ">=3.11,<3.12"
 
 dependencies = [
     "pyyaml (>=6.0.3,<7.0.0)",
-    "pandas (>=2.3.3,<3.0.0)",
     "icalendar (>=6.3.2,<7.0.0)",
-    "requests (>=2.32.5,<3.0.0)",
-    "beautifulsoup4 (>=4.14.3,<5.0.0)",
-    "cloudscraper (>=1.2.71,<2.0.0)",
     "google-api-python-client (>=2.187.0,<3.0.0)",
     "google-auth-httplib2 (>=0.3.0,<0.4.0)",
     "google-auth-oauthlib (>=1.2.3,<2.0.0)",
-    "ics (>=0.7.2,<0.8.0)",
-    "python-dotenv (>=1.2.1,<2.0.0)",
-    "sqlalchemy (>=2.0.45,<3.0.0)",
-    "rapidfuzz (>=3.14.3,<4.0.0)",
     "typer (>=0.20.0,<0.21.0)",
-    "networkx (>=3.6.1,<4.0.0)",
-    "cattrs (>=25.3.0,<26.0.0)",
     "python-json-logger (>=4.0.0,<5.0.0)",
     "platformdirs (>=4.5.1,<5.0.0)",
-    "itsdangerous (>=2.2.0,<3.0.0)",
-    "jinja2 (>=3.1.6,<4.0.0)",
     "sport-index",
     "nicegui>=3.10.0",
     "num2words>=0.5.14",
@@ -41,7 +29,7 @@ sports-calendar = "sports_calendar.__main__:app"
 packages = ["src/sports_calendar"]
 
 [tool.uv.sources]
-sport-index = { path = "../../sport-index", editable = true }
+sport-index = { git = "https://github.com/JolanDUBOIS/sport-index.git", tag = "v1.0.0" }
 
 [build-system]
 requires = ["hatchling"]
