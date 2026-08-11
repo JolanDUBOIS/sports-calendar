@@ -27,11 +27,16 @@ class SelectionItemPresenter:
 
     @property
     def title(self) -> str:
-        return f'{self.item.name} - {get_sport_name(self.client, self.item.sport_id)} ({len(self.item.filters)} filters)'
+        """ Sport first: that is what the card actually is. """
+        sport = get_sport_name(self.client, self.item.sport_id)
+        return f'{self.item.name} ({sport})' if self.item.name else sport
 
     @property
     def subtitle(self) -> str:
-        return "" # TODO - Maybe show something later
+        count = len(self.item.filters)
+        if count == 0:
+            return 'Nothing followed yet'
+        return 'Following 1 thing' if count == 1 else f'Following {count} things'
 
     def get_filter_presenters(self) -> list[SelectionFilterPresenter]:
         return [SelectionFilterPresenter(filter, self.item, self.client) for filter in self.item.filters]

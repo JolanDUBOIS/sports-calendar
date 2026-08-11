@@ -58,7 +58,9 @@ class BaseModal(ABC):
             self._build_body()
 
             with ui.row().classes("justify-end gap-2 mt-6 w-full"):
-                ui.button(self.cancel_label, on_click=dialog.close).props("flat")
+                # Markers keep tests unambiguous: a modal's buttons often carry the
+                # same label as the card button that opened them.
+                ui.button(self.cancel_label, on_click=dialog.close).props("flat").mark("modal-cancel")
 
                 def confirm() -> None:
                     payload = self._get_payload()
@@ -68,7 +70,7 @@ class BaseModal(ABC):
                     if should_close is not False:
                         dialog.close()
 
-                ui.button(self.confirm_label, on_click=confirm).props(self._confirm_button_props())
+                ui.button(self.confirm_label, on_click=confirm).props(self._confirm_button_props()).mark("modal-confirm")
 
         dialog.open()
 
@@ -121,16 +123,28 @@ class FormModal(BaseModal):
         return {field.name: field.value for field in self.fields}
 
 
+# Type-ahead sends one upstream request per un-coalesced keystroke, and the
+# provider does not throttle its search endpoint at all. A debounce shorter than
+# normal typing cadence (~150-250ms per character) therefore coalesces nothing:
+# at 0.1s, "UEFA Ch" cost three separate API calls. 0.35s waits for a real pause.
+SEARCH_DEBOUNCE_SECONDS = 0.35
+
+# Two characters matches an enormous slice of the catalogue and is rarely what
+# anyone means; three is still forgiving for short names.
+MIN_SEARCH_QUERY_LENGTH = 3
+
 class SearchModal(BaseModal):
     def __init__(
         self,
         title: str,
         search_fn: Callable[[str], dict[Any, str]],
         message: str | None = None,
+        search_hint: str = "Search...",
         **kwargs
     ):
         super().__init__(title=title, message=message, **kwargs)
         self.search_fn = search_fn
+        self.search_hint = search_hint
         self._search_id = 0
         self.options: dict[Any, str] = {}
         self._selected_id = None
@@ -143,7 +157,7 @@ class SearchModal(BaseModal):
             # Put the input and the spinner in a row
             with ui.row().classes("w-full items-center no-wrap gap-2"):
                 self._search_input = ui.input(
-                    label="Search...",
+                    label=self.search_hint,
                     on_change=self._handle_search
                 ).classes("flex-grow").props("autofocus clearable")
 
@@ -165,7 +179,7 @@ class SearchModal(BaseModal):
         self._search_id += 1
         current_id = self._search_id
 
-        if len(query) < 2:
+        if len(query) < MIN_SEARCH_QUERY_LENGTH:
             self._results_container.classes("hidden")
             self._results_container.clear()
             self._spinner.classes("hidden")
@@ -174,8 +188,7 @@ class SearchModal(BaseModal):
         # Show the spinner instantly so the app feels highly responsive
         self._spinner.classes(remove="hidden")
 
-        # You can drop the debounce even lower to 0.1 if you have the cache
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(SEARCH_DEBOUNCE_SECONDS)
         if current_id != self._search_id:
             return
 

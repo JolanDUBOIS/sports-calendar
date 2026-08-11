@@ -1,6 +1,5 @@
 from typing import Literal
 
-from num2words import num2words
 from sportindex import SportClient
 
 from sports_calendar.application import SelectionService
@@ -25,19 +24,14 @@ class SelectionPresenter:
 
     @property
     def title(self) -> str:
-        return f'Selection "{self.selection.name}"'
+        return self.selection.name
 
     @property
     def subtitle(self) -> str:
-        items = self.selection.items
         sport_ids = self.selection.sport_ids
-        if len(items) == 0:
-            return 'Empty selection'
-        if len(items) == 1:
-            sport_str = get_sport_name(self.client, sport_ids[0])
-            return f'One item (sport: {sport_str})'
-        sports_str = ', '.join(get_sport_name(self.client, sid) for sid in sport_ids)
-        return f'{num2words(len(items)).capitalize()} items (sports: {sports_str})'
+        if not sport_ids:
+            return 'No sports yet'
+        return ', '.join(get_sport_name(self.client, sid) for sid in sport_ids)
 
     def get_item_presenters(
         self,

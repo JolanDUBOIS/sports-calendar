@@ -4,6 +4,7 @@ from nicegui import ui
 
 from sports_calendar.application.selection import SelectionService
 
+from .. import copy
 from ..components import (
     AddCard,
     ConfirmModal,
@@ -12,6 +13,8 @@ from ..components import (
     TextField,
     TextValidatorResult,
     base_layout,
+    explanation,
+    info_icon,
 )
 from ..context import app_context
 from ..presenters import SelectionPresenter
@@ -19,14 +22,33 @@ from ..presenters import SelectionPresenter
 logger = logging.getLogger(__name__)
 
 
-def _handle_create_selection(name: str) -> bool:
+def _render_selection_card(presenter: SelectionPresenter) -> InteractiveCard:
+    """ Render one selection card into the caller's current container.
+
+    The caller owns the `with container:` block. Entering the container here as
+    well would nest it inside itself, and the card is then dropped.
+
+    `card` is referenced inside its own on_delete lambda: the lambda only runs on
+    click, by which point the name is bound.
+    """
+    card = InteractiveCard(
+        title=presenter.title,
+        subtitle=presenter.subtitle,
+        on_click=lambda: ui.navigate.to(f'/selections/{presenter.name}'),
+        on_delete=lambda: _open_delete_modal(presenter, card),
+    )
+    card.container.mark('selection-card')
+    return card
+
+
+def _handle_create_selection(name: str, container: ui.column) -> bool:
     normalized_name = name.strip()
     if not normalized_name:
-        ui.notify('Please enter a selection name.', type='warning')
+        ui.notify('Please enter a name.', type='warning')
         return False
 
     try:
-        SelectionPresenter.create(
+        presenter = SelectionPresenter.create(
             client=app_context.client,
             name=normalized_name,
         )
@@ -34,25 +56,30 @@ def _handle_create_selection(name: str) -> bool:
         ui.notify(str(exc), type='negative')
         return False
 
-    ui.notify(f'Selection "{normalized_name}" created.', type='positive')
-    ui.navigate.reload()
+    # Added in place rather than reloading the page: a reload collapses every
+    # expanded card on screen, which is jarring mid-edit.
+    with container:
+        card = _render_selection_card(presenter)
+    card.container.move(container, target_index=0)  # list is newest-first
+
+    ui.notify(copy.CALENDAR_CREATED.format(name=normalized_name), type='positive')
     return True
 
 def _validate_selection_name(name: str) -> TextValidatorResult:
     if not name.strip():
         return False, "Name cannot be empty."
     if SelectionService.selection_exists(name.strip()):
-        return False, "A selection with this name already exists."
+        return False, "You already have a calendar with this name."
     return True, None
 
-def _open_create_modal() -> None:
+def _open_create_modal(container: ui.column) -> None:
     modal = FormModal(
-        title='Create Selection',
-        message='Enter a name for the new selection.',
+        title=copy.NEW_CALENDAR_TITLE,
+        message=copy.NEW_CALENDAR_MESSAGE,
         fields=[
             TextField(
                 name='name',
-                label='Selection name',
+                label=copy.CALENDAR_NAME_LABEL,
                 validator=_validate_selection_name,
             )
         ],
@@ -60,46 +87,43 @@ def _open_create_modal() -> None:
         cancel_label='Cancel',
         confirm_color='primary',
     )
-    modal.open(on_confirm=lambda payload: _handle_create_selection(payload['name']))
+    modal.open(on_confirm=lambda payload: _handle_create_selection(payload['name'], container))
 
-def _handle_delete_selection(presenter: SelectionPresenter) -> None:
+def _handle_delete_selection(presenter: SelectionPresenter, card: InteractiveCard) -> None:
     try:
         presenter.delete()
     except KeyError:
         logger.exception("Selection '%s' could not be deleted", presenter.name)
-        ui.notify(f'Selection "{presenter.name}" was not found.', type='negative')
+        ui.notify(f'Calendar "{presenter.name}" was not found.', type='negative')
         return
 
-    ui.notify(f'Selection "{presenter.name}" deleted.', type='positive')
-    ui.navigate.reload()
+    card.container.delete()
+    ui.notify(copy.CALENDAR_DELETED.format(name=presenter.name), type='positive')
 
-def _open_delete_modal(presenter: SelectionPresenter) -> None:
+def _open_delete_modal(presenter: SelectionPresenter, card: InteractiveCard) -> None:
     ConfirmModal(
-        title='Delete Selection',
-        message=f'Are you sure you want to delete "{presenter.name}"? This cannot be undone.',
+        title=copy.DELETE_CALENDAR_TITLE,
+        message=copy.DELETE_CALENDAR_MESSAGE.format(name=presenter.name),
         confirm_label='Delete',
         cancel_label='Cancel',
         confirm_color='negative',
-    ).open(on_confirm=lambda _: _handle_delete_selection(presenter))
+    ).open(on_confirm=lambda _: _handle_delete_selection(presenter, card))
 
 
 @ui.page('/selections')
 def selections_page():
     with base_layout():
-        ui.label('All Selections').classes('text-3xl font-bold mb-4')
+        with ui.row().classes('items-center gap-2'):
+            ui.label(copy.CALENDARS_PAGE_TITLE).classes('text-3xl font-bold')
+            info_icon(copy.WHAT_IS_A_CALENDAR, size='sm')
+        explanation(copy.CALENDARS_PAGE_INTRO).classes('mb-4')
 
         with ui.column().classes('w-full gap-2'):
-            for selection in SelectionService.get_all_selections(sort_by='updated_at', order='desc'):
-                presenter = SelectionPresenter(
-                    selection=selection,
-                    client=app_context.client
-                )
+            cards_container = ui.column().classes('w-full gap-2')
+            with cards_container:
+                for selection in SelectionService.get_all_selections(sort_by='updated_at', order='desc'):
+                    _render_selection_card(
+                        SelectionPresenter(selection=selection, client=app_context.client)
+                    )
 
-                InteractiveCard(
-                    title=presenter.title,
-                    subtitle=presenter.subtitle,
-                    on_click=lambda p=presenter: ui.navigate.to(f'/selections/{p.name}'),
-                    on_delete=lambda p=presenter: _open_delete_modal(p),
-                )
-
-            AddCard(on_click=_open_create_modal)
+            AddCard(on_click=lambda: _open_create_modal(cards_container))

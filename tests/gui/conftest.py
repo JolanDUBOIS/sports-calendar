@@ -11,8 +11,11 @@ Declaring the dependency explicitly makes the order guaranteed.
 """
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
+from nicegui import events
+from nicegui.testing import User
 from nicegui.testing.user_simulation import user_simulation
 
 GUI_MAIN_FILE = Path(__file__).parents[2] / "src/sports_calendar/interfaces/gui/app.py"
@@ -54,8 +57,74 @@ def isolated_selections(tmp_path, monkeypatch):
     return selections_dir
 
 
+FAKE_SPORTS = [
+    SimpleNamespace(id="spt:1", name="football"),
+    SimpleNamespace(id="spt:11", name="motorsport"),
+]
+
+
 @pytest.fixture
-async def user(isolated_selections):  # noqa: ARG001 - ordering dependency
+def offline_sport_index(monkeypatch):
+    """ Stub the sport-index calls the GUI makes while rendering.
+
+    Rendering an item calls `get_sport_name`, and the create-item modal calls
+    `client.list(Sport)`; both hit the network. Stubbing them keeps GUI tests
+    hermetic and fast. `Sport.decode_id` is a classmethod, so the fake sports
+    only need a prefixed `id` and a `name`.
+    """
+    from sportindex import SportClient
+
+    from sports_calendar.interfaces.gui.presenters import selection, selection_item
+
+    monkeypatch.setattr(SportClient, "list", lambda self, entity_cls, **kwargs: FAKE_SPORTS)
+
+    # Patched where they are used: both presenter modules bound the name at
+    # import time via `from ..catalog import get_sport_name`.
+    for module in (selection, selection_item):
+        monkeypatch.setattr(module, "get_sport_name", lambda client, sport_id: f"Sport-{sport_id}")
+
+    return FAKE_SPORTS
+
+
+@pytest.fixture
+async def user(isolated_selections, offline_sport_index):  # noqa: ARG001 - ordering dependency
     """ A simulated user driving the real GUI pages against isolated storage. """
     async with user_simulation(main_file=GUI_MAIN_FILE) as simulated_user:
         yield simulated_user
+
+
+def _click_one(
+    user: User,
+    target: str | type | None = None,
+    *,
+    marker: str | None = None,
+    index: int = 0,
+) -> None:
+    """ Click exactly one matched element.
+
+    Two reasons this exists instead of `user.find(...).click()`:
+
+    1. `find()` returns every match and `click()` fires all of them, which is
+       wrong when several cards each carry a "Delete" button.
+    2. `click()` iterates the element's live listener dict. Our handlers remove
+       cards in place, which mutates that dict mid-iteration and raises
+       "dictionary changed size during iteration". Iterating a copy avoids it.
+       This is a limitation of the simulator only: a real browser dispatches the
+       click over the websocket, outside that loop.
+    """
+    interaction = user.find(marker=marker) if marker is not None else user.find(target)
+    element = list(interaction.elements)[index]
+
+    for listener in list(element._event_listeners.values()):  # noqa: SLF001
+        if listener.element_id != element.id:
+            continue
+        events.handle_event(
+            listener.handler,
+            events.GenericEventArguments(sender=element, client=user.client, args=None),
+        )
+
+
+@pytest.fixture
+def click_one():
+    """ Expose `_click_one` to tests without import-path gymnastics. """
+    return _click_one

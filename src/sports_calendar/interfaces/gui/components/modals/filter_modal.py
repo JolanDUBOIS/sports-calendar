@@ -3,10 +3,18 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from sportindex import StageTier
-
 from sports_calendar.core.selection import FilterType, Rule, SelectionFilter
 
+from ...copy import (
+    FIELD_HELP,
+    FILTER_TYPE_HELP,
+    FOLLOW_TITLE,
+    FOLLOW_TYPE_LABEL,
+    RULE_LABELS,
+    SESSION_LABELS,
+    filter_type_label,
+    search_hint,
+)
 from .base import FormModal
 from .fields import (
     ModalField,
@@ -21,9 +29,15 @@ if TYPE_CHECKING:
     from ...catalog import FilterSearchProvider
 
 
-selection_rule_options = {rule.value: rule.name.capitalize() for rule in Rule}
-sessions_options = {tier.value: tier.name.lower() for tier in StageTier}
-filter_type_options = {filter_type.value: filter_type.value for filter_type in FilterType}
+selection_rule_options = {
+    rule.value: RULE_LABELS.get(rule, rule.name.capitalize()) for rule in Rule
+}
+# Only the tiers that are actually sessions: StageTier also carries structural
+# levels (sport, season, event, lap) that nobody would ever pick.
+sessions_options = {tier.value: label for tier, label in SESSION_LABELS.items()}
+filter_type_options = {
+    filter_type.value: filter_type_label(filter_type) for filter_type in FilterType
+}
 
 # --- Helpers ---
 
@@ -126,18 +140,21 @@ def build_min_ranking_filter_fields(
             name="competition_ids",
             label="Competitions",
             default_values=defaults["competition_ids"],
-            search_fn=lambda query: search_provider.search_competition(query, sport_id)
+            search_fn=lambda query: search_provider.search_competition(query, sport_id),
+            search_hint=search_hint("competition", sport_id)
         ),
         SelectField(
             name="selection_rule",
-            label="Selection Rule",
+            label="Which matches to keep",
             default=defaults["selection_rule"],
-            options=selection_rule_options
+            options=selection_rule_options,
+            help_text=FIELD_HELP["selection_rule"]
         ),
         SearchableSelectField(
             name="selection_reference",
             label="Opponent Team",
             search_fn=lambda query: search_provider.search_competitor(query, sport_id),
+            search_hint=search_hint("competitor", sport_id),
             default_value=defaults["selection_reference"]
         ) # Should only be shown when selection_rule is OPPONENT, but implementing that kind of dynamic field logic in the modal
           # is a bit complex, so for now it's always shown.
@@ -162,7 +179,8 @@ def build_competitions_filter_fields(
             name="competition_ids",
             label="Competitions",
             default_values=defaults["competition_ids"],
-            search_fn=lambda query: search_provider.search_competition(query, sport_id)
+            search_fn=lambda query: search_provider.search_competition(query, sport_id),
+            search_hint=search_hint("competition", sport_id)
         ),
         # TODO - Add stage when we have stages in the model
     ]
@@ -190,18 +208,21 @@ def build_competitors_filter_fields(
             name="competitor_ids",
             label="Competitors",
             default_values=defaults["competitor_ids"],
-            search_fn=lambda query: search_provider.search_competitor(query, sport_id)
+            search_fn=lambda query: search_provider.search_competitor(query, sport_id),
+            search_hint=search_hint("competitor", sport_id)
         ),
         SelectField(
             name="selection_rule",
-            label="Selection Rule",
+            label="Which matches to keep",
             default=defaults["selection_rule"],
-            options=selection_rule_options
+            options=selection_rule_options,
+            help_text=FIELD_HELP["selection_rule"]
         ),
         SearchableSelectField(
             name="selection_reference",
             label="Opponent Team",
             search_fn=lambda query: search_provider.search_competitor(query, sport_id),
+            search_hint=search_hint("competitor", sport_id),
             default_value=defaults["selection_reference"]
         )
     ]
@@ -227,6 +248,7 @@ def build_sessions_filter_fields(
             name="competition_id",
             label="Competition",
             search_fn=lambda query: search_provider.search_competition(query, sport_id),
+            search_hint=search_hint("competition", sport_id),
             default_value=defaults["competition_id"]
         ),
         MultipleSelectField(
@@ -266,8 +288,8 @@ class FilterModal(FormModal):
         self,
         initial_filter: SelectionFilter,
         search_provider: FilterSearchProvider,
-        title: str = "Edit Filter",
-        message: str | None = "Select a filter type, then fill the fields for that type.",
+        title: str = FOLLOW_TITLE,
+        message: str | None = None,
         initial_filter_type: FilterType = FilterType.EMPTY,
         **kwargs,
     ):
@@ -277,9 +299,10 @@ class FilterModal(FormModal):
 
         self._filter_type_field = SelectField(
             name="filter_type",
-            label="Filter Type",
+            label=FOLLOW_TYPE_LABEL,
             options=filter_type_options,
             default=self._selected_filter_type.value,
+            help_text=FILTER_TYPE_HELP.get(self._selected_filter_type),
         )
 
         self._dynamic_fields = _FIELD_BUILDER_MAP[self._selected_filter_type](
@@ -308,6 +331,8 @@ class FilterModal(FormModal):
     def update(self, new_filter_type: FilterType) -> None:
         self._selected_filter_type = new_filter_type
         self._filter_type_field.default = self._selected_filter_type.value
+        # Explanation follows the choice, so the modal describes what is selected.
+        self._filter_type_field.help_text = FILTER_TYPE_HELP.get(self._selected_filter_type)
 
         self._dynamic_fields = _FIELD_BUILDER_MAP[self._selected_filter_type](
             initial_filter=self._initial_filter,

@@ -13,13 +13,16 @@ from sports_calendar.infra.engine import Resolver
 logger = logging.getLogger(__name__)
 
 
-def build_calendar(name: str = "dev") -> SportsCalendar:
-    """ Resolve a selection into a SportsCalendar.
+def resolve_events(name: str = "dev") -> SportsEventCollection:
+    """ Resolve a selection into a de-duplicated collection of events.
 
     Shared workflow: available to both the backend and the UI. Must stay free of
     any Google Calendar dependency so a UI-only install can import it.
+
+    This is the step the UI needs on its own, to preview what a selection
+    produces before anything is written to a calendar.
     """
-    logger.info(f"Building calendar for selection {name}.")
+    logger.info(f"Resolving events for selection {name}.")
 
     SelectionService.initialize_registry()
 
@@ -38,7 +41,11 @@ def build_calendar(name: str = "dev") -> SportsCalendar:
 
     logger.info(f"Total events selected: {len(events)}")
     logger.debug(f"Selected events:\n{events}")
+    return events
 
+
+def build_calendar(name: str = "dev") -> SportsCalendar:
+    """ Resolve a selection and wrap the resulting events in a SportsCalendar. """
     calendar = SportsCalendar()
-    calendar.add_events(events)
+    calendar.add_events(resolve_events(name))
     return calendar

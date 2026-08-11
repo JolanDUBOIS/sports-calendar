@@ -102,6 +102,9 @@ class AddCard(InteractiveCard):
     def __init__(self, label: str = '+', on_click: Callable = None):
         self.label = label
         super().__init__(title='', subtitle=None, on_click=on_click)
+        # Marker so tests can target the add button rather than guessing at
+        # card ordering.
+        self.container.mark('add-card')
 
     def _build_header(self):
         return None

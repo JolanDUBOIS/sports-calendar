@@ -10,6 +10,6 @@ imported from their module path directly:
     from sports_calendar.application.workflows.clear_calendar import clear_calendar
 """
 
-from .build_calendar import build_calendar
+from .build_calendar import build_calendar, resolve_events
 
-__all__ = ["build_calendar"]
+__all__ = ["build_calendar", "resolve_events"]

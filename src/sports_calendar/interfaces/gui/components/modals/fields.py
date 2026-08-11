@@ -35,10 +35,20 @@ def _extract_query_from_event(event: Any) -> str:
 
 
 class ModalField(ABC):
-    def __init__(self, name: str, label: str):
+    def __init__(self, name: str, label: str, help_text: str | None = None):
         self.name = name
         self.label = label
+        self.help_text = help_text
         self._element = None
+
+    def _apply_help(self) -> None:
+        """ Show the field's explanation as a persistent Quasar hint.
+
+        Called by subclasses at the end of render(). Quotes are stripped because
+        the text is interpolated into a prop string.
+        """
+        if self.help_text and self._element is not None:
+            self._element.props(f'hint="{self.help_text.replace(chr(34), chr(39))}"')
 
     @abstractmethod
     def render(self) -> None:
@@ -113,9 +123,10 @@ class SelectField(ModalField):
         name: str,
         label: str,
         options: list[Any] | dict[Any, str],
-        default: Any = None
+        default: Any = None,
+        help_text: str | None = None
     ):
-        super().__init__(name, label)
+        super().__init__(name, label, help_text)
         self.options = _normalize_options(options)
         self.default = default
 
@@ -125,6 +136,7 @@ class SelectField(ModalField):
             options=self.options,
             value=self.default
         ).classes("w-full")
+        self._apply_help()
 
     @property
     def value(self) -> Any:
@@ -204,10 +216,12 @@ class SearchableSelectField(ModalField):
         label: str,
         search_fn: Callable[[str], dict[Any, str]],
         default_value: Any = None,
-        default_label: str = ""
+        default_label: str = "",
+        search_hint: str = "Search..."
     ):
         super().__init__(name, label)
         self.search_fn = search_fn
+        self.search_hint = search_hint
         self._value = default_value
 
         if default_value and default_label:
@@ -236,7 +250,7 @@ class SearchableSelectField(ModalField):
                 ui.icon('search', size="sm").classes("text-gray-500")
 
     def _open_modal(self) -> None:
-        modal = SearchModal(title=f"Search {self.label}", search_fn=self.search_fn)
+        modal = SearchModal(title=f"Search {self.label}", search_fn=self.search_fn, search_hint=self.search_hint)
 
         def on_confirm(payload: tuple[Any, str] | None) -> bool:
             if payload is not None:
@@ -263,10 +277,12 @@ class SearchableMultipleSelectField(ModalField):
         name: str,
         label: str,
         search_fn: Callable[[str], dict[Any, str]],
-        default_values: dict[Any, str] | None = None
+        default_values: dict[Any, str] | None = None,
+        search_hint: str = "Search..."
     ):
         super().__init__(name, label)
         self.search_fn = search_fn
+        self.search_hint = search_hint
         self._selections = default_values or {}
         self._chips_container = None
 
@@ -307,7 +323,7 @@ class SearchableMultipleSelectField(ModalField):
         self._render_chips()
 
     def _open_modal(self) -> None:
-        modal = SearchModal(title=f"Add to {self.label}", search_fn=self.search_fn)
+        modal = SearchModal(title=f"Add to {self.label}", search_fn=self.search_fn, search_hint=self.search_hint)
 
         def on_confirm(payload: tuple[Any, str] | None) -> bool:
             if payload is not None:
