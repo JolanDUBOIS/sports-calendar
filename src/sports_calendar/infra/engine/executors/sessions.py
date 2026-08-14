@@ -1,6 +1,7 @@
 import logging
 
-from sportindex import Competition, EventCollection, SportClient, StageEvent
+from sportindex import EventCollection, SportClient, StageEvent
+from sportindex.exceptions import DomainError, SportIndexError
 
 from sports_calendar.core.selection import SessionsFilterFields
 
@@ -14,19 +15,33 @@ class SessionsExecutor(BaseExecutor[SessionsFilterFields]):
 
     @classmethod
     def fetch(cls, filter_fields: SessionsFilterFields, client: SportClient) -> EventCollection:
-        """ Fetch events that meet the sessions criteria using the provided SportClient. """
+        """ Fetch events that meet the sessions criteria using the provided SportClient.
+
+        `substage.tier` is lazy: reading it fetches the substage. One flaky
+        request there used to raise straight out of the whole build — a single
+        practice session cost every other event in the calendar, across every
+        sport. A session that cannot be read is skipped and logged instead.
+        """
         events = EventCollection()
-        competition = client.get(filter_fields.competition_id, Competition)
-        if competition is None:
-            logger.warning(f"Competition with ID {filter_fields.competition_id} not found. Returning empty event collection.")
-            return events
-        main_events = competition.seasons[0].get_fixtures()
+        main_events = cls.fetch_current_fixtures(filter_fields.competition_id, client)
         for event in main_events:
             if not isinstance(event, StageEvent):
                 logger.warning(f"Skipping non-stage event {event!r} while fetching sessions events.")
                 continue
-            for substage in event.substages:
-                if substage.tier in filter_fields.sessions:
+
+            try:
+                substages = list(event.substages)
+            except (SportIndexError, DomainError):
+                logger.exception(f"Could not read sessions of stage {event.id}. Skipping it.")
+                continue
+
+            for substage in substages:
+                try:
+                    wanted = substage.tier in filter_fields.sessions
+                except (SportIndexError, DomainError):
+                    logger.exception(f"Could not read session {substage.id}. Skipping it.")
+                    continue
+                if wanted:
                     events.add(substage)
         return events
 
