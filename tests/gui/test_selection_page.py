@@ -11,6 +11,8 @@ from nicegui.testing import User
 from sports_calendar.application.selection import SelectionService
 
 SELECTION = "my-sel"
+FOOTBALL = 1
+TENNIS = 5
 
 
 async def _open_with_items(user: User, *item_names: str) -> None:
@@ -40,7 +42,9 @@ async def test_adding_an_item_keeps_other_cards_expanded(user: User) -> None:
 
     user.find(marker="add-card").click()
     await user.should_see("Add a sport")
-    next(iter(user.find(ui.select).elements)).set_value(1)
+    # A different sport: football is already on the page, and a sport already in
+    # the calendar is no longer offered.
+    next(iter(user.find(ui.select).elements)).set_value(TENNIS)
     user.find(marker="modal-confirm").click()
 
     await user.should_see("Sport added.")
@@ -54,11 +58,35 @@ async def test_adding_an_item_clears_the_empty_placeholder(user: User) -> None:
 
     user.find(marker="add-card").click()
     await user.should_see("Add a sport")
-    next(iter(user.find(ui.select).elements)).set_value(1)
+    next(iter(user.find(ui.select).elements)).set_value(FOOTBALL)
     user.find(marker="modal-confirm").click()
 
     await user.should_see("Sport added.")
     await user.should_not_see("No sports yet")
+
+
+async def test_a_sport_already_in_the_calendar_is_not_offered_again(user: User) -> None:
+    """ An item is only a grouping by sport, and its filters union with every
+    other item's — so a second football card would behave identically to putting
+    those rules on the first one. """
+    await _open_with_items(user, "first")
+
+    user.find(marker="add-card").click()
+    await user.should_see("Add a sport")
+
+    options = next(iter(user.find(ui.select).elements)).options
+    assert FOOTBALL not in options
+    assert TENNIS in options
+
+
+async def test_the_menu_explains_itself_when_every_sport_is_taken(user: User) -> None:
+    SelectionService.add_empty_selection(SELECTION)
+    for sport_id in (FOOTBALL, TENNIS, 11):  # every supported sport in the stub
+        SelectionService.add_empty_item(SELECTION, sport_id)
+    await user.open(f"/selections/{SELECTION}")
+
+    user.find(marker="add-card").click()
+    await user.should_see("Every sport is already in this calendar")
 
 
 async def test_deleting_an_item_removes_only_that_card(user: User, click_one) -> None:

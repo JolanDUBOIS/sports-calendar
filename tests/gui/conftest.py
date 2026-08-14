@@ -57,8 +57,13 @@ def isolated_selections(tmp_path, monkeypatch):
     return selections_dir
 
 
+# Includes ice-hockey deliberately: it is a real sport-index sport that the app
+# has no event class for, so it is what proves the UI filters the list down to
+# what the backend can actually build.
 FAKE_SPORTS = [
     SimpleNamespace(id="spt:1", name="football"),
+    SimpleNamespace(id="spt:4", name="ice-hockey"),
+    SimpleNamespace(id="spt:5", name="tennis"),
     SimpleNamespace(id="spt:11", name="motorsport"),
 ]
 
