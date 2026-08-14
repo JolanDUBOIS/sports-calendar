@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING, Any
 
 from nicegui import ui
 
+from ...catalog import SearchUnavailableError
+from ...copy import SEARCH_FAILED, SEARCH_UNAVAILABLE
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -35,6 +38,10 @@ class BaseModal(ABC):
         self.min_width = min_width
         self.max_width = max_width
         self.payload_adapter = payload_adapter
+        # Set by open(). Held so a modal that fills itself in after opening can
+        # keep Save disabled until it has something worth saving.
+        self._dialog = None
+        self._confirm_button = None
 
     @abstractmethod
     def _build_body(self) -> None:
@@ -51,6 +58,7 @@ class BaseModal(ABC):
         with ui.dialog() as dialog, ui.card().classes("p-5 rounded-lg shadow-lg").style(
             f"min-width: {self.min_width}; max-width: {self.max_width}; width: 100%;"
         ):
+            self._dialog = dialog
             ui.label(self.title).classes("text-h6 mb-2")
             if self.message:
                 ui.label(self.message).classes("text-body2 text-gray-700")
@@ -70,9 +78,17 @@ class BaseModal(ABC):
                     if should_close is not False:
                         dialog.close()
 
-                ui.button(self.confirm_label, on_click=confirm).props(self._confirm_button_props()).mark("modal-confirm")
+                self._confirm_button = ui.button(
+                    self.confirm_label, on_click=confirm
+                ).props(self._confirm_button_props()).mark("modal-confirm")
+                self._confirm_button.set_enabled(self._is_ready())
 
         dialog.open()
+
+    def _is_ready(self) -> bool:
+        """ Whether the modal holds enough to be saved. Overridden by modals
+        that fill themselves in after opening. """
+        return True
 
 
 class ConfirmModal(BaseModal):
@@ -120,7 +136,9 @@ class FormModal(BaseModal):
         self._render_fields()
 
     def _get_payload(self) -> dict[str, Any]:
-        return {field.name: field.value for field in self.fields}
+        # Unnamed fields are presentational — a spinner, a note — and must not
+        # contribute a key that a payload adapter might read.
+        return {field.name: field.value for field in self.fields if field.name}
 
 
 # Type-ahead sends one upstream request per un-coalesced keystroke, and the
@@ -167,6 +185,10 @@ class SearchModal(BaseModal):
             self._results_container = ui.scroll_area().classes(
                 "w-full h-48 border border-gray-200 rounded hidden"
             )
+            # Shown only when the provider could not be reached. Without it, an
+            # unreachable provider and a genuinely unknown name look the same.
+            self._error_label = ui.label("").classes("text-xs text-red-600")
+            self._error_label.set_visibility(False)
 
     async def _handle_search(self, event: Any) -> None:
         if self._ignore_next_change:
@@ -206,6 +228,7 @@ class SearchModal(BaseModal):
                 # Save the fresh API result to the cache
                 self._cache[query] = results
 
+            self._set_error(None)
             self.options = results
             self._results_container.clear()
 
@@ -220,13 +243,27 @@ class SearchModal(BaseModal):
             else:
                 self._results_container.classes("hidden")
 
+        except SearchUnavailableError:
+            # The provider was not reachable. Say so: an empty list here reads
+            # as "no such team", and the usual cause is a VPN, a corporate
+            # proxy, or a captive portal — none of which the user can guess at.
+            logger.warning(f"Search unavailable for query: '{query}'")
+            self._results_container.classes("hidden")
+            self._results_container.clear()
+            self._set_error(SEARCH_UNAVAILABLE)
+
         except Exception:
             logger.exception(f"Search failed for query: '{query}'")
+            self._set_error(SEARCH_FAILED)
 
         finally:
             # Always hide the spinner when done, even if it crashed
             if current_id == self._search_id:
                 self._spinner.classes("hidden")
+
+    def _set_error(self, message: str | None) -> None:
+        self._error_label.set_text(message or "")
+        self._error_label.set_visibility(bool(message))
 
     def _select_item(self, item_id: Any, item_name: str) -> None:
         self._selected_id = item_id

@@ -80,6 +80,7 @@ def _open_create_modal(container: ui.column) -> None:
             TextField(
                 name='name',
                 label=copy.CALENDAR_NAME_LABEL,
+                placeholder=copy.SELECTION_NAME_EXAMPLES,
                 validator=_validate_selection_name,
             )
         ],

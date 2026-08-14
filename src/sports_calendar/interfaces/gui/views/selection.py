@@ -5,6 +5,7 @@ from nicegui import ui
 from sportindex import Sport
 
 from sports_calendar.application.selection import SelectionService
+from sports_calendar.core.sports import is_supported
 
 from .. import copy
 from ..components import (
@@ -56,15 +57,45 @@ def _open_create_item_modal(
     items_container: ui.column,
     on_changed: Callable[[], None],
 ) -> None:
+    # Only sports the backend can actually turn into calendar events. Offering
+    # the rest would let someone build a calendar that raises at sync time,
+    # because build_calendar has no event class to map them to.
+    #
+    # And only sports not already in the calendar: an item is now nothing but a
+    # grouping by sport — its filters are unioned, and so are the items — so a
+    # second football card would be exactly equivalent to putting those rules on
+    # the first one, while looking like it meant something different.
+    already_added = {item.sport_id for item in presenter.selection.items}
     sports = sorted(app_context.client.list(Sport), key=lambda sport: sport.name.lower())
-    sport_options = {Sport.decode_id(sport.id)[2]: sport.name.capitalize() for sport in sports}
+    sport_options = {}
+    for sport in sports:
+        sport_id = Sport.decode_id(sport.id)[2]
+        if is_supported(sport_id) and sport_id not in already_added:
+            sport_options[sport_id] = sport.name.capitalize()
+
+    name_field = TextField(
+        name='name',
+        label=copy.SPORT_NAME_LABEL,
+        placeholder=copy.DEFAULT_ITEM_NAME_EXAMPLE,
+        help_text=copy.SPORT_NAME_HELP,
+    )
 
     modal = FormModal(
         title=copy.ADD_SPORT_TITLE,
         message=copy.ADD_SPORT_MESSAGE,
         fields=[
-            SelectField(name='sport', label='Sport', options=sport_options),
-            TextField(name='name', label=copy.SPORT_NAME_LABEL),
+            SelectField(
+                name='sport',
+                label='Sport',
+                options=sport_options,
+                empty_note=copy.ALL_SPORTS_ADDED,
+                # "e.g. Formula 1, MotoGP" is only helpful once the sport is
+                # known, so the example follows the choice.
+                on_change=lambda sport_id: name_field.set_placeholder(
+                    copy.item_name_example(sport_id)
+                ),
+            ),
+            name_field,
         ],
         confirm_label='Create',
         cancel_label='Cancel',

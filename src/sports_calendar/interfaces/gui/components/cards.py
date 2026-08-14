@@ -1,16 +1,42 @@
+import inspect
 from collections.abc import Callable
 
 from nicegui import ui
 
 
+def _busy_button(label: str, handler: Callable, props: str) -> ui.button:
+    """ A button that refuses to fire again until its handler has finished.
+
+    "Edit" opens a dialog that has to look things up before it is usable. Even
+    with the dialog appearing immediately, any handler that awaits leaves a
+    window in which a second click is accepted — and two clicks meant two
+    dialogs, stacked on top of each other.
+    """
+    button = ui.button(label).props(props)
+
+    async def run() -> None:
+        button.disable()
+        try:
+            result = handler()
+            if inspect.isawaitable(result):
+                await result
+        finally:
+            button.enable()
+
+    button.on_click(run)
+    return button
+
+
 class BaseCard:
     """A standard card. Can be used alone or as a context manager to add items below the header."""
 
-    def __init__(self, title: str, subtitle: str = None, on_delete: Callable = None, on_edit: Callable = None):
+    def __init__(self, title: str, subtitle: str = None, on_delete: Callable = None, on_edit: Callable = None, draggable: bool = False):
         self.title = title
         self.subtitle = subtitle
         self.on_delete = on_delete
         self.on_edit = on_edit
+        self.draggable = draggable
+        self.drag_handle = None
 
         self.container = self._create_container()
         with self.container:
@@ -24,17 +50,35 @@ class BaseCard:
     def _build_header(self):
         """Builds the shared title and button layout."""
         with ui.row().classes('w-full items-center justify-between p-4'):
+            if self.draggable:
+                # The conventional six dots. Only the handle starts a drag, so
+                # selecting the title text still works normally.
+                self.drag_handle = ui.icon('drag_indicator').classes(
+                    'text-gray-400 cursor-grab active:cursor-grabbing mr-1'
+                ).mark('drag-handle')
+
             with ui.column().classes('gap-0'):
                 self.title_label = ui.label(self.title).classes('text-lg font-bold')
-                if self.subtitle:
-                    ui.label(self.subtitle).classes('text-sm text-gray-500 italic')
+                # Always created, hidden while empty: cards are updated in place
+                # rather than re-rendered, so a subtitle that only exists when
+                # it started non-empty can never be corrected later.
+                self.subtitle_label = ui.label(self.subtitle or '').classes('text-sm text-gray-500 italic')
+                self.subtitle_label.set_visibility(bool(self.subtitle))
 
             if self.on_edit or self.on_delete:
                 with ui.row().classes('gap-2 ml-auto'):
+                    # click.stop so the click does not also toggle the expansion
+                    # this header belongs to.
                     if self.on_edit:
-                        ui.button('Edit', on_click=self.on_edit).props('color=primary flat dense').on('click.stop', lambda: None)
+                        _busy_button('Edit', self.on_edit, 'color=primary flat dense').on('click.stop', lambda: None)
                     if self.on_delete:
-                        ui.button('Delete', on_click=self.on_delete).props('color=red flat dense').on('click.stop', lambda: None)
+                        _busy_button('Delete', self.on_delete, 'color=red flat dense').on('click.stop', lambda: None)
+
+    def set_subtitle(self, subtitle: str | None) -> None:
+        """ Update the subtitle in place, hiding it when there is nothing to say. """
+        self.subtitle = subtitle
+        self.subtitle_label.set_text(subtitle or '')
+        self.subtitle_label.set_visibility(bool(subtitle))
 
     def _build_body(self):
         """Creates the mount point for nested elements."""

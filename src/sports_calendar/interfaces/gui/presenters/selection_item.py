@@ -27,16 +27,40 @@ class SelectionItemPresenter:
 
     @property
     def title(self) -> str:
-        """ Sport first: that is what the card actually is. """
+        """ Sport first: that is what the card actually is.
+
+        A name matching the sport adds nothing — naming a football item
+        "Football" used to render as "Football (Football)" — so the
+        parenthetical is dropped whenever it would only repeat the heading.
+        """
         sport = get_sport_name(self.client, self.item.sport_id)
-        return f'{self.item.name} ({sport})' if self.item.name else sport
+        name = (self.item.name or '').strip()
+        if not name or name.casefold() == sport.casefold():
+            return sport
+        return f'{name} ({sport})'
 
     @property
     def subtitle(self) -> str:
+        """ "3 filters", not "Following 3 things".
+
+        "Filter" is jargon that non-developers already use and understand, and
+        it is accurate; "thing" was vaguer without being any friendlier.
+        """
         count = len(self.item.filters)
         if count == 0:
-            return 'Nothing followed yet'
-        return 'Following 1 thing' if count == 1 else f'Following {count} things'
+            return 'No filters yet'
+        return '1 filter' if count == 1 else f'{count} filters'
+
+    def refresh(self) -> None:
+        """ Re-read the item from the service.
+
+        The presenter holds a snapshot, and every mutation goes through
+        `SelectionService`, which updates the stored copy rather than this one.
+        Views used to patch their local list by hand to keep the two in step —
+        two sources of truth, kept aligned by remembering to. This reads the one
+        that is authoritative. It is an in-memory registry lookup, not I/O.
+        """
+        self.item = SelectionService.get_item(self.item.uid)
 
     def get_filter_presenters(self) -> list[SelectionFilterPresenter]:
         return [SelectionFilterPresenter(filter, self.item, self.client) for filter in self.item.filters]
