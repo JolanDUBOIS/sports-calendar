@@ -96,7 +96,7 @@ async def test_deleting_an_item_removes_only_that_card(user: User, click_one) ->
     survivor.value = True
 
     # Each card has its own Delete button; click the first card's.
-    click_one(user, "Delete", index=0)
+    click_one(user, marker="card-delete", index=0)
     await user.should_see("also removes")
     click_one(user, marker="modal-confirm")
 
@@ -108,7 +108,7 @@ async def test_deleting_an_item_removes_only_that_card(user: User, click_one) ->
 async def test_deleting_the_last_item_restores_the_placeholder(user: User, click_one) -> None:
     await _open_with_items(user, "only")
 
-    click_one(user, "Delete")
+    click_one(user, marker="card-delete")
     await user.should_see("also removes")
     click_one(user, marker="modal-confirm")
 

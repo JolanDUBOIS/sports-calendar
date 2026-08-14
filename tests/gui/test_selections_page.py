@@ -43,7 +43,7 @@ async def test_deleting_a_selection_removes_its_card(user: User, click_one) -> N
     await user.open("/selections")
     await user.should_see("doomed")
 
-    click_one(user, "Delete")
+    click_one(user, marker="card-delete")
     await user.should_see("goes with it")
     click_one(user, marker="modal-confirm")
 

@@ -76,7 +76,7 @@ async def test_the_dialog_is_on_screen_while_its_fields_are_still_loading(
 ) -> None:
     await _open_page_with_a_competitions_rule(user)
 
-    click_one(user, "Edit")
+    click_one(user, marker="card-edit")
 
     # The dialog and its placeholder are up even though the provider has not
     # answered yet — this is the whole point of the change.
@@ -94,7 +94,7 @@ async def test_save_is_disabled_until_the_fields_arrive(
     """ Otherwise Save on a half-built form would overwrite the rule with nothing. """
     await _open_page_with_a_competitions_rule(user)
 
-    click_one(user, "Edit")
+    click_one(user, marker="card-edit")
     await user.should_see("Looking up what this rule follows")
 
     save = next(iter(user.find(marker="modal-confirm").elements))
@@ -111,10 +111,10 @@ async def test_the_edit_button_ignores_clicks_while_it_is_working(
     """ The double-click that used to stack dialogs. """
     await _open_page_with_a_competitions_rule(user)
 
-    click_one(user, "Edit")
+    click_one(user, marker="card-edit")
     await user.should_see("Looking up what this rule follows")
 
-    edit = next(iter(user.find("Edit").elements))
+    edit = next(iter(user.find(marker="card-edit").elements))
     assert edit.enabled is False, "a second click would open a second dialog"
 
     blocking_provider.released.set()
