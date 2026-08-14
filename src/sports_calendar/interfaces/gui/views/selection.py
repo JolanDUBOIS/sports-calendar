@@ -7,7 +7,7 @@ from sportindex import Sport
 from sports_calendar.application.selection import SelectionService
 from sports_calendar.core.sports import is_supported
 
-from .. import copy
+from .. import copy, theme
 from ..components import (
     AddCard,
     FormModal,
@@ -118,10 +118,10 @@ def selection_page(selection_name: str):
     try:
         selection_core = SelectionService.get_selection(selection_name)
     except KeyError:
-        logger.exception(f"Selection '{selection_name}' not found.")
+        logger.exception("Selection '%s' not found", selection_name)
         with base_layout():
-            ui.label(f'No calendar called "{selection_name}".').classes('text-red-500 text-xl font-bold mb-4')
-            ui.button('Back to my calendars', on_click=lambda: ui.navigate.to('/selections')).props('flat')
+            ui.label(f'No calendar called "{selection_name}".').classes(f'{theme.PAGE_TITLE} mb-4')
+            ui.button('Back to my calendars', on_click=lambda: ui.navigate.to('/selections')).props('flat no-caps')
         return
 
     # A drawer is a top-level layout element: NiceGUI rejects it if it is nested
@@ -135,31 +135,32 @@ def selection_page(selection_name: str):
             client=app_context.client
         )
 
-        with ui.row().classes('w-full items-baseline justify-between mb-6'):
+        with ui.row().classes('w-full items-center justify-between mb-6'):
             with ui.column().classes('gap-1'), ui.row().classes('items-center gap-2'):
-                ui.label(presenter.title).classes('text-3xl font-bold')
+                ui.label(presenter.title).classes(theme.PAGE_TITLE)
                 info_icon(copy.WHAT_IS_A_SPORT_SECTION, size='sm')
 
             with ui.row().classes('gap-2'):
-                ui.button('Back', on_click=lambda: ui.navigate.to('/selections')).props('outline')
-                ui.button('Preview', icon='event', on_click=preview_drawer.toggle).props('outline')
-
-        ui.separator().classes('mb-6')
+                ui.button('Back', on_click=lambda: ui.navigate.to('/selections')).props('outline no-caps')
+                ui.button('Preview', icon='event', on_click=preview_drawer.toggle).props('outline no-caps')
 
         item_presenters = presenter.get_item_presenters(sort_by='updated_at', order='desc')
-        logger.debug(f"Retrieved {len(item_presenters)} items for selection '{selection_name}'")
+        logger.debug("Retrieved %d items for selection '%s'", len(item_presenters), selection_name)
 
-        empty_label = ui.label(copy.NO_SPORTS_YET).classes('text-gray-500 italic')
-        items_container = ui.column().classes('w-full gap-2')
+        # One column so the cards, the placeholder and the add button are spaced
+        # by a single rule rather than by margins that have to agree with it.
+        with ui.column().classes('w-full gap-3'):
+            empty_label = ui.label(copy.NO_SPORTS_YET).classes(theme.MUTED)
+            items_container = ui.column().classes('w-full gap-3')
 
-        def refresh_empty_state() -> None:
-            """ Show the placeholder only while the item list is actually empty. """
-            empty_label.set_visibility(not items_container.default_slot.children)
+            def refresh_empty_state() -> None:
+                """ Show the placeholder only while the item list is actually empty. """
+                empty_label.set_visibility(not items_container.default_slot.children)
 
-        for item_p in item_presenters:
-            render_item_card(item_p, items_container, on_removed=refresh_empty_state)
-        refresh_empty_state()
+            for item_p in item_presenters:
+                render_item_card(item_p, items_container, on_removed=refresh_empty_state)
+            refresh_empty_state()
 
-        AddCard(on_click=lambda: _open_create_item_modal(
-            presenter, items_container, refresh_empty_state,
-        ))
+            AddCard(on_click=lambda: _open_create_item_modal(
+                presenter, items_container, refresh_empty_state,
+            ))

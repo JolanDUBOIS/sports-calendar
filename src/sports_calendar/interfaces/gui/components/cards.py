@@ -3,16 +3,36 @@ from collections.abc import Callable
 
 from nicegui import ui
 
+from .. import theme
 
-def _busy_button(label: str, handler: Callable, props: str) -> ui.button:
-    """ A button that refuses to fire again until its handler has finished.
+
+def _busy_icon_button(
+    icon: str, tooltip: str, handler: Callable, *, marker: str, danger: bool = False
+) -> ui.button:
+    """ An icon action that refuses to fire again until its handler has finished.
 
     "Edit" opens a dialog that has to look things up before it is usable. Even
     with the dialog appearing immediately, any handler that awaits leaves a
     window in which a second click is accepted — and two clicks meant two
     dialogs, stacked on top of each other.
+
+    Icon-only, so it carries a tooltip and a marker: the tooltip because the app
+    is aimed at people who should not have to guess, and the marker because
+    there is no longer a label for a test to search for.
     """
-    button = ui.button(label).props(props)
+    # `color=None` matters: NiceGUI defaults a button to `color='primary'`,
+    # which renders Quasar's `.text-primary` — and that rule is `!important`, so
+    # no selector in `theme.py` can outrank it. Dropping the prop lets the theme
+    # own the colour, which is where it belongs.
+    button = ui.button(
+        icon=icon, color=None
+    ).props("flat dense round size=sm").classes(
+        theme.ICON_BUTTON_DANGER if danger else theme.ICON_BUTTON
+    ).mark(marker)
+    with button:
+        # Above the icon rather than below it: below, the tooltip lands on the
+        # next rule down and covers the thing you are about to compare it to.
+        ui.tooltip(tooltip).props('anchor="top middle" self="bottom middle"')
 
     async def run() -> None:
         button.disable()
@@ -45,11 +65,11 @@ class BaseCard:
 
     def _create_container(self):
         """Creates the outer shell. Overridden by subclasses."""
-        return ui.card().classes('w-full mb-2 shadow-sm border border-gray-200 transition-colors duration-200 p-0')
+        return ui.card().classes(f'w-full p-0 {theme.CARD}')
 
     def _build_header(self):
         """Builds the shared title and button layout."""
-        header_row = ui.row().classes('w-full items-center justify-between p-4')
+        header_row = ui.row().classes('w-full items-center justify-between px-4 py-3')
         if self.draggable:
             # `.nicegui-row` puts a 1rem gap on every row. Inline so it wins
             # without depending on stylesheet order.
@@ -66,29 +86,37 @@ class BaseCard:
                 # margin has to swallow that whitespace before it moves anything
                 # visible. Measured against the box, not against the dots.
                 self.drag_handle = ui.icon('drag_indicator', size='26px').classes(
-                    'drag-handle text-gray-400 hover:text-gray-600 '
-                    'cursor-grab active:cursor-grabbing'
+                    f'drag-handle {theme.DRAG_HANDLE} cursor-grab active:cursor-grabbing'
                 # Asymmetric on purpose: the left margin fights the row's padding
                 # as well as the glyph's whitespace, the right one only the
                 # whitespace. Equal numbers here would not look equal on screen.
-                ).style('margin-left: -22px; margin-right: 4px; padding: 0').mark('drag-handle')
+                #
+                # The left margin is smaller than it looks like it should be
+                # because a rule now has a visible border of its own: the dots
+                # have to clear that edge, where before they only had to line up
+                # with the padding of the panel behind them.
+                ).style('margin-left: -14px; margin-right: 4px; padding: 0').mark('drag-handle')
 
-            with ui.column().classes('gap-0'):
-                self.title_label = ui.label(self.title).classes('text-lg font-bold')
+            with ui.column().classes('gap-0.5'):
+                self.title_label = ui.label(self.title).classes(theme.CARD_TITLE)
                 # Always created, hidden while empty: cards are updated in place
                 # rather than re-rendered, so a subtitle that only exists when
                 # it started non-empty can never be corrected later.
-                self.subtitle_label = ui.label(self.subtitle or '').classes('text-sm text-gray-500 italic')
+                self.subtitle_label = ui.label(self.subtitle or '').classes(theme.CARD_SUBTITLE)
                 self.subtitle_label.set_visibility(bool(self.subtitle))
 
             if self.on_edit or self.on_delete:
-                with ui.row().classes('gap-2 ml-auto'):
+                with ui.row().classes('gap-1 ml-auto items-center'):
                     # click.stop so the click does not also toggle the expansion
                     # this header belongs to.
                     if self.on_edit:
-                        _busy_button('Edit', self.on_edit, 'color=primary flat dense').on('click.stop', lambda: None)
+                        _busy_icon_button(
+                            'edit', 'Edit', self.on_edit, marker='card-edit',
+                        ).on('click.stop', lambda: None)
                     if self.on_delete:
-                        _busy_button('Delete', self.on_delete, 'color=red flat dense').on('click.stop', lambda: None)
+                        _busy_icon_button(
+                            'delete', 'Delete', self.on_delete, marker='card-delete', danger=True,
+                        ).on('click.stop', lambda: None)
 
     def set_subtitle(self, subtitle: str | None) -> None:
         """ Update the subtitle in place, hiding it when there is nothing to say. """
@@ -119,7 +147,7 @@ class InteractiveCard(BaseCard):
     def _create_container(self):
         card = super()._create_container()
         if self.on_click:
-            card.on('click', self.on_click).classes('cursor-pointer hover:bg-gray-50')
+            card.on('click', self.on_click).classes(f'cursor-pointer {theme.CARD_INTERACTIVE}')
         return card
 
 
@@ -132,28 +160,31 @@ class ExpandableCard(BaseCard):
 
     def _create_container(self):
         """Override to use NiceGUI's expansion element instead of a normal card."""
-        expansion_classes = 'w-full mb-2 bg-white shadow-sm border border-gray-200 rounded-md overflow-hidden'
-        self.exp = ui.expansion(value=self.default_open).classes(expansion_classes)
+        self.exp = ui.expansion(value=self.default_open).classes(f'w-full {theme.CARD}')
         return self.exp
 
     def _build_header(self):
         """Override to inject the parent's header specifically into the expansion slot."""
-        with self.exp.add_slot('header'):
-            header_classes = 'w-full cursor-pointer hover:bg-gray-50 transition-colors duration-200'
-            with ui.column().classes(header_classes):
-                super()._build_header()
+        with self.exp.add_slot('header'), ui.column().classes(f'w-full cursor-pointer {theme.CARD_HEADER}'):
+            super()._build_header()
 
     def _build_body(self):
         """Override to style the drop-down section."""
-        self.body_container = ui.column().classes('w-full p-4 bg-gray-50 border-t border-gray-200')
+        # Narrower at the sides than the header above it: the rules inside carry
+        # their own borders, so a wide gutter around them just wastes width.
+        self.body_container = ui.column().classes(f'w-full px-2 pb-3 pt-1 {theme.CARD_BODY}')
 
 
 class FilterBlock(BaseCard):
-    """A borderless card component for displaying individual filters inside an ExpandableCard."""
+    """One rule, inside an ExpandableCard's body.
+
+    It gets a surface of its own rather than sitting transparent on the body:
+    with three of them stacked up, a shared background made them read as one
+    undifferentiated block instead of three things you can act on separately.
+    """
 
     def _create_container(self):
-        # Override the parent method to remove borders, shadows, and default backgrounds.
-        return ui.card().classes('w-full bg-transparent shadow-none p-0 transition-colors duration-200')
+        return ui.card().classes(f'w-full p-0 {theme.RULE}')
 
 
 class AddCard(InteractiveCard):
@@ -166,9 +197,17 @@ class AddCard(InteractiveCard):
         # card ordering.
         self.container.mark('add-card')
 
+    def _create_container(self):
+        # A dashed ghost rather than a solid card: it is an affordance, not
+        # content, and should not compete with the real cards above it.
+        card = ui.card().classes(f'w-full p-0 {theme.ADD_CARD}')
+        if self.on_click:
+            card.on('click', self.on_click).classes('cursor-pointer')
+        return card
+
     def _build_header(self):
         return None
 
     def _build_body(self):
         with ui.row().classes('w-full items-center justify-center py-3'):
-            ui.label(self.label).classes('text-3xl font-light text-gray-500 leading-none')
+            ui.label(self.label).classes(theme.ADD_CARD_GLYPH)

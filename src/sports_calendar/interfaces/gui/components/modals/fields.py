@@ -5,33 +5,21 @@ from typing import Any
 
 from nicegui import ui
 
+from ... import theme
 from .base import SearchModal
 
 logger = logging.getLogger(__name__)
 
 
 def _normalize_options(options: list[Any] | dict[Any, str]) -> dict[Any, str]:
-    logger.debug(f"Normalizing {len(options)} options for field: {options}")
+    logger.debug("Normalizing %d options for a field", len(options))
     if isinstance(options, dict):
         return options
     return {option: str(option) for option in options}
 
 
-SearchOptionsFn = Callable[[str], list[Any] | dict[Any, str]]
 TextValidatorResult = bool | tuple[bool, str | None]
 TextValidatorFn = Callable[[str], TextValidatorResult]
-
-
-def _extract_query_from_event(event: Any) -> str:
-    args = getattr(event, "args", None)
-    if isinstance(args, str):
-        return args
-    if isinstance(args, list) and args:
-        return str(args)
-    if isinstance(args, dict):
-        value = args.get("value", args.get("inputValue", ""))
-        return str(value)
-    return ""
 
 
 class ModalField(ABC):
@@ -76,7 +64,7 @@ class ModalField(ABC):
         `hint` prop has nothing to attach to and would silently do nothing.
         """
         if self.help_text:
-            ui.label(self.help_text).classes("text-xs text-gray-500")
+            ui.label(self.help_text).classes(theme.HINT)
 
     @abstractmethod
     def render(self) -> None:
@@ -107,7 +95,7 @@ class LoadingField(ModalField):
     def render(self) -> None:
         with ui.row().classes("w-full items-center gap-3 py-4"):
             ui.spinner(size="1.5em", color="primary")
-            ui.label(self.message).classes("text-sm text-gray-500")
+            ui.label(self.message).classes(theme.MUTED)
 
     @property
     def value(self) -> None:
@@ -197,7 +185,53 @@ class TextField(ModalField):
         return self._element.value if self._element else self.default
 
 
-class SelectField(ModalField):
+class _OptionsField(ModalField):
+    """ Shared machinery for the two fields backed by a menu of choices.
+
+    Both can have their choices replaced while the form is open — the rounds on
+    offer depend on which competitions are chosen — and both have to explain an
+    empty menu rather than opening onto nothing. The only thing that differs is
+    what counts as a selection worth keeping once the choices change, which is
+    `_surviving_selection`.
+    """
+
+    def __init__(self, name: str, label: str, help_text: str | None, empty_note: str | None):
+        super().__init__(name, label, help_text)
+        self.empty_note = empty_note
+        self._empty_note = None
+
+    def set_options(self, options: list[Any] | dict[Any, str]) -> None:
+        """ Replace the choices in place, dropping a selection no longer valid.
+
+        In place rather than by rebuilding the modal: these options depend on
+        another field, and re-rendering the form would discard everything the
+        user had already filled in.
+        """
+        self.options = _normalize_options(options)
+        self.default = self._surviving_selection()
+        if self._element is not None:
+            self._element.set_options(self.options, value=self.default)
+        self._refresh_empty_note()
+
+    @abstractmethod
+    def _surviving_selection(self) -> Any:
+        """ What is left of the current selection under the new choices. """
+        raise NotImplementedError
+
+    def _render_empty_note(self) -> None:
+        """ Build the note. Called from render(), inside the field's column. """
+        self._empty_note = ui.label(self.empty_note or "").classes(theme.DANGER_TEXT)
+        self._refresh_empty_note()
+
+    def _refresh_empty_note(self) -> None:
+        """ Explain an empty menu, rather than opening onto nothing. """
+        if self._empty_note is None:
+            return
+        self._empty_note.set_text(self.empty_note or "")
+        self._empty_note.set_visibility(bool(self.empty_note) and not self.options)
+
+
+class SelectField(_OptionsField):
     def __init__(
         self,
         name: str,
@@ -210,13 +244,11 @@ class SelectField(ModalField):
         empty_note: str | None = None,
         on_change: Callable[[Any], None] | None = None
     ):
-        super().__init__(name, label, help_text)
+        super().__init__(name, label, help_text, empty_note)
         self.options = _normalize_options(options)
         self.default = default
         self.clearable = clearable
-        self.empty_note = empty_note
         self.on_change = on_change
-        self._empty_note = None
         # Quasar renders `hint` into a fixed-height strip, so anything longer
         # than a line overflows onto whatever field comes next. Paragraph-length
         # help has to be a caption instead, which flows normally.
@@ -233,40 +265,34 @@ class SelectField(ModalField):
                 self._element.props("clearable")
             if self.on_change is not None:
                 self._element.on_value_change(lambda event: self.on_change(event.value))
-            self._empty_note = ui.label(self.empty_note or "").classes("text-xs text-red-600")
-            self._refresh_empty_note()
+            self._render_empty_note()
             if self.help_as_caption:
                 self._render_help_caption()
             else:
                 self._apply_help()
         self._apply_visibility()
 
-    def set_options(self, options: list[Any] | dict[Any, str]) -> None:
-        """ Replace the choices in place, clearing a selection no longer valid.
+    def _surviving_selection(self) -> Any:
+        return self.value if self.value in self.options else None
 
-        In place rather than by rebuilding the modal: these options depend on
-        another field, and re-rendering the form would discard everything the
-        user had already filled in.
+    def bind_value_change(self, handler: Callable[[Any], None]) -> None:
+        """ Call `handler` with the new value whenever the selection changes.
+
+        Exists so callers do not have to reach through `_element`: the select is
+        destroyed and rebuilt every time the form re-renders, so anything
+        holding on to it is holding a dead element, and re-arming the handler is
+        a normal part of that cycle rather than a private detail.
         """
-        self.options = _normalize_options(options)
-        self.default = self.value if self.value in self.options else None
-        if self._element is not None:
-            self._element.set_options(self.options, value=self.default)
-        self._refresh_empty_note()
-
-    def _refresh_empty_note(self) -> None:
-        """ Explain an empty menu, rather than opening onto nothing. """
-        if self._empty_note is None:
+        if self._element is None:
             return
-        self._empty_note.set_text(self.empty_note or "")
-        self._empty_note.set_visibility(bool(self.empty_note) and not self.options)
+        self._element.on_value_change(lambda event: handler(event.value))
 
     @property
     def value(self) -> Any:
         return self._element.value if self._element else self.default
 
 
-class MultipleSelectField(ModalField):
+class MultipleSelectField(_OptionsField):
     def __init__(
         self,
         name: str,
@@ -276,11 +302,9 @@ class MultipleSelectField(ModalField):
         help_text: str | None = None,
         empty_note: str | None = None
     ):
-        super().__init__(name, label, help_text)
+        super().__init__(name, label, help_text, empty_note)
         self.options = _normalize_options(options)
         self.default = default or []
-        self.empty_note = empty_note
-        self._empty_note = None
 
     def render(self) -> None:
         with ui.column().classes("w-full gap-1"):
@@ -290,30 +314,11 @@ class MultipleSelectField(ModalField):
                 value=self.default,
                 multiple=True,
             ).props("use-chips").classes("w-full")
-            self._empty_note = ui.label(self.empty_note or "").classes("text-xs text-red-600")
-            self._refresh_empty_note()
+            self._render_empty_note()
             self._apply_help()
 
-    def set_options(self, options: list[Any] | dict[Any, str]) -> None:
-        """ Replace the choices in place, dropping any selection no longer valid.
-
-        In place rather than by rebuilding the modal: these options depend on
-        another field, and re-rendering the form would discard everything the
-        user had already filled in.
-        """
-        self.options = _normalize_options(options)
-        self.default = [value for value in self.value if value in self.options]
-        if self._element is not None:
-            self._element.set_options(self.options, value=self.default)
-        self._refresh_empty_note()
-
-    def _refresh_empty_note(self) -> None:
-        """ Explain an empty menu, rather than showing a menu that opens onto nothing. """
-        if getattr(self, "_empty_note", None) is None:
-            return
-        show = bool(self.empty_note) and not self.options
-        self._empty_note.set_text(self.empty_note or "")
-        self._empty_note.set_visibility(show)
+    def _surviving_selection(self) -> list[Any]:
+        return [value for value in self.value if value in self.options]
 
     @property
     def value(self) -> list[Any]:
@@ -349,19 +354,19 @@ class SearchableSelectField(ModalField):
 
     def render(self) -> None:
         with ui.column().classes("w-full gap-1") as self._root:
-            ui.label(self.label).classes("text-sm text-gray-700 font-medium")
+            ui.label(self.label).classes(theme.FIELD_LABEL)
 
             # We use a clickable ui.row instead of a button.
             # This mimics standard input fields perfectly and avoids q-btn reactivity issues.
             self._box = ui.row().classes(
-                "w-full px-3 py-2 bg-white border border-gray-300 rounded text-gray-800 "
-                "hover:bg-gray-50 cursor-pointer items-center justify-between min-h-[42px] transition-colors"
+                "w-full px-3 py-2 cursor-pointer items-center justify-between "
+                f"min-h-[42px] {theme.PICKER}"
             ).on('click', self._open_modal)
 
             with self._box:
                 # The label is now an independent element that updates reliably
                 self._label_element = ui.label(self._display_text).classes("truncate")
-                ui.icon('search', size="sm").classes("text-gray-500")
+                ui.icon('search', size="sm").classes(theme.MUTED)
 
             self._render_help_caption()
         self._apply_visibility()
@@ -410,11 +415,11 @@ class SearchableMultipleSelectField(ModalField):
 
     def render(self) -> None:
         with ui.column().classes("w-full gap-1"):
-            ui.label(self.label).classes("text-sm text-gray-700 font-medium")
+            ui.label(self.label).classes(theme.FIELD_LABEL)
 
             # The main visual box
             with ui.row().classes(
-                "w-full gap-1 p-1.5 bg-white border border-gray-300 rounded items-center wrap min-h-[42px]"
+                f"w-full gap-1 p-1.5 items-center wrap min-h-[42px] {theme.CHIP_TRAY}"
             ):
                 # A dedicated sub-container strictly for the chips
                 self._chips_container = ui.row().classes("gap-1 items-center wrap flex-grow m-0 p-0")

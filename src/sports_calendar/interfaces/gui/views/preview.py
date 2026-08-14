@@ -16,6 +16,7 @@ from nicegui import run, ui
 from sports_calendar.application.workflows import resolve_events
 from sports_calendar.core.calendar import SportsEventCollection
 
+from .. import theme
 from ..components import explanation
 from ..copy import PREVIEW_EMPTY, PREVIEW_INTRO, PREVIEW_STALE
 
@@ -45,7 +46,7 @@ def _render_events(container: ui.column, events: SportsEventCollection) -> None:
             explanation(PREVIEW_EMPTY)
             return
 
-        ui.label(f"{len(ordered)} events").classes("text-xs uppercase text-gray-500")
+        ui.label(f"{len(ordered)} events").classes(f"uppercase tracking-wide {theme.HINT}")
 
         current_day = None
         for event in ordered:
@@ -56,21 +57,21 @@ def _render_events(container: ui.column, events: SportsEventCollection) -> None:
                 current_day = day
                 heading = day.strftime("%a %d %b %Y") if day else "Date unknown"
                 ui.label(heading).classes(
-                    "text-xs font-bold uppercase text-gray-500 mt-3"
+                    f"font-bold uppercase tracking-wide mt-3 {theme.HINT}"
                 )
 
-            with ui.card().classes("w-full p-2 shadow-none border border-gray-200"):
-                ui.label(event.summary).classes("text-sm font-medium leading-tight")
+            with ui.card().classes(f"w-full p-2 gap-0.5 {theme.RULE}"):
+                ui.label(event.summary).classes(theme.CARD_TITLE)
                 if start:
-                    ui.label(start.strftime("%H:%M")).classes("text-xs text-gray-500")
+                    ui.label(start.strftime("%H:%M")).classes(theme.HINT)
 
 
 def render_preview_drawer(selection_name: str) -> ui.right_drawer:
     """ Build the (initially hidden) preview drawer for a selection. """
-    drawer = ui.right_drawer(value=False, fixed=True).classes("bg-gray-50").props("width=380 bordered")
+    drawer = ui.right_drawer(value=False, fixed=True).classes(theme.INSET).props("width=380 bordered")
 
     with drawer, ui.column().classes("w-full gap-2 p-2"):
-        ui.label("Event preview").classes("text-lg font-bold")
+        ui.label("Event preview").classes(theme.SECTION_TITLE)
         explanation(PREVIEW_INTRO)
 
         results = ui.column().classes("w-full gap-1 mt-2")
@@ -90,13 +91,13 @@ def render_preview_drawer(selection_name: str) -> ui.right_drawer:
                 results.clear()
                 with results:
                     ui.label("Could not build the preview.").classes(
-                        "text-sm font-medium text-red-600"
+                        f"font-medium {theme.DANGER_TEXT}"
                     )
-                    ui.label(str(exc)).classes("text-xs text-red-500 break-words")
+                    ui.label(str(exc)).classes(f"break-words {theme.DANGER_TEXT}")
                 return
 
             _render_events(results, events)
 
-        ui.button("Build preview", on_click=load).props("outline").classes("w-full")
+        ui.button("Build preview", on_click=load).props("outline no-caps").classes("w-full")
 
     return drawer

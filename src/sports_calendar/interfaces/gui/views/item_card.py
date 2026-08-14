@@ -59,7 +59,7 @@ def _handle_delete_filter(filter_presenter: SelectionFilterPresenter, block: Fil
     try:
         filter_presenter.delete()
     except KeyError:
-        logger.exception(f"Filter '{filter_presenter.uid}' could not be deleted")
+        logger.exception("Filter '%s' could not be deleted", filter_presenter.uid)
         ui.notify('That was not found.', type='negative')
         return
 
@@ -100,8 +100,8 @@ def _handle_edit_filter(filter_presenter: SelectionFilterPresenter, block: Filte
         filter_presenter.update(payload)
         _refresh_filter_block(filter_presenter, block)
         ui.notify(copy.RULE_SAVED, type="positive")
-    except (KeyError, ValueError) as e:
-        logger.exception(f"Failed to update filter '{filter_presenter.uid}': {e}")
+    except (KeyError, ValueError):
+        logger.exception("Failed to update filter '%s'", filter_presenter.uid)
         ui.notify("Could not save that.", type="negative")
 
 
@@ -135,18 +135,16 @@ async def _open_edit_filter_modal(filter_presenter: SelectionFilterPresenter, bl
 # cannot know that; without it, dragging a rule one place down put it back
 # exactly where it started. And the line showing where the rule will land has to
 # follow the cursor, which is not something a round trip per dragover can do.
+#
+# The classes it toggles are styled in `theme.py` along with everything else —
+# this file decides *when* a row is a drop target, never what that looks like.
 _DRAG_AND_DROP_JS = """
-<style>
-  .filter-row.drag-source { opacity: .45; }
-  .filter-row.drop-before { box-shadow: inset 0 3px 0 0 #1976d2; }
-  .filter-row.drop-after  { box-shadow: inset 0 -3px 0 0 #1976d2; }
-</style>
 <script>
 (() => {
   let dragged = null;
 
   const clear = () => document.querySelectorAll('.filter-row').forEach(
-    r => r.classList.remove('drop-before', 'drop-after'));
+    r => r.classList.remove('sc-drop-before', 'sc-drop-after'));
 
   // Rows are only draggable while the handle is held, so selecting the title
   // text still behaves normally.
@@ -161,7 +159,7 @@ _DRAG_AND_DROP_JS = """
     const row = e.target.closest?.('.filter-row');
     if (!row) return;
     dragged = row;
-    row.classList.add('drag-source');
+    row.classList.add('sc-drag-source');
     e.dataTransfer.effectAllowed = 'move';
   });
 
@@ -172,7 +170,7 @@ _DRAG_AND_DROP_JS = """
     e.preventDefault();                     // without this the drop is refused
     clear();
     const box = row.getBoundingClientRect();
-    row.classList.add(e.clientY < box.top + box.height / 2 ? 'drop-before' : 'drop-after');
+    row.classList.add(e.clientY < box.top + box.height / 2 ? 'sc-drop-before' : 'sc-drop-after');
   });
 
   document.addEventListener('drop', e => {
@@ -194,7 +192,7 @@ _DRAG_AND_DROP_JS = """
   });
 
   document.addEventListener('dragend', () => {
-    dragged?.classList.remove('drag-source');
+    dragged?.classList.remove('sc-drag-source');
     dragged = null;
     clear();
   });
@@ -343,6 +341,6 @@ def render_item_card(
             redraw_filters()
 
             with ui.row().classes('w-full items-center justify-center gap-2 mt-2'):
-                ui.button(copy.ADD_RULE_BUTTON, on_click=lambda: _handle_create_filter(item_presenter, filters_container, card)).props('outline')
+                ui.button(copy.ADD_RULE_BUTTON, on_click=lambda: _handle_create_filter(item_presenter, filters_container, card)).props('outline no-caps')
                 info_icon(copy.WHAT_IS_A_RULE)
     return card

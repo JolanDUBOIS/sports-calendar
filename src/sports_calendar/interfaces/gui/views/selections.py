@@ -4,7 +4,7 @@ from nicegui import ui
 
 from sports_calendar.application.selection import SelectionService
 
-from .. import copy
+from .. import copy, theme
 from ..components import (
     AddCard,
     ConfirmModal,
@@ -115,12 +115,12 @@ def _open_delete_modal(presenter: SelectionPresenter, card: InteractiveCard) -> 
 def selections_page():
     with base_layout():
         with ui.row().classes('items-center gap-2'):
-            ui.label(copy.CALENDARS_PAGE_TITLE).classes('text-3xl font-bold')
+            ui.label(copy.CALENDARS_PAGE_TITLE).classes(theme.PAGE_TITLE)
             info_icon(copy.WHAT_IS_A_CALENDAR, size='sm')
-        explanation(copy.CALENDARS_PAGE_INTRO).classes('mb-4')
+        explanation(copy.CALENDARS_PAGE_INTRO).classes('mb-6')
 
-        with ui.column().classes('w-full gap-2'):
-            cards_container = ui.column().classes('w-full gap-2')
+        with ui.column().classes('w-full gap-3'):
+            cards_container = ui.column().classes('w-full gap-3')
             with cards_container:
                 for selection in SelectionService.get_all_selections(sort_by='updated_at', order='desc'):
                     _render_selection_card(

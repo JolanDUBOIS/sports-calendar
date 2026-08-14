@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from nicegui import ui
 
+from ... import theme
 from ...catalog import SearchUnavailableError
 from ...copy import SEARCH_FAILED, SEARCH_UNAVAILABLE
 
@@ -52,23 +53,23 @@ class BaseModal(ABC):
         raise NotImplementedError
 
     def _confirm_button_props(self) -> str:
-        return f"color={self.confirm_color}"
+        return f"color={self.confirm_color} unelevated no-caps"
 
     def open(self, on_confirm: Callable[[Any], bool | None]) -> None:
-        with ui.dialog() as dialog, ui.card().classes("p-5 rounded-lg shadow-lg").style(
+        with ui.dialog() as dialog, ui.card().classes("p-6").style(
             f"min-width: {self.min_width}; max-width: {self.max_width}; width: 100%;"
         ):
             self._dialog = dialog
-            ui.label(self.title).classes("text-h6 mb-2")
+            ui.label(self.title).classes(f"{theme.SECTION_TITLE} mb-1")
             if self.message:
-                ui.label(self.message).classes("text-body2 text-gray-700")
+                ui.label(self.message).classes(theme.MUTED)
 
             self._build_body()
 
             with ui.row().classes("justify-end gap-2 mt-6 w-full"):
                 # Markers keep tests unambiguous: a modal's buttons often carry the
                 # same label as the card button that opened them.
-                ui.button(self.cancel_label, on_click=dialog.close).props("flat").mark("modal-cancel")
+                ui.button(self.cancel_label, on_click=dialog.close).props("flat no-caps").mark("modal-cancel")
 
                 def confirm() -> None:
                     payload = self._get_payload()
@@ -103,7 +104,7 @@ class ConfirmModal(BaseModal):
         return None
 
     def _confirm_button_props(self) -> str:
-        return f"color={self.confirm_color} autofocus"
+        return f"{super()._confirm_button_props()} autofocus"
 
 
 class FormModal(BaseModal):
@@ -168,6 +169,11 @@ class SearchModal(BaseModal):
         self._selected_id = None
         self._selected_name = None
         self._ignore_next_change = False
+        # Per dialog, by design and not by oversight: it spares the retyping and
+        # backspacing inside one search, and dies with it. Anything longer-lived
+        # would have to answer when a search result stops being true, which is a
+        # different question from "what is this competition called" — see
+        # ROADMAP C12.
         self._cache: dict[str, dict[Any, str]] = {}
 
     def _build_body(self) -> None:
@@ -183,11 +189,11 @@ class SearchModal(BaseModal):
                 self._spinner = ui.spinner(color="primary", size="1.5em").classes("hidden")
 
             self._results_container = ui.scroll_area().classes(
-                "w-full h-48 border border-gray-200 rounded hidden"
+                f"w-full h-48 hidden {theme.SCROLL_PANEL}"
             )
             # Shown only when the provider could not be reached. Without it, an
             # unreachable provider and a genuinely unknown name look the same.
-            self._error_label = ui.label("").classes("text-xs text-red-600")
+            self._error_label = ui.label("").classes(theme.DANGER_TEXT)
             self._error_label.set_visibility(False)
 
     async def _handle_search(self, event: Any) -> None:
@@ -239,7 +245,7 @@ class SearchModal(BaseModal):
                         ui.item(
                             item_name,
                             on_click=lambda e, i=item_id, n=item_name: self._select_item(i, n)
-                        ).classes("cursor-pointer hover:bg-blue-50 transition-colors")
+                        ).classes("cursor-pointer transition-colors")
             else:
                 self._results_container.classes("hidden")
 
@@ -247,13 +253,13 @@ class SearchModal(BaseModal):
             # The provider was not reachable. Say so: an empty list here reads
             # as "no such team", and the usual cause is a VPN, a corporate
             # proxy, or a captive portal — none of which the user can guess at.
-            logger.warning(f"Search unavailable for query: '{query}'")
+            logger.warning("Search unavailable for query: '%s'", query)
             self._results_container.classes("hidden")
             self._results_container.clear()
             self._set_error(SEARCH_UNAVAILABLE)
 
         except Exception:
-            logger.exception(f"Search failed for query: '{query}'")
+            logger.exception("Search failed for query: '%s'", query)
             self._set_error(SEARCH_FAILED)
 
         finally:
