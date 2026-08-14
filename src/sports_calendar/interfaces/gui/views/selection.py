@@ -18,7 +18,7 @@ from ..components import (
 )
 from ..context import app_context
 from ..presenters import SelectionPresenter
-from .item_card import render_item_card
+from .item_card import enable_filter_reordering, render_item_card
 from .preview import render_preview_drawer
 
 logger = logging.getLogger(__name__)
@@ -127,6 +127,7 @@ def selection_page(selection_name: str):
     # A drawer is a top-level layout element: NiceGUI rejects it if it is nested
     # inside the page's content column, so it is built before base_layout().
     preview_drawer = render_preview_drawer(selection_name)
+    enable_filter_reordering()
 
     with base_layout():
         presenter = SelectionPresenter(

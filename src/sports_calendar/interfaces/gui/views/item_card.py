@@ -127,15 +127,80 @@ async def _open_edit_filter_modal(filter_presenter: SelectionFilterPresenter, bl
     await modal.load_fields()
 
 
-class _DragState:
-    """ Which rule is currently being dragged, for one card.
+# Reordering runs in the browser and reports one result, rather than being
+# assembled from server-side dragstart/drop events.
+#
+# Two reasons. The insertion point depends on where the cursor is relative to a
+# row's midpoint — above it means before, below means after — and the server
+# cannot know that; without it, dragging a rule one place down put it back
+# exactly where it started. And the line showing where the rule will land has to
+# follow the cursor, which is not something a round trip per dragover can do.
+_DRAG_AND_DROP_JS = """
+<style>
+  .filter-row.drag-source { opacity: .45; }
+  .filter-row.drop-before { box-shadow: inset 0 3px 0 0 #1976d2; }
+  .filter-row.drop-after  { box-shadow: inset 0 -3px 0 0 #1976d2; }
+</style>
+<script>
+(() => {
+  let dragged = null;
 
-    Per card rather than global: dragging a rule from one sport into another
-    would be meaningless, and the drop handlers should simply not see it.
-    """
+  const clear = () => document.querySelectorAll('.filter-row').forEach(
+    r => r.classList.remove('drop-before', 'drop-after'));
 
-    def __init__(self) -> None:
-        self.uid: str | None = None
+  // Rows are only draggable while the handle is held, so selecting the title
+  // text still behaves normally.
+  document.addEventListener('mousedown', e => {
+    const handle = e.target.closest('.drag-handle');
+    if (handle) handle.closest('.filter-row')?.setAttribute('draggable', 'true');
+  });
+  document.addEventListener('mouseup', () => document.querySelectorAll('.filter-row')
+    .forEach(r => r.removeAttribute('draggable')));
+
+  document.addEventListener('dragstart', e => {
+    const row = e.target.closest?.('.filter-row');
+    if (!row) return;
+    dragged = row;
+    row.classList.add('drag-source');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  document.addEventListener('dragover', e => {
+    if (!dragged) return;
+    const row = e.target.closest?.('.filter-row');
+    if (!row || row.parentElement !== dragged.parentElement) return;
+    e.preventDefault();                     // without this the drop is refused
+    clear();
+    const box = row.getBoundingClientRect();
+    row.classList.add(e.clientY < box.top + box.height / 2 ? 'drop-before' : 'drop-after');
+  });
+
+  document.addEventListener('drop', e => {
+    if (!dragged) return;
+    const row = e.target.closest?.('.filter-row');
+    if (!row || row.parentElement !== dragged.parentElement) return;
+    e.preventDefault();
+    const box = row.getBoundingClientRect();
+    const after = e.clientY >= box.top + box.height / 2;
+    // The rule the moved one should end up in front of; null means the end.
+    let before = after ? row.nextElementSibling : row;
+    if (before === dragged) before = dragged.nextElementSibling;
+    emitEvent('filters_reordered', {
+      item: dragged.parentElement.dataset.itemUid,
+      moved: dragged.dataset.filterUid,
+      before: before ? before.dataset.filterUid : null,
+    });
+    clear();
+  });
+
+  document.addEventListener('dragend', () => {
+    dragged?.classList.remove('drag-source');
+    dragged = null;
+    clear();
+  });
+})();
+</script>
+"""
 
 
 async def _fill_subtitles(pairs: list[tuple[SelectionFilterPresenter, FilterBlock]]) -> None:
@@ -166,8 +231,7 @@ def _render_filter_block(
     filter_presenter: SelectionFilterPresenter,
     item_presenter: SelectionItemPresenter,
     card: ExpandableCard,
-    drag: _DragState | None = None,
-    on_reordered: Callable[[], None] | None = None,
+    draggable: bool = False,
 ) -> FilterBlock:
     block = FilterBlock(
         title=filter_presenter.title,
@@ -175,53 +239,20 @@ def _render_filter_block(
         subtitle=None,
         on_delete=lambda: _open_delete_filter_modal(filter_presenter, block, item_presenter, card),
         on_edit=lambda: _open_edit_filter_modal(filter_presenter, block),
-        draggable=drag is not None,
+        draggable=draggable,
     )
-    if drag is not None:
-        _make_draggable(block, filter_presenter.uid, item_presenter, drag, on_reordered)
+    if draggable:
+        # What the browser side reads to know which rule it is moving.
+        block.container.classes('filter-row').props(
+            f'data-filter-uid="{filter_presenter.uid}"'
+        )
     return block
-
-
-def _make_draggable(
-    block: FilterBlock,
-    filter_uid: str,
-    item_presenter: SelectionItemPresenter,
-    drag: _DragState,
-    on_reordered: Callable[[], None] | None,
-) -> None:
-    """ Wire one rule up for drag-and-drop reordering.
-
-    Native HTML5 drag events rather than a sortable library: nothing here needs
-    animation, and the app has to keep working once it is packaged offline.
-
-    Order is presentation only — filters are unioned — so a drop that lands
-    somewhere unexpected costs nothing but a tidy-up.
-    """
-    def start() -> None:
-        drag.uid = filter_uid
-
-    def drop() -> None:
-        dropped = drag.uid
-        drag.uid = None
-        if dropped is None or dropped == filter_uid:
-            return
-        SelectionService.move_filter(item_presenter.uid, dropped, before_uid=filter_uid)
-        if on_reordered is not None:
-            on_reordered()
-
-    block.container.props('draggable')
-    block.container.on('dragstart', start)
-    # Without preventDefault on dragover the browser refuses the drop outright.
-    block.container.on('dragover.prevent', lambda: None)
-    block.container.on('drop.prevent', drop)
 
 
 async def _handle_create_filter(
     item_presenter: SelectionItemPresenter,
     filters_container: ui.column,
     card: ExpandableCard,
-    drag: '_DragState | None' = None,
-    on_reordered: Callable[[], None] | None = None,
 ) -> None:
     try:
         created_filter = item_presenter.create_empty_filter()
@@ -235,10 +266,34 @@ async def _handle_create_filter(
     _refresh_card_header(item_presenter, card)
 
     with filters_container:
-        block = _render_filter_block(created_filter, item_presenter, card, drag, on_reordered)
+        block = _render_filter_block(created_filter, item_presenter, card, draggable=True)
 
     ui.notify(copy.RULE_ADDED, type='positive')
     await _open_edit_filter_modal(created_filter, block)
+
+
+def enable_filter_reordering() -> None:
+    """ Install the browser-side drag behaviour. Call once per page. """
+    ui.add_head_html(_DRAG_AND_DROP_JS)
+
+
+def apply_filter_reorder(payload: dict, item_uid: str) -> bool:
+    """ Record a drop the browser has already worked out. True if it applied.
+
+    Every card on the page hears every drop, so each checks whether the rule
+    came from its own list. `before` is the rule the moved one should end up in
+    front of, or None for the end of the list — the browser decides which,
+    because it depends on where in the target row the cursor was released.
+    """
+    if payload.get('item') != item_uid:
+        return False
+
+    moved = payload.get('moved')
+    if not moved:
+        return False
+
+    SelectionService.move_filter(item_uid, moved, before_uid=payload.get('before'))
+    return True
 
 
 def render_item_card(
@@ -258,8 +313,9 @@ def render_item_card(
             on_delete=lambda: _open_delete_item_modal(item_presenter, card, on_removed),
         )
         with card:
-            filters_container = ui.column().classes('w-full gap-2')
-            drag = _DragState()
+            filters_container = ui.column().classes('w-full gap-2 filter-list').props(
+                f'data-item-uid="{item_presenter.uid}"'
+            )
 
             def redraw_filters() -> None:
                 """ Re-render the rules in their stored order.
@@ -273,15 +329,20 @@ def render_item_card(
                 pairs = []
                 with filters_container:
                     for filter_p in item_presenter.get_filter_presenters():
-                        block = _render_filter_block(filter_p, item_presenter, card, drag, redraw_filters)
+                        block = _render_filter_block(filter_p, item_presenter, card, draggable=True)
                         pairs.append((filter_p, block))
                 # Off the render path: the page returns immediately and the
                 # detail lines appear as their lookups come back.
                 ui.timer(0.05, lambda: _fill_subtitles(pairs), once=True)
 
+            def on_reordered(event) -> None:
+                if apply_filter_reorder(event.args or {}, item_presenter.uid):
+                    redraw_filters()
+
+            ui.on('filters_reordered', on_reordered)
             redraw_filters()
 
             with ui.row().classes('w-full items-center justify-center gap-2 mt-2'):
-                ui.button(copy.ADD_RULE_BUTTON, on_click=lambda: _handle_create_filter(item_presenter, filters_container, card, drag, redraw_filters)).props('outline')
+                ui.button(copy.ADD_RULE_BUTTON, on_click=lambda: _handle_create_filter(item_presenter, filters_container, card)).props('outline')
                 info_icon(copy.WHAT_IS_A_RULE)
     return card
