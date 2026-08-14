@@ -1,3 +1,2 @@
-from .competition_stages import CompetitionStage
-from .entity_id import EntityId
+from .entity_id import EntityId, raw_entity_id
 from .selection import Selection, SelectionFilter, SelectionItem

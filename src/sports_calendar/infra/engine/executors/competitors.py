@@ -2,6 +2,7 @@ import logging
 
 from sportindex import Competitor, Event, EventCollection, SportClient
 
+from sports_calendar.core import raw_entity_id
 from sports_calendar.core.selection import CompetitorsFilterFields, Rule
 
 from .base import BaseExecutor
@@ -40,17 +41,31 @@ class CompetitorsExecutor(BaseExecutor[CompetitorsFilterFields]):
 
     @staticmethod
     def _matches_selection_rule(event: Event, filter_fields: CompetitorsFilterFields) -> bool:
-        """ Check if the event matches the selection rule defined in the filter fields. """
+        """ Check if the event matches the selection rule defined in the filter fields.
+
+        Comparison is on raw ids, not on the ids as stored. A team picked from
+        the search box is saved as `team:1644`, while the same club appears on
+        its own fixtures as `t-cpt:1644` — comparing those as strings matched
+        nothing, so every "follow this team" filter came back empty.
+        """
         logger.debug(f"Checking event {event.id} against selection rule {filter_fields.selection_rule}")
-        if event.competitors:
-            event_competitors = {event.competitors.home, event.competitors.away}
+        if not event.competitors:
+            return False
+
+        wanted = {raw_entity_id(competitor_id) for competitor_id in filter_fields.competitor_ids}
+        present = {
+            raw_entity_id(competitor.id)
+            for competitor in (event.competitors.home, event.competitors.away)
+            if competitor is not None
+        }
+
         if filter_fields.selection_rule.rule == Rule.ANY:
-            return any(competitor_id in filter_fields.competitor_ids for competitor_id in [competitor.id for competitor in event_competitors])
+            return bool(present & wanted)
         if filter_fields.selection_rule.rule == Rule.BOTH:
-            return all(competitor_id in filter_fields.competitor_ids for competitor_id in [competitor.id for competitor in event_competitors])
+            return present.issubset(wanted)
         if filter_fields.selection_rule.rule == Rule.OPPONENT:
-            reference_id = filter_fields.selection_rule.reference
-            if reference_id in [competitor.id for competitor in event_competitors]:
-                other_competitor_id = next(competitor.id for competitor in event_competitors if competitor.id != reference_id)
-                return other_competitor_id in filter_fields.competitor_ids
+            reference_id = raw_entity_id(filter_fields.selection_rule.reference or "")
+            if reference_id in present:
+                others = present - {reference_id}
+                return bool(others & wanted)
         return False
