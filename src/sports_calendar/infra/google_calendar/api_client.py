@@ -1,3 +1,4 @@
+import base64
 import logging
 import time
 from datetime import datetime
@@ -10,6 +11,34 @@ from .auth import GoogleAuthManager
 from .console import TemporaryConsolePrinter
 
 logger = logging.getLogger(__name__)
+
+
+def google_event_id(source_id: str) -> str:
+    """ A Google-legal event id derived from the provider's own id.
+
+    Google accepts a caller-supplied id, but only in base32hex — lowercase `a`
+    to `v` and the digits — so `mch:12345` cannot be used as it stands. base32
+    encoding maps onto exactly that alphabet, is deterministic, and is
+    reversible, so an event on the calendar can still be traced back to the
+    fixture it came from.
+
+    Verified against the live API: an event inserted under such an id is
+    retrievable by it, and `mch:12345` yields `dlhmgehh68pj8d8`.
+    """
+    return base64.b32hexencode(source_id.encode()).decode().lower().rstrip("=")
+
+
+def source_id_from_google_id(event_id: str) -> str | None:
+    """ The provider id an event was written under, or None if we did not write it.
+
+    Anything the user added to the calendar by hand decodes to nothing usable,
+    and must be left alone by a sync.
+    """
+    padded = event_id.upper() + "=" * (-len(event_id) % 8)
+    try:
+        return base64.b32hexdecode(padded).decode()
+    except (ValueError, UnicodeDecodeError):
+        return None
 
 
 printer = TemporaryConsolePrinter()
@@ -111,6 +140,14 @@ class GoogleCalendarAPI:
             'location': event.get('location'),
         }
 
+        # The iCalendar event is mapped field by field, so anything not named
+        # here never reaches Google. The UID carries the provider's event id,
+        # and setting it as Google's own id is what lets a later sync recognise
+        # this event instead of writing a second copy of the same fixture.
+        uid = event.get('uid')
+        if uid:
+            event_body['id'] = google_event_id(str(uid))
+
         max_attempts = 5
         backoff = 1
 
@@ -129,6 +166,28 @@ class GoogleCalendarAPI:
                         continue
                     logger.error("Max attempts reached. Could not add event due to rate limit.")
                     raise e
+
+                if e.resp.status == 409 and event_body.get('id'):
+                    # Google keeps an id reserved after the event is deleted, so
+                    # inserting a fixture we have written before is refused
+                    # outright. It can still be written through: `update`
+                    # succeeds where `insert` will not, on a cancelled event and
+                    # on a deleted one alike. This makes writing an event
+                    # idempotent, which is what allows the same fixture to be
+                    # rewritten every night without accumulating copies.
+                    logger.debug(f"Event {event_body['id']} already exists; updating it in place.")
+                    self.service.events().update(
+                        calendarId=self.calendar_id, eventId=event_body['id'], body=event_body
+                    ).execute()
+                    time.sleep(0.1)
+                    return
+
+                # Previously this fell out of the `except` and round the loop,
+                # so after five attempts the method returned as though it had
+                # worked. Events went missing from the calendar with nothing
+                # logged above debug.
+                logger.error(f"Could not add event '{event_body.get('summary')}': {e}")
+                raise
             except Exception:
                 logger.exception("Unexpected error adding event.")
                 raise
