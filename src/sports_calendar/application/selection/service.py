@@ -212,6 +212,38 @@ class SelectionService:
         SelectionRegistry.replace(filter_context.selection)
 
     @staticmethod
+    def move_filter(item_uid: str, filter_uid: str, before_uid: str | None) -> None:
+        """ Move one filter to sit immediately before another, or to the end.
+
+        Purely presentational: an item is the union of its filters, so the order
+        they are stored in has no effect on the calendar. It exists because a
+        card holding eight rules is easier to read when related ones sit
+        together.
+
+        Unknown uids are ignored rather than raising — a drop that lands after
+        the page has moved on should do nothing, not break the page.
+        """
+        item_context = SelectionRegistry.get_item_context(item_uid)
+        filters = list(item_context.item.filters)
+
+        moving = next((f for f in filters if f.uid == filter_uid), None)
+        if moving is None or filter_uid == before_uid:
+            return
+
+        filters.remove(moving)
+        if before_uid is None:
+            filters.append(moving)
+        else:
+            target = next((i for i, f in enumerate(filters) if f.uid == before_uid), None)
+            if target is None:
+                return
+            filters.insert(target, moving)
+
+        item_context.item.filters = filters
+        item_context.selection.replace_item(item_context.item)
+        SelectionRegistry.replace(item_context.selection)
+
+    @staticmethod
     def clone_filter(filter_uid: str) -> SelectionFilter:
         filter_context = SelectionRegistry.get_filter_context(filter_uid)
         cloned_filter = filter_context.filter.clone()
