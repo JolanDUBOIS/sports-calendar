@@ -17,6 +17,7 @@ class Paths:
     CREDS_FOLDER: Path
     SECRETS_FOLDER: Path
     SELECTIONS_FOLDER: Path
+    LABEL_CACHE_FILE: Path
 
     _setup: bool = False
 
@@ -38,6 +39,11 @@ class Paths:
         cls.CREDS_FOLDER = cls.CONFIG_DIR / ".credentials"
         cls.SECRETS_FOLDER = cls.CONFIG_DIR / ".secrets"
         cls.SELECTIONS_FOLDER = cls.CONFIG_DIR / "selections"
+        # State, not config: derived from the provider and safe to delete. It
+        # lives beside the logs rather than in the config the user edits.
+        cls.LABEL_CACHE_FILE = (
+            Path(user_state_dir(cls.APP_NAME)) / "entity-labels.json"
+        )
 
         cls._setup = True
         cls.create_folders()
@@ -57,6 +63,7 @@ class Paths:
             cls.CREDS_FOLDER,
             cls.SECRETS_FOLDER,
             cls.SELECTIONS_FOLDER,
+            cls.LABEL_CACHE_FILE.parent,
         )
 
         for directory in required_dirs:
