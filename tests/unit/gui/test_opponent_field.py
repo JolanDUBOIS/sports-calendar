@@ -6,9 +6,11 @@ a reference team. The picker used to sit there permanently, asking every user of
 """
 
 from sports_calendar.core.selection import Rule
-from sports_calendar.interfaces.gui.components.modals.filter_modal import (
-    _format_selection_rule,
+from sports_calendar.interfaces.gui.components.modals.filter_modal.field_builders import (
     _rule_and_reference_fields,
+)
+from sports_calendar.interfaces.gui.components.modals.filter_modal.payloads import (
+    _format_selection_rule,
 )
 
 FOOTBALL = 1
