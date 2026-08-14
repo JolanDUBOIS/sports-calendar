@@ -13,7 +13,9 @@ import sports_calendar.interfaces.gui.presenters.selection_item as selection_ite
 from sports_calendar.core import SelectionFilter, SelectionItem
 from sports_calendar.interfaces.gui.catalog import format_entity_label
 from sports_calendar.interfaces.gui.presenters.filter import SelectionFilterPresenter
-from sports_calendar.interfaces.gui.presenters.selection_item import SelectionItemPresenter
+from sports_calendar.interfaces.gui.presenters.selection_item import (
+    SelectionItemPresenter,
+)
 
 PSG_TEAM = "t-cpt:1644"
 ALCARAZ = "t-ath:275923"

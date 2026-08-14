@@ -114,22 +114,11 @@ class SelectionFilterPresenter:
             return sport_id
         return self.parent_item.sport_id
 
-    @property
-    def explanation(self) -> str:
-        raise NotImplementedError
-
-        # Empty Filter explaination example:
-        # "This is an empty filter. It doesn't filter anything and is mainly used "
-        # "as a starting point for creating new filters or for testing purposes."
-
     def delete(self) -> None:
         SelectionService.remove_filter(self.filter.uid)
 
     def update(self, payload: dict) -> None:
-        logger.debug(f"Updating filter '{self.uid}' with payload: {payload}")
+        logger.debug("Updating filter '%s' with payload: %s", self.uid, payload)
         new_filter = SelectionFilter.from_dict(payload)
         SelectionService.replace_filter(new_filter)
         self.filter = new_filter
-
-    def clone(self) -> ...:
-        raise NotImplementedError

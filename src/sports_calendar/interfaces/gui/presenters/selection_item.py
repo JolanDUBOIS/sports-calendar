@@ -71,6 +71,3 @@ class SelectionItemPresenter:
     def create_empty_filter(self, name: str | None = None) -> SelectionFilterPresenter:
         created_filter = SelectionService.add_empty_filter(self.item.uid, name=name)
         return SelectionFilterPresenter(created_filter, self.item, self.client)
-
-    def clone(self) -> ...:
-        raise NotImplementedError

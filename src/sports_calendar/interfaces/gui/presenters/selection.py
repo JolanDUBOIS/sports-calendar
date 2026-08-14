@@ -53,9 +53,6 @@ class SelectionPresenter:
         item = selection.get_item(created_item.uid)
         return SelectionItemPresenter(item, selection, self.client)
 
-    def request_clone(self) -> ...: # Returns another selection presenter ?
-        raise NotImplementedError
-
     @classmethod
     def create(cls, client: SportClient, name: str) -> "SelectionPresenter":
         selection = SelectionService.add_empty_selection(name)
