@@ -14,8 +14,17 @@ if TYPE_CHECKING:
 class SportsEvent(ABC):
     """ Abstract base class for sports events. """
 
-    def __init__(self, **kwargs):
-        """ Initialize the sports event with common attributes. """
+    def __init__(self, source_id: str | None = None, **kwargs):
+        """ Initialize the sports event with common attributes.
+
+        `source_id` is the provider's own id for this event (`mch:12345`). It is
+        what lets a synced calendar recognise an event it has already written,
+        so a fixture that moves is updated in place rather than removed and
+        recreated. Deliberately not derived from the event's details: a Ligue 1
+        fixture is pencilled in for a Sunday and only given its real kick-off a
+        month out, and it is the same match throughout.
+        """
+        self.source_id = source_id
         self.extra = kwargs
 
     def __repr__(self):
@@ -48,13 +57,25 @@ class SportsEvent(ABC):
         raise NotImplementedError("Subclasses must implement description property for event details.")
 
     def get_event(self) -> ICalendarEvent:
-        """ Convert this sports event into an iCalendar event. """
+        """ Convert this sports event into an iCalendar event.
+
+        Optional fields are omitted when empty rather than written blank:
+        icalendar stringifies whatever it is given, so a missing venue used to
+        reach the calendar as the literal text "None".
+        """
         event = ICalendarEvent()
+        # The provider's id, carried so a sync can match this against an event
+        # it wrote before. UID is the standard iCalendar field for it; how a
+        # given calendar service stores it is that service's problem.
+        if self.source_id:
+            event.add("uid", self.source_id)
         event.add("summary", self.summary)
         event.add("dtstart", self.start)
         event.add("dtend", self.end)
-        event.add("location", self.location)
-        event.add("description", self.description)
+        if self.location:
+            event.add("location", self.location)
+        if self.description:
+            event.add("description", self.description)
         return event
 
     @abstractmethod

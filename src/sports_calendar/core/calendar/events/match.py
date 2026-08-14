@@ -64,8 +64,12 @@ class MatchEvent(SportsEvent):
 
     @property
     def location(self) -> str:
-        """ Location of the Match event. """
-        return self._venue
+        """ Location of the Match event.
+
+        Empty rather than None when the provider names no venue — common for
+        rugby — so callers can treat it as the string this signature promises.
+        """
+        return self._venue or ""
 
     @property
     def description(self) -> str:
@@ -96,7 +100,13 @@ class MatchEvent(SportsEvent):
             competition_id=event.competition.id if event.competition else None,
             competition_name=event.competition.name if event.competition else None,
             stage=event.round.name if event.round else None,
-            leg=event.round.round if event.round else None,
+            # `Round.value` is a matchday number in a league (Ligue 1 rounds
+            # 1..34) but an opaque provider id in a knockout competition (the
+            # Champions League playoff round is 636). Only the league case is a
+            # meaningful "leg", and a named round is what marks the other, so
+            # the number is dropped whenever the round carries a name.
+            leg=event.round.value if event.round and not event.round.name else None,
             venue=event.venue.name if event.venue else None,
+            source_id=str(event.id),
             sport_idx_event=event
         )
