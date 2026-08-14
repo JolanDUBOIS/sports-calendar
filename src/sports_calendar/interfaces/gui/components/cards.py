@@ -49,13 +49,29 @@ class BaseCard:
 
     def _build_header(self):
         """Builds the shared title and button layout."""
-        with ui.row().classes('w-full items-center justify-between p-4'):
+        header_row = ui.row().classes('w-full items-center justify-between p-4')
+        if self.draggable:
+            # `.nicegui-row` puts a 1rem gap on every row. Inline so it wins
+            # without depending on stylesheet order.
+            header_row.style('gap: 0.25rem')
+
+        with header_row:
             if self.draggable:
                 # The conventional six dots. Only the handle starts a drag, so
                 # selecting the title text still works normally.
-                self.drag_handle = ui.icon('drag_indicator').classes(
-                    'text-gray-400 cursor-grab active:cursor-grabbing mr-1'
-                ).mark('drag-handle')
+                #
+                # The margins look far too large for the gap they close, and
+                # have to be: `drag_indicator` draws its dots in the middle of a
+                # square glyph box with transparent space either side, so a
+                # margin has to swallow that whitespace before it moves anything
+                # visible. Measured against the box, not against the dots.
+                self.drag_handle = ui.icon('drag_indicator', size='26px').classes(
+                    'drag-handle text-gray-400 hover:text-gray-600 '
+                    'cursor-grab active:cursor-grabbing'
+                # Asymmetric on purpose: the left margin fights the row's padding
+                # as well as the glyph's whitespace, the right one only the
+                # whitespace. Equal numbers here would not look equal on screen.
+                ).style('margin-left: -22px; margin-right: 4px; padding: 0').mark('drag-handle')
 
             with ui.column().classes('gap-0'):
                 self.title_label = ui.label(self.title).classes('text-lg font-bold')
