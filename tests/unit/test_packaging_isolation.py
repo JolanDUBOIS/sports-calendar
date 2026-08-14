@@ -23,7 +23,7 @@ BACKEND_PACKAGES = [
 ]
 
 # Packages installed by the `ui` extra.
-UI_PACKAGES = ["nicegui", "num2words"]
+UI_PACKAGES = ["nicegui"]
 
 
 class _BlockedImportFinder:

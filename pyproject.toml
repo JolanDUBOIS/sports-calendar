@@ -29,7 +29,6 @@ backend = [
 # UI: the NiceGUI selection editor shipped to end users.
 ui = [
     "nicegui>=3.10.0",
-    "num2words>=0.5.14",
 ]
 
 [project.scripts]
@@ -87,7 +86,6 @@ forbidden_modules = [
     "googleapiclient",
     "google_auth_oauthlib",
     "nicegui",
-    "num2words",
     "sports_calendar.infra.google_calendar",
     "sports_calendar.interfaces",
 ]
@@ -114,7 +112,6 @@ source_modules = [
 ]
 forbidden_modules = [
     "nicegui",
-    "num2words",
     "sports_calendar.interfaces.gui",
 ]
 
