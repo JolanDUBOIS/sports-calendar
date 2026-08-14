@@ -8,7 +8,7 @@ from typing import Literal, TypeAlias
 
 from sportindex import StageTier
 
-from sports_calendar.core import CompetitionStage, EntityId
+from sports_calendar.core import EntityId
 from sports_calendar.core.utils import validate
 
 from .enums import FilterType
@@ -104,14 +104,72 @@ class MinRankingFilterFields:
         )
 
 @dataclass
-class CompetitionsFilterFields:
-    competition_ids: list[EntityId]
-    filter_type: Literal[FilterType.COMPETITIONS] = FilterType.COMPETITIONS
-    stage: CompetitionStage = CompetitionStage.NULL
+class WorldRankingFilterFields:
+    """ Follow whoever sits near the top of a governing body's ranking.
+
+    `sport_id` is carried here, redundantly with the owning SelectionFilter,
+    because rankings are not addressable entities in sport-index: they are only
+    reachable through `Sport.get_rankings()`, so the executor needs to know the
+    sport to find the table at all.
+    """
+    ranking: int
+    ranking_id: int
+    sport_id: int
+    filter_type: Literal[FilterType.WORLD_RANKING] = FilterType.WORLD_RANKING
+    selection_rule: EntitySelectionRule = field(default_factory=EntitySelectionRule)
 
     def __post_init__(self):
-        validate(isinstance(self.stage, CompetitionStage),
-                 "stage must be a CompetitionStage", logger)
+        validate(isinstance(self.ranking, int) and self.ranking > 0,
+                 "ranking must be a positive integer", logger)
+        validate(isinstance(self.ranking_id, int),
+                 "ranking_id must be an integer", logger)
+        validate(isinstance(self.sport_id, int),
+                 "sport_id must be an integer", logger)
+
+    def clone(self) -> WorldRankingFilterFields:
+        return copy.deepcopy(self)
+
+    def to_dict(self) -> dict:
+        return {
+            "ranking": self.ranking,
+            "ranking_id": self.ranking_id,
+            "sport_id": self.sport_id,
+            "filter_type": self.filter_type.value,
+            "selection_rule": self.selection_rule.to_dict()
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> WorldRankingFilterFields:
+        if not data.get("filter_type") == FilterType.WORLD_RANKING.value:
+            raise ValueError(f"Invalid filter_type for WorldRankingFilterFields: {data.get('filter_type')}")
+        return cls(
+            ranking=data["ranking"],
+            ranking_id=data["ranking_id"],
+            sport_id=data["sport_id"],
+            selection_rule=EntitySelectionRule.from_dict(data.get("selection_rule", {}))
+        )
+
+@dataclass
+class CompetitionsFilterFields:
+    """ Whole competitions, optionally narrowed to particular rounds.
+
+    `from_round` is a sport-index round *slug* ("quarterfinals"), and means
+    "this round and everything after it". None means the whole competition.
+
+    A slug rather than an ordering of our own: each competition reports its
+    rounds in the order they are played, so "from the quarter-finals" is
+    resolved against that competition's own ladder. Competitions also
+    reorganise — the Champions League gained a league phase in 24/25 — and
+    re-reading the provider's rounds survives that, where a hand-maintained
+    taxonomy would not.
+    """
+    competition_ids: list[EntityId]
+    filter_type: Literal[FilterType.COMPETITIONS] = FilterType.COMPETITIONS
+    from_round: str | None = None
+
+    def __post_init__(self):
+        validate(self.from_round is None or isinstance(self.from_round, str),
+                 "from_round must be a round slug or None", logger)
         validate(isinstance(self.competition_ids, list) and all(isinstance(cid, EntityId) for cid in self.competition_ids),
                  "competition_ids must be a list of EntityId", logger)
 
@@ -122,16 +180,18 @@ class CompetitionsFilterFields:
         return {
             "competition_ids": self.competition_ids,
             "filter_type": self.filter_type.value,
-            "stage": self.stage.value
+            "from_round": self.from_round
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> CompetitionsFilterFields:
         if not data.get("filter_type") == FilterType.COMPETITIONS.value:
             raise ValueError(f"Invalid filter_type for CompetitionsFilterFields: {data.get('filter_type')}")
+        # Filters saved before this carry a `stage` key that was never populated
+        # or read; it is simply ignored.
         return cls(
             competition_ids=data["competition_ids"],
-            stage=CompetitionStage(data.get("stage", CompetitionStage.NULL.value))
+            from_round=data.get("from_round")
         )
 
 @dataclass
@@ -199,6 +259,7 @@ class SessionsFilterFields:
 FilterFields: TypeAlias = (
     EmptyFilterFields
     | MinRankingFilterFields
+    | WorldRankingFilterFields
     | CompetitionsFilterFields
     | CompetitorsFilterFields
     | SessionsFilterFields

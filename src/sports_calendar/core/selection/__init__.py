@@ -11,5 +11,6 @@ from .filters import (
     Rule,
     SelectionFilter,
     SessionsFilterFields,
+    WorldRankingFilterFields,
 )
 from .models import Selection, SelectionItem

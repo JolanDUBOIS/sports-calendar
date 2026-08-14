@@ -5,3 +5,4 @@ from .empty import EmptyExecutor
 from .mapping import EXECUTOR_MAP
 from .min_ranking import MinRankingExecutor
 from .sessions import SessionsExecutor
+from .world_ranking import WorldRankingExecutor

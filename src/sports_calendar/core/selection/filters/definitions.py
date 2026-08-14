@@ -8,6 +8,7 @@ from .fields import (
     FilterFields,
     MinRankingFilterFields,
     SessionsFilterFields,
+    WorldRankingFilterFields,
 )
 
 
@@ -26,6 +27,10 @@ FILTER_DEFINITIONS: dict[FilterType, FilterDefinition] = {
     ),
     FilterType.MIN_RANKING: FilterDefinition(
         fields_cls=MinRankingFilterFields,
+        target=FilterTarget.COMPETITOR
+    ),
+    FilterType.WORLD_RANKING: FilterDefinition(
+        fields_cls=WorldRankingFilterFields,
         target=FilterTarget.COMPETITOR
     ),
     FilterType.COMPETITIONS: FilterDefinition(

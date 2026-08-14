@@ -8,6 +8,10 @@ class FilterType(Enum):
     COMPETITIONS = "competitions"
     COMPETITORS = "competitors"
     SESSIONS = "sessions"
+    # Distinct from MIN_RANKING: that one reads a season's league table, this
+    # one reads a governing body's standing order (ATP, FIFA). Sports with no
+    # league table, tennis above all, only have the latter.
+    WORLD_RANKING = "world_ranking"
 
 
 # === Filter Target Enum ====

@@ -9,6 +9,7 @@ from .competitors import CompetitorsExecutor
 from .empty import EmptyExecutor
 from .min_ranking import MinRankingExecutor
 from .sessions import SessionsExecutor
+from .world_ranking import WorldRankingExecutor
 
 if TYPE_CHECKING:
     from .base import BaseExecutor
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 
 EXECUTOR_MAP: dict[FilterType, type[BaseExecutor]] = {
     FilterType.MIN_RANKING: MinRankingExecutor,
+    FilterType.WORLD_RANKING: WorldRankingExecutor,
     FilterType.COMPETITORS: CompetitorsExecutor,
     FilterType.SESSIONS: SessionsExecutor,
     FilterType.COMPETITIONS: CompetitionsExecutor,

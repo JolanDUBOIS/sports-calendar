@@ -8,5 +8,6 @@ from .fields import (
     MinRankingFilterFields,
     Rule,
     SessionsFilterFields,
+    WorldRankingFilterFields,
 )
 from .filters import SelectionFilter
