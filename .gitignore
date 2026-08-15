@@ -34,3 +34,10 @@ dist/
 
 # Tests data
 tests/mock_data/
+# Working notes between Jolan and Claude — task lists, briefs, one-off repro
+# scripts. These are scratch, not project documentation: they must never end up
+# in the history.
+ROADMAP.md
+MORNING_BRIEF.md
+OVERNIGHT_NOTES.md
+repro_*.py
