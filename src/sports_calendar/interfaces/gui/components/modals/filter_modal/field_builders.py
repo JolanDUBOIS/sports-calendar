@@ -15,12 +15,12 @@ from sports_calendar.core.selection import FilterType, Rule, SelectionFilter
 from sports_calendar.core.sports import ranking_choices
 
 from ....copy import (
-    FIELD_HELP,
     OPPONENT_LABEL,
     ROUNDS_LABEL,
     ROUNDS_NONE_SHARED,
-    RULE_LABELS,
     SESSION_LABELS,
+    field_help,
+    rule_label,
     search_hint,
 )
 from ..fields import (
@@ -36,9 +36,15 @@ if TYPE_CHECKING:
     from ....catalog import FilterSearchProvider
 
 
-selection_rule_options = {
-    rule.value: RULE_LABELS.get(rule, rule.name.capitalize()) for rule in Rule
-}
+def selection_rule_options_for(sport_id: int) -> dict[str, str]:
+    """ The three "which matches to keep" rules, worded for this sport.
+
+    A function rather than a module-level dict: the labels say "teams" for
+    football and "players" for tennis, so they cannot be decided at import time.
+    """
+    return {rule.value: rule_label(rule, sport_id) for rule in Rule}
+
+
 # Only the tiers that are actually sessions: StageTier also carries structural
 # levels (sport, season, event, lap) that nobody would ever pick.
 sessions_options = {tier.value: label for tier, label in SESSION_LABELS.items()}
@@ -62,7 +68,7 @@ def _rule_and_reference_fields(
         search_fn=lambda query: search_provider.search_competitor(query, sport_id),
         search_hint=search_hint("competitor", sport_id),
         default_value=default_reference,
-        help_text=FIELD_HELP["selection_reference"],
+        help_text=field_help("selection_reference", sport_id),
     )
     reference_field.set_visible(default_rule == Rule.OPPONENT.value)
 
@@ -70,8 +76,8 @@ def _rule_and_reference_fields(
         name="selection_rule",
         label="Which matches to keep",
         default=default_rule,
-        options=selection_rule_options,
-        help_text=FIELD_HELP["selection_rule"],
+        options=selection_rule_options_for(sport_id),
+        help_text=field_help("selection_rule", sport_id),
         on_change=lambda value: reference_field.set_visible(value == Rule.OPPONENT.value),
     )
     return [rule_field, reference_field]
@@ -117,7 +123,7 @@ def build_min_ranking_filter_fields(
             name="ranking",
             label="Minimum Ranking",
             default=ranking,
-            help_text=FIELD_HELP["ranking"],
+            help_text=field_help("ranking", sport_id),
         ),
         SearchableMultipleSelectField(
             name="competition_ids",
@@ -127,7 +133,7 @@ def build_min_ranking_filter_fields(
             default_values=competitions,
             search_fn=lambda query: search_provider.search_competition(query, sport_id),
             search_hint=search_hint("competition", sport_id),
-            help_text=FIELD_HELP["competition_ids"],
+            help_text=field_help("competition_ids", sport_id),
         ),
         *_rule_and_reference_fields(rule, reference, search_provider, sport_id),
     ]
@@ -157,13 +163,13 @@ def build_world_ranking_filter_fields(
             label="Ranking",
             default=ranking_id,
             options=dict(choices),
-            help_text=FIELD_HELP["ranking_id"],
+            help_text=field_help("ranking_id", sport_id),
         ),
         NumberField(
             name="ranking",
             label="Top how many",
             default=ranking,
-            help_text=FIELD_HELP["world_ranking"],
+            help_text=field_help("world_ranking", sport_id),
         ),
         *_rule_and_reference_fields(rule, reference, search_provider, sport_id),
     ]
@@ -186,7 +192,7 @@ def build_competitions_filter_fields(
         label=ROUNDS_LABEL,
         default=from_round,
         options=search_provider.get_shared_rounds(list(competitions)),
-        help_text=FIELD_HELP["from_round"],
+        help_text=field_help("from_round", sport_id),
         empty_note=ROUNDS_NONE_SHARED,
         clearable=True,
     )
@@ -202,7 +208,7 @@ def build_competitions_filter_fields(
             default_values=competitions,
             search_fn=lambda query: search_provider.search_competition(query, sport_id),
             search_hint=search_hint("competition", sport_id),
-            help_text=FIELD_HELP["competition_ids"],
+            help_text=field_help("competition_ids", sport_id),
             on_change=_refresh_rounds,
         ),
         rounds_field,
@@ -229,7 +235,7 @@ def build_competitors_filter_fields(
             default_values=competitors,
             search_fn=lambda query: search_provider.search_competitor(query, sport_id),
             search_hint=search_hint("competitor", sport_id),
-            help_text=FIELD_HELP["competitor_ids"],
+            help_text=field_help("competitor_ids", sport_id),
         ),
         *_rule_and_reference_fields(rule, reference, search_provider, sport_id),
     ]
@@ -254,14 +260,14 @@ def build_sessions_filter_fields(
             search_fn=lambda query: search_provider.search_competition(query, sport_id),
             search_hint=search_hint("competition", sport_id),
             default_value=competition_id,
-            help_text=FIELD_HELP["competition_id"],
+            help_text=field_help("competition_id", sport_id),
         ),
         MultipleSelectField(
             name="sessions",
             label="Sessions",
             default=sessions,
             options=sessions_options,
-            help_text=FIELD_HELP["sessions"],
+            help_text=field_help("sessions", sport_id),
         ),
     ]
 

@@ -11,7 +11,6 @@ from sports_calendar.core.selection import FilterType, SelectionFilter
 from sports_calendar.core.sports import allowed_filter_types
 
 from ....copy import (
-    FILTER_TYPE_HELP,
     FOLLOW_TITLE,
     FOLLOW_TYPE_LABEL,
     MODAL_LOAD_FAILED,
@@ -19,6 +18,7 @@ from ....copy import (
     RULE_NAME_EXAMPLES,
     RULE_NAME_HELP,
     RULE_NAME_LABEL,
+    filter_type_help,
     filter_type_label,
 )
 from ..base import FormModal
@@ -86,7 +86,7 @@ class FilterModal(FormModal):
             label=FOLLOW_TYPE_LABEL,
             options=filter_type_options_for(initial_filter.sport_id, initial_filter_type),
             default=self._selected_filter_type.value,
-            help_text=FILTER_TYPE_HELP.get(self._selected_filter_type),
+            help_text=filter_type_help(self._selected_filter_type, initial_filter.sport_id),
             # These run to a paragraph and would overlap the next field's label
             # if rendered as a Quasar hint.
             help_as_caption=True,
@@ -185,7 +185,9 @@ class FilterModal(FormModal):
         self._selected_filter_type = new_filter_type
         self._filter_type_field.default = self._selected_filter_type.value
         # Explanation follows the choice, so the modal describes what is selected.
-        self._filter_type_field.help_text = FILTER_TYPE_HELP.get(self._selected_filter_type)
+        self._filter_type_field.help_text = filter_type_help(
+            self._selected_filter_type, self._initial_filter.sport_id
+        )
 
         # Some types need the network for their defaults, so the form shows a
         # placeholder in the meantime rather than freezing on the dropdown.

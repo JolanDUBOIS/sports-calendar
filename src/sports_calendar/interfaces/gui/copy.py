@@ -15,14 +15,17 @@ from sports_calendar.core.selection import FilterType, Rule
 
 # ---- Filter types ---------------------------------------------------------
 
+# `{competitors}` and friends are filled in per sport by `_for_sport` below:
+# "teams" for football, "players" for tennis. Written as placeholders rather
+# than patched afterwards, because the previous approach — labelling everything
+# "Top Teams" and then running `.replace("Top Teams", "Top Players")` — only
+# worked for the exact strings someone remembered to spell that way.
 FILTER_TYPE_LABELS: dict[FilterType, str] = {
     FilterType.EMPTY: "Not set yet",
     FilterType.COMPETITIONS: "Specific competitions",
-    FilterType.COMPETITORS: "Specific teams or players",
-    # Wording follows the sport: "Top Teams" for football, "Top Players" for
-    # tennis. See `filter_type_label`, which takes the sport into account.
-    FilterType.MIN_RANKING: "Top Teams",
-    FilterType.WORLD_RANKING: "Top Teams (world rankings)",
+    FilterType.COMPETITORS: "Specific {competitors}",
+    FilterType.MIN_RANKING: "Top {Competitors}",
+    FilterType.WORLD_RANKING: "Top {Competitors} (world rankings)",
     FilterType.SESSIONS: "Race sessions",
 }
 
@@ -32,21 +35,24 @@ FILTER_TYPE_HELP: dict[FilterType, str] = {
         "adds no events — pick one of the other types above.",
     FilterType.COMPETITIONS:
         "Follow whole competitions: every fixture of the current season for each "
-        "competition you pick. Good for \"all Champions League matches\".",
+        "one you pick. You can also start from a round, to follow only the "
+        "knockout stages of a cup.",
     FilterType.COMPETITORS:
-        "Follow specific teams or players. Use the rule below to say whether you "
+        "Follow {competitors} you name. Use the rule below to say whether you "
         "want every match they play, or only certain match-ups.",
     FilterType.MIN_RANKING:
-        "Follow whoever currently sits near the top of one or more competitions. "
-        "Pick the standings to read and a cut-off position; the teams are read "
-        "live each time the calendar is built, so it keeps itself up to date. "
-        "For rankings that span every competition, like FIFA or the ATP, use "
-        "\"Top of the world rankings\" instead.",
+        "Follow whoever currently sits at the top of a table. Pick the standings "
+        "to read and a cut-off position — you then get every match those "
+        "{competitors} play, not only their matches in that competition. Read "
+        "again on each build, so it follows the table rather than a fixed list. "
+        "For a ranking that spans every competition, use "
+        "\"{world_ranking_label}\".",
     FilterType.WORLD_RANKING:
         "Follow whoever currently sits near the top of a world ranking — FIFA, "
-        "the ATP, World Rugby. These span every competition rather than one "
-        "season's table. Re-read each time the calendar is built, so it follows "
-        "the ranking rather than a fixed list of names.",
+        "the ATP, World Rugby. The only difference from \"{min_ranking_label}\" "
+        "is where the ranking is read from: a global ranking rather than one "
+        "competition's table. Either way you get every match those "
+        "{competitors} play.",
     FilterType.SESSIONS:
         "For motorsport and other staged events: pick a championship, then choose "
         "which session types you care about (the race only, or practice and "
@@ -58,19 +64,25 @@ FILTER_TYPE_HELP: dict[FilterType, str] = {
 RULE_LABELS: dict[Rule, str] = {
     Rule.ANY: "Any of them is playing",
     Rule.BOTH: "Two of them play each other",
-    Rule.OPPONENT: "One specific team plays one of them",
+    # Names the picked side first, like the other two, so the three read as
+    # variations of one sentence rather than three unrelated ones.
+    Rule.OPPONENT: "One of them plays a specific opponent",
 }
 
+# NOT CURRENTLY SHOWN ANYWHERE. `SelectField` has no per-option help, so what
+# the user actually reads about this choice is `FIELD_HELP["selection_rule"]`.
+# Kept because the wording is better than the one line that is displayed, and
+# because surfacing it is a small UI change rather than a rewrite.
 RULE_HELP: dict[Rule, str] = {
     Rule.ANY:
-        "Keep a match if at least one of the teams you picked is in it. This is "
-        "the usual choice.",
+        "Keep a match if at least one of the {competitors} you picked is in it. "
+        "This is the usual choice.",
     Rule.BOTH:
-        "Keep a match only when both sides are teams you picked — the big "
-        "match-ups between your teams, and nothing else.",
+        "Keep a match only when both sides are {competitors} you picked — the "
+        "big match-ups between them, and nothing else.",
     Rule.OPPONENT:
-        "Keep a match only when the reference team below is playing, and its "
-        "opponent is one of the teams you picked.",
+        "Keep a match only when the opponent named below is playing, and it is "
+        "up against one of the {competitors} you picked.",
 }
 
 # ---- Sessions -------------------------------------------------------------
@@ -94,7 +106,10 @@ SEARCH_EXAMPLES: dict[tuple[str, str], tuple[str, ...]] = {
     ("competition", "football"): ("UEFA Women's Champions League", "Ligue 1"),
     ("competitor", "football"): ("Paris Saint-Germain", "PSG", "Arsenal Women"),
 
-    ("competition", "motorsport"): ("Formula 1", "F1 Academy"),
+    # Three rather than two: MotoGP is the obvious second championship to name,
+    # and dropping F1 Academy for it would leave motorsport the only row with no
+    # women's series in it.
+    ("competition", "motorsport"): ("Formula 1", "MotoGP", "F1 Academy"),
     ("competitor", "motorsport"): ("Doriane Pin", "Max Verstappen"),
 
     ("competition", "tennis"): ("Roland Garros", "Wimbledon"),
@@ -170,21 +185,31 @@ FIELD_HELP: dict[str, str] = {
     "ranking":
         "How far down the table to go. 5 means the top five positions.",
     "competition_ids":
-        "Type to search. Only competitions for this item's sport are shown.",
+        "Type to search. Only competitions for this sport are shown.",
     "competition_id":
         "The championship whose sessions you want to follow.",
     "competitor_ids":
-        "Type to search for teams or players in this item's sport.",
+        "Type to search for {competitors} in this sport.",
     "selection_rule":
-        "Decides which matches are kept once your teams are known.",
+        "Decides which matches are kept once your {competitors} are known.",
+    # Says what the field is for rather than naming the rule that uses it: the
+    # field is only visible under that rule now, so repeating its name was both
+    # the longest line here and the least informative.
+    #
+    # Phrased without a pronoun for the competitor, because the right one
+    # changes with the sport — "it" is fine for a club and wrong for a person.
     "selection_reference":
-        "Only used by the \"one specific team plays one of them\" rule.",
+        "Keeps only the matches where one of those above plays this "
+        "{competitor}.",
     "sessions":
         "Which parts of a race weekend to put in the calendar.",
     "from_round":
-        "Leave empty for every match. Pick a round to keep it and everything after it.",
+        "Empty keeps every match. Otherwise: that round, and everything after.",
+    # "Each governing body keeps its own" meant nothing to anyone who did not
+    # already know the answer. Says what you will actually see in the menu.
     "ranking_id":
-        "Which ranking to read. Each governing body keeps its own.",
+        "Which ranking to read. Most sports publish more than one — men's and "
+        "women's, singles and doubles.",
     "world_ranking":
         "How far down the ranking to go. 20 means the current top twenty.",
 }
@@ -321,7 +346,7 @@ PREVIEW_EMPTY = (
 SELECTION_NAME_EXAMPLES = "e.g. Everything I follow, Watching with friends, Just the big nights"
 
 ITEM_NAME_EXAMPLES: dict[int, str] = {
-    1: "e.g. Premier League + PSG",
+    1: "e.g. Ligue 1 + PSG",
     2: "e.g. EuroLeague nights",
     5: "e.g. Grand Slams",
     6: "e.g. Starligue + PSG Handball",
@@ -337,16 +362,64 @@ DEFAULT_ITEM_NAME_EXAMPLE = "e.g. Everything I want to watch"
 _INDIVIDUAL_SPORT_IDS = frozenset({5, 65})  # tennis, cycling
 
 
-def filter_type_label(filter_type: FilterType, sport_id: int | None = None) -> str:
-    """ Human label for a filter type, falling back to its raw value.
+def competitors_word(sport_id: int | None) -> str:
+    """ "teams" or "players", whichever this sport's competitors are. """
+    return "players" if sport_id in _INDIVIDUAL_SPORT_IDS else "teams"
 
-    Ranking filters say "Team" or "Player" depending on the sport, because the
-    generic word for both ("competitor") is jargon the rest of the UI avoids.
+
+def _for_sport(text: str, sport_id: int | None) -> str:
+    """ Fill a copy template's `{competitors}` placeholders for one sport.
+
+    `{world_ranking_label}` and `{min_ranking_label}` are available too, so that
+    a sentence pointing at another menu entry names it by reference. One help
+    text used to say 'use "Top of the world rankings"', which was not what the
+    menu had said for some time — a cross-reference that can go stale is worse
+    than none, because it sends the reader looking for something that isn't
+    there.
     """
+    plural = competitors_word(sport_id)
+    singular = plural.removesuffix("s")
+    return text.format(
+        competitor=singular,
+        Competitor=singular.capitalize(),
+        competitors=plural,
+        Competitors=plural.capitalize(),
+        min_ranking_label=filter_type_label(FilterType.MIN_RANKING, sport_id),
+        world_ranking_label=filter_type_label(FilterType.WORLD_RANKING, sport_id),
+    )
+
+
+def filter_type_label(filter_type: FilterType, sport_id: int | None = None) -> str:
+    """ Human label for a filter type, falling back to its raw value. """
     label = FILTER_TYPE_LABELS.get(filter_type, filter_type.value)
-    if sport_id in _INDIVIDUAL_SPORT_IDS:
-        label = label.replace("Top Teams", "Top Players")
-    return label
+    plural = competitors_word(sport_id)
+    # Not `_for_sport`: that resolves the two label placeholders by calling back
+    # here, which would recurse.
+    return label.format(competitors=plural, Competitors=plural.capitalize())
+
+
+def filter_type_help(filter_type: FilterType, sport_id: int | None = None) -> str | None:
+    """ The paragraph explaining a filter type, in this sport's vocabulary. """
+    help_text = FILTER_TYPE_HELP.get(filter_type)
+    return _for_sport(help_text, sport_id) if help_text else None
+
+
+def rule_label(rule: Rule, sport_id: int | None = None) -> str:
+    """ Human label for a selection rule. """
+    return _for_sport(RULE_LABELS.get(rule, rule.name.capitalize()), sport_id)
+
+
+def rule_help(rule: Rule, sport_id: int | None = None) -> str | None:
+    """ The explanation of one selection rule. Not currently displayed — see
+    `RULE_HELP`. """
+    help_text = RULE_HELP.get(rule)
+    return _for_sport(help_text, sport_id) if help_text else None
+
+
+def field_help(field_name: str, sport_id: int | None = None) -> str | None:
+    """ The hint under one form field, in this sport's vocabulary. """
+    help_text = FIELD_HELP.get(field_name)
+    return _for_sport(help_text, sport_id) if help_text else None
 
 
 def item_name_example(sport_id: int) -> str:
